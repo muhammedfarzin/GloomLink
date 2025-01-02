@@ -8,14 +8,14 @@ const User = () => {
   const [selectedValue, setSelectedValue] = useState("home");
 
   useEffect(() => {
-    const pathSegments = location.pathname.split("/");
-    setSelectedValue(pathSegments[1] === "" ? "home" : pathSegments[1]);
+    const selected = location.pathname.split("/").pop();
+    setSelectedValue(selected || "home");
   }, [location]);
 
   return (
     <div>
       <UserSideMenuBar selected={selectedValue} />
-      <div className="w-3/5 max-w-[840px] px-5 m-auto">
+      <div className="w-3/5 max-w-[840px] m-auto">
       <Outlet />
     </div>
     </div>

@@ -37,16 +37,16 @@ const UserSideMenuBar: React.FC<UserSideMenuBarProps> = ({ selected }) => {
           selected={selected === "search"}
         />
         <MenuButton
-          to="/create/post"
+          to="/create-post"
           icon={HomeIcon}
           text="Create Posts"
-          selected={selected === "create"}
+          selected={selected === "create-post"}
         />
         <MenuButton
-          to="/saved/post"
+          to="/saved-post"
           icon={HomeIcon}
           text="Saved Posts"
-          selected={selected === "saved"}
+          selected={selected === "saved-post"}
         />
         <MenuButton
           to="/profile"

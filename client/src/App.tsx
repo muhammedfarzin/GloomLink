@@ -13,7 +13,7 @@ function App() {
     (state: RootState) => state.theme.colorTheme.background
   );
   return (
-    <div className="h-screen w-screen overflow-y-scroll" style={{ backgroundColor: background }}>
+    <div className="h-screen w-screen overflow-y-scroll no-scrollbar" style={{ backgroundColor: background }}>
       <Routes>
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signup" element={<Signup />} />

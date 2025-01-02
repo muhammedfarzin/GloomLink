@@ -14,7 +14,7 @@ select:focus {
 }
 
 .btn {
-  @apply text-base font-bold rounded-lg py-2 my-1;
+  @apply text-base font-bold rounded-lg py-2 my-1 cursor-pointer bg-opacity-0;
 }
 
 .btn-flex {
