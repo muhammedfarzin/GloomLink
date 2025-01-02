@@ -1,10 +1,11 @@
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
-import GloomLinkLogo from "../../assets/GloomLink-Logo.svg";
-import SignUpIllustrationDark from "../../assets/SignUp-Illustration-Dark.svg";
+import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
+import SignUpIllustrationDark from "../../assets/images/SignUp-Illustration-Dark.svg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
@@ -79,6 +80,13 @@ const Signup = () => {
 
             <button className="btn btn-primary border w-full">Sign Up</button>
           </FormBox>
+
+            <Link
+              to="/login"
+              className="btn btn-dark border w-72 block mx-auto !mt-4 p-3"
+            >
+              <span className="ml-4 text-sm">Already have an account?</span>
+            </Link>
         </div>
       </div>
     </>

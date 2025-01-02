@@ -1,5 +1,5 @@
-import GloomLinkLogo from "../../assets/GloomLink-Logo.svg";
-import LoginIllustrationDark from "../../assets/Login-Illustration-Dark.svg";
+import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
+import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.svg";
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
 

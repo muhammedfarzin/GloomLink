@@ -1,7 +1,7 @@
-import GloomLinkLogo from "../../assets/GloomLink-Logo.svg";
-import LoginIllustrationDark from "../../assets/Login-Illustration-Dark.svg";
-import EnvelopeIcon from "../../assets/Envelope.svg";
-import GoogleIcon from "../../assets/Google.svg";
+import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
+import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.svg";
+import EnvelopeIcon from "../../assets/icons/Envelope.svg";
+import GoogleIcon from "../../assets/icons/Google.svg";
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
 import { Link } from "react-router-dom";
@@ -36,13 +36,13 @@ const Login: React.FC = () => {
           <div id="auth-options">
             <Link
               to="/signup"
-              className="btn btn-dark border w-72 block mx-auto"
+              className="btn btn-dark border w-72 block mx-auto p-3"
             >
               <img src={EnvelopeIcon} alt="email" className="inline" />
               <span className="ml-4 text-sm">Sign Up with Email</span>
             </Link>
 
-            <button className="btn btn-dark border w-72 mt-5 block mx-auto">
+            <button className="btn btn-dark border w-72 mt-5 block mx-auto p-3">
               <img src={GoogleIcon} alt="google" className="inline" />
               <span className="ml-4 text-sm">Continue with Google</span>
             </button>
