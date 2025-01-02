@@ -16,8 +16,9 @@ const User = () => {
     <div>
       <UserSideMenuBar selected={selectedValue} />
       <div className="w-3/5 max-w-[840px] m-auto">
-      <Outlet />
-    </div>
+        <Outlet />
+      </div>
+      <ChatList />
     </div>
   );
 };
