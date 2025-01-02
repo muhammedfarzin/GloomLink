@@ -1,0 +1,118 @@
+<svg
+   width="1435mm"
+   height="300mm"
+   viewBox="0 0 1435 300"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="GloomLink Logo svg.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#d0d0d0"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="true"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showborder="false"
+     inkscape:zoom="0.078084352"
+     inkscape:cx="2132.3094"
+     inkscape:cy="390.60323"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     borderlayer="true"
+     inkscape:antialias-rendering="true" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient4"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#bfbfbf;stop-opacity:1;"
+         offset="0"
+         id="stop4" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop5" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#bfbfbf;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2"
+       id="linearGradient3"
+       x1="332.47464"
+       y1="-10.005805"
+       x2="583.38971"
+       y2="284.17587"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0066724,0,0,0.99626732,-330.60182,3.8786006)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4"
+       id="linearGradient5"
+       x1="788.92426"
+       y1="-281.25531"
+       x2="880.58856"
+       y2="213.74466"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-0.3739252)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g2">
+      <rect
+         style="fill:none;stroke:none;stroke-width:2.866;stroke-dasharray:none"
+         id="rect2"
+         width="1432.1342"
+         height="297.13409"
+         x="0"
+         y="-297.13409"
+         transform="scale(1,-1)" />
+      <path
+         id="path2"
+         style="fill:url(#linearGradient3);fill-rule:evenodd;stroke:#000000;stroke-width:1.00146;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 254.49927,162.23048 c 0,62.73612 -166.23216,150.24013 -114.78015,113.59378 C 345.36792,129.35239 79.187892,195.43219 24.938961,162.23048 -28.975694,129.23338 166.8854,-59.624454 139.71912,48.636698 124.44066,109.52339 254.49927,99.494373 254.49927,162.23048 Z"
+         sodipodi:nodetypes="sssss"
+         inkscape:export-filename="GloomLink Icon.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96" />
+      <text
+         xml:space="preserve"
+         style="font-size:210.017px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:url(#linearGradient5);stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         x="294.96597"
+         y="221.06749"
+         id="text3"><tspan
+           sodipodi:role="line"
+           id="tspan3"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:210.017px;font-family:'Segoe Print';-inkscape-font-specification:'Segoe Print Bold';fill:url(#linearGradient5);stroke-width:1;stroke-dasharray:none"
+           x="294.96597"
+           y="221.06749">GloomLink</tspan></text>
+    </g>
+  </g>
+</svg>
