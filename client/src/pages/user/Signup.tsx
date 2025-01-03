@@ -6,11 +6,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import DropDownBox from "../../components/DropDownBox";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
   const [dob, setDob] = useState<Date>();
-  const [gender, setGender] = useState<String>();
+  const [gender, setGender] = useState<string>();
 
   return (
     <>
@@ -38,25 +39,15 @@ const Signup = () => {
             <InputBox placeholder="Email" type="email" />
 
             <div className="flex gap-2">
-              <select
-                id="gender"
-                className={`bg-[#353535] py-2 my-1 ${
-                  gender ? "text-white" : "text-[#9ca3af]"
-                }`}
-                onChange={(e) => {
-                  setGender(e.target.value);
-                }}
+              <DropDownBox
+                placeholder="Gender (Optional)"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
               >
-                <option disabled selected hidden>
-                  Gender (Optional)
-                </option>
-                <option value="m">
-                  Male
-                </option>
-                <option value="f">
-                  Female
-                </option>
-              </select>
+                <option value="m">Male</option>
+                <option value="f">Female</option>
+              </DropDownBox>
+
               <DatePicker
                 selected={dob}
                 onChange={(date) => date && setDob(date)}
@@ -81,12 +72,12 @@ const Signup = () => {
             <button className="btn btn-primary border w-full">Sign Up</button>
           </FormBox>
 
-            <Link
-              to="/login"
-              className="btn btn-dark border w-72 block mx-auto !mt-4 p-3"
-            >
-              <span className="ml-4 text-sm">Already have an account?</span>
-            </Link>
+          <Link
+            to="/login"
+            className="btn btn-dark border w-72 block mx-auto !mt-4 p-3"
+          >
+            <span className="ml-4 text-sm">Already have an account?</span>
+          </Link>
         </div>
       </div>
     </>
