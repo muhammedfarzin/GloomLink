@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { type RootState } from "../redux/store";
+import { type RootState } from "../../../redux/store";
 import ChatItem from "./ChatItem";
 
 const ChatList = () => {

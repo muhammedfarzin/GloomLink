@@ -1,9 +1,8 @@
 import { Outlet, useLocation } from "react-router-dom";
-import UserSideMenuBar from "./Components/UserSideMenuBar";
+import AdminSideMenuBar from "./components/AdminSideMenuBar";
 import { useEffect, useState } from "react";
-import ChatList from "./Components/ChatList";
 
-const User = () => {
+const Admin: React.FC = () => {
   const location = useLocation();
   const [selectedValue, setSelectedValue] = useState("home");
 
@@ -13,14 +12,13 @@ const User = () => {
   }, [location]);
 
   return (
-    <div>
-      <UserSideMenuBar selected={selectedValue} />
-      <div className="w-3/5 max-w-[840px] m-auto">
+    <>
+      <AdminSideMenuBar selected={selectedValue} />
+      <div className="w-4/5 ml-auto w-">
         <Outlet />
       </div>
-      <ChatList />
-    </div>
+    </>
   );
 };
 
-export default User;
+export default Admin;

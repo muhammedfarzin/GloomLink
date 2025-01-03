@@ -3,7 +3,7 @@ import { Link, type LinkProps } from "react-router-dom";
 import { RootState } from "../redux/store";
 
 interface MenuButtonProps extends LinkProps {
-  icon: string;
+  icon?: string;
   text: string;
   iconClassName?: string;
   alt?: string;
@@ -20,18 +20,27 @@ const MenuButton: React.FC<MenuButtonProps> = ({
   ...props
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const backgroundColor = selected ? colorTheme.selection : colorTheme.primary;
 
   return (
     <Link
-      className={`btn-flex btn-primary ${className || ''}`}
+      className={`btn-flex btn-primary ${className || ""}`}
+      style={{ backgroundColor}}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.backgroundColor = backgroundColor + "bb")
+      }
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.backgroundColor = backgroundColor)
+      }
       {...props}
-      style={{ backgroundColor: selected ? colorTheme.selection : undefined }}
     >
-      <img
-        src={icon}
-        alt={alt ?? text}
-        className={`inline w-6 mx-4 my-1 ${iconClassName || ''}`}
-      />
+      {icon ? (
+        <img
+          src={icon}
+          alt={alt ?? text}
+          className={`inline w-6 h-6 mr-4 ${iconClassName || ""}`}
+        />
+      ) : null}
       {text}
     </Link>
   );

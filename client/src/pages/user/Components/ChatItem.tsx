@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import ProfileImage from "./ProfileImage";
+import { RootState } from "../../../redux/store";
+import ProfileImage from "../../../components/ProfileImage";
 
 interface ChatItemProps {
   username: string;

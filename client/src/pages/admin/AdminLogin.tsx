@@ -3,7 +3,7 @@ import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.s
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
 
-const Login: React.FC = () => {
+const AdminLogin: React.FC = () => {
   return (
     <>
       <div className="py-3 px-4 md:py-6 md:px-14">
@@ -31,4 +31,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;
