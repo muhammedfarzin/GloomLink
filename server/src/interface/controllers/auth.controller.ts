@@ -1,28 +1,35 @@
 import { RequestHandler } from "express";
-import jwt from "jsonwebtoken";
-import { type User  } from "../../infrastructure/database/models/UserModel.js";
+import {
+  UserDocument,
+  type User,
+} from "../../infrastructure/database/models/UserModel.js";
 import { HttpError } from "../../infrastructure/errors/HttpError.js";
 import { userRepository } from "../../infrastructure/repositories/UserRepository.js";
+import {
+  generateToken,
+  type TokenPayloadType,
+} from "../../application/services/token.service.js";
 
 export const login: RequestHandler = async (req, res, next) => {
-  const { username, password }: Pick<User, "username" | "password"> =
-    req.body;
+  const { username, password }: Pick<User, "username" | "password"> = req.body;
 
   try {
     if (!username || !password) {
       throw new HttpError(400, "Username and password are required.");
     }
 
-    const authorized = await userRepository.verifyUser(username, password);
-    if (authorized) {
-      const token = jwt.sign({ username }, process.env.JWT_SECRET || "secret", {
-        expiresIn: "5m",
-      });
-
-      res.status(200).json({ token, message: "Login successful" });
-    } else {
+    const userData = await userRepository.verifyUser(username, password, true);
+    if (!userData) {
       throw new HttpError(403, "Invalid username or password");
     }
+    const { password: _, ...resUser } = userData.toObject();
+
+    const payload: TokenPayloadType = { data: resUser, role: "user" };
+    const tokens = generateToken(payload);
+
+    res
+      .status(200)
+      .json({ userData: resUser, tokens, message: "Login successful" });
   } catch (error) {
     next(error);
   }
@@ -70,9 +77,10 @@ export const signup: RequestHandler = async (req, res, next) => {
       dob,
     });
 
-    const {password: _, ...resUser} = newUser.toObject();
+    const { password: _, ...resUser } = newUser.toObject();
+    const tokens = generateToken({ data: resUser, role: "user" });
 
-    res.status(201).json({ user: resUser, message: "User created" });
+    res.status(201).json({ user: resUser, tokens, message: "User created" });
   } catch (err) {
     next(err);
   }
