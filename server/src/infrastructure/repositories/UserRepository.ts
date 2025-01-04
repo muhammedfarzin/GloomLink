@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 
 class UserRepository {
   async create(
-    userData: Omit<User, "conversations" | "blockedUsers" | "savedPosts">
+    userData: Omit<User, "status" | "conversations" | "blockedUsers" | "savedPosts">
   ): Promise<UserDocument> {
     const user = new UserModel(userData);
     return await user.save();
