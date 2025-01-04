@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import { type UserDocument } from "../../infrastructure/database/models/UserModel.js";
+import { type User  } from "../../infrastructure/database/models/UserModel.js";
 import { HttpError } from "../../infrastructure/errors/HttpError.js";
 import { userRepository } from "../../infrastructure/repositories/UserRepository.js";
 
 export const login: RequestHandler = async (req, res, next) => {
-  const { username, password }: Pick<UserDocument, "username" | "password"> =
+  const { username, password }: Pick<User, "username" | "password"> =
     req.body;
 
   try {
@@ -23,11 +23,7 @@ export const login: RequestHandler = async (req, res, next) => {
     } else {
       throw new HttpError(403, "Invalid username or password");
     }
-  } catch (error: any) {
-    if (error instanceof HttpError) {
+  } catch (error) {
       next(error);
-    } else {
-      next(new HttpError(500, error.message));
-    }
   }
 };

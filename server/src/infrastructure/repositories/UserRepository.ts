@@ -1,11 +1,10 @@
-import { UserDocument, UserModel } from "../database/models/UserModel";
-import { HttpError } from "../errors/HttpError";
+import { type User, type UserDocument, UserModel } from "../database/models/UserModel";
 import bcrypt from "bcryptjs";
 
 class UserRepository {
   async create(
     userData: Omit<
-      UserDocument,
+      User,
       "conversations" | "blockedUsers" | "savedPosts"
     >
   ): Promise<UserDocument> {
