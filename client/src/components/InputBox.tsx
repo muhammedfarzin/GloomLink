@@ -2,27 +2,31 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { type RootState } from "../redux/store";
 
-interface InputBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  backgroundColor?: string;
+}
 
 const InputBox: React.FC<InputBoxProps> = ({
   type = "text",
   className,
+  backgroundColor,
   ...props
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const backgroundColorTheme = backgroundColor || colorTheme.primary;
 
   return (
     <input
       type={type}
       className={`my-1 ${className}`}
       onFocus={(e) =>
-        (e.currentTarget.style.backgroundColor = colorTheme.primary + 'bb')
+        (e.currentTarget.style.backgroundColor = backgroundColorTheme + 'bb')
       }
       onBlur={(e) =>
-        (e.currentTarget.style.backgroundColor = colorTheme.primary)
+        (e.currentTarget.style.backgroundColor = backgroundColorTheme)
       }
       style={{
-        backgroundColor: colorTheme.primary,
+        backgroundColor: backgroundColorTheme,
         color: colorTheme.text,
       }}
       {...props}

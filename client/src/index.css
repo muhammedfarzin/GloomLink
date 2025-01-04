@@ -42,6 +42,10 @@ select option:hover {
   background: red;
 }
 
+.search-box {
+  @apply flex items-center rounded-lg;
+}
+
 .react-datepicker__day--selected {
   @apply !bg-[#1d1d1d] !text-white font-bold;
 }

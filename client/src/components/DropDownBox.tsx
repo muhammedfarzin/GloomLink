@@ -20,14 +20,16 @@ const DropDownBox: React.FC<DropDownBoxProps> = ({
     <select
       id="gender"
       className={`bg-[#353535] py-2 my-1 ${
-        value ? "text-white" : placeholderClassName ?? "text-[#9ca3af]"
+        value || !placeholder ? "text-white" : placeholderClassName ?? "text-[#9ca3af]"
       } ${className}`}
       value={value}
       {...props}
     >
-      <option disabled selected={!value} hidden>
-        {placeholder}
-      </option>
+      {placeholder ? (
+        <option disabled selected={!value} hidden>
+          {placeholder}
+        </option>
+      ) : null}
 
       {children}
     </select>

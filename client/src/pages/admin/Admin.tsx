@@ -14,7 +14,7 @@ const Admin: React.FC = () => {
   return (
     <>
       <AdminSideMenuBar selected={selectedValue} />
-      <div className="w-4/5 ml-auto w-">
+      <div className="w-4/5 ml-auto">
         <Outlet />
       </div>
     </>

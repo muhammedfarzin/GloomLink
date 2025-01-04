@@ -6,6 +6,7 @@ interface ColorThemeState {
   background: string;
   text: string;
   selection: string;
+  border: string;
 }
 
 interface ThemeState {
@@ -19,6 +20,7 @@ const defaultTheme: ThemeState = {
     background: "#1f1f1f",
     text: "#ffffff",
     selection: "#191919",
+    border: "#2f2f2f"
   },
 };
 

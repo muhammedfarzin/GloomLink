@@ -8,6 +8,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import Signup from "./pages/user/Signup";
 import Home from "./pages/user/Home";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUserLists from "./pages/admin/AdminUserLists";
 
 function App() {
   const { background, text: textColor } = useSelector(
@@ -30,6 +31,7 @@ function App() {
 
         <Route path="admin" element={<Admin />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUserLists />} />
         </Route>
       </Routes>
     </div>
