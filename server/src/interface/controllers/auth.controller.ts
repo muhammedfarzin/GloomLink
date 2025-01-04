@@ -24,6 +24,56 @@ export const login: RequestHandler = async (req, res, next) => {
       throw new HttpError(403, "Invalid username or password");
     }
   } catch (error) {
-      next(error);
+    next(error);
+  }
+};
+
+export const signup: RequestHandler = async (req, res, next) => {
+  const {
+    firstname,
+    lastname,
+    username,
+    mobile,
+    email,
+    gender,
+    password,
+  }: User = req.body;
+  let dob: Date | undefined;
+
+  try {
+    if (
+      !firstname ||
+      !lastname ||
+      !username ||
+      !mobile ||
+      !email ||
+      !password
+    ) {
+      throw new HttpError(400, "All fields are required.");
+    }
+
+    if (gender && gender !== "m" && gender !== "f") {
+      throw new HttpError(400, "Invalid gender");
+    }
+    if (req.body.dob) {
+      dob = new Date(req.body.dob);
+    }
+
+    const newUser = await userRepository.create({
+      firstname,
+      lastname,
+      username,
+      mobile,
+      email,
+      password,
+      gender,
+      dob,
+    });
+
+    const {password: _, ...resUser} = newUser.toObject();
+
+    res.status(201).json({ user: resUser, message: "User created" });
+  } catch (err) {
+    next(err);
   }
 };
