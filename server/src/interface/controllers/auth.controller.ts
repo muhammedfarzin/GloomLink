@@ -24,7 +24,7 @@ export const login: RequestHandler = async (req, res, next) => {
     }
     const { password: _, ...resUser } = userData.toObject();
 
-    const payload: TokenPayloadType = { data: resUser, role: "user" };
+    const payload: TokenPayloadType = { role: "user", ...resUser };
     const tokens = generateToken(payload);
 
     res
@@ -78,7 +78,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     });
 
     const { password: _, ...resUser } = newUser.toObject();
-    const tokens = generateToken({ data: resUser, role: "user" });
+    const tokens = generateToken({ role: "user", ...resUser });
 
     res.status(201).json({ user: resUser, tokens, message: "User created" });
   } catch (err) {

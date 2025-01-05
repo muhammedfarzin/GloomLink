@@ -1,7 +1,8 @@
 import { type Document, model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-export type User = {
+export interface User {
+  _id: Schema.Types.ObjectId;
   username: string;
   password: string;
   firstname: string;
@@ -15,7 +16,7 @@ export type User = {
   conversations: Schema.Types.ObjectId[];
   blockedUsers: Schema.Types.ObjectId[];
   savedPosts: Schema.Types.ObjectId[];
-};
+}
 
 export type UserDocument = User & Document;
 
