@@ -4,9 +4,61 @@ import EnvelopeIcon from "../../assets/icons/Envelope.svg";
 import GoogleIcon from "../../assets/icons/Google.svg";
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios, { AxiosError } from "axios";
+
+interface LoginFormType {
+  username: string;
+  password: string;
+}
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<LoginFormType>({
+    username: "",
+    password: "",
+  });
+  const [errorMessage, setErrorMessage] = useState<string>();
+
+  const handleOnLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    const validateForm = () => {
+      if (!formData.username || !formData.password) {
+        setErrorMessage("Please enter username and password");
+        return false;
+      }
+      return true;
+    };
+
+    if (validateForm()) {
+      try {
+        const response = await axios.post(BASE_URL + "/user/login", formData);
+        const { accessToken, refreshToken } = response.data.tokens as Record<
+          string,
+          string
+        >;
+        
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        navigate("/");
+      } catch (error) {
+        if (error instanceof AxiosError && error.response) {
+          setErrorMessage(error.response.data.message);
+        } else setErrorMessage("Something went wrong");
+      }
+    }
+  };
+
+  const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
     <>
       <div className="py-3 px-4 md:py-6 md:px-14">
@@ -23,10 +75,29 @@ const Login: React.FC = () => {
         </div>
 
         <div className="w-full md:w-1/2 px-4 my-auto text-center">
-          <FormBox title="Login">
-            <InputBox placeholder="Phone number, username, or email" type="text" />
-            <InputBox placeholder="Password" type="password" />
-            <button className="btn btn-primary border w-full">Login</button>
+          <FormBox
+            title="Login"
+            errorMessage={errorMessage}
+            onSubmit={handleOnLogin}
+          >
+            <InputBox
+              value={formData.username}
+              name="username"
+              placeholder="Phone number, username, or email"
+              type="text"
+              onChange={handleOnChange}
+            />
+            <InputBox
+              value={formData.password}
+              name="password"
+              placeholder="Password"
+              type="password"
+              onChange={handleOnChange}
+            />
+
+            <button type="submit" className="btn btn-primary border w-full">
+              Login
+            </button>
           </FormBox>
 
           <span className="text-[#82919E] font-bold text-base block my-3">
