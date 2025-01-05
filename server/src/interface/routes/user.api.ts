@@ -11,7 +11,7 @@ router.post(
   "/signup/verify",
   authenticateToken,
   authorizeRole("temp"),
-  authController.signupVerification
+  authController.verifyOTP
 );
 
 export { router as userApiRouter };

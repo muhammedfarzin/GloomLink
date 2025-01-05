@@ -4,6 +4,7 @@ import {
   UserModel,
 } from "../database/models/UserModel";
 import bcrypt from "bcryptjs";
+import { otpRepository } from "./OtpRepository";
 
 class UserRepository {
   async create(
@@ -13,7 +14,10 @@ class UserRepository {
     >
   ): Promise<UserDocument> {
     const user = new UserModel(userData);
-    return await user.save();
+    const newUser = await user.save();
+    await otpRepository.generateOtp(userData);
+
+    return newUser;
   }
 
   async verifyUser(
