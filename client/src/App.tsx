@@ -9,6 +9,7 @@ import Signup from "./pages/user/Signup";
 import Home from "./pages/user/Home";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserLists from "./pages/admin/AdminUserLists";
+import OtpVerification from "./pages/user/OtpVerification";
 
 function App() {
   const { background, text: textColor } = useSelector(
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="login" element={<UserLogin />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="signup/verify" element={<OtpVerification />} />
         <Route path="admin/login" element={<AdminLogin />} />
 
         <Route path="" element={<User />}>

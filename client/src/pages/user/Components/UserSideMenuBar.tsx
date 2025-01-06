@@ -5,12 +5,16 @@ import SearchIcon from "../../../assets/icons/Search.svg";
 import AddSquareIcon from "../../../assets/icons/AddSquare.svg";
 import SavedIcon from "../../../assets/icons/Saved.svg";
 import ProfileCircleIcon from "../../../assets/icons/ProfileCircle.svg";
+import { useDispatch } from "react-redux";
+import { logout } from "../../../redux/reducers/auth";
 
 interface UserSideMenuBarProps {
   selected?: string;
 }
 
 const UserSideMenuBar: React.FC<UserSideMenuBarProps> = ({ selected }) => {
+  const dispatch = useDispatch();
+
   return (
     <SideMenuBar>
       <MenuButton
@@ -42,6 +46,14 @@ const UserSideMenuBar: React.FC<UserSideMenuBarProps> = ({ selected }) => {
         icon={ProfileCircleIcon}
         text="Profile"
         selected={selected === "profile"}
+      />
+      <MenuButton
+        to="/logout"
+        text="Logout"
+        onClick={(e) => {
+          e.preventDefault();
+          dispatch(logout({ type: "user" }));
+        }}
       />
     </SideMenuBar>
   );

@@ -5,47 +5,52 @@ import GoogleIcon from "../../assets/icons/Google.svg";
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
-
-interface LoginFormType {
-  username: string;
-  password: string;
-}
+import {
+  logout,
+  setAuthUser,
+  type TokensState,
+  type UserAuthState,
+} from "../../redux/reducers/auth";
+import { validateLoginForm, type LoginFormType } from "./formValidations";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userData = useSelector((state: RootState) => state.auth.userData);
   const [formData, setFormData] = useState<LoginFormType>({
     username: "",
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState<string>();
 
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && userData && userData.status !== "blocked") {
+      navigate("/");
+    } else {
+      dispatch(logout({ type: "user" }));
+    }
+  }, [userData]);
+
   const handleOnLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
-    const validateForm = () => {
-      if (!formData.username || !formData.password) {
-        setErrorMessage("Please enter username and password");
-        return false;
-      }
-      return true;
-    };
+    const isValidated = validateLoginForm(formData, setErrorMessage);
 
-    if (validateForm()) {
+    if (isValidated) {
       try {
         const response = await axios.post(BASE_URL + "/user/login", formData);
-        const { accessToken, refreshToken } = response.data.tokens as Record<
-          string,
-          string
-        >;
-        
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        const userData = response.data.userData as UserAuthState;
+        const tokens = response.data.tokens as TokensState;
 
+        dispatch(setAuthUser({ userData, tokens }));
         navigate("/");
       } catch (error) {
         if (error instanceof AxiosError && error.response) {

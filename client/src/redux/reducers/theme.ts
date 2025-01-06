@@ -20,23 +20,11 @@ const defaultTheme: ThemeState = {
     background: "#1f1f1f",
     text: "#ffffff",
     selection: "#191919",
-    border: "#2f2f2f"
+    border: "#2f2f2f",
   },
 };
 
-const loadState = (): ThemeState => {
-  try {
-    const serializedState = localStorage.getItem("theme");
-    if (!serializedState) {
-      return defaultTheme;
-    }
-    return JSON.parse(serializedState);
-  } catch (err) {
-    return defaultTheme;
-  }
-};
-
-const initialState: ThemeState = loadState();
+const initialState: ThemeState = defaultTheme;
 
 const themeSlice = createSlice({
   name: "theme",
@@ -44,9 +32,7 @@ const themeSlice = createSlice({
   reducers: {
     setColorTheme: (state, action: PayloadAction<ColorThemeState>) => {
       state.colorTheme = action.payload;
-      const serializedState = JSON.stringify(state);
-      localStorage.setItem("theme", serializedState);
-    }
+    },
   },
 });
 

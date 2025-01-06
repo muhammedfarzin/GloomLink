@@ -1,7 +1,9 @@
-import { combineReducers } from '@reduxjs/toolkit';
-import themeReducer from './reducers/theme';
+import { combineReducers } from "@reduxjs/toolkit";
+import authReducer from "./reducers/auth";
+import themeReducer from "./reducers/theme";
 
 const rootReducer = combineReducers({
+  auth: authReducer,
   theme: themeReducer,
 });
 
