@@ -27,7 +27,7 @@ const otpSchema = new Schema<Otp>({
   },
 });
 
-async function sendVerificationEmail(email: string, otp: string) {
+export async function sendVerificationEmail(email: string, otp: string) {
   const mailResponse = await sendMail(
       email,
       'GloomLink Verification Email',

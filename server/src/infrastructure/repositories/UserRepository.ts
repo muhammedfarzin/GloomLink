@@ -5,6 +5,7 @@ import {
 } from "../database/models/UserModel";
 import bcrypt from "bcryptjs";
 import { otpRepository } from "./OtpRepository";
+import { HttpError } from "../errors/HttpError";
 
 class UserRepository {
   async create(
@@ -18,6 +19,32 @@ class UserRepository {
     await otpRepository.generateOtp(userData);
 
     return newUser;
+  }
+
+  async findByUsername(username: string) {
+    const user = await UserModel.findOne({ username });
+    if (!user) return null;
+
+    const { password: _, ...result } = user.toObject();
+    return result;
+  }
+
+  async updateById(userID: string, update: Partial<User> ) {
+    return await UserModel.updateOne({ _id: userID }, update);
+  }
+
+  async userExists(username: string, email: string, throwIfExist: boolean) {
+    let user = await UserModel.findOne({ username });
+    if (user) {
+      if (throwIfExist) throw new HttpError(400, "Username already exists");
+      return user;
+    }
+    user = await UserModel.findOne({ email });
+    if (user) {
+      if (throwIfExist) throw new HttpError(400, "Email already exists");
+      return user;
+    }
+    return false;
   }
 
   async verifyUser(

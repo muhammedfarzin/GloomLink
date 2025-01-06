@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TokenPayloadType } from "../../application/services/token.service";
 
@@ -19,6 +19,8 @@ export const authenticateToken: RequestHandler = (req, res, next) => {
     req.user = data;
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof TokenExpiredError) {
+      next(new HttpError(401, "Your token has been expired"));
+    } else     next(error);
   }
 };

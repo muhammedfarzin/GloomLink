@@ -61,6 +61,8 @@ export const signup: RequestHandler = async (req, res, next) => {
       throw new HttpError(400, "All fields are required.");
     }
 
+    await userRepository.userExists(username, email, true);
+
     if (gender && gender !== "m" && gender !== "f") {
       throw new HttpError(400, "Invalid gender");
     }
@@ -82,9 +84,23 @@ export const signup: RequestHandler = async (req, res, next) => {
     const { password: _, ...resUser } = newUser.toObject();
     const tokens = generateToken({ role: "temp", ...resUser });
 
-    res.status(201).json({ user: resUser, tokens, message: "User created" });
+    res
+      .status(201)
+      .json({ userData: resUser, tokens, message: "User created" });
   } catch (err) {
     next(err);
+  }
+};
+
+export const resendOTP: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role === "admin")
+      throw new HttpError(401, "Unauthorized");
+
+    await otpRepository.resendOtp(req.user.email);
+    res.status(200).json({ message: "Otp has been send successfully" });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -102,21 +118,18 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
       throw new HttpError(400, "Invalid OTP, please try again");
     }
 
-    const updatedUser = await UserModel.updateOne(
-      { _id: req.user._id },
-      { status: "active" }
-    );
+    await userRepository.updateById(req.user._id, { status: "active" });
+    const updatedUser = await userRepository.findByUsername(req.user.username);
+    if (!updatedUser) throw new HttpError(404, "User not found");
 
     const { role, ...userWithoutRole } = req.user;
     const tokens = generateToken({ role: "user", ...userWithoutRole });
 
-    res
-      .status(200)
-      .json({
-        userData: updatedUser,
-        tokens,
-        message: "OTP verified successfully",
-      });
+    res.status(200).json({
+      userData: updatedUser,
+      tokens,
+      message: "OTP verified successfully",
+    });
   } catch (error) {
     next(error);
   }

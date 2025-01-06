@@ -1,4 +1,4 @@
-import { OtpModel } from "../database/models/OtpModel";
+import { OtpModel, sendVerificationEmail } from "../database/models/OtpModel";
 import { User } from "../database/models/UserModel";
 import otpGenerator from "otp-generator";
 import { HttpError } from "../errors/HttpError";
@@ -37,6 +37,10 @@ class OtpRepository {
     await existOtp.deleteOne();
 
     return true;
+  }
+
+  async resendOtp(email: string) {
+    this.generateOtp({ email });
   }
 }
 
