@@ -134,3 +134,32 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const adminLogin: RequestHandler = async (req, res, next) => {
+  const { username, password } = req.body as {
+    username?: string;
+    password?: string;
+  };
+
+  try {
+    if (!username || !password) {
+      throw new HttpError(400, "Username and password are required.");
+    }
+
+    if (
+      process.env.ADMIN_USERNAME !== username ||
+      process.env.ADMIN_PASSWORD !== password
+    ) {
+      throw new HttpError(403, "Invalid username or password!");
+    }
+
+    const payload: TokenPayloadType = { role: "admin", username };
+    const tokens = generateToken(payload);
+
+    res
+      .status(200)
+      .json({ userData: { username }, tokens, message: "Login successful" });
+  } catch (error) {
+    next(error);
+  }
+};

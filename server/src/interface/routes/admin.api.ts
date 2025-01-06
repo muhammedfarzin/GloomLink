@@ -1,5 +1,8 @@
 import { Router } from "express";
+import { adminLogin } from "../controllers/auth.controller";
 
 const router = Router();
 
-export {router as adminApiRouter};
+router.post("/login", adminLogin);
+
+export { router as adminApiRouter };
