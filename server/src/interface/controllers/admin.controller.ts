@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import { HttpError } from "../../infrastructure/errors/HttpError";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
 
 export const fetchAllUsers: RequestHandler = async (req, res, next) => {
