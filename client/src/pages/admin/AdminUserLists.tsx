@@ -4,8 +4,19 @@ import DropDownBox from "../../components/DropDownBox";
 import SearchBox from "../../components/SearchBox";
 import Table from "./components/Table/Table";
 import TableData from "./components/Table/TableData";
+import { useEffect, useState } from "react";
+import type { UserAuthState } from "../../redux/reducers/auth";
+import adminApiClient from "../../adminApiClient";
 
 const AdminUserLists: React.FC = () => {
+  const [users, setUsers] = useState<UserAuthState[]>([]);
+
+  useEffect(() => {
+    adminApiClient.get("/users").then((response) => {
+      setUsers(response.data.users);
+    });
+  }, []);
+
   return (
     <div className="m-auto w-full max-w-[1000px]">
       <div className="m-2">
@@ -22,7 +33,6 @@ const AdminUserLists: React.FC = () => {
         <div className="mt-3" id="users-list">
           <Table
             headings={[
-              "User ID",
               "Username",
               "Full Name",
               "Email",
@@ -31,24 +41,32 @@ const AdminUserLists: React.FC = () => {
               "Action",
             ]}
           >
-            <tr>
-              <TableData>23415</TableData>
-              <TableData>new_user</TableData>
-              <TableData>New User</TableData>
-              <TableData>newuser@email.com</TableData>
-              <TableData>9876858963</TableData>
-              <TableData>Active</TableData>
-              <TableData className="!px-1">
-                <div className="flex gap-1">
-                  <Link to={"edit/"} className="text-xs w-full">
-                    <Button className="w-full">Edit</Button>
-                  </Link>
-                  <Button className="text-xs w-full" backgroundColor="#991b1b">
-                    Block
-                  </Button>
-                </div>
-              </TableData>
-            </tr>
+            {users.map((user) => (
+              <tr key={user._id}>
+                <TableData>{user.username}</TableData>
+                <TableData>
+                  {user.firstname} {user.lastname}
+                </TableData>
+                <TableData>{user.email}</TableData>
+                <TableData>{user.mobile}</TableData>
+                <TableData>{user.status}</TableData>
+                <TableData className="!px-1">
+                  <div className="flex gap-1">
+                    <Link to={"edit/"} className="text-xs w-full">
+                      <Button className="w-full">Edit</Button>
+                    </Link>
+                    <Button
+                      className="text-xs w-full"
+                      backgroundColor={
+                        user.status !== "blocked" ? "#991b1b" : undefined
+                      }
+                    >
+                      {user.status === "blocked" ? "Unblock" : "Block"}
+                    </Button>
+                  </div>
+                </TableData>
+              </tr>
+            ))}
           </Table>
         </div>
       </div>
