@@ -67,38 +67,56 @@ class UserRepository {
     return await this.findById(userId);
   }
 
-  async userExists(username: string, email: string, throwIfExist: boolean) {
+  async userExists(
+    query: Pick<User, "username" | "email" | "mobile">,
+    throwIfExist: boolean
+  ) {
+    const { username, email, mobile } = query;
+
     let user = await UserModel.findOne({ username });
     if (user) {
       if (throwIfExist) throw new HttpError(400, "Username already exists");
       return user;
     }
+
     user = await UserModel.findOne({ email });
     if (user) {
       if (throwIfExist) throw new HttpError(400, "Email already exists");
+      return user;
+    }
+
+    user = await UserModel.findOne({ mobile });
+    if (user) {
+      if (throwIfExist) throw new HttpError(400, "Mobile already exists");
       return user;
     }
     return false;
   }
 
   async verifyUser(
-    username: string,
+    identifier: string,
     password: string,
     returnData?: false
   ): Promise<boolean>;
 
   async verifyUser(
-    username: string,
+    identifier: string,
     password: string,
     returnData: true
   ): Promise<UserDocument | false>;
 
   async verifyUser(
-    username: string,
+    identifier: string,
     password: string,
     returnData?: boolean
   ): Promise<UserDocument | boolean> {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({
+      $or: [
+        { username: identifier },
+        { email: identifier },
+        { mobile: identifier },
+      ],
+    });
     if (!user) {
       return false;
     }

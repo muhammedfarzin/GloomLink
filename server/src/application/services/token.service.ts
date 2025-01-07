@@ -1,10 +1,12 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-import type { User } from "../../infrastructure/database/models/UserModel";
 
 export type TokenPayloadType = NonNullable<Request["user"]>;
 
-export const generateToken = (payload: TokenPayloadType) => {
+export const generateToken = (
+  payload: TokenPayloadType,
+  withRefreshToken: boolean = true
+) => {
   const { role, username } = payload;
   if (role !== "admin") {
     var {
@@ -21,7 +23,7 @@ export const generateToken = (payload: TokenPayloadType) => {
     expiresIn: "10m",
   });
 
-  if (payload.role !== "temp") {
+  if (withRefreshToken) {
     var refreshToken: string | undefined = jwt.sign(
       data,
       process.env.JWT_REFRESH_SECRET || "refresh_secret",

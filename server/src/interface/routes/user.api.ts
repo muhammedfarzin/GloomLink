@@ -8,11 +8,17 @@ const router = Router();
 router.post("/login", authController.login);
 router.post("/signup", authController.signup);
 
-router.post("/signup/resend-otp", authenticateToken, authorizeRole("temp"), authController.resendOTP);
+router.post(
+  "/signup/resend-otp",
+  authenticateToken,
+  authorizeRole("user"),
+  authController.resendOTP
+);
+
 router.post(
   "/signup/verify-otp",
   authenticateToken,
-  authorizeRole("temp"),
+  authorizeRole("user"),
   authController.verifyOTP
 );
 

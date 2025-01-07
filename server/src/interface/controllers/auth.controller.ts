@@ -33,7 +33,7 @@ export const login: RequestHandler = async (req, res, next) => {
     const { password: _, ...resUser } = userData.toObject();
 
     const payload: TokenPayloadType = { role: "user", ...resUser };
-    const tokens = generateToken(payload);
+    const tokens = generateToken(payload, userData.status !== "not-verified");
 
     res
       .status(200)
@@ -67,7 +67,7 @@ export const signup: RequestHandler = async (req, res, next) => {
       throw new HttpError(400, "All fields are required.");
     }
 
-    await userRepository.userExists(username, email, true);
+    await userRepository.userExists({ username, email, mobile }, true);
 
     if (gender && gender !== "m" && gender !== "f") {
       throw new HttpError(400, "Invalid gender");
@@ -88,7 +88,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     });
 
     const { password: _, ...resUser } = newUser.toObject();
-    const tokens = generateToken({ role: "temp", ...resUser });
+    const tokens = generateToken({ role: "temp", ...resUser }, false);
 
     res
       .status(201)
@@ -100,7 +100,7 @@ export const signup: RequestHandler = async (req, res, next) => {
 
 export const resendOTP: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.user || req.user.role === "admin")
+    if (!req.user || req.user.role !== "user")
       throw new HttpError(401, "Unauthorized");
 
     await otpRepository.resendOtp(req.user.email);
@@ -112,7 +112,7 @@ export const resendOTP: RequestHandler = async (req, res, next) => {
 
 export const verifyOTP: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.user || req.user.role === "admin")
+    if (!req.user || req.user.role !== "user")
       throw new HttpError(401, "Unauthorized");
 
     const otp: string | undefined = req.body.otp;
