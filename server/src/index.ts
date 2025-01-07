@@ -1,4 +1,4 @@
-import express, {type Express} from "express";
+import express, { type Express } from "express";
 import http from "http";
 import dotenv from "dotenv";
 import { connectDatabase } from "./infrastructure/database";

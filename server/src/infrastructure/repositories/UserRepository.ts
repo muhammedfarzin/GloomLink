@@ -21,6 +21,16 @@ class UserRepository {
     return newUser;
   }
 
+  async findById(userId: string) {
+    const user = await UserModel.findById(userId, {
+      blockedUsers: 0,
+      conversations: 0,
+      savedPosts: 0,
+      password: 0,
+    });
+    return user?.toObject();
+  }
+
   async findByUsername(username: string) {
     const user = await UserModel.findOne({ username });
     if (!user) return null;
@@ -50,6 +60,11 @@ class UserRepository {
 
   async updateById(userID: string, update: Partial<User>) {
     return await UserModel.updateOne({ _id: userID }, update);
+  }
+
+  async updateStatusById(userId: string, status: User["status"]) {
+    await this.updateById(userId, { status });
+    return await this.findById(userId);
   }
 
   async userExists(username: string, email: string, throwIfExist: boolean) {
