@@ -14,7 +14,7 @@ export const authorizeRole = (
       if (req.user.role === role) {
         return next();
       }
-      throw new HttpError(403, "User does not have access to this route");
+      throw new HttpError(403, "You are not allowed to do this operation");
     } catch (error) {
       next(error);
     }
