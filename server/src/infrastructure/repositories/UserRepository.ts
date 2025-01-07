@@ -29,7 +29,26 @@ class UserRepository {
     return result;
   }
 
-  async updateById(userID: string, update: Partial<User> ) {
+  async findAll(
+    filter: Partial<
+      Omit<User, "blockedUsers" | "conversations" | "savedPosts" | "password">
+    > = {},
+    page: number = 1,
+    limit: number = 20
+  ) {
+    const skip = (page - 1) * limit;
+    const users = await UserModel.find(filter, {
+      blockedUsers: 0,
+      conversations: 0,
+      savedPosts: 0,
+      password: 0,
+    })
+      .skip(skip)
+      .limit(limit);
+    return users.map((user) => user.toObject());
+  }
+
+  async updateById(userID: string, update: Partial<User>) {
     return await UserModel.updateOne({ _id: userID }, update);
   }
 
