@@ -71,3 +71,6 @@ ehthumbs.db
 *.bak
 *.tmp
 *.temp
+
+# Build folder
+dist/
