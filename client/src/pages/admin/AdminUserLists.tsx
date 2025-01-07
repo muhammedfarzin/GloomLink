@@ -17,6 +17,23 @@ const AdminUserLists: React.FC = () => {
     });
   }, []);
 
+  const blockUser = (userId: string, type: "block" | "unblock" = "block") => {
+    adminApiClient.put(`/users/${userId}/${type}`).then((response) => {
+      if (response.status === 200) {
+        console.log(response.data);
+        setUsers(
+          users.map((user) => {
+            if (user._id === response.data.user._id) {
+              user.status = response.data.user.status;
+              console.log("status updated");
+              return user;
+            } else return user;
+          })
+        );
+      }
+    });
+  };
+
   return (
     <div className="m-auto w-full max-w-[1000px]">
       <div className="m-2">
@@ -59,6 +76,11 @@ const AdminUserLists: React.FC = () => {
                       className="text-xs w-full"
                       backgroundColor={
                         user.status !== "blocked" ? "#991b1b" : undefined
+                      }
+                      onClick={() =>
+                        user.status === "blocked"
+                          ? blockUser(user._id, "unblock")
+                          : blockUser(user._id)
                       }
                     >
                       {user.status === "blocked" ? "Unblock" : "Block"}
