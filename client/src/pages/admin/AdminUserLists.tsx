@@ -20,12 +20,10 @@ const AdminUserLists: React.FC = () => {
   const blockUser = (userId: string, type: "block" | "unblock" = "block") => {
     adminApiClient.put(`/users/${userId}/${type}`).then((response) => {
       if (response.status === 200) {
-        console.log(response.data);
         setUsers(
           users.map((user) => {
             if (user._id === response.data.user._id) {
               user.status = response.data.user.status;
-              console.log("status updated");
               return user;
             } else return user;
           })
