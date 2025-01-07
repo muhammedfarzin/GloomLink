@@ -21,9 +21,15 @@ export const login: RequestHandler = async (req, res, next) => {
     }
 
     const userData = await userRepository.verifyUser(username, password, true);
+
     if (!userData) {
       throw new HttpError(403, "Invalid username or password");
+    } else if (userData.status === "blocked") {
+      throw new HttpError(403, "Your account has been blocked");
+    } else if (userData.status === "not-verified") {
+      await otpRepository.resendOtp(userData.email);
     }
+
     const { password: _, ...resUser } = userData.toObject();
 
     const payload: TokenPayloadType = { role: "user", ...resUser };
