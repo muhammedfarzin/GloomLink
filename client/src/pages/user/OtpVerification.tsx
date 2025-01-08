@@ -79,7 +79,6 @@ const OtpVerification: React.FC = () => {
       dispatch(setAuthUser({ userData, tokens }));
       navigate("/");
     } catch (error) {
-      console.log(error);
       if (error instanceof AxiosError && error.response) {
         if (error.status === 401) {
           error.response.data.message = "Time expired, please try again";

@@ -34,11 +34,13 @@ adminApiClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("adminRefreshToken");
-        const response = await axios.post(BASE_URL + "/user/auth/refresh", {
+        const response = await axios.post(BASE_URL + "/auth/refresh", {
           token: refreshToken,
         });
-        const newAccessToken = response.data.accessToken;
-        localStorage.setItem("accessToken", newAccessToken);
+        const newAccessToken = response.data.tokens.accessToken;
+        const newRefreshToken = response.data.tokens.refreshToken;
+        localStorage.setItem("adminAccessToken", newAccessToken);
+        localStorage.setItem("adminRefreshToken", newRefreshToken);
         adminApiClient.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${newAccessToken}`;
