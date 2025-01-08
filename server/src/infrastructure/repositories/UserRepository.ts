@@ -14,6 +14,8 @@ class UserRepository {
       "_id" | "status" | "conversations" | "blockedUsers" | "savedPosts"
     >
   ): Promise<UserDocument> {
+    await this.userExists(userData, true);
+
     const user = new UserModel(userData);
     const newUser = await user.save();
     await otpRepository.generateOtp(userData);

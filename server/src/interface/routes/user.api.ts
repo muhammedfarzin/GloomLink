@@ -22,4 +22,6 @@ router.post(
   authController.verifyOTP
 );
 
+router.post("/auth/refresh", authController.refreshToken);
+
 export { router as userApiRouter };

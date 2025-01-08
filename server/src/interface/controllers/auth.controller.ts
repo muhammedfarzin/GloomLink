@@ -1,13 +1,11 @@
 import { RequestHandler } from "express";
-import {
-  UserDocument,
-  UserModel,
-  type User,
-} from "../../infrastructure/database/models/UserModel.js";
+import type { User } from "../../infrastructure/database/models/UserModel.js";
 import { HttpError } from "../../infrastructure/errors/HttpError.js";
 import { userRepository } from "../../infrastructure/repositories/UserRepository.js";
 import {
   generateToken,
+  verifyToken,
+  type TokensType,
   type TokenPayloadType,
 } from "../../application/services/token.service.js";
 import { otpRepository } from "../../infrastructure/repositories/OtpRepository.js";
@@ -66,8 +64,6 @@ export const signup: RequestHandler = async (req, res, next) => {
     ) {
       throw new HttpError(400, "All fields are required.");
     }
-
-    await userRepository.userExists({ username, email, mobile }, true);
 
     if (gender && gender !== "m" && gender !== "f") {
       throw new HttpError(400, "Invalid gender");
@@ -135,6 +131,58 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
       userData: updatedUser,
       tokens,
       message: "OTP verified successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refreshToken: RequestHandler = async (req, res, next) => {
+  const { token } = req.body as { token?: string };
+
+  try {
+    if (!token) {
+      throw new HttpError(400, "Refresh token is required.");
+    }
+
+    const decoded = verifyToken(token, "refresh");
+    let newTokens: TokensType;
+
+    if (!decoded) {
+      throw new HttpError(403, "Invalid refresh token.");
+    }
+
+    if (decoded.role === "user") {
+      const user = await userRepository.findByUsername(decoded.username);
+      if (!user) {
+        throw new HttpError(404, "User not found.");
+      } else if (user.status === "blocked") {
+        throw new HttpError(401, "Your account is blocked");
+      }
+
+      const { _id, email, firstname, lastname, username, mobile, status } =
+        user;
+      const resData = {
+        _id: _id.toString(),
+        email,
+        firstname,
+        lastname,
+        username,
+        mobile,
+        status,
+      };
+
+      newTokens = generateToken({ role: "user", ...resData }, true);
+    } else if (decoded.role === "admin") {
+      newTokens = generateToken({
+        role: "admin",
+        username: decoded.username,
+      });
+    } else throw new HttpError(401, "Unauthorized");
+
+    res.status(200).json({
+      tokens: newTokens,
+      message: "Token refreshed successfully",
     });
   } catch (error) {
     next(error);

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { adminLogin } from "../controllers/auth.controller";
+import * as authController from "../controllers/auth.controller";
 import { authenticateToken } from "../middleware/authenticate-token.middleware";
 import { authorizeRole } from "../middleware/authorize-role.middleware";
 import * as adminController from "../controllers/admin.controller";
 
 const router = Router();
 
-router.post("/login", adminLogin);
+router.post("/login", authController.adminLogin);
 
 router.get(
   "/users",
@@ -28,5 +28,7 @@ router.put(
   authorizeRole("admin"),
   adminController.unblockUser
 );
+
+router.post("/auth/refresh", authController.refreshToken);
 
 export { router as adminApiRouter };
