@@ -91,3 +91,9 @@ select option:hover {
     background-color: #fff; /* Background color for visibility */
   }
 }
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}

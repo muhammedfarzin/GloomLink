@@ -7,6 +7,7 @@ import CommentIcon from "../../assets/icons/Comment.svg";
 import ShareIcon from "../../assets/icons/Share.svg";
 import SavedIcon from "../../assets/icons/Saved.svg";
 import { Link } from "react-router-dom";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
 
 const PostListCard: React.FC = () => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
@@ -20,10 +21,10 @@ const PostListCard: React.FC = () => {
     >
       {/* Uploaded By */}
       <div className="flex flex-row items-center">
-        <Link to={'/username'}>
+        <Link to={"/username"}>
           <ProfileImage className="w-10 cursor-pointer" />
         </Link>
-        <Link to={'/username'}>
+        <Link to={"/username"}>
           <span className="text-base font-bold cursor-pointer">username</span>
         </Link>
       </div>
@@ -31,11 +32,27 @@ const PostListCard: React.FC = () => {
       {/* Post */}
       <div>
         <p className="text-sm font-normal">Caption</p>
-        <img
+
+        <Carousel className="relative w-full">
+          <CarouselContent>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <CarouselItem key={index}>
+                <img
+                  className="mt-1 w-full rounded-xl"
+                  src="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
+                  alt="post"
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absulute left-2 bg-transparent opacity-10 hover:opacity-100 disabled:opacity-0 hidden md:inline-flex" />
+          <CarouselNext className="absulute right-2 bg-transparent opacity-10 hover:opacity-100 disabled:opacity-0 hidden md:inline-flex" />
+        </Carousel>
+        {/* <img
           className="mt-1 w-full rounded-xl"
           src="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
           alt="post"
-        />
+        /> */}
       </div>
 
       {/* Post Actions */}
