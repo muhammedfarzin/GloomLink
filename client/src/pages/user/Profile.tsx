@@ -4,7 +4,11 @@ import ProfileImage from "../../components/ProfileImage";
 import Button from "../../components/Button";
 import PostGridCard from "../../components/post/PostGridCard";
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+  self?: boolean;
+}
+
+const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   return (
@@ -20,7 +24,10 @@ const Profile: React.FC = () => {
           <div className="flex gap-4 md:gap-8 max-h-16">
             <ProfileImage />
             <div className="flex justify-between w-full">
-              <div id="profile-deta" className="flex flex-col justify-center w-1/3">
+              <div
+                id="profile-deta"
+                className="flex flex-col justify-center w-1/3"
+              >
                 <span className="text-lg font-bold">Username</span>
                 <span className="text-sm font-light">Full Name</span>
               </div>
@@ -38,13 +45,25 @@ const Profile: React.FC = () => {
           </div>
 
           <div id="profile-actions" className="flex flex-col gap-2 mt-4">
-            <div className="flex gap-2">
-              <Button className="w-full">Edit Profile</Button>
-              <Button className="w-full">Switch to Light</Button>
-            </div>
-            <div className="flex gap-2">
-              <Button className="w-full">Enable Subscription</Button>
-            </div>
+            {self ? (
+              <>
+                <div className="flex gap-2">
+                  <Button className="w-full">Edit Profile</Button>
+                  <Button className="w-full">Switch to Light</Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="w-full">Enable Subscription</Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex gap-2">
+                  <Button className="w-full">Follow</Button>
+                  <Button className="w-full">Message</Button>
+                  <Button className="w-full">Subscribe</Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

@@ -31,8 +31,9 @@ function App() {
 
         <Route path="" element={<User />}>
           <Route index element={<Home />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="profile" element={<Profile self />} />
           <Route path="create-post" element={<CreatePost />} />
+          <Route path=":username" element={<Profile />} />
         </Route>
 
         <Route path="admin" element={<Admin />}>
