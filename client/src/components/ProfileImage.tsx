@@ -1,16 +1,18 @@
 import ProfileAvatar from "../assets/icons/Profile-Avatar.svg";
 
 interface ProfileImageProps {
+  className?: string;
   profileImage?: string;
   isOnline?: boolean;
 }
 
 const ProfileImage: React.FC<ProfileImageProps> = ({
+  className,
   profileImage,
   isOnline = false,
 }) => {
   return (
-    <div className="bg-slate-300 w-1/4 min-w-8 max-w-16 rounded-full mr-2 relative">
+    <div className={`bg-slate-300 min-w-8 max-w-16 rounded-full mr-2 relative ${className || 'w-1/4'}`}>
       <img
         src={profileImage || ProfileAvatar}
         alt="Profile"
