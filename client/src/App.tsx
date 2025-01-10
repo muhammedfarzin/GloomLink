@@ -12,6 +12,7 @@ import AdminUserLists from "./pages/admin/AdminUserLists";
 import OtpVerification from "./pages/user/OtpVerification";
 import Profile from "./pages/user/Profile";
 import CreatePost from "./pages/user/CreatePost";
+import SavedPost from "./pages/user/SavedPost";
 
 function App() {
   const { background, text: textColor } = useSelector(
@@ -33,6 +34,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile self />} />
           <Route path="create-post" element={<CreatePost />} />
+          <Route path="saved-post" element={<SavedPost />} />
           <Route path=":username" element={<Profile />} />
         </Route>
 
