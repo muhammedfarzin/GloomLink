@@ -74,3 +74,6 @@ ehthumbs.db
 
 # Build folder
 dist/
+
+# Public
+public/
