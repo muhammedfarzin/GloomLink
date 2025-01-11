@@ -25,6 +25,8 @@ export const createPost: RequestHandler = async (req, res, next) => {
       tags,
       userId: req.user._id,
     });
+
+    res.status(201).json({ post, message: "Post created successfully" });
   } catch (error) {
     next(error);
   }

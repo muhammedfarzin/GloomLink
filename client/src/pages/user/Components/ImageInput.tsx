@@ -48,8 +48,9 @@ const ImageInput: React.FC<ImageInputProps> = ({
     <div className="flex overflow-x-scroll no-scrollbar">
       <div className={`flex ${className || "gap-2"}`}>
         {/* Added Image Listing */}
-        {values.map((image) => (
+        {values.map((image, index) => (
           <div
+            key={index}
             className={`flex relative justify-center items-center rounded-lg border h-40 ${cardClassName}`}
             style={cardStyle}
             onMouseEnter={(e) =>

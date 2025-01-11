@@ -3,7 +3,7 @@ import multer from "multer";
 
 export const uploadImage = multer({
   storage: multer.diskStorage({
-    destination: "./public/images/",
+    destination: path.join("public", "images"),
     filename: (req, file, cb) => {
       const randomNumber = Math.floor(Math.random() * 90000) + 10000;
       cb(

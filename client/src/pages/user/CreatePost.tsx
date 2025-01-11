@@ -6,13 +6,43 @@ import DropDownBox from "../../components/DropDownBox";
 import Button from "../../components/Button";
 import TagsInput from "./components/TagsInput";
 import ImageInput from "./components/ImageInput";
+import apiClient from "@/apiClient";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost: React.FC = () => {
+  const navigate = useNavigate();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+
   const [caption, setCaption] = useState<string>("");
   const [images, setImages] = useState<File[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [publishedFor, setpublishedFor] = useState<string>("public");
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+    formData.append("caption", caption);
+    formData.append("tags", JSON.stringify(tags));
+    formData.append("publishedFor", publishedFor);
+
+    try {
+      setLoading("Posting...");
+      await apiClient.post("/posts/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      navigate("/profile");
+    } catch (error) {
+      console.error("Error creating post:", error);
+    } finally {
+      setLoading(null);
+    }
+  };
 
   return (
     <div className="mx-4 mt-4">
@@ -23,7 +53,7 @@ const CreatePost: React.FC = () => {
           borderColor: colorTheme.border,
         }}
       >
-        <form method="post">
+        <form method="post" onSubmit={handleSubmit}>
           <ImageInput values={images} onChange={setImages} />
           <InputBox
             className="mt-2"
@@ -47,8 +77,9 @@ const CreatePost: React.FC = () => {
             <Button
               className="border border-[#9ca3af33] font-bold w-32 my-1"
               type="submit"
+              disabled={loading ? true : false}
             >
-              Post
+              {loading || "Post"}
             </Button>
           </div>
         </form>

@@ -15,6 +15,7 @@ const postSchema = new Schema<Post>({
   userId: {
     type: Schema.Types.ObjectId,
     required: true,
+    ref: "User",
   },
   caption: {
     type: String,
