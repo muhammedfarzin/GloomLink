@@ -133,6 +133,34 @@ class UserRepository {
     }
     return true;
   }
+
+  async fetchProfileDetails(username: string) {
+    const data = await UserModel.aggregate([
+      { $match: { username } },
+      {
+        $project: {
+          username: 1,
+          firstname: 1,
+          lastname: 1,
+          image: 1,
+        },
+      },
+      {
+        $addFields: {
+          fullname: { $concat: ["$firstname", " ", "$lastname"] },
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "userId",
+          as: "posts",
+        },
+      },
+    ]);
+    return data[0];
+  }
 }
 
 export const userRepository = new UserRepository();

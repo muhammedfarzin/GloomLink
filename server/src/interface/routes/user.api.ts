@@ -1,6 +1,7 @@
 import { Router } from "express";
 import * as authController from "../controllers/auth.controller.js";
 import * as postController from "../controllers/post.controller.js";
+import * as userController from "../controllers/user.controller.js";
 import { authenticateToken } from "../middleware/authenticate-token.middleware.js";
 import { authorizeRole } from "../middleware/authorize-role.middleware.js";
 import { uploadImage } from "../middleware/file-upload.middleware.js";
@@ -24,6 +25,8 @@ router.post(
   authController.verifyOTP
 );
 
+router.post("/auth/refresh", authController.refreshToken);
+
 router.post(
   "/posts/create",
   authenticateToken,
@@ -32,6 +35,11 @@ router.post(
   postController.createPost
 );
 
-router.post("/auth/refresh", authController.refreshToken);
+router.get(
+  "/profile",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.fetchMyProfile
+);
 
 export { router as userApiRouter };
