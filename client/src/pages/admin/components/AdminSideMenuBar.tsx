@@ -2,6 +2,7 @@ import { useDispatch } from "react-redux";
 import MenuButton from "../../../components/MenuButton";
 import SideMenuBar from "../../../components/SideMenuBar";
 import { logout } from "../../../redux/reducers/auth";
+import ConfirmButton from "@/components/ConfirmButton";
 
 interface AdminSideMenuBarProps {
   selected?: string;
@@ -32,14 +33,15 @@ const AdminSideMenuBar: React.FC<AdminSideMenuBarProps> = ({ selected }) => {
         text="Subscriptions"
         selected={selected === "subscriptions"}
       />
-      <MenuButton
-        to="/logout"
-        text="Logout"
-        onClick={(e) => {
-          e.preventDefault();
+
+      <ConfirmButton
+      description="Do you really want to logout from admin portal"
+        onSuccess={() => {
           dispatch(logout({ type: "admin" }));
         }}
-      />
+      >
+        <MenuButton to="/logout" text="Logout" />
+      </ConfirmButton>
     </SideMenuBar>
   );
 };

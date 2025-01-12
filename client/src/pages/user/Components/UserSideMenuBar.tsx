@@ -8,6 +8,7 @@ import ProfileCircleIcon from "../../../assets/icons/ProfileCircle.svg";
 import LogoutIcon from "../../../assets/icons/Logout.svg";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../redux/reducers/auth";
+import ConfirmButton from "@/components/ConfirmButton";
 
 interface UserSideMenuBarProps {
   selected?: string;
@@ -48,15 +49,19 @@ const UserSideMenuBar: React.FC<UserSideMenuBarProps> = ({ selected }) => {
         text="Profile"
         selected={selected === "profile"}
       />
-      <MenuButton
-        to="/logout"
-        icon={LogoutIcon}
-        text="Logout"
-        onClick={(e) => {
-          e.preventDefault();
+
+      <ConfirmButton
+        onSuccess={() => {
           dispatch(logout({ type: "user" }));
         }}
-      />
+        description="Do you really want to logout"
+      >
+        <MenuButton
+          to="/logout"
+          icon={LogoutIcon}
+          text="Logout"
+        />
+      </ConfirmButton>
     </SideMenuBar>
   );
 };

@@ -7,6 +7,7 @@ import TableData from "./components/Table/TableData";
 import { useEffect, useState } from "react";
 import type { UserAuthState } from "../../redux/reducers/auth";
 import adminApiClient from "../../adminApiClient";
+import ConfirmButton from "@/components/ConfirmButton";
 
 const AdminUserLists: React.FC = () => {
   const [users, setUsers] = useState<UserAuthState[]>([]);
@@ -70,19 +71,25 @@ const AdminUserLists: React.FC = () => {
                     <Link to={"edit/"} className="text-xs w-full">
                       <Button className="w-full">Edit</Button>
                     </Link>
-                    <Button
-                      className="text-xs w-full"
-                      backgroundColor={
-                        user.status !== "blocked" ? "#991b1b" : undefined
-                      }
-                      onClick={() =>
+                    <ConfirmButton
+                      description={`Do you really want to ${
+                        user.status === "blocked" ? "unblock" : "block"
+                      } ${user.username}`}
+                      onSuccess={() =>
                         user.status === "blocked"
                           ? blockUser(user._id, "unblock")
                           : blockUser(user._id)
                       }
                     >
-                      {user.status === "blocked" ? "Unblock" : "Block"}
-                    </Button>
+                      <Button
+                        className="text-xs w-full"
+                        backgroundColor={
+                          user.status !== "blocked" ? "#991b1b" : undefined
+                        }
+                      >
+                        {user.status === "blocked" ? "Unblock" : "Block"}
+                      </Button>
+                    </ConfirmButton>
                   </div>
                 </TableData>
               </tr>
