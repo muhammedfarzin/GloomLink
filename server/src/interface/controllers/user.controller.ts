@@ -16,3 +16,14 @@ export const fetchMyProfile: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const fetchProfile: RequestHandler = async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const userData = await userRepository.fetchProfileDetails(username);
+
+    res.json(userData);
+  } catch (error) {
+    next(error);
+  }
+};

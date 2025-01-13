@@ -68,4 +68,11 @@ router.get(
   userController.fetchMyProfile
 );
 
+router.get(
+  "/profile/:username",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.fetchProfile
+);
+
 export { router as userApiRouter };
