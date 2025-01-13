@@ -8,6 +8,8 @@ import { uploadImage } from "../middleware/file-upload.middleware.js";
 
 const router = Router();
 
+// Authentications
+
 router.post("/login", authController.login);
 router.post("/signup", authController.signup);
 
@@ -25,9 +27,11 @@ router.post(
   authController.verifyOTP
 );
 
-router.post("/auth/google", authController.signInUsingGoogle)
+router.post("/auth/google", authController.signInUsingGoogle);
 
 router.post("/auth/refresh", authController.refreshToken);
+
+// Post management
 
 router.post(
   "/posts/create",
@@ -36,6 +40,15 @@ router.post(
   uploadImage.array("images"),
   postController.createPost
 );
+
+router.put(
+  "/posts/save/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.savePost
+);
+
+// Profiles
 
 router.get(
   "/profile",

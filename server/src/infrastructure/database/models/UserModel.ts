@@ -14,7 +14,6 @@ export interface User {
   image?: string;
   gender?: string;
   dob?: Date;
-  conversations: Schema.Types.ObjectId[];
   blockedUsers: Schema.Types.ObjectId[];
   savedPosts: Schema.Types.ObjectId[];
 }
@@ -42,11 +41,6 @@ const userSchema = new Schema<User>(
     },
     gender: { type: String, default: null, enum: ["m", "f"] },
     dob: { type: Date, default: null },
-    conversations: {
-      type: [Schema.Types.ObjectId],
-      ref: "Conversation",
-      default: [],
-    },
     blockedUsers: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
     savedPosts: { type: [Schema.Types.ObjectId], ref: "Post", default: [] },
   },

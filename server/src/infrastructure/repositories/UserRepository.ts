@@ -10,10 +10,7 @@ import type { ProjectionType } from "mongoose";
 
 class UserRepository {
   async create(
-    userData: Omit<
-      User,
-      "_id" | "status" | "conversations" | "blockedUsers" | "savedPosts"
-    >
+    userData: Omit<User, "_id" | "status" | "blockedUsers" | "savedPosts">
   ): Promise<UserDocument> {
     await this.userExists(userData, true);
 
@@ -27,7 +24,6 @@ class UserRepository {
   async findById(userId: string) {
     const user = await UserModel.findById(userId, {
       blockedUsers: 0,
-      conversations: 0,
       savedPosts: 0,
       password: 0,
     });
@@ -39,7 +35,6 @@ class UserRepository {
       filter,
       projection || {
         password: 0,
-        conversations: 0,
         blockedUsers: 0,
         savedPosts: 0,
       }
@@ -57,7 +52,7 @@ class UserRepository {
 
   async findAll(
     filter: Partial<
-      Omit<User, "blockedUsers" | "conversations" | "savedPosts" | "password">
+      Omit<User, "blockedUsers" | "savedPosts" | "password">
     > = {},
     page: number = 1,
     limit: number = 20
@@ -65,7 +60,6 @@ class UserRepository {
     const skip = (page - 1) * limit;
     const users = await UserModel.find(filter, {
       blockedUsers: 0,
-      conversations: 0,
       savedPosts: 0,
       password: 0,
     })

@@ -31,3 +31,11 @@ export const createPost: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const savePost: RequestHandler = async (req, res, next) => {
+  if (!req.user || req.user.role !== "user") {
+    throw new HttpError(401, "Unauthorized");
+  }
+
+  
+};
