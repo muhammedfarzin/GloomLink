@@ -9,6 +9,7 @@ export interface User {
   lastname: string;
   email: string;
   mobile: string;
+  authType?: "email" | "google";
   status: "active" | "inactive" | "blocked" | "not-verified";
   image?: string;
   gender?: string;
@@ -22,13 +23,18 @@ export type UserDocument = User & Document;
 
 const userSchema = new Schema<User>(
   {
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    mobile: { type: String, required: true },
+    mobile: { type: String },
     image: { type: String, default: null },
+    authType: {
+      type: String,
+      default: "email",
+      enum: ["email", "google"],
+    },
     status: {
       type: String,
       default: "not-verified",

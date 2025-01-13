@@ -77,3 +77,6 @@ dist/
 
 # Public
 public/
+
+# Credentials
+**/*-service-account-file.json

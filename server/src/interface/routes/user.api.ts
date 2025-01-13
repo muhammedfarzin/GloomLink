@@ -25,6 +25,8 @@ router.post(
   authController.verifyOTP
 );
 
+router.post("/auth/google", authController.signInUsingGoogle)
+
 router.post("/auth/refresh", authController.refreshToken);
 
 router.post(

@@ -1,5 +1,9 @@
 import { RequestHandler } from "express";
-import type { User } from "../../infrastructure/database/models/UserModel.js";
+import firebaseAdmin from "firebase-admin";
+import {
+  UserModel,
+  type User,
+} from "../../infrastructure/database/models/UserModel.js";
 import { HttpError } from "../../infrastructure/errors/HttpError.js";
 import { userRepository } from "../../infrastructure/repositories/UserRepository.js";
 import {
@@ -9,6 +13,14 @@ import {
   type TokenPayloadType,
 } from "../../application/services/token.service.js";
 import { otpRepository } from "../../infrastructure/repositories/OtpRepository.js";
+import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
+import { Schema } from "mongoose";
+
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(
+    firebaseServiceAccount as firebaseAdmin.ServiceAccount
+  ),
+});
 
 export const login: RequestHandler = async (req, res, next) => {
   const { username, password }: Pick<User, "username" | "password"> = req.body;
@@ -131,6 +143,62 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
       userData: updatedUser,
       tokens,
       message: "OTP verified successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
+  try {
+    const { token } = req.body as { token?: string };
+
+    if (!token) throw new HttpError(400, "Please provide auth token");
+
+    const decodedData = await firebaseAdmin.auth().verifyIdToken(token);
+    const email = decodedData.email;
+    const existUser = await userRepository.findOne({ email });
+    let userData: User &
+      Required<{
+        _id: Schema.Types.ObjectId;
+      }>;
+
+    if (existUser) {
+      if (existUser.authType !== "google")
+        throw new HttpError(400, "Please use previous method you used");
+      userData = existUser;
+    } else {
+      const { name, picture: image, email, uid: password } = decodedData;
+      const [firstname, ...restName] = name.split(" ");
+      const lastname = restName.join(" ");
+      const username = `${email?.split("@")[0]}-${Date.now()}${
+        Math.random() * 90000
+      }`;
+
+      const newUser = new UserModel({
+        username,
+        firstname,
+        lastname,
+        email,
+        image,
+        password,
+        status: "active",
+        authType: "google",
+      });
+      userData = await newUser.save();
+    }
+
+    const tokenPayload: TokenPayloadType = {
+      role: "user",
+      ...userData,
+      _id: userData._id.toString(),
+    };
+    const tokens = generateToken(tokenPayload);
+
+    res.status(200).json({
+      userData,
+      tokens,
+      message: "Google login successfully",
     });
   } catch (error) {
     next(error);

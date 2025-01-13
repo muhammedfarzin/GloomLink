@@ -38,9 +38,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
 
   useEffect(() => {
     if (self) {
-      console.log("fetching data");
       apiClient.get("/profile").then((response) => {
-        console.log("got the data");
         const { posts, ...userData } = response.data;
         setUserData(userData);
         setPosts(posts);

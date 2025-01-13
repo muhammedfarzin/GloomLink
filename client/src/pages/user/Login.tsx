@@ -1,12 +1,12 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
 import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
 import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.svg";
 import EnvelopeIcon from "../../assets/icons/Envelope.svg";
 import GoogleIcon from "../../assets/icons/Google.svg";
 import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
 import {
   logout,
   setAuthUser,
@@ -16,6 +16,8 @@ import {
 import { validateLoginForm, type LoginFormType } from "./formValidations";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { signInWithPopup } from "firebase/auth";
+import { firebaseAuth, googleAuthProvider } from "@/firebase";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -38,6 +40,14 @@ const Login: React.FC = () => {
     }
   }, [userData]);
 
+  const handleSuccessLogin = (data: any) => {
+    const userData = data.userData as UserAuthState;
+    const tokens = data.tokens as TokensState;
+
+    dispatch(setAuthUser({ userData, tokens }));
+    navigate("/");
+  };
+
   const handleOnLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -47,11 +57,7 @@ const Login: React.FC = () => {
     if (isValidated) {
       try {
         const response = await axios.post(BASE_URL + "/user/login", formData);
-        const userData = response.data.userData as UserAuthState;
-        const tokens = response.data.tokens as TokensState;
-
-        dispatch(setAuthUser({ userData, tokens }));
-        navigate("/");
+        handleSuccessLogin(response.data);
       } catch (error) {
         if (error instanceof AxiosError && error.response) {
           setErrorMessage(error.response.data.message);
@@ -62,6 +68,26 @@ const Login: React.FC = () => {
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const credentials = await signInWithPopup(
+        firebaseAuth,
+        googleAuthProvider
+      );
+      const token = await credentials.user.getIdToken();
+      const response = await axios.post(BASE_URL + "/user/auth/google", {
+        token,
+      });
+
+      handleSuccessLogin(response.data);
+    } catch (error) {
+      console.log(error)
+      if (error instanceof AxiosError && error.response) {
+        setErrorMessage(error.response.data.message);
+      } else setErrorMessage("Something went wrong");
+    }
   };
 
   return (
@@ -120,7 +146,9 @@ const Login: React.FC = () => {
 
             <button className="btn btn-dark border w-72 mt-5 block mx-auto p-3">
               <img src={GoogleIcon} alt="google" className="inline" />
-              <span className="ml-4 text-sm">Continue with Google</span>
+              <span className="ml-4 text-sm" onClick={handleGoogleLogin}>
+                Continue with Google
+              </span>
             </button>
           </div>
         </div>

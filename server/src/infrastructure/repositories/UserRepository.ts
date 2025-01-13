@@ -6,6 +6,7 @@ import {
 import bcrypt from "bcryptjs";
 import { otpRepository } from "./OtpRepository";
 import { HttpError } from "../errors/HttpError";
+import type { ProjectionType } from "mongoose";
 
 class UserRepository {
   async create(
@@ -30,6 +31,19 @@ class UserRepository {
       savedPosts: 0,
       password: 0,
     });
+    return user?.toObject();
+  }
+
+  async findOne(filter: Partial<User>, projection?: ProjectionType<User>) {
+    const user = await UserModel.findOne(
+      filter,
+      projection || {
+        password: 0,
+        conversations: 0,
+        blockedUsers: 0,
+        savedPosts: 0,
+      }
+    );
     return user?.toObject();
   }
 
