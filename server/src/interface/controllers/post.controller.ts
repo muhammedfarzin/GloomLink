@@ -3,6 +3,7 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { postRepository } from "../../infrastructure/repositories/PostRepository";
 import type { Post } from "../../infrastructure/database/models/PostModel";
 import { UserModel } from "../../infrastructure/database/models/UserModel";
+import { userRepository } from "../../infrastructure/repositories/UserRepository";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -28,6 +29,20 @@ export const createPost: RequestHandler = async (req, res, next) => {
     });
 
     res.status(201).json({ post, message: "Post created successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const fetchSavedPosts: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const posts = await postRepository.getSavedPost(req.user._id);
+
+    res.status(200).json(posts);
   } catch (error) {
     next(error);
   }

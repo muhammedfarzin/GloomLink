@@ -43,6 +43,8 @@ router.post(
   postController.createPost
 );
 
+router.get("/posts/saved", authenticateToken, authorizeRole("user"), postController.fetchSavedPosts)
+
 router.put(
   "/posts/save/:postId",
   authenticateToken,
