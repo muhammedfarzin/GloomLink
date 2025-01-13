@@ -56,15 +56,15 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
             borderColor: colorTheme.border,
           }}
         >
-          <div className="flex gap-4 md:gap-8 max-h-16">
-            <ProfileImage />
+          <div className="flex gap-4 md:gap-8 max-h-16 items-center">
+            <ProfileImage className="min-w-12" />
             <div className="flex justify-between w-full">
               <div
                 id="profile-deta"
                 className="flex flex-col justify-center w-1/3"
               >
-                <span className="text-lg font-bold">{userData?.username}</span>
-                <span className="text-sm font-light">{userData?.fullname}</span>
+                <span className="text-lg font-bold truncate">{userData?.username}</span>
+                <span className="text-sm font-light truncate">{userData?.fullname}</span>
               </div>
               <div className="flex justify-around w-2/3">
                 <div className="flex flex-col justify-center text-center">

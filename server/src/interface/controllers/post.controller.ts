@@ -51,3 +51,36 @@ export const savePost: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const unsavePost: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const postId = req.params.postId;
+
+    await UserModel.updateOne(
+      { _id: req.user._id },
+      { $pull: { savedPosts: postId } }
+    );
+
+    res.status(200).json({ postId, message: "Post saved successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const fetchPosts: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const posts = await postRepository.getPosts(req.user._id);
+
+    res.status(200).json(posts);
+  } catch (error) {
+    next(error);
+  }
+};

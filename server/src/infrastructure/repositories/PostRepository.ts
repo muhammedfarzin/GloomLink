@@ -1,5 +1,6 @@
 import { PostModel, type Post } from "../database/models/PostModel";
 import { HttpError } from "../errors/HttpError";
+import { userRepository } from "./UserRepository";
 
 class PostRepository {
   async createPost(
@@ -24,6 +25,41 @@ class PostRepository {
 
     const post = await newPost.save();
     return post.toObject();
+  }
+
+  async getPosts(userId: string) {
+    const user = await userRepository.findById(userId, { savedPosts: 1 });
+    if (!user) throw new HttpError(401, "Unauthorized");
+    const savedPosts = user.savedPosts.map((post) => post.toString());
+
+    const posts = await PostModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "uploadedBy",
+          pipeline: [
+            {
+              $project: {
+                username: 1,
+                image: 1,
+                firstname: 1,
+                lastname: 1,
+              },
+            },
+          ],
+        },
+      },
+      { $limit: 20 },
+      { $unwind: "$uploadedBy" },
+    ]);
+
+    const resPosts = posts.map((post) => {
+      post.saved = savedPosts.includes(post._id.toString());
+      return post;
+    });
+    return resPosts;
   }
 }
 

@@ -25,8 +25,10 @@ const CreatePost: React.FC = () => {
     images.forEach((image) => {
       formData.append("images", image);
     });
+    tags.forEach((tag) => {
+      formData.append("tags", tag);
+    });
     formData.append("caption", caption);
-    formData.append("tags", JSON.stringify(tags));
     formData.append("publishedFor", publishedFor);
 
     try {

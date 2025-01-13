@@ -21,12 +21,15 @@ class UserRepository {
     return newUser;
   }
 
-  async findById(userId: string) {
-    const user = await UserModel.findById(userId, {
-      blockedUsers: 0,
-      savedPosts: 0,
-      password: 0,
-    });
+  async findById(userId: string, projection?: ProjectionType<User>) {
+    const user = await UserModel.findById(
+      userId,
+      projection || {
+        blockedUsers: 0,
+        savedPosts: 0,
+        password: 0,
+      }
+    );
     return user?.toObject();
   }
 

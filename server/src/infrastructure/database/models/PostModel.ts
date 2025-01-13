@@ -11,34 +11,37 @@ export interface Post {
   status: "active" | "blocked";
 }
 
-const postSchema = new Schema<Post>({
-  userId: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: "User",
+const postSchema = new Schema<Post>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    caption: {
+      type: String,
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    tags: {
+      type: [String],
+      default: [],
+    },
+    publishedFor: {
+      type: String,
+      default: "public",
+      enum: ["public", "subscriber"],
+    },
+    status: {
+      type: String,
+      default: "active",
+      enum: ["active", "blocked"],
+    },
   },
-  caption: {
-    type: String,
-  },
-  images: {
-    type: [String],
-    default: [],
-  },
-  tags: {
-    type: [String],
-    default: [],
-  },
-  publishedFor: {
-    type: String,
-    default: "public",
-    enum: ["public", "subscriber"],
-  },
-  status: {
-    type: String,
-    default: "active",
-    enum: ["active", "blocked"],
-  },
-});
+  { timestamps: true }
+);
 
 postSchema.pre("save", function (next) {
   if (!this.caption && (!this.images || this.images.length === 0)) {

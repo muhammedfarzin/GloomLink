@@ -33,6 +33,8 @@ router.post("/auth/refresh", authController.refreshToken);
 
 // Post management
 
+router.get("/posts", authenticateToken, authorizeRole("user"), postController.fetchPosts)
+
 router.post(
   "/posts/create",
   authenticateToken,
@@ -46,6 +48,13 @@ router.put(
   authenticateToken,
   authorizeRole("user"),
   postController.savePost
+);
+
+router.put(
+  "/posts/unsave/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.unsavePost
 );
 
 // Profiles

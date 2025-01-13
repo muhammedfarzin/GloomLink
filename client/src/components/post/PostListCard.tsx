@@ -5,6 +5,7 @@ import IconButton from "../IconButton";
 import HeartIcon from "../../assets/icons/Heart.svg";
 import CommentIcon from "../../assets/icons/Comment.svg";
 import ShareIcon from "../../assets/icons/Share.svg";
+import SaveIcon from "../../assets/icons/Save.svg";
 import SavedIcon from "../../assets/icons/Saved.svg";
 import { Link } from "react-router-dom";
 import {
@@ -14,15 +15,48 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
+import { useState } from "react";
 import apiClient from "@/apiClient";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
 
-const PostListCard: React.FC = () => {
+export interface Post {
+  _id: string;
+  userId: string;
+  caption: string;
+  images: string[];
+  tags: string[];
+  publishedFor: "public" | "subscriber";
+  createdAt: string;
+  saved: boolean;
+  uploadedBy: {
+    _id: string;
+    firstname: string;
+    lastname: string;
+    username: string;
+    image: string;
+  };
+}
+
+interface PostListCardProps {
+  postData: Pick<Post, "_id" | "caption" | "images" | "saved" | "uploadedBy">;
+}
+
+const PostListCard: React.FC<PostListCardProps> = ({
+  postData: { _id, caption, images, uploadedBy, saved },
+}) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const [isSaved, setIsSaved] = useState<boolean>(saved);
 
-  const handleSavePost = (postId: string) => {
-    apiClient.put(`${BASE_URL}/user/posts/save/${postId}`);
+  const handleSavePost = async (postId: string, type: "save" | "unsave") => {
+    try {
+      console.log(type)
+      setIsSaved(!isSaved);
+      const path = type === "save" ? "posts/save/" : "posts/unsave/";
+      await apiClient.put(path + postId);
+    } catch (error) {
+      setIsSaved(!isSaved);
+    }
   };
 
   return (
@@ -34,26 +68,35 @@ const PostListCard: React.FC = () => {
     >
       {/* Uploaded By */}
       <div className="flex flex-row items-center">
-        <Link to={"/username"}>
-          <ProfileImage className="w-10 cursor-pointer" />
+        <Link to={`/${uploadedBy.username}`}>
+          <ProfileImage
+            className="w-10 cursor-pointer"
+            profileImage={uploadedBy.image && IMAGE_BASE_URL + uploadedBy.image}
+          />
         </Link>
-        <Link to={"/username"}>
-          <span className="text-base font-bold cursor-pointer">username</span>
+        <Link to={`/${uploadedBy.username}`}>
+          <span className="text-base font-bold cursor-pointer">
+            {uploadedBy.username}
+          </span>
         </Link>
       </div>
 
       {/* Post */}
       <div>
-        <p className="text-sm font-normal">Caption</p>
+        <p className="text-sm font-normal">{caption}</p>
 
         <Carousel className="relative w-full">
           <CarouselContent>
-            {Array.from({ length: 5 }).map((_, index) => (
+            {images.map((image, index) => (
               <CarouselItem key={index}>
                 <img
-                  className="mt-1 w-full rounded-xl"
-                  src="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
+                  className="mt-1 w-full object-contain rounded-xl max-h-80 border"
+                  src={IMAGE_BASE_URL + image}
                   alt="post"
+                  style={{
+                    borderColor: colorTheme.border,
+                    backgroundColor: colorTheme.text + "05",
+                  }}
                 />
               </CarouselItem>
             ))}
@@ -61,11 +104,6 @@ const PostListCard: React.FC = () => {
           <CarouselPrevious className="absulute left-2 bg-transparent opacity-10 hover:opacity-100 disabled:opacity-0 hidden md:inline-flex" />
           <CarouselNext className="absulute right-2 bg-transparent opacity-10 hover:opacity-100 disabled:opacity-0 hidden md:inline-flex" />
         </Carousel>
-        {/* <img
-          className="mt-1 w-full rounded-xl"
-          src="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg"
-          alt="post"
-        /> */}
       </div>
 
       {/* Post Actions */}
@@ -77,9 +115,13 @@ const PostListCard: React.FC = () => {
         </div>
         <div className="p-1">
           <IconButton
-            icon={SavedIcon}
+            icon={isSaved ? SavedIcon : SaveIcon}
             alt="save"
-            onClick={() => handleSavePost("postId")}
+            onClick={() =>
+              isSaved
+                ? handleSavePost(_id, "unsave")
+                : handleSavePost(_id, "save")
+            }
           />
         </div>
       </div>
