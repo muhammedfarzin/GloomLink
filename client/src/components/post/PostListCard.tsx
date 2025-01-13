@@ -7,10 +7,23 @@ import CommentIcon from "../../assets/icons/Comment.svg";
 import ShareIcon from "../../assets/icons/Share.svg";
 import SavedIcon from "../../assets/icons/Saved.svg";
 import { Link } from "react-router-dom";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "../ui/carousel";
+import apiClient from "@/apiClient";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 const PostListCard: React.FC = () => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+
+  const handleSavePost = (postId: string) => {
+    apiClient.put(`${BASE_URL}/user/posts/save/${postId}`);
+  };
 
   return (
     <div
@@ -63,7 +76,11 @@ const PostListCard: React.FC = () => {
           <IconButton icon={ShareIcon} alt="share" />
         </div>
         <div className="p-1">
-          <IconButton icon={SavedIcon} alt="save" />
+          <IconButton
+            icon={SavedIcon}
+            alt="save"
+            onClick={() => handleSavePost("postId")}
+          />
         </div>
       </div>
     </div>

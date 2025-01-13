@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { postRepository } from "../../infrastructure/repositories/PostRepository";
 import type { Post } from "../../infrastructure/database/models/PostModel";
+import { UserModel } from "../../infrastructure/database/models/UserModel";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -33,9 +34,20 @@ export const createPost: RequestHandler = async (req, res, next) => {
 };
 
 export const savePost: RequestHandler = async (req, res, next) => {
-  if (!req.user || req.user.role !== "user") {
-    throw new HttpError(401, "Unauthorized");
-  }
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
 
-  
+    const postId = req.params.postId;
+
+    await UserModel.updateOne(
+      { _id: req.user._id },
+      { $push: { savedPosts: postId } }
+    );
+
+    res.status(200).json({ postId, message: "Post saved successfully" });
+  } catch (error) {
+    next(error);
+  }
 };
