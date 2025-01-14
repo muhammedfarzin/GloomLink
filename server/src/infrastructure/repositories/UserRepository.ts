@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { otpRepository } from "./OtpRepository";
 import { HttpError } from "../errors/HttpError";
 import type { ProjectionType } from "mongoose";
+import { FollowModel } from "../database/models/FollowModel";
 
 class UserRepository {
   async create(
@@ -149,14 +150,6 @@ class UserRepository {
     const data = await UserModel.aggregate([
       { $match: { username } },
       {
-        $project: {
-          username: 1,
-          firstname: 1,
-          lastname: 1,
-          image: 1,
-        },
-      },
-      {
         $addFields: {
           fullname: { $concat: ["$firstname", " ", "$lastname"] },
         },
@@ -169,8 +162,54 @@ class UserRepository {
           as: "posts",
         },
       },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followingTo",
+          as: "followers",
+        },
+      },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followedBy",
+          as: "following",
+        },
+      },
+      {
+        $project: {
+          username: 1,
+          firstname: 1,
+          lastname: 1,
+          fullname: 1,
+          image: 1,
+          followersCount: { $size: "$followers" },
+          followingCount: { $size: "$following" },
+          posts: 1,
+        },
+      },
     ]);
     return data[0];
+  }
+
+  async followUser(followedBy: string, followingTo: string) {
+    const followData = new FollowModel({
+      followedBy,
+      followingTo,
+    });
+
+    await followData.save();
+  }
+
+  async unfollowUser(followedBy: string, followingTo: string) {
+    await FollowModel.findOneAndDelete({ followedBy, followingTo });
+  }
+
+  async checkIsFollowing(followedBy: string, followingTo: string) {
+    const follow = await FollowModel.findOne({ followedBy, followingTo });
+    return !!follow;
   }
 }
 

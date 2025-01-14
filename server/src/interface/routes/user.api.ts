@@ -33,7 +33,12 @@ router.post("/auth/refresh", authController.refreshToken);
 
 // Post management
 
-router.get("/posts", authenticateToken, authorizeRole("user"), postController.fetchPosts)
+router.get(
+  "/posts",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.fetchPosts
+);
 
 router.post(
   "/posts/create",
@@ -43,7 +48,12 @@ router.post(
   postController.createPost
 );
 
-router.get("/posts/saved", authenticateToken, authorizeRole("user"), postController.fetchSavedPosts)
+router.get(
+  "/posts/saved",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.fetchSavedPosts
+);
 
 router.put(
   "/posts/save/:postId",
@@ -73,6 +83,20 @@ router.get(
   authenticateToken,
   authorizeRole("user"),
   userController.fetchProfile
+);
+
+router.post(
+  "/profile/follow/:userId",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.followUser
+);
+
+router.post(
+  "/profile/unfollow/:userId",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.unfollowUser
 );
 
 export { router as userApiRouter };

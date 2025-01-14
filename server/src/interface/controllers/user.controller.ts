@@ -19,10 +19,50 @@ export const fetchMyProfile: RequestHandler = async (req, res, next) => {
 
 export const fetchProfile: RequestHandler = async (req, res, next) => {
   try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
     const username = req.params.username;
     const userData = await userRepository.fetchProfileDetails(username);
+    const isFollowing = await userRepository.checkIsFollowing(
+      req.user._id,
+      userData._id
+    );
 
-    res.json(userData);
+    res.json({...userData, isFollowing});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const followUser: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    await userRepository.followUser(req.user._id, req.params.userId);
+
+    res
+      .status(200)
+      .json({ userId: req.params.userId, message: "Followed successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const unfollowUser: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    await userRepository.unfollowUser(req.user._id, req.params.userId);
+
+    res
+      .status(200)
+      .json({ userId: req.params.userId, message: "Unfollowed successfully" });
   } catch (error) {
     next(error);
   }
