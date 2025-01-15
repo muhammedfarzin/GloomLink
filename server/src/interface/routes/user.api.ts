@@ -79,6 +79,13 @@ router.get(
 );
 
 router.get(
+  "/profile/edit",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.fetchMyData
+);
+
+router.get(
   "/profile/:username",
   authenticateToken,
   authorizeRole("user"),

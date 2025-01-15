@@ -17,6 +17,29 @@ export const fetchMyProfile: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const fetchMyData: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const userData = await userRepository.findById(req.user._id, {
+      firstname: 1,
+      lastname: 1,
+      username: 1,
+      email: 1,
+      mobile: 1,
+      gender: 1,
+      dob: 1,
+      image: 1,
+    });
+
+    res.status(200).json(userData);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const fetchProfile: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
@@ -25,12 +48,13 @@ export const fetchProfile: RequestHandler = async (req, res, next) => {
 
     const username = req.params.username;
     const userData = await userRepository.fetchProfileDetails(username);
+    if (!userData) throw new HttpError(404, "Not found");
     const isFollowing = await userRepository.checkIsFollowing(
       req.user._id,
       userData._id
     );
 
-    res.json({...userData, isFollowing});
+    res.json({ ...userData, isFollowing });
   } catch (error) {
     next(error);
   }

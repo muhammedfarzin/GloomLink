@@ -5,7 +5,8 @@ import Button from "../../components/Button";
 import PostGridCard from "../../components/post/PostGridCard";
 import { useEffect, useState } from "react";
 import apiClient from "@/apiClient";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { AxiosError } from "axios";
 
 interface ProfileProps {
   self?: boolean;
@@ -36,11 +37,12 @@ const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const navigate = useNavigate();
   const { username } = useParams();
   const [userData, setUserData] = useState<UserDataType>();
   const [posts, setPosts] = useState<PostsType[]>([]);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [loading, setLoading] = useState<string | null>("Loading...");
+  const [loading, setLoading] = useState<string | null>();
 
   useEffect(() => {
     setLoading("Loading...");
@@ -51,8 +53,13 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
         setIsFollowing(isFollowing);
         setUserData(userData);
         setPosts(posts);
+        setLoading(null);
       })
-      .finally(() => setLoading(null));
+      .catch((error) => {
+        if (error instanceof AxiosError) {
+          setLoading(error.response?.data.message || error.message);
+        } else setLoading("Something went wrong");
+      });
   }, [username]);
 
   const handleFollow = async (type: "follow" | "unfollow") => {
@@ -68,7 +75,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
     <div className="m-auto max-w-[704px]">
       {loading || !userData ? (
         <div className="w-full h-screen flex justify-center items-center">
-          Loading...
+          {loading}
         </div>
       ) : (
         <div className="m-2">
@@ -114,7 +121,12 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
               {self ? (
                 <>
                   <div className="flex gap-2">
-                    <Button className="w-full">Edit Profile</Button>
+                    <Button
+                      className="w-full"
+                      onClick={() => navigate("/profile/edit")}
+                    >
+                      Edit Profile
+                    </Button>
                     <Button className="w-full">Switch to Light</Button>
                   </div>
                   {userData?.followersCount >= 10 ? (

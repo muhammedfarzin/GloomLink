@@ -13,6 +13,7 @@ import OtpVerification from "./pages/user/OtpVerification";
 import Profile from "./pages/user/Profile";
 import CreatePost from "./pages/user/CreatePost";
 import SavedPost from "./pages/user/SavedPost";
+import EditProfile from "./pages/user/EditProfile";
 
 function App() {
   const { background, text: textColor } = useSelector(
@@ -33,6 +34,7 @@ function App() {
         <Route path="" element={<User />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile self />} />
+          <Route path="profile/edit" element={<EditProfile />} />
           <Route path="create-post" element={<CreatePost />} />
           <Route path="saved-post" element={<SavedPost />} />
           <Route path=":username" element={<Profile />} />
