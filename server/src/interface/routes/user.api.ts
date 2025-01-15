@@ -85,6 +85,14 @@ router.get(
   userController.fetchMyData
 );
 
+router.post(
+  "/profile/edit",
+  authenticateToken,
+  authorizeRole("user"),
+  uploadImage.single("image"),
+  userController.updateProfile
+);
+
 router.get(
   "/profile/:username",
   authenticateToken,

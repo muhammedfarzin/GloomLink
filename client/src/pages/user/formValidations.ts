@@ -21,7 +21,9 @@ const passwordRegex =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
 const mobileRegex = /^[6-9]\d{9}$/;
 
-export type EditProfileFormType = SignUpFormType & { newPassword: string };
+export type EditProfileFormType = { [key: string]: string } & SignUpFormType & {
+    newPassword: string;
+  };
 
 export const validateLoginForm = (
   formData: LoginFormType,
@@ -129,8 +131,8 @@ export const validateEditProfileForm = (
         return false;
       }
     }
-  }
-  return false;
+  } else return false;
+  return true;
 };
 
 export const validateOtpForm = (
@@ -149,12 +151,16 @@ function validateRequiredFields(
   errorCallback: ErrorCallbackType
 ) {
   for (const field in datas) {
-    const fieldNameArr = field.split(/(?=[A-Z])/);
-    const fieldName = fieldNameArr
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-      .join(" ");
-    errorCallback(`${fieldName} is required.`);
-    return false;
+    if (!datas[field]) {
+      const fieldNameArr = field.split(/(?=[A-Z])/);
+      const fieldName = fieldNameArr
+        .map(
+          (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+        )
+        .join(" ");
+      errorCallback(`${fieldName} is required.`);
+      return false;
+    }
   }
   return true;
 }

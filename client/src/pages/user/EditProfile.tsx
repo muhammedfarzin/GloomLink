@@ -12,10 +12,13 @@ import Cropper, { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import DialogBox from "@/components/DialogBox";
 import apiClient from "@/apiClient";
+import { useNavigate } from "react-router-dom";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
 
 const EditProfile: React.FC = () => {
+  const navigate = useNavigate();
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
   const [image, setImage] = useState<File | string>();
@@ -38,6 +41,7 @@ const EditProfile: React.FC = () => {
       const { dob, gender, image, ...userData } = response.data;
       setDob(dob);
       setGender(gender);
+      setImage(image);
       setFormData({ ...formData, ...userData });
     });
   }, []);
@@ -73,12 +77,32 @@ const EditProfile: React.FC = () => {
     }
   };
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    if (!validateEditProfileForm(formData, (errMessage) => alert(errMessage)))
-      return;
+  const handleSubmit = async () => {
+    try {
+      if (!validateEditProfileForm(formData, (errMessage) => alert(errMessage)))
+        return;
 
-    
+      const formDatas = new FormData();
+
+      if (image instanceof File) formDatas.append("image", image);
+      if (dob) formDatas.append("dob", dob.toString());
+      if (gender) formDatas.append("gender", gender);
+
+      for (const [key, value] of Object.entries(formData)) {
+        formDatas.append(key, value);
+      }
+
+      await apiClient.post("/profile/edit", formDatas, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      navigate("/profile");
+    } catch (error) {
+      console.log(error);
+      alert((error as Error).message || "Something went wrong");
+    }
   };
 
   return (
@@ -89,7 +113,9 @@ const EditProfile: React.FC = () => {
           <ProfileImage
             className="cursor-pointer w-3/4 !max-w-36"
             profileImage={
-              image instanceof File ? URL.createObjectURL(image) : image
+              image instanceof File
+                ? URL.createObjectURL(image)
+                : image && IMAGE_BASE_URL + image
             }
             onClick={() => imageInputRef.current?.click()}
           />
@@ -103,7 +129,14 @@ const EditProfile: React.FC = () => {
           />
 
           <div className="w-full mt-4">
-            <form method="post" onSubmit={handleSubmit} className="w-full">
+            <form
+              method="post"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+              className="w-full"
+            >
               <InputBox
                 value={formData.username}
                 onChange={handleOnChange}
@@ -198,7 +231,9 @@ const EditProfile: React.FC = () => {
                 type="password"
               />
               <div className="flex justify-end mt-1">
-                <Button>Update</Button>
+                <Button type="submit" onClick={handleSubmit}>
+                  Update
+                </Button>
               </div>
             </form>
           </div>

@@ -87,7 +87,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
             }}
           >
             <div className="flex gap-4 md:gap-8 max-h-16 items-center">
-              <ProfileImage className="min-w-12" />
+              <ProfileImage profileImage={IMAGE_BASE_URL + userData.image} className="min-w-12" />
               <div className="flex justify-between w-full">
                 <div
                   id="profile-deta"

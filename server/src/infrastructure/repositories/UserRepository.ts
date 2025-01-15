@@ -6,7 +6,7 @@ import {
 import bcrypt from "bcryptjs";
 import { otpRepository } from "./OtpRepository";
 import { HttpError } from "../errors/HttpError";
-import type { ProjectionType } from "mongoose";
+import type { Document, ProjectionType, Schema } from "mongoose";
 import { FollowModel } from "../database/models/FollowModel";
 
 class UserRepository {
@@ -22,7 +22,36 @@ class UserRepository {
     return newUser;
   }
 
-  async findById(userId: string, projection?: ProjectionType<User>) {
+  async findById(
+    user: string,
+    projection?: ProjectionType<User> | null,
+    returnDocument?: false
+  ): Promise<
+    | (User &
+        Required<{
+          _id: Schema.Types.ObjectId;
+        }>)
+    | null
+  >;
+  async findById(
+    user: string,
+    projection?: ProjectionType<User> | null,
+    returnDocument?: true
+  ): Promise<
+    | (Document<unknown, {}, User> &
+        User &
+        Required<{
+          _id: Schema.Types.ObjectId;
+        }> & {
+          __v: number;
+        })
+    | null
+  >;
+  async findById(
+    userId: string,
+    projection?: ProjectionType<User> | null,
+    returnDocument: boolean = false
+  ) {
     const user = await UserModel.findById(
       userId,
       projection || {
@@ -31,7 +60,8 @@ class UserRepository {
         password: 0,
       }
     );
-    return user?.toObject();
+
+    return returnDocument ? user : user?.toObject();
   }
 
   async findOne(filter: Partial<User>, projection?: ProjectionType<User>) {
