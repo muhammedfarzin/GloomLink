@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import apiClient from "@/apiClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { AxiosError } from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileProps {
   self?: boolean;
@@ -34,7 +35,11 @@ interface PostsType {
 }
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
+  const { toast } = useToast();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const myUsername = useSelector(
+    (state: RootState) => state.auth.userData?.username
+  );
   const navigate = useNavigate();
   const { username } = useParams();
   const [userData, setUserData] = useState<UserDataType>();
@@ -64,8 +69,15 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
     try {
       setIsFollowing(!isFollowing);
       await apiClient.post(`/profile/${type}/${userData?._id}`);
-    } catch (error) {
-      setIsFollowing(!isFollowing);
+    } catch (error: any) {
+      setIsFollowing(isFollowing);
+      toast({
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong",
+        variant: "destructive",
+      });
     }
   };
 
@@ -144,11 +156,22 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
                       onClick={() =>
                         handleFollow(isFollowing ? "unfollow" : "follow")
                       }
+                      disabled={username === myUsername}
                     >
                       {isFollowing ? "Unfollow" : "Follow"}
                     </Button>
-                    <Button className="w-full">Message</Button>
-                    <Button className="w-full">Subscribe</Button>
+                    <Button
+                      className="w-full"
+                      disabled={username === myUsername}
+                    >
+                      Message
+                    </Button>
+                    <Button
+                      className="w-full"
+                      disabled={username === myUsername}
+                    >
+                      Subscribe
+                    </Button>
                   </div>
                 </>
               )}
@@ -161,7 +184,11 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
             {posts.length ? (
               <div className="flex flex-wrap gap-2 p-2">
                 {posts?.map((post) => (
-                  <PostGridCard key={post._id} image={post.images[0]} caption={post.caption} />
+                  <PostGridCard
+                    key={post._id}
+                    image={post.images[0]}
+                    caption={post.caption}
+                  />
                 ))}
               </div>
             ) : (
