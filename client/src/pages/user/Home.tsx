@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 import PostListCard, { type Post } from "../../components/post/PostListCard";
 import apiClient from "@/apiClient";
+import { useToast } from "@/hooks/use-toast";
 
 const Home = () => {
+  const { toast } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    apiClient.get("/posts").then((response) => {
-      setPosts(response.data as Post[]);
-    });
+    apiClient
+      .get("/posts")
+      .then((response) => {
+        setPosts(response.data as Post[]);
+      })
+      .catch((error) => {
+        toast({
+          description:
+            error.response.data.message ||
+            error.message ||
+            "Something went wrong",
+          variant: "destructive",
+        });
+      });
   }, []);
 
   return (

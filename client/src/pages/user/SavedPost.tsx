@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import PostListCard, { type Post } from "../../components/post/PostListCard";
 import apiClient from "@/apiClient";
 import EmptyIllustrationDark from "../../assets/images/Empty-Illustration-Dark.svg";
+import { useToast } from "@/hooks/use-toast";
 
 const SavedPost = () => {
+  const { toast } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<string | null>("Loading...");
 
@@ -13,6 +15,15 @@ const SavedPost = () => {
       .get("/posts/saved")
       .then((response) => {
         setPosts(response.data as Post[]);
+      })
+      .catch((error) => {
+        toast({
+          description:
+            error.response.data.message ||
+            error.message ||
+            "Something went wrong",
+          variant: "destructive",
+        });
       })
       .finally(() => setLoading(null));
   }, []);

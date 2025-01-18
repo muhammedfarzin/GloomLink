@@ -40,55 +40,25 @@ export const validateSignUpForm = (
   formData: SignUpFormType,
   errorCallback: ErrorCallbackType
 ): boolean => {
-  if (!formData.firstname) {
-    errorCallback("First name is required.");
-    return false;
-  }
-
-  if (!formData.lastname) {
-    errorCallback("Last name is required.");
-    return false;
-  }
-
-  if (!formData.username) {
-    errorCallback("Username is required.");
-    return false;
-  }
-
-  if (!formData.email) {
-    errorCallback("Email is required.");
-    return false;
-  }
-
-  if (!formData.mobile) {
-    errorCallback("Mobile number is required.");
-    return false;
-  }
-
-  if (!formData.password) {
-    errorCallback("Password is required.");
-    return false;
-  }
-
-  if (!formData.confirmPassword) {
-    errorCallback("Confirm password is required.");
-    return false;
-  }
-
   if (
-    !formData.firstname ||
-    !formData.lastname ||
-    !formData.username ||
-    !formData.email ||
-    !formData.password ||
-    !formData.confirmPassword
+    !validateRequiredFields(
+      {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        username: formData.username,
+        email: formData.email,
+        mobile: formData.mobile,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      },
+      errorCallback
+    )
   ) {
-    errorCallback("All fields are required.");
     return false;
   }
 
   if (!mobileRegex.test(formData.mobile)) {
-    errorCallback("Mobile number is invalid.");
+    errorCallback("Please enter a valid mobile number.");
     return false;
   }
 
@@ -150,17 +120,19 @@ function validateRequiredFields(
   datas: Record<string, any>,
   errorCallback: ErrorCallbackType
 ) {
-  for (const field in datas) {
-    if (!datas[field]) {
-      const fieldNameArr = field.split(/(?=[A-Z])/);
-      const fieldName = fieldNameArr
-        .map(
-          (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-        )
+  for (const [key, value] of Object.entries(datas)) {
+    if (!value || (typeof value == "string" && !value.trim())) {
+      const fieldName = key
+        .replace(/(?=[A-Z])|(?:name)/, (match) => ` ${match}`)
+        .split(" ")
         .join(" ");
-      errorCallback(`${fieldName} is required.`);
+      errorCallback(`${capitalizeString(fieldName)} is required.`);
       return false;
     }
   }
   return true;
+}
+
+function capitalizeString(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }

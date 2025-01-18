@@ -13,12 +13,16 @@ import "cropperjs/dist/cropper.css";
 import DialogBox from "@/components/DialogBox";
 import apiClient from "@/apiClient";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState<string | null>(null);
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
   const [image, setImage] = useState<File | string>();
@@ -37,13 +41,26 @@ const EditProfile: React.FC = () => {
   const cropperRef = useRef<ReactCropperElement>(null);
 
   useEffect(() => {
-    apiClient.get("/profile/edit").then((response) => {
-      const { dob, gender, image, ...userData } = response.data;
-      setDob(dob);
-      setGender(gender);
-      setImage(image);
-      setFormData({ ...formData, ...userData });
-    });
+    setLoading("Loading...");
+    apiClient
+      .get("/profile/edit")
+      .then((response) => {
+        const { dob, gender, image, ...userData } = response.data;
+        setDob(dob);
+        setGender(gender);
+        setImage(image);
+        setFormData({ ...formData, ...userData });
+      })
+      .catch((error) => {
+        toast({
+          description:
+            error.response.data.message ||
+            error.message ||
+            "Something went wrong",
+          variant: "destructive",
+        });
+      })
+      .finally(() => setLoading(null));
   }, []);
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -79,8 +96,14 @@ const EditProfile: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!validateEditProfileForm(formData, (errMessage) => alert(errMessage)))
+      setLoading("Updating...");
+      if (
+        !validateEditProfileForm(formData, (errMessage) => {
+          throw new Error(errMessage);
+        })
+      ) {
         return;
+      }
 
       const formDatas = new FormData();
 
@@ -100,8 +123,19 @@ const EditProfile: React.FC = () => {
 
       navigate("/profile");
     } catch (error) {
-      console.log(error);
-      alert((error as Error).message || "Something went wrong");
+      if (error instanceof AxiosError) {
+        toast({
+          description: error.response?.data?.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          description: (error as Error).message || "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -231,8 +265,12 @@ const EditProfile: React.FC = () => {
                 type="password"
               />
               <div className="flex justify-end mt-1">
-                <Button type="submit" onClick={handleSubmit}>
-                  Update
+                <Button
+                  type="submit"
+                  onClick={handleSubmit}
+                  disabled={!!loading}
+                >
+                  {loading || "Update"}
                 </Button>
               </div>
             </form>

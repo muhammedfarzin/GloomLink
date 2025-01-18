@@ -8,9 +8,11 @@ import TagsInput from "./components/TagsInput";
 import ImageInput from "./components/ImageInput";
 import apiClient from "@/apiClient";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   const [caption, setCaption] = useState<string>("");
@@ -19,19 +21,24 @@ const CreatePost: React.FC = () => {
   const [publishedFor, setpublishedFor] = useState<string>("public");
   const [loading, setLoading] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    const formData = new FormData();
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
-    tags.forEach((tag) => {
-      formData.append("tags", tag);
-    });
-    formData.append("caption", caption);
-    formData.append("publishedFor", publishedFor);
 
     try {
+      if (!images.length && !caption.trim()) {
+        throw new Error("Please enter caption or upload images");
+      }
+
+      const formData = new FormData();
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+      tags.forEach((tag) => {
+        formData.append("tags", tag);
+      });
+      formData.append("caption", caption);
+      formData.append("publishedFor", publishedFor);
+
       setLoading("Posting...");
       await apiClient.post("/posts/create", formData, {
         headers: {
@@ -39,8 +46,14 @@ const CreatePost: React.FC = () => {
         },
       });
       navigate("/profile");
-    } catch (error) {
-      console.error("Error creating post:", error);
+    } catch (error: any) {
+      toast({
+        description:
+          error.response?.data.message ||
+          error.message ||
+          "Something went wrong",
+        variant: "destructive",
+      });
     } finally {
       setLoading(null);
     }
