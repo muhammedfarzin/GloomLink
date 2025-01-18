@@ -48,7 +48,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
 
   const handleSavePost = async (postId: string, type: "save" | "unsave") => {
     try {
-      console.log(type)
+      console.log(type);
       setIsSaved(!isSaved);
       const path = type === "save" ? "posts/save/" : "posts/unsave/";
       await apiClient.put(path + postId);
@@ -73,7 +73,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
           />
         </Link>
         <Link to={`/${uploadedBy.username}`}>
-          <span className="text-base font-bold cursor-pointer">
+          <span className="text-base font-bold cursor-pointer line-clamp-1">
             {uploadedBy.username}
           </span>
         </Link>
@@ -81,7 +81,9 @@ const PostListCard: React.FC<PostListCardProps> = ({
 
       {/* Post */}
       <div>
-        <p className="text-sm font-normal">{caption}</p>
+        <p className="text-base max-h-[4.5rem] transition-all duration-1000 hover:max-h-[5000px] line-clamp-3 hover:line-clamp-none">
+          {caption}
+        </p>
 
         <Carousel className="relative w-full">
           <CarouselContent>

@@ -161,7 +161,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
             {posts.length ? (
               <div className="flex flex-wrap gap-2 p-2">
                 {posts?.map((post) => (
-                  <PostGridCard key={post._id} image={post.images[0]} />
+                  <PostGridCard key={post._id} image={post.images[0]} caption={post.caption} />
                 ))}
               </div>
             ) : (
