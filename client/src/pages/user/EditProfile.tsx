@@ -69,6 +69,15 @@ const EditProfile: React.FC = () => {
   const handleOnUpload: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.files) {
       const selectedImage = e.target.files[0];
+
+      if (selectedImage.type.split("/")[0] !== "image") {
+        toast({
+          description: "Please upload only images",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         setCropImage(reader.result);

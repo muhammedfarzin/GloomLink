@@ -3,6 +3,7 @@ import { RootState } from "../../../redux/store";
 import AddImageIcon from "../../../assets/icons/Add-Image.svg";
 import CloseIcon from "../../../assets/icons/Close.svg";
 import { useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ImageInputProps {
   className?: string;
@@ -21,6 +22,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
   values = [],
   onChange,
 }) => {
+  const { toast } = useToast();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,12 +33,19 @@ const ImageInput: React.FC<ImageInputProps> = ({
 
   const handleOnUpload: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.files) {
-      const fileArray = Array.from(e.target.files);
-      onChange?.(values.concat(fileArray));
+      const fileArray: File[] = [];
       Array.from(e.target.files).forEach((file) => {
-        const url = URL.createObjectURL(file);
-        URL.revokeObjectURL(url);
+        if (file.type.split("/")[0] !== "image") {
+          toast({
+            description: "Please upload only images",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        fileArray.push(file);
       });
+      onChange?.(values.concat(fileArray));
     }
   };
 
@@ -107,6 +116,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
             ref={imageInputRef}
             type="file"
             accept="image/*"
+            value={[]}
             multiple
             hidden
             onChange={handleOnUpload}
