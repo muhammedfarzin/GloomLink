@@ -96,7 +96,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     });
 
     const { password: _, ...resUser } = newUser.toObject();
-    const tokens = generateToken({ role: "temp", ...resUser }, false);
+    const tokens = generateToken({ role: "user", ...resUser }, false);
 
     res
       .status(201)
