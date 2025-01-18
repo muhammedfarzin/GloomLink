@@ -259,9 +259,9 @@ const EditProfile: React.FC = () => {
 
               <InputBox
                 value={formData.password}
-                name="password"
+                name="currentPassword"
                 onChange={handleOnChange}
-                placeholder="Password"
+                placeholder="Current password"
                 type="password"
               />
               <div className="flex justify-end mt-1">

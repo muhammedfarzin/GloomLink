@@ -122,10 +122,10 @@ function validateRequiredFields(
 ) {
   for (const [key, value] of Object.entries(datas)) {
     if (!value || (typeof value == "string" && !value.trim())) {
-      const fieldName = key
-        .replace(/(?=[A-Z])|(?:name)/, (match) => ` ${match}`)
-        .split(" ")
-        .join(" ");
+      const fieldName =
+        key === "username"
+          ? "Username"
+          : key.replace(/(?=[A-Z])|(name)/, (match) => ` ${match}`).trim();
       errorCallback(`${capitalizeString(fieldName)} is required.`);
       return false;
     }
