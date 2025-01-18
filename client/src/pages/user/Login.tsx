@@ -19,8 +19,6 @@ import { RootState } from "../../redux/store";
 import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleAuthProvider } from "@/firebase";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -56,7 +54,7 @@ const Login: React.FC = () => {
 
     if (isValidated) {
       try {
-        const response = await axios.post(BASE_URL + "/user/login", formData);
+        const response = await axios.post("/api/user/login", formData);
         handleSuccessLogin(response.data);
       } catch (error) {
         if (error instanceof AxiosError && error.response) {
@@ -77,7 +75,7 @@ const Login: React.FC = () => {
         googleAuthProvider
       );
       const token = await credentials.user.getIdToken();
-      const response = await axios.post(BASE_URL + "/user/auth/google", {
+      const response = await axios.post("api/user/auth/google", {
         token,
       });
 

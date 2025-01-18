@@ -15,8 +15,6 @@ import {
 import { LoginFormType, validateLoginForm } from "../user/formValidations";
 import axios, { AxiosError } from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -45,7 +43,7 @@ const AdminLogin: React.FC = () => {
     if (!isValidated) return;
 
     try {
-      const response = await axios.post(BASE_URL + "/admin/login", formData);
+      const response = await axios.post("/api/admin/login", formData);
       const adminData = response.data.userData as AdminAuthState;
       const tokens = response.data.tokens as TokensState;
 

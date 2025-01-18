@@ -33,8 +33,6 @@ interface PostsType {
   status: string;
 }
 
-const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
-
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const navigate = useNavigate();
@@ -87,7 +85,10 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
             }}
           >
             <div className="flex gap-4 md:gap-8 max-h-16 items-center">
-              <ProfileImage profileImage={IMAGE_BASE_URL + userData.image} className="min-w-12" />
+              <ProfileImage
+                profileImage={userData.image}
+                className="min-w-12"
+              />
               <div className="flex justify-between w-full">
                 <div
                   id="profile-deta"
@@ -160,10 +161,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
             {posts.length ? (
               <div className="flex flex-wrap gap-2 p-2">
                 {posts?.map((post) => (
-                  <PostGridCard
-                    key={post._id}
-                    image={IMAGE_BASE_URL + post.images[0]}
-                  />
+                  <PostGridCard key={post._id} image={post.images[0]} />
                 ))}
               </div>
             ) : (

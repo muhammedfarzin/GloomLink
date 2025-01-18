@@ -2,10 +2,8 @@ import axios from "axios";
 import store from "./redux/store";
 import { logout } from "./redux/reducers/auth";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string + "/user";
-
 const apiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "/api/user",
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,7 +32,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("refreshToken");
-        const response = await axios.post(BASE_URL + "/auth/refresh", {
+        const response = await axios.post("/api/user/auth/refresh", {
           token: refreshToken,
         });
         const newAccessToken = response.data.tokens.accessToken;

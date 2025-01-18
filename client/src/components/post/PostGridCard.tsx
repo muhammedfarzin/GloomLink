@@ -13,14 +13,11 @@ const PostGridCard: React.FC<PostGridCardProps> = ({ image }) => {
       className="border rounded-3xl cursor-pointer aspect-square w-[calc(33.73%-0.5rem)]"
       style={{ borderColor: colorTheme.border }}
     >
-      <img
+      {image ?<img
         className="rounded-3xl h-full w-full object-cover"
-        src={
-          image ||
-          "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRzEVWlSuxRzKVINDVaP0wDm2mh2ENug28zEJXK54vPfTgJg54A"
-        }
+        src={image}
         alt="post"
-      />
+      /> : <span>Text</span>}
     </div>
   );
 };

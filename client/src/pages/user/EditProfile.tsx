@@ -17,7 +17,6 @@ import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
-const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -147,9 +146,7 @@ const EditProfile: React.FC = () => {
           <ProfileImage
             className="cursor-pointer w-3/4 !max-w-36"
             profileImage={
-              image instanceof File
-                ? URL.createObjectURL(image)
-                : image && IMAGE_BASE_URL + image
+              image instanceof File ? URL.createObjectURL(image) : image
             }
             onClick={() => imageInputRef.current?.click()}
           />
@@ -259,7 +256,7 @@ const EditProfile: React.FC = () => {
 
               <InputBox
                 value={formData.password}
-                name="currentPassword"
+                name="password"
                 onChange={handleOnChange}
                 placeholder="Current password"
                 type="password"

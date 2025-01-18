@@ -18,8 +18,6 @@ import {
 import { useState } from "react";
 import apiClient from "@/apiClient";
 
-const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL as string;
-
 export interface Post {
   _id: string;
   userId: string;
@@ -71,7 +69,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
         <Link to={`/${uploadedBy.username}`}>
           <ProfileImage
             className="w-10 cursor-pointer"
-            profileImage={uploadedBy.image && IMAGE_BASE_URL + uploadedBy.image}
+            profileImage={uploadedBy.image}
           />
         </Link>
         <Link to={`/${uploadedBy.username}`}>
@@ -91,7 +89,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
               <CarouselItem key={index}>
                 <img
                   className="mt-1 w-full object-contain rounded-xl max-h-80 border"
-                  src={IMAGE_BASE_URL + image}
+                  src={image}
                   alt="post"
                   style={{
                     borderColor: colorTheme.border,

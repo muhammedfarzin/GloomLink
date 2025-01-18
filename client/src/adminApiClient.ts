@@ -2,10 +2,8 @@ import axios from "axios";
 import store from "./redux/store"; // Adjust the import according to your store file location
 import { logout } from "./redux/reducers/auth"; // Adjust the import according to your actions file location
 
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) + "/admin";
-
 const adminApiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "/api/admin",
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,7 +32,7 @@ adminApiClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("adminRefreshToken");
-        const response = await axios.post(BASE_URL + "/auth/refresh", {
+        const response = await axios.post("/api/admin/auth/refresh", {
           token: refreshToken,
         });
         const newAccessToken = response.data.tokens.accessToken;

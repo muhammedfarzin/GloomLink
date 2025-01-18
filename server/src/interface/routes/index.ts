@@ -10,7 +10,7 @@ router.use("/api/admin", adminApiRouter);
 
 router.use("/api", errorMiddleware);
 
-router.all("*", (_, res) => {
+router.all("*", (req, res) => {
   res.status(404).json({
     status: 404,
     message: "Route not found",

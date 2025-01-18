@@ -16,8 +16,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -34,7 +32,7 @@ const OtpVerification: React.FC = () => {
   const handleResendOtp = async () => {
     try {
       const response = await axios.post(
-        BASE_URL + "/user/signup/resend-otp",
+        "/api/user/signup/resend-otp",
         {
           accessToken,
         },
@@ -63,7 +61,7 @@ const OtpVerification: React.FC = () => {
 
     try {
       const response = await axios.post(
-        BASE_URL + "/user/signup/verify-otp",
+        "/api/user/signup/verify-otp",
         {
           otp,
         },

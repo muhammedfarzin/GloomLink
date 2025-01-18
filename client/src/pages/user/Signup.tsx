@@ -18,8 +18,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
   const navigate = useNavigate();
@@ -39,13 +37,13 @@ const Signup = () => {
   const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
-      const accessToken = localStorage.getItem("accessToken");
-      if (accessToken && userData && userData.status !== "blocked") {
-        navigate("/");
-      } else {
-        dispatch(logout({ type: "user" }));
-      }
-    }, [userData]);
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && userData && userData.status !== "blocked") {
+      navigate("/");
+    } else {
+      dispatch(logout({ type: "user" }));
+    }
+  }, [userData]);
 
   const handleOnSignup: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -53,7 +51,7 @@ const Signup = () => {
       const isValidated = validateSignUpForm(formData, setErrorMessage);
       if (!isValidated) return;
 
-      const response = await axios.post(BASE_URL + "/user/signup", {
+      const response = await axios.post("/api/user/signup", {
         ...formData,
         dob: dob?.toISOString(),
         gender: gender,
