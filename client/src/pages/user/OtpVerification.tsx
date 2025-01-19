@@ -118,7 +118,13 @@ const OtpVerification: React.FC = () => {
             errorMessage={errorMessage}
             onSubmit={handleVerifyOtp}
           >
-            <div className="w-full flex justify-end mt-[-1rem]">
+            <div className="w-full flex justify-between mt-[-1rem]">
+              <span
+                className="cursor-pointer hover:opacity-75"
+                onClick={() => dispatch(logout({ type: "user" }))}
+              >
+                Cancel
+              </span>
               <TimerButton onClick={handleResendOtp}>Resend OTP</TimerButton>
             </div>
             <InputBox
