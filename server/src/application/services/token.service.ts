@@ -13,16 +13,10 @@ export const generateToken = (
 ): TokensType => {
   const { role, username } = payload;
   if (role !== "admin") {
-    var {
-      _id,
-      email,
-      mobile,
-      status,
-    }: { _id?: string; email?: string; mobile?: string; status?: string } =
-      payload;
+    var { _id, email, status, authType } = payload as Partial<typeof payload>;
   }
 
-  const data = { role, _id, username, email, mobile, status };
+  const data = { role, _id, username, email, status, authType };
   const accessToken = jwt.sign(
     data,
     process.env.JWT_ACCESS_SECRET || "secret",

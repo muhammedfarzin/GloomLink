@@ -13,7 +13,7 @@ declare module "express-serve-static-core" {
           lastname: string;
           username: string;
           email: string;
-          mobile: string;
+          authType: "email" | "google";
           status: "active" | "inactive" | "blocked" | "not-verified";
         };
   }

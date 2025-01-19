@@ -90,7 +90,7 @@ router.post(
   authenticateToken,
   authorizeRole("user"),
   uploadImage.single("image"),
-  userController.updateProfile
+  authController.updateProfile
 );
 
 router.get(

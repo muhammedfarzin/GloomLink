@@ -15,6 +15,7 @@ import {
 import { otpRepository } from "../../infrastructure/repositories/OtpRepository.js";
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
 import { Schema } from "mongoose";
+import fs from "fs";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -192,6 +193,7 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
       role: "user",
       ...userData,
       _id: userData._id.toString(),
+      authType: userData.authType || "email",
     };
     const tokens = generateToken(tokenPayload);
 
@@ -228,8 +230,17 @@ export const refreshToken: RequestHandler = async (req, res, next) => {
         throw new HttpError(401, "Your account is blocked");
       }
 
-      const { _id, email, firstname, lastname, username, mobile, status } =
-        user;
+      const {
+        _id,
+        email,
+        firstname,
+        lastname,
+        username,
+        mobile,
+        status,
+        authType,
+      } = user;
+
       const resData = {
         _id: _id.toString(),
         email,
@@ -238,6 +249,7 @@ export const refreshToken: RequestHandler = async (req, res, next) => {
         username,
         mobile,
         status,
+        authType: authType || "email",
       };
 
       newTokens = generateToken({ role: "user", ...resData }, true);
@@ -252,6 +264,97 @@ export const refreshToken: RequestHandler = async (req, res, next) => {
       tokens: newTokens,
       message: "Token refreshed successfully",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProfile: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const {
+      username,
+      firstname,
+      lastname,
+      mobile,
+      dob,
+      gender,
+      password,
+      newPassword,
+    } = req.body as Partial<User> & { newPassword: string };
+    const image = req.file?.path.replace("public", "");
+    let existImage: string | undefined;
+
+    if (!firstname) throw new HttpError(400, "Please enter firstname.");
+    else if (!lastname) throw new HttpError(400, "Please enter lastname.");
+    else if (!username) throw new HttpError(400, "Please enter username.");
+    else if (!mobile) throw new HttpError(400, "Please enter mobile number.");
+
+    const user = await userRepository.findById(req.user._id, null, true);
+    if (!user) throw new HttpError(401, "Unauthorized");
+    if (req.user.authType === "email") {
+      if (!password) throw new HttpError(400, "Please enter password.");
+
+      const userVerified = await userRepository.verifyUser(username, password);
+
+      if (!userVerified)
+        throw new HttpError(400, "Invalid password. Please try again");
+
+      user.password = newPassword;
+    }
+
+    if (image && user.image) existImage = user.image;
+
+    user.username = username;
+    user.firstname = firstname;
+    user.lastname = lastname;
+    user.mobile = mobile;
+    user.dob = dob;
+    user.gender = gender;
+    user.image = image;
+    const {
+      _id,
+      username: newUsername,
+      firstname: newFirstname,
+      lastname: newLastname,
+      status,
+      email,
+      authType,
+    } = (await user.save()).toObject();
+    const resUserData = {
+      _id,
+      username: newUsername,
+      firstname: newFirstname,
+      lastname: newLastname,
+      status,
+      email,
+      authType,
+    };
+
+    if (existImage) {
+      fs.unlink("public" + existImage, (err) => {
+        if (err) console.log("Image is not deleted");
+      });
+    }
+
+    const tokenPayload: TokenPayloadType = {
+      role: "user",
+      ...resUserData,
+      _id: resUserData._id.toString(),
+      authType: resUserData.authType || "email",
+    };
+    const tokens = generateToken(tokenPayload);
+
+    res
+      .status(200)
+      .json({
+        userData: resUserData,
+        tokens,
+        message: "Updated profile successfully",
+      });
   } catch (error) {
     next(error);
   }
