@@ -55,6 +55,7 @@ const UserSideMenuBar: React.FC<UserSideMenuBarProps> = ({ selected }) => {
           dispatch(logout({ type: "user" }));
         }}
         description="Do you really want to logout"
+        confirmButtonText="Logout"
       >
         <MenuButton
           to="/logout"

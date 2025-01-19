@@ -78,13 +78,26 @@ export const validateSignUpForm = (
 
 export const validateEditProfileForm = (
   formData: EditProfileFormType,
+  authType: string,
   errorCallback: ErrorCallbackType
 ) => {
-  const { confirmPassword, newPassword, gender, dob, ...requiredField } =
-    formData;
+  const {
+    password,
+    confirmPassword,
+    newPassword,
+    gender,
+    dob: _,
+    ...requiredField
+  } = formData;
+  if (authType === "email") requiredField.password = password;
   if (validateRequiredFields(requiredField, errorCallback)) {
     if (gender && gender !== "f" && gender !== "m") {
       errorCallback("Invalid gender selected");
+      return false;
+    }
+
+    if (!mobileRegex.test(formData.mobile)) {
+      errorCallback("Please enter a valid mobile number.");
       return false;
     }
 
@@ -96,7 +109,7 @@ export const validateEditProfileForm = (
         return false;
       }
 
-      if (formData.newPassword !== formData.confirmPassword) {
+      if (newPassword !== confirmPassword) {
         errorCallback("Passwords do not match.");
         return false;
       }

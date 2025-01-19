@@ -15,17 +15,21 @@ import apiClient from "@/apiClient";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "@/redux/reducers/auth";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
   const [image, setImage] = useState<File | string>();
   const [cropimage, setCropImage] = useState<string | ArrayBuffer | null>(null);
+  const [authType, setAuthType] = useState<string>("email");
   const [formData, setFormData] = useState<EditProfileFormType>({
     firstname: "",
     lastname: "",
@@ -44,11 +48,12 @@ const EditProfile: React.FC = () => {
     apiClient
       .get("/profile/edit")
       .then((response) => {
-        const { dob, gender, image, ...userData } = response.data;
+        const { dob, gender, image, authType, ...userData } = response.data;
         setDob(dob);
         setGender(gender);
         setImage(image);
         setFormData({ ...formData, ...userData });
+        setAuthType(authType);
       })
       .catch((error) => {
         toast({
@@ -106,7 +111,7 @@ const EditProfile: React.FC = () => {
     try {
       setLoading("Updating...");
       if (
-        !validateEditProfileForm(formData, (errMessage) => {
+        !validateEditProfileForm(formData, authType, (errMessage) => {
           throw new Error(errMessage);
         })
       ) {
@@ -123,12 +128,15 @@ const EditProfile: React.FC = () => {
         formDatas.append(key, value);
       }
 
-      await apiClient.post("/profile/edit", formDatas, {
+      const {
+        data: { userData, tokens },
+      } = await apiClient.post("/profile/edit", formDatas, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
+      dispatch(setAuthUser({ userData, tokens }));
       navigate("/profile");
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -204,9 +212,9 @@ const EditProfile: React.FC = () => {
                 <InputBox
                   value={formData.email}
                   name="email"
-                  onChange={handleOnChange}
                   placeholder="Email"
                   type="email"
+                  disabled
                 />
                 <InputBox
                   value={formData.mobile}
@@ -246,30 +254,34 @@ const EditProfile: React.FC = () => {
                 />
               </div>
 
-              <div className="flex gap-2">
-                <InputBox
-                  value={formData.newPassword}
-                  name="newPassword"
-                  onChange={handleOnChange}
-                  placeholder="New password"
-                  type="password"
-                />
-                <InputBox
-                  value={formData.confirmPassword}
-                  name="confirmPassword"
-                  onChange={handleOnChange}
-                  placeholder="Confirm password"
-                  type="password"
-                />
-              </div>
+              {authType === "email" ? (
+                <>
+                  <div className="flex gap-2">
+                    <InputBox
+                      value={formData.newPassword}
+                      name="newPassword"
+                      onChange={handleOnChange}
+                      placeholder="New password"
+                      type="password"
+                    />
+                    <InputBox
+                      value={formData.confirmPassword}
+                      name="confirmPassword"
+                      onChange={handleOnChange}
+                      placeholder="Confirm password"
+                      type="password"
+                    />
+                  </div>
 
-              <InputBox
-                value={formData.password}
-                name="password"
-                onChange={handleOnChange}
-                placeholder="Current password"
-                type="password"
-              />
+                  <InputBox
+                    value={formData.password}
+                    name="password"
+                    onChange={handleOnChange}
+                    placeholder="Current password"
+                    type="password"
+                  />
+                </>
+              ) : null}
               <div className="flex justify-end mt-1">
                 <Button
                   type="submit"
