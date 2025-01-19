@@ -8,7 +8,7 @@ export interface Post {
   images: string[];
   tags: string[];
   publishedFor: "public" | "subscriber";
-  status: "active" | "blocked";
+  status: "active" | "blocked" | "deleted";
 }
 
 const postSchema = new Schema<Post>(
@@ -37,7 +37,7 @@ const postSchema = new Schema<Post>(
     status: {
       type: String,
       default: "active",
-      enum: ["active", "blocked"],
+      enum: ["active", "blocked", "deleted"],
     },
   },
   { timestamps: true }

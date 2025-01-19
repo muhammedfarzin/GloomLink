@@ -21,6 +21,7 @@ interface ConfirmButtonProps {
   title?: string;
   description?: string;
   confirmButtonText?: string;
+  className?: string;
 }
 
 const ConfirmButton: React.FC<ConfirmButtonProps> = ({
@@ -30,6 +31,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
   title,
   description,
   confirmButtonText,
+  className,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const alertBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -37,7 +39,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger className={className}>
         <children.type
           onClick={(e: React.MouseEvent) => {
             e.preventDefault();

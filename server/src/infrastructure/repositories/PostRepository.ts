@@ -1,7 +1,9 @@
+import type { Document, ProjectionType, Schema } from "mongoose";
 import { PostModel, type Post } from "../database/models/PostModel";
 import { UserModel } from "../database/models/UserModel";
 import { HttpError } from "../errors/HttpError";
 import { userRepository } from "./UserRepository";
+import { ReportModel } from "../database/models/ReportModel";
 
 class PostRepository {
   async createPost(
@@ -26,6 +28,46 @@ class PostRepository {
 
     const post = await newPost.save();
     return post.toObject();
+  }
+
+  async findById(
+    postId: string,
+    projection?: ProjectionType<Post> | null,
+    returnDocument?: false
+  ): Promise<
+    | (Post &
+        Required<{
+          _id: Schema.Types.ObjectId;
+        }>)
+    | null
+  >;
+  async findById(
+    postId: string,
+    projection?: ProjectionType<Post> | null,
+    returnDocument?: true
+  ): Promise<
+    | (Document<unknown, {}, Post> &
+        Post &
+        Required<{
+          _id: Schema.Types.ObjectId;
+        }> & {
+          __v: number;
+        })
+    | null
+  >;
+  async findById(
+    postId: string,
+    projection?: ProjectionType<Post> | null,
+    returnDocument: boolean = true
+  ) {
+    const post = await PostModel.findById(postId, projection);
+
+    return returnDocument ? post : post?.toObject();
+  }
+
+  async checkPostExist(postId: string): Promise<boolean> {
+    const post = await PostModel.findById(postId);
+    return !!post;
   }
 
   async getPosts(userId: string) {
@@ -93,6 +135,16 @@ class PostRepository {
     ]);
 
     return savedPosts;
+  }
+
+  async reportPost(postId: string, userId: string) {
+    const report = new ReportModel({
+      reportedBy: userId,
+      targetId: postId,
+      type: "post",
+    });
+
+    await report.save();
   }
 }
 

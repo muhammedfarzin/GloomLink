@@ -114,4 +114,13 @@ router.post(
   userController.unfollowUser
 );
 
+// Report
+
+router.post(
+  "/posts/report/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.reportPost
+);
+
 export { router as userApiRouter };

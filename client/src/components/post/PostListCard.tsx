@@ -17,6 +17,7 @@ import {
 } from "../ui/carousel";
 import { useState } from "react";
 import apiClient from "@/apiClient";
+import PostActionsDropDown from "./PostActionsDropDown";
 
 export interface Post {
   _id: string;
@@ -65,18 +66,21 @@ const PostListCard: React.FC<PostListCardProps> = ({
       }}
     >
       {/* Uploaded By */}
-      <div className="flex flex-row items-center">
-        <Link to={`/${uploadedBy.username}`}>
-          <ProfileImage
-            className="w-10 cursor-pointer"
-            profileImage={uploadedBy.image}
-          />
-        </Link>
-        <Link to={`/${uploadedBy.username}`}>
-          <span className="text-base font-bold cursor-pointer line-clamp-1">
-            {uploadedBy.username}
-          </span>
-        </Link>
+      <div className="flex justify-between">
+        <div className="flex flex-row items-center">
+          <Link to={`/${uploadedBy.username}`}>
+            <ProfileImage
+              className="w-10 cursor-pointer"
+              profileImage={uploadedBy.image}
+            />
+          </Link>
+          <Link to={`/${uploadedBy.username}`}>
+            <span className="text-base font-bold cursor-pointer line-clamp-1">
+              {uploadedBy.username}
+            </span>
+          </Link>
+        </div>
+        <PostActionsDropDown postId={_id} />
       </div>
 
       {/* Post */}
