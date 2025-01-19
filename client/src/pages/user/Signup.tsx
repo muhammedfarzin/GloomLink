@@ -23,6 +23,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<SignUpFormType>({
     firstname: "",
     lastname: "",
@@ -48,6 +49,7 @@ const Signup = () => {
   const handleOnSignup: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
+      setLoading("Signing up...");
       const isValidated = validateSignUpForm(formData, setErrorMessage);
       if (!isValidated) return;
 
@@ -66,6 +68,8 @@ const Signup = () => {
       if (error instanceof AxiosError && error.response) {
         setErrorMessage(error.response.data.message);
       } else setErrorMessage("Something went wrong");
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -146,7 +150,7 @@ const Signup = () => {
               <DatePicker
                 selected={dob}
                 onChange={(date) => date && setDob(date)}
-                placeholderText="Date of Birth"
+                placeholderText="Date of Birth (Optional)"
                 maxDate={maxDate}
                 dateFormat="dd-MMM-yyyy"
                 wrapperClassName="input my-1"
@@ -176,8 +180,12 @@ const Signup = () => {
               type="password"
             />
 
-            <button type="submit" className="btn btn-primary border w-full">
-              Sign Up
+            <button
+              type="submit"
+              className="btn btn-primary border w-full"
+              disabled={!!loading}
+            >
+              {loading ?? "Sign Up"}
             </button>
           </FormBox>
 

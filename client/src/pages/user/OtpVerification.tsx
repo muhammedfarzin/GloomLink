@@ -20,6 +20,7 @@ const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const [loading, setLoading] = useState<string | null>(null);
   const [otp, setOtp] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>();
   const accessToken = localStorage.getItem("accessToken");
@@ -31,6 +32,7 @@ const OtpVerification: React.FC = () => {
 
   const handleResendOtp = async () => {
     try {
+      setLoading("Resending OTP...");
       const response = await axios.post(
         "/api/user/signup/resend-otp",
         {
@@ -47,6 +49,8 @@ const OtpVerification: React.FC = () => {
       if (error instanceof AxiosError && error.response) {
         setErrorMessage(error.response.data.message);
       } else setErrorMessage("Something went wrong");
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -54,12 +58,13 @@ const OtpVerification: React.FC = () => {
     e
   ) => {
     e.preventDefault();
+    setLoading("Verifying...");
     setErrorMessage("");
-    const isValidated = validateOtpForm(otp, setErrorMessage);
-
-    if (!isValidated) return;
-
     try {
+      validateOtpForm(otp, (errorMessage) => {
+        throw new Error(errorMessage);
+      });
+
       const response = await axios.post(
         "/api/user/signup/verify-otp",
         {
@@ -76,17 +81,19 @@ const OtpVerification: React.FC = () => {
 
       dispatch(setAuthUser({ userData, tokens }));
       navigate("/");
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        if (error.status === 401) {
-          error.response.data.message = "Time expired, please try again";
-          dispatch(logout({ type: "user" }));
-        } else if (error.status === 404) {
-          error.response.data.message = "Your otp has been expired";
-          dispatch(logout({ type: "user" }));
-        }
-        setErrorMessage(error.response.data.message);
-      } else setErrorMessage("Something went wrong");
+    } catch (error: any) {
+      if (error.status === 401) {
+        error.response.data.message = "Time expired, please try again";
+        dispatch(logout({ type: "user" }));
+      } else if (error.status === 404) {
+        error.response.data.message = "Your otp has been expired";
+        dispatch(logout({ type: "user" }));
+      }
+      setErrorMessage(
+        error.response?.data?.message || error.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -122,8 +129,12 @@ const OtpVerification: React.FC = () => {
               onChange={(e) => setOtp(e.target.value)}
             />
 
-            <button type="submit" className="btn btn-primary border w-full">
-              Verify
+            <button
+              type="submit"
+              className="btn btn-primary border w-full"
+              disabled={!!loading}
+            >
+              {loading || "Verify"}
             </button>
           </FormBox>
         </div>

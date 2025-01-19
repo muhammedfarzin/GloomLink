@@ -7,10 +7,6 @@ export interface UserAuthState {
   lastname: string;
   status: "not-verified" | "active" | "inactive" | "blocked";
   email: string;
-  mobile: string;
-  image?: string;
-  gender?: "m" | "f";
-  dob?: Date;
 }
 
 export interface AdminAuthState {

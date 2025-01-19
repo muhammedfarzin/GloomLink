@@ -116,13 +116,13 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
                 <div className="flex justify-around w-2/3">
                   <div className="flex flex-col justify-center text-center">
                     <span className="text-xl font-bold">
-                      {userData?.followingCount}
+                      {userData?.followersCount}
                     </span>
                     <span className="text-sm font-light">Followers</span>
                   </div>
                   <div className="flex flex-col justify-center text-center">
                     <span className="text-xl font-bold">
-                      {userData?.followersCount}
+                      {userData?.followingCount}
                     </span>
                     <span className="text-sm font-light">Following</span>
                   </div>

@@ -18,11 +18,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleAuthProvider } from "@/firebase";
+import { FirebaseError } from "firebase/app";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<LoginFormType>({
     username: "",
     password: "",
@@ -48,6 +50,7 @@ const Login: React.FC = () => {
 
   const handleOnLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    setLoading("Authenticating...");
     setErrorMessage("");
 
     const isValidated = validateLoginForm(formData, setErrorMessage);
@@ -60,6 +63,8 @@ const Login: React.FC = () => {
         if (error instanceof AxiosError && error.response) {
           setErrorMessage(error.response.data.message);
         } else setErrorMessage("Something went wrong");
+      } finally {
+        setLoading(null);
       }
     }
   };
@@ -70,21 +75,25 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      setLoading("Logging in with Google");
       const credentials = await signInWithPopup(
         firebaseAuth,
         googleAuthProvider
       );
       const token = await credentials.user.getIdToken();
-      const response = await axios.post("api/user/auth/google", {
+      const response = await axios.post("/api/user/auth/google", {
         token,
       });
 
       handleSuccessLogin(response.data);
-    } catch (error) {
-      console.log(error)
-      if (error instanceof AxiosError && error.response) {
+    } catch (error: any) {
+      if (error instanceof FirebaseError) {
+        setErrorMessage("Google authentication failed");
+      } else if (error instanceof AxiosError && error.response) {
         setErrorMessage(error.response.data.message);
-      } else setErrorMessage("Something went wrong");
+      } else setErrorMessage(error.message || "Something went wrong");
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -124,8 +133,12 @@ const Login: React.FC = () => {
               onChange={handleOnChange}
             />
 
-            <button type="submit" className="btn btn-primary border w-full">
-              Login
+            <button
+              type="submit"
+              className="btn btn-primary border w-full"
+              disabled={!!loading}
+            >
+              {loading || "Login"}
             </button>
           </FormBox>
 
@@ -142,11 +155,13 @@ const Login: React.FC = () => {
               <span className="ml-4 text-sm">Sign Up with Email</span>
             </Link>
 
-            <button className="btn btn-dark border w-72 mt-5 block mx-auto p-3">
+            <button
+              className="btn btn-dark border w-72 mt-5 block mx-auto p-3"
+              onClick={handleGoogleLogin}
+              disabled={!!loading}
+            >
               <img src={GoogleIcon} alt="google" className="inline" />
-              <span className="ml-4 text-sm" onClick={handleGoogleLogin}>
-                Continue with Google
-              </span>
+              <span className="ml-4 text-sm">Continue with Google</span>
             </button>
           </div>
         </div>
