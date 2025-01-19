@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import Button from "../../components/Button";
 import DropDownBox from "../../components/DropDownBox";
 import SearchBox from "../../components/SearchBox";
@@ -10,7 +9,9 @@ import adminApiClient from "../../adminApiClient";
 import ConfirmButton from "@/components/ConfirmButton";
 
 const AdminUserLists: React.FC = () => {
-  const [users, setUsers] = useState<UserAuthState[]>([]);
+  const [users, setUsers] = useState<(UserAuthState & { mobile?: string })[]>(
+    []
+  );
 
   useEffect(() => {
     adminApiClient.get("/users").then((response) => {
@@ -64,13 +65,10 @@ const AdminUserLists: React.FC = () => {
                   {user.firstname} {user.lastname}
                 </TableData>
                 <TableData>{user.email}</TableData>
-                <TableData>{user.mobile}</TableData>
+                <TableData>{user.mobile || "Not provided"}</TableData>
                 <TableData>{user.status}</TableData>
                 <TableData className="!px-1">
                   <div className="flex gap-1">
-                    <Link to={"edit/"} className="text-xs w-full">
-                      <Button className="w-full">Edit</Button>
-                    </Link>
                     <ConfirmButton
                       description={`Do you really want to ${
                         user.status === "blocked" ? "unblock" : "block"

@@ -90,7 +90,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
             {images.map((image, index) => (
               <CarouselItem key={index}>
                 <img
-                  className="mt-1 w-full object-contain rounded-xl max-h-80 border"
+                  className="mt-1 w-full object-contain rounded-xl min-h-40 max-h-80 border"
                   src={image}
                   alt="post"
                   style={{

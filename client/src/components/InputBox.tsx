@@ -18,7 +18,7 @@ const InputBox: React.FC<InputBoxProps> = ({
   return (
     <input
       type={type}
-      className={`my-1 ${className}`}
+      className={`my-1 disabled:opacity-50 ${className}`}
       onFocus={(e) =>
         (e.currentTarget.style.backgroundColor = backgroundColorTheme + 'bb')
       }

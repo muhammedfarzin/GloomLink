@@ -20,6 +20,7 @@ interface ConfirmButtonProps {
   onCancel?: React.MouseEventHandler<HTMLButtonElement>;
   title?: string;
   description?: string;
+  confirmButtonText?: string;
 }
 
 const ConfirmButton: React.FC<ConfirmButtonProps> = ({
@@ -28,6 +29,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
   onCancel,
   title,
   description,
+  confirmButtonText,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const alertBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -48,7 +50,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
       </AlertDialogTrigger>
 
       <AlertDialogContent
-      className="border-none"
+        className="border-none"
         style={{ color: colorTheme.text, background: colorTheme.background }}
       >
         <AlertDialogHeader>
@@ -60,7 +62,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
 
         <AlertDialogFooter>
           <AlertDialogCancel
-          className="border-gray-500 hover:opacity-75 transition-all"
+            className="border-gray-500 hover:opacity-75 transition-all"
             onClick={onCancel}
             style={{
               color: colorTheme.text,
@@ -80,7 +82,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
             }
             style={{ color: colorTheme.text, background: colorTheme.primary }}
           >
-            Continue
+            {confirmButtonText || "Continue"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
