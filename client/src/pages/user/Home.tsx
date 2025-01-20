@@ -29,7 +29,7 @@ const Home = () => {
       <div className="m-2">
         <div className="flex flex-col items-center gap-2 mt-5">
           {posts.map((post) => (
-            <PostListCard key={post._id} postData={post} />
+            <PostListCard key={post._id} postData={post} handleChange={setPosts} />
           ))}
         </div>
       </div>

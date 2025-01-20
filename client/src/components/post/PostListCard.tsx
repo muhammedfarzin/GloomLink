@@ -3,7 +3,6 @@ import { RootState } from "../../redux/store";
 import ProfileImage from "../ProfileImage";
 import IconButton from "../IconButton";
 import HeartIcon from "../../assets/icons/Heart.svg";
-import CommentIcon from "../../assets/icons/Comment.svg";
 import ShareIcon from "../../assets/icons/Share.svg";
 import SaveIcon from "../../assets/icons/Save.svg";
 import SavedIcon from "../../assets/icons/Saved.svg";
@@ -15,9 +14,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
-import { useState } from "react";
 import apiClient from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
+import CommentButton from "./CommentButton";
 
 export interface Post {
   _id: string;
@@ -28,7 +27,7 @@ export interface Post {
   publishedFor: "public" | "subscriber";
   createdAt: string;
   saved?: boolean;
-  status: "active" | "blocked" | "deleted";
+  status?: "active" | "blocked" | "deleted";
   uploadedBy: {
     _id: string;
     firstname: string;
@@ -39,7 +38,7 @@ export interface Post {
   reportCount?: number;
 }
 
-interface PostListCardProps {
+export interface PostListCardProps {
   postData: Pick<
     Post,
     | "_id"
@@ -52,6 +51,9 @@ interface PostListCardProps {
   >;
   isAdmin?: boolean;
   handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
+  className?: string;
+  hideComment?: boolean;
+  captionLine?: number;
 }
 
 const PostListCard: React.FC<PostListCardProps> = ({
@@ -61,28 +63,36 @@ const PostListCard: React.FC<PostListCardProps> = ({
     images,
     uploadedBy,
     saved = false,
-    status,
+    status = "active",
     reportCount,
   },
   isAdmin = false,
   handleChange,
+  className,
+  hideComment,
+  captionLine = 3,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-  const [isSaved, setIsSaved] = useState<boolean>(saved);
 
   const handleSavePost = async (postId: string, type: "save" | "unsave") => {
+    const handleSavedState = (state: Post[]) =>
+      state.map((post) => {
+        if (post._id === postId) post.saved = !saved;
+        return post;
+      });
     try {
-      setIsSaved(!isSaved);
-      const path = type === "save" ? "posts/save/" : "posts/unsave/";
-      await apiClient.put(path + postId);
+      handleChange?.(handleSavedState);
+      await apiClient.put(`/posts/${type}/${postId}`);
     } catch (error) {
-      setIsSaved(!isSaved);
+      handleChange?.(handleSavedState);
     }
   };
 
   return (
     <div
-      className="flex flex-col gap-3 border border-[#9ca3af33] p-4 w-full max-w-lg rounded-2xl"
+      className={`flex flex-col gap-3 border border-[#9ca3af33] p-4 w-full max-w-lg ${
+        className || "rounded-2xl"
+      }`}
       style={{
         backgroundColor: colorTheme.primary,
       }}
@@ -111,9 +121,14 @@ const PostListCard: React.FC<PostListCardProps> = ({
       </div>
 
       {/* Post */}
-      <div>
-        <p className="text-base max-h-[4.5rem] transition-all duration-1000 hover:max-h-[5000px] line-clamp-3 hover:line-clamp-none">
-          {caption}
+      <div className="h-full overflow-y-scroll no-scrollbar">
+        <p
+          className={`text-base max-h-[4.5rem] transition-all duration-1000 hover:max-h-[5000px] line-clamp-${captionLine} hover:line-clamp-none`}
+        >
+          {caption} Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+          Eaque, iusto doloribus nesciunt, molestiae explicabo rerum voluptate
+          quidem voluptates in quas, perspiciatis esse. Odit, a tenetur ducimus
+          dolore id natus nulla.
         </p>
 
         <Carousel className="relative w-full">
@@ -140,17 +155,36 @@ const PostListCard: React.FC<PostListCardProps> = ({
       {/* Post Actions */}
       {!isAdmin ? (
         <div className="flex justify-between w-full">
-          <div className="flex justify-around rounded-xl bg-[#6b728033] p-1 w-1/2">
+          <div
+            className={`flex justify-around rounded-xl bg-[#6b728033] p-1 w-1/${
+              hideComment ? "3" : "2"
+            }`}
+          >
             <IconButton icon={HeartIcon} alt="favorite" />
-            <IconButton icon={CommentIcon} alt="comment" />
+            {!hideComment ? (
+              <CommentButton
+                postCardData={{
+                  postData: {
+                    _id,
+                    caption,
+                    images,
+                    uploadedBy,
+                    saved,
+                    status,
+                    reportCount,
+                  },
+                  handleChange,
+                }}
+              />
+            ) : null}
             <IconButton icon={ShareIcon} alt="share" />
           </div>
           <div className="p-1">
             <IconButton
-              icon={isSaved ? SavedIcon : SaveIcon}
+              icon={saved ? SavedIcon : SaveIcon}
               alt="save"
               onClick={() =>
-                isSaved
+                saved
                   ? handleSavePost(_id, "unsave")
                   : handleSavePost(_id, "save")
               }
