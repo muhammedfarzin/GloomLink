@@ -70,12 +70,140 @@ class PostRepository {
     return !!post;
   }
 
-  async getPosts(userId: string) {
+  async getPostsForAdmin(
+    filter?: "active" | "blocked" | "reported",
+    query?: string
+  ) {
+    if (filter === "reported") {
+      var posts = await ReportModel.aggregate([
+        {
+          $group: {
+            _id: "$targetId",
+            reportCount: { $sum: 1 },
+          },
+        },
+        { $limit: 20 },
+        {
+          $lookup: {
+            from: "posts",
+            localField: "_id",
+            foreignField: "_id",
+            as: "posts",
+            pipeline: [
+              {
+                $match: {
+                  status: { $ne: "deleted" },
+                  $or: [
+                    { caption: { $regex: query || "", $options: "i" } },
+                    { tags: { $in: query?.toLowerCase().split(" ") } },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+        { $unwind: "$posts" },
+        {
+          $replaceRoot: {
+            newRoot: {
+              $mergeObjects: [
+                {
+                  _id: "$_id",
+                  reportCount: "$reportCount",
+                },
+                "$posts",
+              ],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "uploadedBy",
+            pipeline: [
+              {
+                $project: {
+                  username: 1,
+                  image: 1,
+                  firstname: 1,
+                  lastname: 1,
+                },
+              },
+            ],
+          },
+        },
+      ]);
+    } else {
+      var posts = await PostModel.aggregate([
+        {
+          $match: {
+            status: filter ? { $eq: filter } : { $ne: "deleted" },
+            $or: [
+              { caption: { $regex: query || "", $options: "i" } },
+              { tags: query?.toLowerCase().split(" ") },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "uploadedBy",
+            pipeline: [
+              {
+                $project: {
+                  username: 1,
+                  image: 1,
+                  firstname: 1,
+                  lastname: 1,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "reports",
+            localField: "_id",
+            foreignField: "targetId",
+            as: "reports",
+          },
+        },
+        { $limit: 20 },
+        {
+          $project: {
+            userId: 1,
+            caption: 1,
+            images: 1,
+            tags: 1,
+            publishedFor: 1,
+            createdAt: 1,
+            status: 1,
+            uploadedBy: 1,
+            reportCount: { $size: "$reports" },
+          },
+        },
+        { $unwind: "$uploadedBy" },
+      ]);
+    }
+
+    return posts;
+  }
+
+  async getPostsForUser(userId: string) {
     const user = await userRepository.findById(userId, { savedPosts: 1 });
     if (!user) throw new HttpError(401, "Unauthorized");
     const savedPosts = user.savedPosts.map((post) => post.toString());
 
     const posts = await PostModel.aggregate([
+      {
+        $match: {
+          status: "active",
+        },
+      },
       {
         $lookup: {
           from: "users",
@@ -110,7 +238,7 @@ class PostRepository {
     if (!user) throw new HttpError(404, "User not found");
 
     const savedPosts = await PostModel.aggregate([
-      { $match: { _id: { $in: user.savedPosts } } },
+      { $match: { _id: { $in: user.savedPosts }, status: "active" } },
       {
         $lookup: {
           from: "users",
@@ -138,6 +266,14 @@ class PostRepository {
   }
 
   async reportPost(postId: string, userId: string) {
+    const reportExist = await ReportModel.findOne({
+      reportedBy: userId,
+      targetId: postId,
+      type: "post",
+    });
+
+    if (reportExist) return;
+
     const report = new ReportModel({
       reportedBy: userId,
       targetId: postId,
@@ -145,6 +281,19 @@ class PostRepository {
     });
 
     await report.save();
+  }
+
+  async blockPost(postId: string) {
+    await PostModel.findByIdAndUpdate(postId, { status: "blocked" });
+  }
+
+  async unblockPost(postId: string) {
+    await PostModel.findByIdAndUpdate(postId, { status: "active" });
+  }
+
+  async deletePost(postId: string) {
+    await PostModel.findByIdAndUpdate(postId, { status: "deleted" });
+    await ReportModel.deleteMany({ targetId: postId });
   }
 }
 

@@ -30,7 +30,7 @@ const ReportSchema = new Schema<ReportType>(
   }
 );
 
-ReportSchema.pre("save", async function (next) {
+ReportSchema.post("save", async function () {
   const reportCount = await ReportModel.countDocuments({
     targetId: this.targetId,
   });
@@ -42,7 +42,7 @@ ReportSchema.pre("save", async function (next) {
       await UserModel.findByIdAndUpdate(this.targetId, { status: "blocked" });
     }
     await ReportModel.deleteMany({ targetId: this.targetId });
-  } else next();
+  }
 });
 
 export const ReportModel = model("Report", ReportSchema, "reports");

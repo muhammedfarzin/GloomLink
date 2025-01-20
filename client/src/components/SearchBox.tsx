@@ -5,6 +5,7 @@ import SearchIcon from "../assets/icons/Search.svg";
 
 interface SearchBoxProps extends InputBoxProps {
   showSearchIcon?: boolean;
+  onSubmit?: () => void;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
@@ -33,7 +34,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         id="searchBox"
         placeholder="Search"
         className="!bg-transparent !m-0"
-        onSubmit={onSubmit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onSubmit?.();
+          }
+        }}
         {...props}
       />
 
@@ -41,9 +47,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         <button
           className="p-2 rounded-lg"
           style={{ backgroundColor: backgroundColorTheme }}
-          onClick={() => onSubmit && onSubmit({} as React.FormEvent<HTMLInputElement>)}
+          onClick={() => onSubmit?.()}
           onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = colorTheme.selection + '55')
+            (e.currentTarget.style.backgroundColor =
+              colorTheme.selection + "55")
           }
           onMouseLeave={(e) =>
             (e.currentTarget.style.backgroundColor = backgroundColorTheme)

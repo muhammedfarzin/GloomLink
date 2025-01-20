@@ -70,9 +70,11 @@ const AdminUserLists: React.FC = () => {
                 <TableData className="!px-1">
                   <div className="flex gap-1">
                     <ConfirmButton
+                      className="w-full"
                       description={`Do you really want to ${
                         user.status === "blocked" ? "unblock" : "block"
                       } ${user.username}`}
+                      confirmButtonText="Block"
                       onSuccess={() =>
                         user.status === "blocked"
                           ? blockUser(user._id, "unblock")

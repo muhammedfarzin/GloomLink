@@ -27,29 +27,51 @@ export interface Post {
   tags: string[];
   publishedFor: "public" | "subscriber";
   createdAt: string;
-  saved: boolean;
+  saved?: boolean;
+  status: "active" | "blocked" | "deleted";
   uploadedBy: {
     _id: string;
     firstname: string;
     lastname: string;
     username: string;
-    image: string;
+    image?: string;
   };
+  reportCount?: number;
 }
 
 interface PostListCardProps {
-  postData: Pick<Post, "_id" | "caption" | "images" | "saved" | "uploadedBy">;
+  postData: Pick<
+    Post,
+    | "_id"
+    | "caption"
+    | "images"
+    | "saved"
+    | "uploadedBy"
+    | "status"
+    | "reportCount"
+  >;
+  isAdmin?: boolean;
+  handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
 const PostListCard: React.FC<PostListCardProps> = ({
-  postData: { _id, caption, images, uploadedBy, saved },
+  postData: {
+    _id,
+    caption,
+    images,
+    uploadedBy,
+    saved = false,
+    status,
+    reportCount,
+  },
+  isAdmin = false,
+  handleChange,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const [isSaved, setIsSaved] = useState<boolean>(saved);
 
   const handleSavePost = async (postId: string, type: "save" | "unsave") => {
     try {
-      console.log(type);
       setIsSaved(!isSaved);
       const path = type === "save" ? "posts/save/" : "posts/unsave/";
       await apiClient.put(path + postId);
@@ -80,7 +102,12 @@ const PostListCard: React.FC<PostListCardProps> = ({
             </span>
           </Link>
         </div>
-        <PostActionsDropDown postId={_id} />
+        <PostActionsDropDown
+          postId={_id}
+          isAdmin={isAdmin}
+          handleChange={handleChange}
+          status={status}
+        />
       </div>
 
       {/* Post */}
@@ -111,24 +138,39 @@ const PostListCard: React.FC<PostListCardProps> = ({
       </div>
 
       {/* Post Actions */}
-      <div className="flex justify-between w-full">
-        <div className="flex justify-around rounded-xl bg-[#6b728033] p-1 w-1/2">
-          <IconButton icon={HeartIcon} alt="favorite" />
-          <IconButton icon={CommentIcon} alt="comment" />
-          <IconButton icon={ShareIcon} alt="share" />
+      {!isAdmin ? (
+        <div className="flex justify-between w-full">
+          <div className="flex justify-around rounded-xl bg-[#6b728033] p-1 w-1/2">
+            <IconButton icon={HeartIcon} alt="favorite" />
+            <IconButton icon={CommentIcon} alt="comment" />
+            <IconButton icon={ShareIcon} alt="share" />
+          </div>
+          <div className="p-1">
+            <IconButton
+              icon={isSaved ? SavedIcon : SaveIcon}
+              alt="save"
+              onClick={() =>
+                isSaved
+                  ? handleSavePost(_id, "unsave")
+                  : handleSavePost(_id, "save")
+              }
+            />
+          </div>
         </div>
-        <div className="p-1">
-          <IconButton
-            icon={isSaved ? SavedIcon : SaveIcon}
-            alt="save"
-            onClick={() =>
-              isSaved
-                ? handleSavePost(_id, "unsave")
-                : handleSavePost(_id, "save")
-            }
-          />
+      ) : (
+        <div className="flex justify-between w-full">
+          {reportCount ? (
+            <div className="text-center capitalize rounded-xl bg-[#6b728033] p-1 w-1/4">
+              reports: {reportCount}
+            </div>
+          ) : (
+            <div />
+          )}
+          <div className="text-center capitalize rounded-xl bg-[#6b728033] p-1 w-1/4">
+            {status}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
