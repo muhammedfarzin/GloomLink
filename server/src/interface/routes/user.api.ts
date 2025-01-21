@@ -31,44 +31,6 @@ router.post("/auth/google", authController.signInUsingGoogle);
 
 router.post("/auth/refresh", authController.refreshToken);
 
-// Post management
-
-router.get(
-  "/posts",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.fetchPosts
-);
-
-router.post(
-  "/posts/create",
-  authenticateToken,
-  authorizeRole("user"),
-  uploadImage.array("images"),
-  postController.createPost
-);
-
-router.get(
-  "/posts/saved",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.fetchSavedPosts
-);
-
-router.put(
-  "/posts/save/:postId",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.savePost
-);
-
-router.put(
-  "/posts/unsave/:postId",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.unsavePost
-);
-
 // Profiles
 
 router.get(
@@ -112,6 +74,67 @@ router.post(
   authenticateToken,
   authorizeRole("user"),
   userController.unfollowUser
+);
+
+// Post management
+
+router.get(
+  "/posts",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.fetchPosts
+);
+
+router.post(
+  "/posts/create",
+  authenticateToken,
+  authorizeRole("user"),
+  uploadImage.array("images"),
+  postController.createPost
+);
+
+router.get(
+  "/posts/saved",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.fetchSavedPosts
+);
+
+router.put(
+  "/posts/save/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.savePost
+);
+
+router.put(
+  "/posts/unsave/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.unsavePost
+);
+
+// Comments
+
+router.get(
+  "/posts/:postId/comments",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.getComments
+);
+
+router.get(
+  "/posts/:postId/mycomments",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.getMyComments
+);
+
+router.post(
+  "/posts/:postId/comment",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.addComment
 );
 
 // Report

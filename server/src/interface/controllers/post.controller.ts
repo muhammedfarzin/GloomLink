@@ -4,6 +4,7 @@ import { postRepository } from "../../infrastructure/repositories/PostRepository
 import type { Post } from "../../infrastructure/database/models/PostModel";
 import { UserModel } from "../../infrastructure/database/models/UserModel";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
+import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -163,6 +164,79 @@ export const deletePost: RequestHandler = async (req, res, next) => {
     const postId = req.params.postId;
     await postRepository.deletePost(postId);
     res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Comments
+
+export const getComments: RequestHandler = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const userId = req.user?.role === "user" ? req.user._id : undefined;
+    const comments = await commentRepository.getComments(
+      postId,
+      "post",
+      userId
+    );
+
+    res.status(200).json(comments);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyComments: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const postId = req.params.postId;
+    const userId = req.user._id;
+    const comments = await commentRepository.getComments(
+      postId,
+      "post",
+      userId,
+      true
+    );
+
+    res.status(200).json(comments);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addComment: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const postId = req.params.postId;
+    const userId = req.user._id;
+    const { comment }: Record<string, string> = req.body;
+
+    if (!comment.trim()) throw new HttpError(400, "Please provide a comment");
+
+    const newComment = await commentRepository.addComment(
+      postId,
+      userId,
+      comment,
+      "post"
+    );
+    const uploadedBy = await userRepository.findById(userId, {
+      username: 1,
+      firstname: 1,
+      lastname: 1,
+      image: 1,
+    });
+
+    res.status(201).json({
+      comment: { ...newComment, uploadedBy },
+      message: "Comment added successfully",
+    });
   } catch (error) {
     next(error);
   }
