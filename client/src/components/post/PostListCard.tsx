@@ -163,6 +163,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
             <IconButton icon={HeartIcon} alt="favorite" />
             {!hideComment ? (
               <CommentButton
+                postId={_id}
                 postCardData={{
                   postData: {
                     _id,

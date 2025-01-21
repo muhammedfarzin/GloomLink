@@ -6,6 +6,7 @@ interface IconButtonProps {
   className?: string;
   iconClassName?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
@@ -14,12 +15,14 @@ const IconButton: React.FC<IconButtonProps> = ({
   className = "",
   iconClassName,
   onClick,
+  disabled = false,
 }) => {
   return (
     <Button
       variant="ghost"
       className={className + " aspect-square p-1"}
       onClick={onClick}
+      disabled={disabled}
     >
       <img src={icon} alt={alt} className={iconClassName} />
     </Button>

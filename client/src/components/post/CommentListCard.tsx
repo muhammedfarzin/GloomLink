@@ -3,16 +3,31 @@ import { useSelector } from "react-redux";
 import ProfileImage from "../ProfileImage";
 import { Link } from "react-router-dom";
 
-interface CommentListCardProps {
-  profileImage?: string;
-  username: string;
+export interface Comment {
+  _id: string;
   comment: string;
+  targetId: string;
+  userId: string;
+  type: "post";
+  uploadedBy: {
+    _id: string;
+    firstname: string;
+    lastname: string;
+    username: string;
+    image?: string;
+  };
+}
+
+interface CommentListCardProps {
+  comment: Comment["comment"];
+  username: Comment["uploadedBy"]["username"];
+  image: Comment["uploadedBy"]["image"];
 }
 
 const CommentListCard: React.FC<CommentListCardProps> = ({
-  profileImage,
-  username,
   comment,
+  image,
+  username,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
@@ -22,7 +37,7 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
       style={{ backgroundColor: colorTheme.primary }}
     >
       <Link to={`/${username}`}>
-        <ProfileImage className="w-10" profileImage={profileImage} />
+        <ProfileImage className="w-10" profileImage={image} />
       </Link>
 
       <div className="w-full">
