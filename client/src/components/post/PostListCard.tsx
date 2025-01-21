@@ -3,6 +3,7 @@ import { RootState } from "../../redux/store";
 import ProfileImage from "../ProfileImage";
 import IconButton from "../IconButton";
 import HeartIcon from "../../assets/icons/Heart.svg";
+import HeartFilledIcon from "../../assets/icons/HeartFilled.svg";
 import ShareIcon from "../../assets/icons/Share.svg";
 import SaveIcon from "../../assets/icons/Save.svg";
 import SavedIcon from "../../assets/icons/Saved.svg";
@@ -27,6 +28,7 @@ export interface Post {
   publishedFor: "public" | "subscriber";
   createdAt: string;
   saved?: boolean;
+  liked?: boolean;
   status?: "active" | "blocked" | "deleted";
   uploadedBy: {
     _id: string;
@@ -45,6 +47,7 @@ export interface PostListCardProps {
     | "caption"
     | "images"
     | "saved"
+    | "liked"
     | "uploadedBy"
     | "status"
     | "reportCount"
@@ -63,6 +66,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
     images,
     uploadedBy,
     saved = false,
+    liked = false,
     status = "active",
     reportCount,
   },
@@ -85,6 +89,20 @@ const PostListCard: React.FC<PostListCardProps> = ({
       await apiClient.put(`/posts/${type}/${postId}`);
     } catch (error) {
       handleChange?.(handleSavedState);
+    }
+  };
+
+  const handleLikePost = async (type: "like" | "dislike") => {
+    const handleLikedState = (state: Post[]) =>
+      state.map((post) => {
+        if (post._id === _id) post.liked = !liked;
+        return post;
+      });
+    try {
+      handleChange?.(handleLikedState);
+      await apiClient.put(`/posts/${type}/${_id}`);
+    } catch (error) {
+      handleChange?.(handleLikedState);
     }
   };
 
@@ -160,7 +178,14 @@ const PostListCard: React.FC<PostListCardProps> = ({
               hideComment ? "3" : "2"
             }`}
           >
-            <IconButton icon={HeartIcon} alt="favorite" />
+            <IconButton
+              icon={liked ? HeartFilledIcon : HeartIcon}
+              alt="favorite"
+              onClick={() =>
+                liked ? handleLikePost("dislike") : handleLikePost("like")
+              }
+            />
+
             {!hideComment ? (
               <CommentButton
                 postId={_id}

@@ -114,6 +114,20 @@ router.put(
   postController.unsavePost
 );
 
+router.put(
+  "/posts/like/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.likePost
+);
+
+router.put(
+  "/posts/dislike/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.dislikePost
+);
+
 // Comments
 
 router.get(

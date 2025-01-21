@@ -1,0 +1,54 @@
+<svg
+  width="31"
+  height="30"
+  viewBox="0 0 31 30"
+  fill="white"
+  version="1.1"
+  id="svg1"
+  sodipodi:docname="HeartFilled.svg"
+  inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+  xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+  xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:svg="http://www.w3.org/2000/svg"
+>
+  <sodipodi:namedview
+    id="namedview1"
+    pagecolor="#ffffff"
+    bordercolor="#000000"
+    borderopacity="0.25"
+    inkscape:showpageshadow="2"
+    inkscape:pageopacity="0.0"
+    inkscape:pagecheckerboard="0"
+    inkscape:deskcolor="#d1d1d1"
+    inkscape:zoom="18.433333"
+    inkscape:cx="9.1410488"
+    inkscape:cy="12.667269"
+    inkscape:window-width="1366"
+    inkscape:window-height="705"
+    inkscape:window-x="-8"
+    inkscape:window-y="-8"
+    inkscape:window-maximized="1"
+    inkscape:current-layer="g1"
+  />
+  <g clip-path="url(#clip0_67_579)" id="g1" style="fill: #000000">
+    <path
+      d="M 13.7305,27.4336 13.584,27.2988 3.31836,17.7656 C 1.51953,16.0957 0.5,13.752 0.5,11.2969 V 11.1035 C 0.5,6.97853 3.42969,3.43947 7.48438,2.66603 9.79297,2.22072 12.1543,2.75392 14.0352,4.07814 14.5625,4.45314 15.0547,4.88673 15.5,5.38478 15.7461,5.10353 16.0098,4.84572 16.291,4.60548 16.5078,4.41798 16.7305,4.2422 16.9648,4.07814 18.8457,2.75392 21.207,2.22072 23.5156,2.66017 27.5703,3.43361 30.5,6.97853 30.5,11.1035 v 0.1934 c 0,2.4551 -1.0195,4.7988 -2.8184,6.4687 l -10.2656,9.5332 -0.1465,0.1348 c -0.4804,0.4453 -1.1133,0.6973 -1.7695,0.6973 -0.6562,0 -1.2891,-0.2461 -1.7695,-0.6973 z"
+      fill="white"
+      id="path1"
+      style="fill: #ffffff"
+      sodipodi:nodetypes="cccssccccccsscccsc"
+    />
+  </g>
+  <defs id="defs1">
+    <clipPath id="clip0_67_579">
+      <rect
+        width="30"
+        height="30"
+        fill="white"
+        transform="translate(0.5)"
+        id="rect1"
+      />
+    </clipPath>
+  </defs>
+</svg>

@@ -71,7 +71,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
       setDisableForm(false);
     }
   };
-  console.log(comments);
+
   return (
     <>
       <h3 className="text-lg font-bold my-2 mx-4">Comments</h3>

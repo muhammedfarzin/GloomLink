@@ -1,9 +1,15 @@
-import type { Document, ProjectionType, Schema } from "mongoose";
+import {
+  Types,
+  type Document,
+  type ProjectionType,
+  type Schema,
+} from "mongoose";
 import { PostModel, type Post } from "../database/models/PostModel";
 import { UserModel } from "../database/models/UserModel";
 import { HttpError } from "../errors/HttpError";
 import { userRepository } from "./UserRepository";
 import { ReportModel } from "../database/models/ReportModel";
+import { LikeModel } from "../database/models/LikeModel";
 
 class PostRepository {
   async createPost(
@@ -204,6 +210,7 @@ class PostRepository {
           status: "active",
         },
       },
+      { $limit: 20 },
       {
         $lookup: {
           from: "users",
@@ -222,14 +229,34 @@ class PostRepository {
           ],
         },
       },
-      { $limit: 20 },
       { $unwind: "$uploadedBy" },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "liked",
+          pipeline: [
+            {
+              $match: {
+                userId: Types.ObjectId.createFromHexString(userId),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          liked: { $gt: [{ $size: "$liked" }, 0] },
+        },
+      },
     ]);
 
     const resPosts = posts.map((post) => {
       post.saved = savedPosts.includes(post._id.toString());
       return post;
     });
+
     return resPosts;
   }
 

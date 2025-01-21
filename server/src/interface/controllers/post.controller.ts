@@ -5,6 +5,7 @@ import type { Post } from "../../infrastructure/database/models/PostModel";
 import { UserModel } from "../../infrastructure/database/models/UserModel";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
 import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
+import { likeRepository } from "../../infrastructure/repositories/LikeRepository";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -237,6 +238,40 @@ export const addComment: RequestHandler = async (req, res, next) => {
       comment: { ...newComment, uploadedBy },
       message: "Comment added successfully",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const likePost: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const postId = req.params.postId;
+    const userId = req.user._id;
+
+    await likeRepository.createLike(postId, userId, "post");
+
+    res.status(200).json({ message: "Liked post successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const dislikePost: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const postId = req.params.postId;
+    const userId = req.user._id;
+
+    await likeRepository.removeLike(postId, userId, "post");
+
+    res.status(200).json({ message: "Disliked post successfully" });
   } catch (error) {
     next(error);
   }
