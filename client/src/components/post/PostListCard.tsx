@@ -143,10 +143,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
         <p
           className={`text-base max-h-[4.5rem] transition-all duration-1000 hover:max-h-[5000px] line-clamp-${captionLine} hover:line-clamp-none`}
         >
-          {caption} Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-          Eaque, iusto doloribus nesciunt, molestiae explicabo rerum voluptate
-          quidem voluptates in quas, perspiciatis esse. Odit, a tenetur ducimus
-          dolore id natus nulla.
+          {caption}
         </p>
 
         <Carousel className="relative w-full">

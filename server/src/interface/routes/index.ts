@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { userApiRouter } from "./user.api.js";
-import { adminApiRouter } from "./admin.api.js";
-import errorMiddleware from "../middleware/error.middleware.js";
+import { userApiRouter } from "./user.api";
+import { adminApiRouter } from "./admin.api";
+import errorMiddleware from "../middleware/error.middleware";
 
 const router = Router();
 
