@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import store from "./redux/store";
 import { logout } from "./redux/reducers/auth";
 
@@ -32,6 +32,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("refreshToken");
+        if (!refreshToken) return store.dispatch(logout({ type: "user" }));
         const response = await axios.post("/api/user/auth/refresh", {
           token: refreshToken,
         });
@@ -44,9 +45,19 @@ apiClient.interceptors.response.use(
         ] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
-      } catch (refreshError) {
-        store.dispatch(logout({ type: "user" }));
-        return Promise.reject(refreshError);
+      } catch (responseError: any) {
+        if (
+          responseError.response?.data?.message === "Refresh token is required."
+        ) {
+          store.dispatch(logout({ type: "user" }));
+          return Promise.reject(
+            new AxiosError(
+              "Your session session has been expired",
+              responseError.status
+            )
+          );
+        }
+        return Promise.reject(responseError);
       }
     }
     return Promise.reject(error);

@@ -16,7 +16,7 @@ const Home = () => {
       .catch((error) => {
         toast({
           description:
-            error.response.data.message ||
+            error.response?.data?.message ||
             error.message ||
             "Something went wrong",
           variant: "destructive",

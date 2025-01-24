@@ -74,7 +74,7 @@ const AdminUserLists: React.FC = () => {
                       description={`Do you really want to ${
                         user.status === "blocked" ? "unblock" : "block"
                       } ${user.username}`}
-                      confirmButtonText="Block"
+                      confirmButtonText={user.status === "blocked" ? "Unblock" : "Block"}
                       onSuccess={() =>
                         user.status === "blocked"
                           ? blockUser(user._id, "unblock")
