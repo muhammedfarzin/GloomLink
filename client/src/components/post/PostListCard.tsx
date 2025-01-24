@@ -18,6 +18,8 @@ import {
 import apiClient from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
 import CommentButton from "./CommentButton";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Post {
   _id: string;
@@ -41,7 +43,8 @@ export interface Post {
 }
 
 export interface PostListCardProps {
-  postData: Pick<
+  postId: string;
+  postData?: Pick<
     Post,
     | "_id"
     | "caption"
@@ -60,16 +63,8 @@ export interface PostListCardProps {
 }
 
 const PostListCard: React.FC<PostListCardProps> = ({
-  postData: {
-    _id,
-    caption,
-    images,
-    uploadedBy,
-    saved = false,
-    liked = false,
-    status = "active",
-    reportCount,
-  },
+  postId,
+  postData,
   isAdmin = false,
   handleChange,
   className,
@@ -77,6 +72,28 @@ const PostListCard: React.FC<PostListCardProps> = ({
   captionLine = 3,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const { toast } = useToast();
+  const [postDataState, setPostDataState] =
+    useState<PostListCardProps["postData"]>(postData);
+
+  useEffect(() => {
+    if (!postData) {
+      apiClient
+        .get(`/posts/${postId}`)
+        .then((response) => {
+          setPostDataState(response.data);
+        })
+        .catch((error) => {
+          toast({
+            description:
+              error.response?.data?.message ||
+              error.message ||
+              "Something went wrong",
+            variant: "destructive",
+          });
+        });
+    }
+  }, [postData]);
 
   const handleSavePost = async (postId: string, type: "save" | "unsave") => {
     const handleSavedState = (state: Post[]) =>
@@ -85,9 +102,13 @@ const PostListCard: React.FC<PostListCardProps> = ({
         return post;
       });
     try {
+      if (!handleChange && postDataState)
+        setPostDataState({ ...postDataState, saved: !postDataState?.saved });
       handleChange?.(handleSavedState);
       await apiClient.put(`/posts/${type}/${postId}`);
     } catch (error) {
+      if (!handleChange && postDataState)
+        setPostDataState({ ...postDataState, saved: postDataState?.saved });
       handleChange?.(handleSavedState);
     }
   };
@@ -99,12 +120,29 @@ const PostListCard: React.FC<PostListCardProps> = ({
         return post;
       });
     try {
+      if (!handleChange && postDataState)
+        setPostDataState({ ...postDataState, liked: !postDataState?.liked });
       handleChange?.(handleLikedState);
       await apiClient.put(`/posts/${type}/${_id}`);
     } catch (error) {
+      if (!handleChange && postDataState)
+        setPostDataState({ ...postDataState, liked: postDataState?.liked });
       handleChange?.(handleLikedState);
     }
   };
+
+  if (!postDataState) return null;
+
+  const {
+    _id,
+    caption,
+    images,
+    uploadedBy,
+    saved = false,
+    liked = false,
+    status = "active",
+    reportCount,
+  } = postDataState;
 
   return (
     <div
@@ -187,6 +225,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
               <CommentButton
                 postId={_id}
                 postCardData={{
+                  postId: postId,
                   postData: {
                     _id,
                     caption,

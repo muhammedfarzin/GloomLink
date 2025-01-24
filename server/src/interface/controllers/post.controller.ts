@@ -2,10 +2,14 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { postRepository } from "../../infrastructure/repositories/PostRepository";
 import type { Post } from "../../infrastructure/database/models/PostModel";
-import { UserModel } from "../../infrastructure/database/models/UserModel";
+import {
+  type User,
+  UserModel,
+} from "../../infrastructure/database/models/UserModel";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
 import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
 import { likeRepository } from "../../infrastructure/repositories/LikeRepository";
+import { Schema } from "mongoose";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -83,6 +87,33 @@ export const unsavePost: RequestHandler = async (req, res, next) => {
     );
 
     res.status(200).json({ postId, message: "Post saved successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const fetchPost: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const postId = req.params.postId;
+    const post = await postRepository.findById(postId, null, false);
+
+    if (!post) throw new HttpError(404, "Post not found");
+
+    const uploadedBy = await userRepository.findById(post.userId.toString(), {
+      username: 1,
+      firstname: 1,
+      lastname: 1,
+      image: 1,
+    });
+
+    const saved = await postRepository.checkIsSaved(req.user._id, postId);
+    const liked = await likeRepository.checkIsLiked(req.user._id, postId);
+
+    res.status(200).json({ ...post, uploadedBy, saved, liked });
   } catch (error) {
     next(error);
   }

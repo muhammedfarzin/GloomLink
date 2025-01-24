@@ -79,6 +79,7 @@ const AdminPostLists: React.FC = () => {
               posts.map((post) => (
                 <div className="w-full md:w-1/2 p-1">
                   <PostListCard
+                    postId={post._id}
                     isAdmin
                     postData={post}
                     handleChange={setPosts}

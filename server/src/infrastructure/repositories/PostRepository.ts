@@ -292,6 +292,14 @@ class PostRepository {
     return savedPosts;
   }
 
+  async checkIsSaved(userId: string, postId: string) {
+    const user = await UserModel.findById(userId);
+    const savedPosts = user?.savedPosts.filter(
+      (post) => post.toString() === postId
+    );
+    return !!savedPosts?.length;
+  }
+
   async reportPost(postId: string, userId: string) {
     const reportExist = await ReportModel.findOne({
       reportedBy: userId,

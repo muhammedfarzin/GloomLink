@@ -1,36 +1,66 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import PostListCard from "./PostListCard";
+import CommentBox from "./CommentBox";
 
 interface PostGridCardProps {
   image?: string;
   caption?: string;
+  postId: string;
 }
 
-const PostGridCard: React.FC<PostGridCardProps> = ({ image, caption }) => {
+const PostGridCard: React.FC<PostGridCardProps> = ({
+  image,
+  caption,
+  postId,
+}) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   return (
-    <div
-      className="border rounded-3xl cursor-pointer aspect-square w-[calc(33.73%-0.5rem)]"
-      style={{ borderColor: colorTheme.border }}
-    >
-      {image ? (
-        <img
-          className="rounded-3xl h-full w-full object-cover"
-          src={image}
-          alt="post"
-        />
-      ) : (
-        <div className="flex justify-center items-center h-full w-full">
-          <span
-            className="line-clamp-6 p-3 max-h-[70%] text-center"
-            title={caption}
-          >
-            {caption}
-          </span>
+    <Dialog>
+      <DialogTrigger asChild>
+        <div
+          className="border rounded-md md:rounded-3xl cursor-pointer aspect-square w-[calc(33.73%-0.5rem)]"
+          style={{ borderColor: colorTheme.border }}
+        >
+          {image ? (
+            <img
+              className="rounded-md md:rounded-3xl h-full w-full object-cover"
+              src={image}
+              alt="post"
+            />
+          ) : (
+            <div className="flex justify-center items-center h-full w-full">
+              <span
+                className="line-clamp-6 p-3 max-h-[70%] text-center"
+                title={caption}
+              >
+                {caption}
+              </span>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </DialogTrigger>
+      <DialogContent className="w-full max-w-[1000px] h-screen md:h-[82vh] p-0">
+        <div className="flex">
+          {/* Post Card */}
+          <div className="w-full md:w-1/2 h-screen md:h-[82vh]">
+            <PostListCard
+              postId={postId}
+              className="h-full rounded-s-lg"
+              hideComment
+              captionLine={1}
+            />
+          </div>
+
+          {/* Comment Box */}
+          <div className="hidden md:block w-1/2 h-full">
+            <CommentBox postId={postId} />
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

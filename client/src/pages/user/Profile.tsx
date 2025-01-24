@@ -186,6 +186,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
                 {posts?.map((post) => (
                   <PostGridCard
                     key={post._id}
+                    postId={post._id}
                     image={post.images[0]}
                     caption={post.caption}
                   />

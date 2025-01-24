@@ -20,6 +20,11 @@ class LikeRepository {
     await like.save();
   }
 
+  async checkIsLiked(userId: string, targetId: string) {
+    const like = await LikeModel.findOne({ userId, targetId });
+    return !!like;
+  }
+
   async removeLike(
     targetId: string,
     userId: string,

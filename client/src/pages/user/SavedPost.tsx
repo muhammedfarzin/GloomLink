@@ -34,7 +34,12 @@ const SavedPost = () => {
         {posts.length ? (
           <div className="flex flex-col items-center gap-2 mt-5">
             {posts.map((post) => (
-              <PostListCard key={post._id} postData={post} handleChange={setPosts} />
+              <PostListCard
+                key={post._id}
+                postId={post._id}
+                postData={post}
+                handleChange={setPosts}
+              />
             ))}
           </div>
         ) : (

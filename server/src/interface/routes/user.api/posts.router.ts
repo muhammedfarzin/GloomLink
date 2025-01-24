@@ -56,6 +56,13 @@ router.put(
   postController.dislikePost
 );
 
+router.get(
+  "/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.fetchPost
+);
+
 // Comments
 
 router.get(
