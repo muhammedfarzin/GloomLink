@@ -182,7 +182,7 @@ class UserRepository {
     return true;
   }
 
-  async fetchProfileDetails(username: string) {
+  async fetchProfileDetails(username: string, self: boolean) {
     const data = await UserModel.aggregate([
       { $match: { username } },
       {
@@ -196,6 +196,13 @@ class UserRepository {
           localField: "_id",
           foreignField: "userId",
           as: "posts",
+          pipeline: [
+            {
+              $match: {
+                status: { $ne: "deleted", ...(self ? {} : { $eq: "active" }) },
+              },
+            },
+          ],
         },
       },
       {

@@ -1,5 +1,6 @@
-import { Types } from "mongoose";
+import { isObjectIdOrHexString, Types } from "mongoose";
 import { type Like, LikeModel } from "../database/models/LikeModel";
+import { HttpError } from "../errors/HttpError";
 
 class LikeRepository {
   async createLike(
@@ -18,6 +19,17 @@ class LikeRepository {
     });
 
     await like.save();
+  }
+
+  async getCount(postId: string) {
+    if (!isObjectIdOrHexString(postId))
+      throw new HttpError(400, "Invalid post");
+
+    const count = await LikeModel.countDocuments({
+      targetId: Types.ObjectId.createFromHexString(postId),
+    });
+
+    return count;
   }
 
   async checkIsLiked(userId: string, targetId: string) {

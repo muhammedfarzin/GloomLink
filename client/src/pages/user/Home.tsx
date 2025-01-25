@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     apiClient
       .get("/posts")
-      .then((response) => {
+      .then((response) => {console.log(response.data)
         setPosts(response.data as Post[]);
       })
       .catch((error) => {

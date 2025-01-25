@@ -32,6 +32,8 @@ export interface Post {
   saved?: boolean;
   liked?: boolean;
   status?: "active" | "blocked" | "deleted";
+  likesCount?: number;
+  commentsCount?: number;
   uploadedBy: {
     _id: string;
     firstname: string;
@@ -53,6 +55,8 @@ export interface PostListCardProps {
     | "liked"
     | "uploadedBy"
     | "status"
+    | "likesCount"
+    | "commentsCount"
     | "reportCount"
   >;
   isAdmin?: boolean;
@@ -116,17 +120,33 @@ const PostListCard: React.FC<PostListCardProps> = ({
   const handleLikePost = async (type: "like" | "dislike") => {
     const handleLikedState = (state: Post[]) =>
       state.map((post) => {
-        if (post._id === _id) post.liked = !liked;
+        if (post._id === _id) {
+          post.liked = !liked;
+          if (!post.likesCount) {
+            post.likesCount = type === "like" ? 1 : post.likesCount;
+          } else if (type === "like") post.likesCount += 1;
+          else post.likesCount -= 1;
+        }
+
         return post;
       });
     try {
       if (!handleChange && postDataState)
-        setPostDataState({ ...postDataState, liked: !postDataState?.liked });
+        setPostDataState({
+          ...postDataState,
+          liked: !postDataState?.liked,
+          likesCount:
+            (postDataState?.likesCount || 0) + (type === "like" ? 1 : -1),
+        });
       handleChange?.(handleLikedState);
       await apiClient.put(`/posts/${type}/${_id}`);
     } catch (error) {
       if (!handleChange && postDataState)
-        setPostDataState({ ...postDataState, liked: postDataState?.liked });
+        setPostDataState({
+          ...postDataState,
+          liked: postDataState?.liked,
+          likesCount: postDataState?.likesCount,
+        });
       handleChange?.(handleLikedState);
     }
   };
@@ -141,6 +161,8 @@ const PostListCard: React.FC<PostListCardProps> = ({
     saved = false,
     liked = false,
     status = "active",
+    likesCount,
+    commentsCount,
     reportCount,
   } = postDataState;
 
@@ -205,6 +227,18 @@ const PostListCard: React.FC<PostListCardProps> = ({
         </Carousel>
       </div>
 
+      {likesCount || commentsCount ? (
+        <div className="relative h-2">
+          <div className="absolute bottom-[-0.3rem]">
+            {likesCount ? (
+              <span className="cursor-pointer">{`${likesCount} likes`}</span>
+            ) : null}
+            {likesCount && commentsCount ? " • " : null}
+            {commentsCount ? `${commentsCount} comments` : null}
+          </div>
+        </div>
+      ) : null}
+
       {/* Post Actions */}
       {!isAdmin ? (
         <div className="flex justify-between w-full">
@@ -226,15 +260,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
                 postId={_id}
                 postCardData={{
                   postId: postId,
-                  postData: {
-                    _id,
-                    caption,
-                    images,
-                    uploadedBy,
-                    saved,
-                    status,
-                    reportCount,
-                  },
+                  postData: postDataState,
                   handleChange,
                 }}
               />

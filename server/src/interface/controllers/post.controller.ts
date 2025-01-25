@@ -2,14 +2,10 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { postRepository } from "../../infrastructure/repositories/PostRepository";
 import type { Post } from "../../infrastructure/database/models/PostModel";
-import {
-  type User,
-  UserModel,
-} from "../../infrastructure/database/models/UserModel";
+import { UserModel } from "../../infrastructure/database/models/UserModel";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
 import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
 import { likeRepository } from "../../infrastructure/repositories/LikeRepository";
-import { Schema } from "mongoose";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -112,8 +108,12 @@ export const fetchPost: RequestHandler = async (req, res, next) => {
 
     const saved = await postRepository.checkIsSaved(req.user._id, postId);
     const liked = await likeRepository.checkIsLiked(req.user._id, postId);
+    const likesCount = await likeRepository.getCount(postId);
+    const commentsCount = await commentRepository.getCount(postId);
 
-    res.status(200).json({ ...post, uploadedBy, saved, liked });
+    res
+      .status(200)
+      .json({ ...post, uploadedBy, saved, liked, likesCount, commentsCount });
   } catch (error) {
     next(error);
   }

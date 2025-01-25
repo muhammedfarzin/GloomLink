@@ -245,8 +245,26 @@ class PostRepository {
         },
       },
       {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "commentsCount",
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "likesCount",
+        },
+      },
+      {
         $addFields: {
           liked: { $gt: [{ $size: "$liked" }, 0] },
+          commentsCount: { $size: "$commentsCount" },
+          likesCount: { $size: "$likesCount" },
         },
       },
     ]);
@@ -285,7 +303,29 @@ class PostRepository {
       },
       { $limit: 20 },
       { $unwind: "$uploadedBy" },
-      { $addFields: { saved: true } },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "commentsCount",
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "likesCount",
+        },
+      },
+      {
+        $addFields: {
+          saved: true,
+          commentsCount: { $size: "$commentsCount" },
+          likesCount: { $size: "$likesCount" },
+        },
+      },
     ]);
 
     return savedPosts;

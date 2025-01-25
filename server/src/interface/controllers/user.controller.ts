@@ -9,7 +9,7 @@ export const fetchMyProfile: RequestHandler = async (req, res, next) => {
     }
 
     const username = req.user.username;
-    const userData = await userRepository.fetchProfileDetails(username);
+    const userData = await userRepository.fetchProfileDetails(username, true);
 
     res.json(userData);
   } catch (error) {
@@ -48,7 +48,7 @@ export const fetchProfile: RequestHandler = async (req, res, next) => {
     }
 
     const username = req.params.username;
-    const userData = await userRepository.fetchProfileDetails(username);
+    const userData = await userRepository.fetchProfileDetails(username, false);
     if (!userData) throw new HttpError(404, "Not found");
     const isFollowing = await userRepository.checkIsFollowing(
       req.user._id,

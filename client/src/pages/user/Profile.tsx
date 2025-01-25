@@ -180,7 +180,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
           <div id="posts">
             <h3 className="text-xl font-bold my-2">Posts</h3>
 
-            {posts.length ? (
+            {posts?.length ? (
               <div className="flex flex-wrap gap-2 p-2">
                 {posts?.map((post) => (
                   <PostGridCard

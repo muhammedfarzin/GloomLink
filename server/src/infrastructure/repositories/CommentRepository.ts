@@ -72,6 +72,17 @@ class CommentRepository {
 
     return resComment.toObject();
   }
+
+  async getCount(postId: string) {
+    if (!isObjectIdOrHexString(postId))
+      throw new HttpError(400, "Invalid post");
+
+    const count = await CommentModel.countDocuments({
+      targetId: Types.ObjectId.createFromHexString(postId),
+    });
+
+    return count;
+  }
 }
 
 export const commentRepository = new CommentRepository();
