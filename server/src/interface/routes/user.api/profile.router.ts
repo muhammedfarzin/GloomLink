@@ -50,4 +50,18 @@ router.post(
   userController.unfollowUser
 );
 
+router.get(
+  "/followers/:userId",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.fetchFollowers
+);
+
+router.get(
+  "/following/:userId",
+  authenticateToken,
+  authorizeRole("user"),
+  userController.fetchFollowing
+);
+
 export { router as profileRouter };

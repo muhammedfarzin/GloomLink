@@ -9,7 +9,6 @@ import { UserModel } from "../database/models/UserModel";
 import { HttpError } from "../errors/HttpError";
 import { userRepository } from "./UserRepository";
 import { ReportModel } from "../database/models/ReportModel";
-import { LikeModel } from "../database/models/LikeModel";
 
 class PostRepository {
   async createPost(

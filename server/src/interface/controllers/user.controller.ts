@@ -92,3 +92,41 @@ export const unfollowUser: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const fetchFollowers: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const userId = req.params.userId;
+    const followers = await userRepository.fetchFollowing(
+      userId,
+      req.user._id,
+      "followers"
+    );
+
+    res.status(200).json(followers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const fetchFollowing: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const userId = req.params.userId;
+    const followers = await userRepository.fetchFollowing(
+      userId,
+      req.user._id,
+      "following"
+    );
+
+    res.status(200).json(followers);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -6,7 +6,13 @@ import {
 import bcrypt from "bcryptjs";
 import { otpRepository } from "./OtpRepository";
 import { HttpError } from "../errors/HttpError";
-import type { Document, ProjectionType, Schema } from "mongoose";
+import {
+  isObjectIdOrHexString,
+  Types,
+  type Document,
+  type ProjectionType,
+  type Schema,
+} from "mongoose";
 import { FollowModel } from "../database/models/FollowModel";
 
 class UserRepository {
@@ -240,6 +246,87 @@ class UserRepository {
   async checkIsFollowing(followedBy: string, followingTo: string) {
     const follow = await FollowModel.findOne({ followedBy, followingTo });
     return !!follow;
+  }
+
+  async fetchFollowers(userId: string) {
+    if (!isObjectIdOrHexString(userId))
+      throw new HttpError(400, "Invalid userId");
+
+    const followers = await FollowModel.aggregate([
+      { $match: { followingTo: Types.ObjectId.createFromHexString(userId) } },
+      { $limit: 20 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "followedBy",
+          foreignField: "_id",
+          as: "userData",
+          pipeline: [
+            {
+              $project: {
+                firstname: 1,
+                lastname: 1,
+                username: 1,
+                image: 1,
+              },
+            },
+          ],
+        },
+      },
+      { $unwind: "$userData" },
+      { $replaceRoot: { newRoot: "$userData" } },
+    ]);
+
+    return followers;
+  }
+
+  async fetchFollowing(
+    userId: string,
+    myId: string,
+    type: "followers" | "following"
+  ) {
+    if (!isObjectIdOrHexString(userId))
+      throw new HttpError(400, "Invalid userId");
+
+    const followers = await FollowModel.aggregate([
+      {
+        $match: {
+          [type === "followers" ? "followingTo" : "followedBy"]:
+            Types.ObjectId.createFromHexString(userId),
+        },
+      },
+      { $limit: 20 },
+      {
+        $lookup: {
+          from: "users",
+          localField: type === "followers" ? "followedBy" : "followingTo",
+          foreignField: "_id",
+          as: "userData",
+        },
+      },
+      { $unwind: "$userData" },
+      { $replaceRoot: { newRoot: "$userData" } },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followingTo",
+          as: "isFollowing",
+          pipeline: [
+            {
+              $match: { followedBy: Types.ObjectId.createFromHexString(myId) },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          isFollowing: { $gt: [{ $size: "$isFollowing" }, 0] },
+        },
+      },
+    ]);
+
+    return followers;
   }
 }
 
