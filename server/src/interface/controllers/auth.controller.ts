@@ -284,7 +284,7 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       gender,
       password,
       newPassword,
-    } = req.body as Partial<User> & { newPassword: string };
+    } = req.body as Partial<User> & { newPassword?: string };
     const image = req.file?.path.replace("public", "");
     let existImage: string | undefined;
 
@@ -303,7 +303,7 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       if (!userVerified)
         throw new HttpError(400, "Invalid password. Please try again");
 
-      user.password = newPassword;
+      if (newPassword) user.password = newPassword;
     }
 
     if (image && user.image) existImage = user.image;
@@ -348,13 +348,11 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
     };
     const tokens = generateToken(tokenPayload);
 
-    res
-      .status(200)
-      .json({
-        userData: resUserData,
-        tokens,
-        message: "Updated profile successfully",
-      });
+    res.status(200).json({
+      userData: resUserData,
+      tokens,
+      message: "Updated profile successfully",
+    });
   } catch (error) {
     next(error);
   }

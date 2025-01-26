@@ -1,12 +1,6 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import ProfileImage from "../ProfileImage";
-import IconButton from "../IconButton";
-import HeartIcon from "../../assets/icons/Heart.svg";
-import HeartFilledIcon from "../../assets/icons/HeartFilled.svg";
-import ShareIcon from "../../assets/icons/Share.svg";
-import SaveIcon from "../../assets/icons/Save.svg";
-import SavedIcon from "../../assets/icons/Saved.svg";
 import { Link } from "react-router-dom";
 import {
   Carousel,
@@ -17,9 +11,11 @@ import {
 } from "../ui/carousel";
 import apiClient from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
-import CommentButton from "./CommentButton";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import PostActions from "./PostActions";
+import DialogBox from "../DialogBox";
+import UsersList from "../UsersList";
 
 export interface Post {
   _id: string;
@@ -163,7 +159,6 @@ const PostListCard: React.FC<PostListCardProps> = ({
     status = "active",
     likesCount,
     commentsCount,
-    reportCount,
   } = postDataState;
 
   return (
@@ -231,7 +226,14 @@ const PostListCard: React.FC<PostListCardProps> = ({
         <div className="relative h-2">
           <div className="absolute bottom-[-0.3rem]">
             {likesCount ? (
-              <span className="cursor-pointer">{`${likesCount} likes`}</span>
+              <DialogBox
+                dialogElement={
+                  <UsersList apiUrl={`/posts/${_id}/likes`} title="users" />
+                }
+                title="Liked by"
+              >
+                <span className="cursor-pointer">{`${likesCount} likes`}</span>
+              </DialogBox>
             ) : null}
             {likesCount && commentsCount ? " • " : null}
             {commentsCount ? `${commentsCount} comments` : null}
@@ -239,60 +241,14 @@ const PostListCard: React.FC<PostListCardProps> = ({
         </div>
       ) : null}
 
-      {/* Post Actions */}
-      {!isAdmin ? (
-        <div className="flex justify-between w-full">
-          <div
-            className={`flex justify-around rounded-xl bg-[#6b728033] p-1 w-1/${
-              hideComment ? "3" : "2"
-            }`}
-          >
-            <IconButton
-              icon={liked ? HeartFilledIcon : HeartIcon}
-              alt="favorite"
-              onClick={() =>
-                liked ? handleLikePost("dislike") : handleLikePost("like")
-              }
-            />
-
-            {!hideComment ? (
-              <CommentButton
-                postId={_id}
-                postCardData={{
-                  postId: postId,
-                  postData: postDataState,
-                  handleChange,
-                }}
-              />
-            ) : null}
-            <IconButton icon={ShareIcon} alt="share" />
-          </div>
-          <div className="p-1">
-            <IconButton
-              icon={saved ? SavedIcon : SaveIcon}
-              alt="save"
-              onClick={() =>
-                saved
-                  ? handleSavePost(_id, "unsave")
-                  : handleSavePost(_id, "save")
-              }
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="flex justify-between w-full">
-          {reportCount ? (
-            <div className="text-center capitalize rounded-xl bg-[#6b728033] p-1 w-1/4">
-              reports: {reportCount}
-            </div>
-          ) : (
-            <div />
-          )}
-          <div className="text-center capitalize rounded-xl bg-[#6b728033] p-1 w-1/4">
-            {status}
-          </div>
-        </div>
-      )}
+      <PostActions
+        postData={postDataState}
+        isAdmin={isAdmin}
+        hideComment={hideComment}
+        handleChange={handleChange}
+        handleLikePost={handleLikePost}
+        handleSavePost={handleSavePost}
+      />
     </div>
   );
 };

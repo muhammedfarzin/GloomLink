@@ -37,6 +37,40 @@ class LikeRepository {
     return !!like;
   }
 
+  async getLikedUsers(targetId: string, type: Like["type"] = "post") {
+    const users = await LikeModel.aggregate([
+      {
+        $match: {
+          targetId: Types.ObjectId.createFromHexString(targetId),
+          type,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                firstname: 1,
+                lastname: 1,
+                username: 1,
+                image: 1,
+              },
+            },
+          ],
+        },
+      },
+      { $unwind: "$userData" },
+      { $replaceRoot: { newRoot: "$userData" } },
+    ]);
+
+    return users;
+  }
+
   async removeLike(
     targetId: string,
     userId: string,

@@ -86,6 +86,8 @@ router.post(
   postController.addComment
 );
 
+router.get("/:postId/likes", authenticateToken, authorizeRole("user"), postController.getLikedUsers)
+
 // Report
 
 router.post(

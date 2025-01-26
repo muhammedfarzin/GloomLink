@@ -8,9 +8,9 @@ import {
 import DropDownBox from "@/components/DropDownBox";
 import DatePicker from "react-datepicker";
 import Button from "@/components/Button";
-import Cropper, { ReactCropperElement } from "react-cropper";
+import { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import DialogBox from "@/components/DialogBox";
+import CropperDialogBox from "@/components/CropperDialogBox";
 import apiClient from "@/apiClient";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -294,22 +294,14 @@ const EditProfile: React.FC = () => {
             </form>
           </div>
         </div>
-        <DialogBox
+        <CropperDialogBox
+          cropperRef={cropperRef}
+          cropImage={cropimage as string}
           title="Crop"
           show={!!cropimage}
           onClose={() => setCropImage(null)}
           onDone={handleCropDone}
-        >
-          <Cropper
-            ref={cropperRef}
-            src={cropimage as string}
-            style={{ height: 300, width: "100%" }}
-            initialAspectRatio={1}
-            aspectRatio={1}
-            guides={false}
-            viewMode={1}
-          />
-        </DialogBox>
+        />
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-import apiClient from "@/apiClient";
 import {
   Dialog,
   DialogContent,
@@ -6,9 +5,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
-import UserListCard, { type FollowUserData } from "./UserListCard";
+import UsersList from "@/components/UsersList";
 
 interface FollowDialogButtonProps {
   userId: string;
@@ -21,24 +18,6 @@ const FollowDialogButton: React.FC<FollowDialogButtonProps> = ({
   followCount,
   type,
 }) => {
-  const { toast } = useToast();
-  const [users, setUsers] = useState<FollowUserData[]>([]);
-
-  useEffect(() => {
-    apiClient
-      .get(`/profile/${type}/${userId}`)
-      .then((response) => setUsers(response.data))
-      .catch((error) => {
-        toast({
-          description:
-            error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
-          variant: "destructive",
-        });
-      });
-  }, []);
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -53,15 +32,7 @@ const FollowDialogButton: React.FC<FollowDialogButtonProps> = ({
           <DialogTitle className="capitalize">{type}</DialogTitle>
         </DialogHeader>
 
-        <div className="w-full h-full mt-[-0.5rem] overflow-y-scroll no-scrollbar">
-          {users.length ? (
-            users.map((user) => (
-              <UserListCard userData={user} handleChange={setUsers} />
-            ))
-          ) : (
-            <div className="flex justify-center items-center h-full">There is no {type}</div>
-          )}
-        </div>
+        <UsersList apiUrl={`/profile/${type}/${userId}`} title={type} />
       </DialogContent>
     </Dialog>
   );

@@ -1,62 +1,32 @@
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
+} from "./ui/dialog";
 
 interface DialogBoxProps {
-  children?: React.ReactNode;
-  title?: string;
-  description?: string;
-  show?: boolean;
-  onDone?: () => void;
-  onClose?: () => void;
+  children: React.ReactNode;
+  dialogElement: React.ReactNode;
+  title: string;
 }
 
 const DialogBox: React.FC<DialogBoxProps> = ({
   children,
+  dialogElement,
   title,
-  description,
-  show,
-  onDone,
-  onClose,
 }) => {
-  const showBtnRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (show) showBtnRef.current?.click();
-  }, [show]);
-
   return (
-    <Dialog onOpenChange={(isOpen) => (!isOpen ? onClose?.() : null)}>
-      <DialogTrigger asChild>
-        <Button ref={showBtnRef} variant="outline" className="hidden" />
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+
+      <DialogContent className="flex flex-col w-full md:w-80 h-full md:max-h-[80vh] p-4">
         <DialogHeader>
-          {title ? <DialogTitle>{title}</DialogTitle> : null}
-          {description ? (
-            <DialogDescription>{description}</DialogDescription>
-          ) : null}
+          <DialogTitle className="capitalize">{title}</DialogTitle>
         </DialogHeader>
-        {children}
-        <DialogFooter>
-          <DialogClose>
-            <Button type="button" variant="secondary">
-              Close
-            </Button>
-            <Button type="submit" onClick={onDone}>
-              Done
-            </Button>
-          </DialogClose>
-        </DialogFooter>
+
+        {dialogElement}
       </DialogContent>
     </Dialog>
   );

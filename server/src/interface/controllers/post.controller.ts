@@ -201,6 +201,17 @@ export const deletePost: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const getLikedUsers: RequestHandler = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const users = await likeRepository.getLikedUsers(postId, "post");
+
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Comments
 
 export const getComments: RequestHandler = async (req, res, next) => {
