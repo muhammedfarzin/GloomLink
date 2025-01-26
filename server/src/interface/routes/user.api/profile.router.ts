@@ -21,7 +21,7 @@ router.get(
   userController.fetchMyData
 );
 
-router.post(
+router.put(
   "/edit",
   authenticateToken,
   authorizeRole("user"),

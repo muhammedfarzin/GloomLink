@@ -130,7 +130,7 @@ const EditProfile: React.FC = () => {
 
       const {
         data: { userData, tokens },
-      } = await apiClient.post("/profile/edit", formDatas, {
+      } = await apiClient.put("/profile/edit", formDatas, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
