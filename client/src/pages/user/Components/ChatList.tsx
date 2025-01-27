@@ -10,9 +10,10 @@ const ChatList = () => {
       className="w-1/5 max-w-[300px] h-screen py-6 px-4 overflow-y-scroll no-scrollbar fixed right-0 top-0"
       style={{
         backgroundColor: colorTheme.secondary,
+        color: colorTheme.text,
       }}
     >
-      <h1 className="text-xl text-white font-bold">Chats</h1>
+      <h1 className="text-xl font-bold">Chats</h1>
 
       <div className="flex flex-col gap-2 mt-5" id="chats">
         <ChatItem username="user_name" online />

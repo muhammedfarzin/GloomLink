@@ -25,7 +25,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
   return (
     <Link
       className={`btn-flex btn-primary ${className || ""}`}
-      style={{ backgroundColor}}
+      style={{ backgroundColor, color: colorTheme.text }}
       onMouseEnter={(e) =>
         (e.currentTarget.style.backgroundColor = backgroundColor + "bb")
       }
@@ -39,6 +39,9 @@ const MenuButton: React.FC<MenuButtonProps> = ({
           src={icon}
           alt={alt ?? text}
           className={`inline w-6 h-6 mr-4 ${iconClassName || ""}`}
+          style={{
+            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+          }}
         />
       ) : null}
       {text}

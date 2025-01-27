@@ -20,7 +20,7 @@ const InputBox: React.FC<InputBoxProps> = ({
       type={type}
       className={`my-1 disabled:opacity-50 ${className}`}
       onFocus={(e) =>
-        (e.currentTarget.style.backgroundColor = backgroundColorTheme + 'bb')
+        (e.currentTarget.style.backgroundColor = backgroundColorTheme + 'dc')
       }
       onBlur={(e) =>
         (e.currentTarget.style.backgroundColor = backgroundColorTheme)

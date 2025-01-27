@@ -5,12 +5,15 @@ import CommentListCard, { type Comment } from "./CommentListCard";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 interface CommentBoxProps {
   postId: string;
 }
 
 const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toast } = useToast();
   const [commentInput, setCommentInput] = useState<string>("");
   const [comments, setComments] = useState<Comment[]>([]);
@@ -93,7 +96,10 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
           </div>
         )}
       </div>
-      <div className="flex items-center gap-2 w-full border-t border-[#6b728033] py-1 px-2">
+      <div
+        className="flex items-center gap-2 w-full border-t border-[#6b728033] py-1 px-2 rounded-br-lg"
+        style={{ backgroundColor: colorTheme.secondary }}
+      >
         <InputBox
           type="text"
           placeholder="Add a comment..."

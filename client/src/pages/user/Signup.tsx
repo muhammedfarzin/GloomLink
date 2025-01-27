@@ -2,8 +2,6 @@ import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
 import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
 import SignUpIllustrationDark from "../../assets/images/SignUp-Illustration-Dark.svg";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DropDownBox from "../../components/DropDownBox";
@@ -17,11 +15,13 @@ import {
 } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import DateInput from "@/components/DateInput";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const userData = useSelector((state: RootState) => state.auth.userData);
   const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<SignUpFormType>({
@@ -80,7 +80,14 @@ const Signup = () => {
   return (
     <>
       <div className="py-3 px-4 md:py-6 md:px-14">
-        <img src={GloomLinkLogo} alt="GloomLink" className="w-44 md:w-64" />
+        <img
+          src={GloomLinkLogo}
+          alt="GloomLink"
+          className="w-44 md:w-64"
+          style={{
+            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+          }}
+        />
       </div>
 
       <div className="flex">
@@ -137,7 +144,7 @@ const Signup = () => {
               type="number"
             />
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <DropDownBox
                 placeholder="Gender (Optional)"
                 value={gender}
@@ -147,21 +154,11 @@ const Signup = () => {
                 <option value="f">Female</option>
               </DropDownBox>
 
-              <DatePicker
-                selected={dob}
-                onChange={(date) => date && setDob(date)}
-                placeholderText="Date of Birth (Optional)"
+              <DateInput
+                date={dob}
                 maxDate={maxDate}
-                dateFormat="dd-MMM-yyyy"
-                wrapperClassName="input my-1"
-                className="bg-[#353535] text-white"
-                calendarClassName="!bg-[#353535]"
-                monthClassName={() => "text-[blue]"}
-                dayClassName={(date) =>
-                  date < maxDate
-                    ? "!text-white hover:!bg-[#585858]"
-                    : "!text-white opacity-25"
-                }
+                setDate={setDob}
+                className="w-full"
               />
             </div>
 

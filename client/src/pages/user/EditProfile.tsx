@@ -6,7 +6,6 @@ import {
   validateEditProfileForm,
 } from "./formValidations";
 import DropDownBox from "@/components/DropDownBox";
-import DatePicker from "react-datepicker";
 import Button from "@/components/Button";
 import { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
@@ -17,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { useDispatch } from "react-redux";
 import { setAuthUser } from "@/redux/reducers/auth";
+import DateInput from "@/components/DateInput";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 
@@ -225,9 +225,9 @@ const EditProfile: React.FC = () => {
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <DropDownBox
-                  className="w-[calc(100%-1.5rem)]"
+                  className="w-full"
                   placeholder="Gender (Optional)"
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
@@ -236,21 +236,11 @@ const EditProfile: React.FC = () => {
                   <option value="f">Female</option>
                 </DropDownBox>
 
-                <DatePicker
-                  selected={dob}
-                  onChange={(date) => date && setDob(date)}
-                  placeholderText="Date of Birth"
+                <DateInput
+                  date={dob}
                   maxDate={maxDate}
-                  dateFormat="dd-MMM-yyyy"
-                  wrapperClassName="input my-1"
-                  className="bg-[#353535] text-white"
-                  calendarClassName="!bg-[#353535]"
-                  monthClassName={() => "text-[blue]"}
-                  dayClassName={(date) =>
-                    date < maxDate
-                      ? "!text-white hover:!bg-[#585858]"
-                      : "!text-white opacity-25"
-                  }
+                  setDate={setDob}
+                  className="w-full"
                 />
               </div>
 

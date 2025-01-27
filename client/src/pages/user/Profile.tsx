@@ -1,14 +1,14 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import ProfileImage from "../../components/ProfileImage";
-import Button from "../../components/Button";
 import PostGridCard from "../../components/post/PostGridCard";
 import { useEffect, useState } from "react";
 import apiClient from "@/apiClient";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
 import FollowDialogButton from "./components/FollowDialogButton";
+import ProfileActions from "./components/ProfileActions";
 
 interface ProfileProps {
   self?: boolean;
@@ -38,10 +38,6 @@ interface PostsType {
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const { toast } = useToast();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-  const myUsername = useSelector(
-    (state: RootState) => state.auth.userData?.username
-  );
-  const navigate = useNavigate();
   const { username } = useParams();
   const [userData, setUserData] = useState<UserDataType>();
   const [posts, setPosts] = useState<PostsType[]>([]);
@@ -129,52 +125,13 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
               </div>
             </div>
 
-            <div id="profile-actions" className="flex flex-col gap-2 mt-4">
-              {self ? (
-                <>
-                  <div className="flex gap-2">
-                    <Button
-                      className="w-full"
-                      onClick={() => navigate("/profile/edit")}
-                    >
-                      Edit Profile
-                    </Button>
-                    <Button className="w-full">Switch to Light</Button>
-                  </div>
-                  {userData?.followersCount >= 10 ? (
-                    <div className="flex gap-2">
-                      <Button className="w-full">Enable Subscription</Button>
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <div className="flex gap-2">
-                    <Button
-                      className="w-full"
-                      onClick={() =>
-                        handleFollow(isFollowing ? "unfollow" : "follow")
-                      }
-                      disabled={username === myUsername}
-                    >
-                      {isFollowing ? "Unfollow" : "Follow"}
-                    </Button>
-                    <Button
-                      className="w-full"
-                      disabled={username === myUsername}
-                    >
-                      Message
-                    </Button>
-                    <Button
-                      className="w-full"
-                      disabled={username === myUsername}
-                    >
-                      Subscribe
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
+            <ProfileActions
+              username={username}
+              self={self}
+              followersCount={userData.followersCount}
+              isFollowing={isFollowing}
+              handleFollow={handleFollow}
+            />
           </div>
 
           <div id="posts">

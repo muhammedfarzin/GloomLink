@@ -19,6 +19,7 @@ import type { RootState } from "../../redux/store";
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const userData = useSelector((state: RootState) => state.auth.userData);
   const [loading, setLoading] = useState<string | null>(null);
   const [otp, setOtp] = useState<string>("");
@@ -100,7 +101,14 @@ const OtpVerification: React.FC = () => {
   return (
     <>
       <div className="py-3 px-4 md:py-6 md:px-14">
-        <img src={GloomLinkLogo} alt="GloomLink" className="w-44 md:w-64" />
+        <img
+          src={GloomLinkLogo}
+          alt="GloomLink"
+          className="w-44 md:w-64"
+          style={{
+            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+          }}
+        />
       </div>
 
       <div className="flex">

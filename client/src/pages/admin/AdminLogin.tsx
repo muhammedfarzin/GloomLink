@@ -19,6 +19,7 @@ const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const adminData = useSelector((state: RootState) => state.auth.adminData);
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const [formData, setFormData] = useState<LoginFormType>({
     username: "",
     password: "",
@@ -63,7 +64,14 @@ const AdminLogin: React.FC = () => {
   return (
     <>
       <div className="py-3 px-4 md:py-6 md:px-14">
-        <img src={GloomLinkLogo} alt="GloomLink" className="w-44 md:w-64" />
+        <img
+          src={GloomLinkLogo}
+          alt="GloomLink"
+          className="w-44 md:w-64"
+          style={{
+            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+          }}
+        />
       </div>
 
       <div className="flex">

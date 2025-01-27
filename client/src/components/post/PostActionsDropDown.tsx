@@ -12,6 +12,8 @@ import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Post } from "./PostListCard";
 import adminApiClient from "@/adminApiClient";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface PostActionsDropDownProps {
   postId: string;
@@ -26,6 +28,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   isAdmin = false,
   handleChange,
 }) => {
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toast } = useToast();
 
   const reportPost = () => {
@@ -86,7 +89,13 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="rounded-full aspect-square p-2">
-          <img src={ThreeDotsVerticalIcon} alt="more" />
+          <img
+            src={ThreeDotsVerticalIcon}
+            alt="more"
+            style={{
+              filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+            }}
+          />
         </Button>
       </DropdownMenuTrigger>
 

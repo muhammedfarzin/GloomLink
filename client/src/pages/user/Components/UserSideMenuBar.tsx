@@ -57,11 +57,7 @@ const UserSideMenuBar: React.FC<UserSideMenuBarProps> = ({ selected }) => {
         description="Do you really want to logout"
         confirmButtonText="Logout"
       >
-        <MenuButton
-          to="/logout"
-          icon={LogoutIcon}
-          text="Logout"
-        />
+        <MenuButton to="/logout" icon={LogoutIcon} text="Logout" />
       </ConfirmButton>
     </SideMenuBar>
   );

@@ -34,12 +34,12 @@ select:focus {
   @apply border-[#82919E];
 }
 
-select option {
+select.white option {
   @apply text-white;
 }
 
-select option:hover {
-  background: red;
+select.black option {
+  @apply text-black;
 }
 
 .search-box {
