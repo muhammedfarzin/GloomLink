@@ -1,6 +1,5 @@
-import ThreeDotsVerticalIcon from "@/assets/icons/ThreeDotsVertical.svg";
 import { Button } from "../ui/button";
-import { FlagTriangleLeft } from "lucide-react";
+import { FlagTriangleLeft, EllipsisVertical, Trash2, Edit } from "lucide-react";
 import ConfirmButton from "../ConfirmButton";
 import {
   DropdownMenu,
@@ -17,6 +16,7 @@ import { RootState } from "@/redux/store";
 
 interface PostActionsDropDownProps {
   postId: string;
+  userId: string;
   status: Post["status"];
   isAdmin?: boolean;
   handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
@@ -24,11 +24,12 @@ interface PostActionsDropDownProps {
 
 const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   postId,
+  userId,
   status,
   isAdmin = false,
   handleChange,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
   const { toast } = useToast();
 
   const reportPost = () => {
@@ -76,44 +77,74 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
       });
   };
 
-  const handleDeletePost = () => {
-    adminApiClient.delete(`/posts/${postId}`).then((response) => {
+  const handleDeletePost = async (userType: "user" | "admin" = "user") => {
+    try {
+      if (userType === "user") {
+        var response = await apiClient.delete(`/posts/${postId}`);
+      } else {
+        var response = await adminApiClient.delete(`/posts/${postId}`);
+      }
+
       handleChange?.((state) => state.filter((post) => post._id !== postId));
       toast({
         description: response.data.message || "Post deleted successfully",
       });
-    });
+    } catch (error: any) {
+      toast({
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Post deleted successfully",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="rounded-full aspect-square p-2">
-          <img
-            src={ThreeDotsVerticalIcon}
-            alt="more"
-            style={{
-              filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
-            }}
-          />
+        <Button variant="ghost" className="rounded-full aspect-square p-2 hover:bg-[#9ca3af66]">
+          <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>
 
       {!isAdmin ? (
+        // User
         <DropdownMenuContent className="w-20">
-          <ConfirmButton
-            description="Do you really want to report this post?"
-            confirmButtonText="Report"
-            onSuccess={reportPost}
-            className="w-full"
-          >
-            <DropdownMenuItem>
-              <FlagTriangleLeft />
-              <span>Report</span>
-            </DropdownMenuItem>
-          </ConfirmButton>
+          {myUserId === userId ? (
+            <>
+              <DropdownMenuItem>
+                <Edit />
+                <span>Edit</span>
+              </DropdownMenuItem>
+              <ConfirmButton
+                description="Do you really want to delete this post?"
+                confirmButtonText="Delete"
+                onSuccess={() => handleDeletePost("user")}
+                className="w-full"
+              >
+                <DropdownMenuItem>
+                  <Trash2 />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </ConfirmButton>
+            </>
+          ) : (
+            <ConfirmButton
+              description="Do you really want to report this post?"
+              confirmButtonText="Report"
+              onSuccess={reportPost}
+              className="w-full"
+            >
+              <DropdownMenuItem>
+                <FlagTriangleLeft />
+                <span>Report</span>
+              </DropdownMenuItem>
+            </ConfirmButton>
+          )}
         </DropdownMenuContent>
       ) : (
+        // Admin
         <DropdownMenuContent className="w-20">
           <ConfirmButton
             description="Do you really want to block this post?"
@@ -130,7 +161,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
           <ConfirmButton
             description="Do you really want to delete this post?"
             confirmButtonText="Delete"
-            onSuccess={handleDeletePost}
+            onSuccess={() => handleDeletePost("admin")}
             className="w-full"
           >
             <DropdownMenuItem>

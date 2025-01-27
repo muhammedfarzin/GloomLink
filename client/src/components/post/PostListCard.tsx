@@ -187,6 +187,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
         </div>
         <PostActionsDropDown
           postId={_id}
+          userId={uploadedBy._id}
           isAdmin={isAdmin}
           handleChange={handleChange}
           status={status}

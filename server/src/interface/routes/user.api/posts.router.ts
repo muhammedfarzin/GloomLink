@@ -86,7 +86,19 @@ router.post(
   postController.addComment
 );
 
-router.get("/:postId/likes", authenticateToken, authorizeRole("user"), postController.getLikedUsers)
+router.get(
+  "/:postId/likes",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.getLikedUsers
+);
+
+router.delete(
+  "/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.deletePost
+);
 
 // Report
 

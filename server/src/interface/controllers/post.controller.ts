@@ -194,6 +194,13 @@ export const unblockPost: RequestHandler = async (req, res, next) => {
 export const deletePost: RequestHandler = async (req, res, next) => {
   try {
     const postId = req.params.postId;
+
+    if (req.user?.role === "user") {
+      const post = await postRepository.findById(postId);
+      if (post?.userId.toString() !== req.user._id)
+        throw new HttpError(403, "You are not allowed to delete this post");
+    }
+
     await postRepository.deletePost(postId);
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
