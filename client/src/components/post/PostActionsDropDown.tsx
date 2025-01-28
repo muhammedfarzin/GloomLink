@@ -13,6 +13,7 @@ import type { Post } from "./PostListCard";
 import adminApiClient from "@/adminApiClient";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useNavigate } from "react-router-dom";
 
 interface PostActionsDropDownProps {
   postId: string;
@@ -29,6 +30,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   isAdmin = false,
   handleChange,
 }) => {
+  const navigate = useNavigate();
   const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
   const { toast } = useToast();
 
@@ -103,7 +105,10 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="rounded-full aspect-square p-2 hover:bg-[#9ca3af66]">
+        <Button
+          variant="ghost"
+          className="rounded-full aspect-square p-2 hover:bg-[#9ca3af66]"
+        >
           <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>
@@ -113,7 +118,9 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
         <DropdownMenuContent className="w-20">
           {myUserId === userId ? (
             <>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate(`/edit-post/${postId}`)}
+              >
                 <Edit />
                 <span>Edit</span>
               </DropdownMenuItem>

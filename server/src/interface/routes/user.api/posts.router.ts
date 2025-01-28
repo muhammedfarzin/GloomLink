@@ -21,6 +21,14 @@ router.post(
   postController.createPost
 );
 
+router.put(
+  "/edit/:postId",
+  authenticateToken,
+  authorizeRole("user"),
+  uploadImage.array("images"),
+  postController.editPost
+);
+
 router.get(
   "/saved",
   authenticateToken,

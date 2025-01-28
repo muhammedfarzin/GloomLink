@@ -36,6 +36,48 @@ export const createPost: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const editPost: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+    const postId = req.params.postId;
+    const {
+      caption,
+      tags = [],
+      publishedFor,
+      removedImages = [],
+    } = req.body as {
+      caption?: string;
+      tags?: string[];
+      publishedFor?: string;
+      removedImages?: string[];
+    };
+    const images = (req.files as Express.Multer.File[])?.map((file) =>
+      file.path.replace("public", "")
+    );
+
+    if (
+      !publishedFor ||
+      (publishedFor !== "public" && publishedFor !== "subscriber")
+    ) {
+      throw new HttpError(400, "Please provide valid publishedFor");
+    }
+
+    const newPost = await postRepository.editPost(postId, {
+      caption,
+      tags,
+      publishedFor,
+      images,
+      removedImages,
+    });
+
+    res.status(200).json(newPost);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const fetchSavedPosts: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {

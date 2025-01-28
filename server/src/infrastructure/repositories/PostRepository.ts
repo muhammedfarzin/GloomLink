@@ -9,6 +9,8 @@ import { UserModel } from "../database/models/UserModel";
 import { HttpError } from "../errors/HttpError";
 import { userRepository } from "./UserRepository";
 import { ReportModel } from "../database/models/ReportModel";
+import fs from "fs";
+import path from "path";
 
 class PostRepository {
   async createPost(
@@ -33,6 +35,41 @@ class PostRepository {
 
     const post = await newPost.save();
     return post.toObject();
+  }
+
+  async editPost(
+    postId: string,
+    postData: Pick<Post, "caption" | "images" | "publishedFor" | "tags"> & {
+      removedImages: string[];
+    }
+  ) {
+    const { caption, images, publishedFor, tags, removedImages } = postData;
+
+    if (
+      !publishedFor ||
+      (publishedFor !== "public" && publishedFor !== "subscriber")
+    ) {
+      throw new HttpError(400, "Please provide valid publishedFor");
+    }
+
+    await PostModel.findByIdAndUpdate(postId, {
+      $set: { caption, publishedFor, tags },
+      $push: { images },
+    });
+
+    const post = await PostModel.findByIdAndUpdate(
+      postId,
+      { $pull: { images: { $in: removedImages } } },
+      { new: true }
+    );
+
+    removedImages.map((image) =>
+      fs.unlink(path.join("public", image), (err) => {
+        if (err) console.error(err);
+      })
+    );
+
+    return post?.toObject();
   }
 
   async findById(

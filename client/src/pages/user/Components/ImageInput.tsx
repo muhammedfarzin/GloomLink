@@ -10,8 +10,9 @@ interface ImageInputProps {
   cardClassName?: string;
   backgroundColor?: `#${string}`;
   color?: `#${string}`;
-  values?: File[];
-  onChange?: (imageList: File[]) => void;
+  values?: (File | string)[];
+  onChange?: (imageList: (File | string)[]) => void;
+  onRemove?: (imageList: File | string) => void;
 }
 
 const ImageInput: React.FC<ImageInputProps> = ({
@@ -21,6 +22,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
   color,
   values = [],
   onChange,
+  onRemove,
 }) => {
   const { toast } = useToast();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
@@ -49,7 +51,8 @@ const ImageInput: React.FC<ImageInputProps> = ({
     }
   };
 
-  const handleOnRemove = (image: File) => {
+  const handleOnRemove = (image: File | string) => {
+    onRemove?.(image);
     onChange?.(values.filter((value) => value !== image));
   };
 
@@ -62,18 +65,12 @@ const ImageInput: React.FC<ImageInputProps> = ({
             key={index}
             className={`flex relative justify-center items-center rounded-lg border h-40 ${cardClassName}`}
             style={cardStyle}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                cardStyle.backgroundColor + "bb")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                cardStyle.backgroundColor)
-            }
           >
             <img
-              className="opacity-50 h-full w-full object-contain rounded-lg"
-              src={URL.createObjectURL(image)}
+              className="h-full w-full object-contain rounded-lg"
+              src={
+                typeof image === "string" ? image : URL.createObjectURL(image)
+              }
               alt="Image"
               onLoad={(e) => {
                 const img = e.currentTarget;

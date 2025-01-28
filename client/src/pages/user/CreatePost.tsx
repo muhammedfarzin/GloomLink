@@ -1,28 +1,57 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import InputBox from "../../components/InputBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DropDownBox from "../../components/DropDownBox";
 import Button from "../../components/Button";
 import TagsInput from "./components/TagsInput";
 import ImageInput from "./components/ImageInput";
 import apiClient from "@/apiClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { postId } = useParams();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
 
   const [caption, setCaption] = useState<string>("");
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<(File | string)[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [publishedFor, setpublishedFor] = useState<string>("public");
+  const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (postId) {
+      apiClient
+        .get(`/posts/${postId}`)
+        .then((response) => {
+          const { userId, images, caption, tags, publishedFor } = response.data;
+          if (userId !== myUserId) return navigate("/profile");
+
+          setImages(images);
+          setCaption(caption);
+          setTags(tags);
+          setpublishedFor(publishedFor);
+        })
+        .catch((error) => {
+          toast({
+            description:
+              error.response?.data.message ||
+              error.message ||
+              "Something went wrong",
+            variant: "destructive",
+          });
+        });
+    }
+  }, [postId]);
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+    setLoading("Posting...");
 
     try {
       if (!images.length && !caption.trim()) {
@@ -31,7 +60,7 @@ const CreatePost: React.FC = () => {
 
       const formData = new FormData();
       images.forEach((image) => {
-        formData.append("images", image);
+        if (image instanceof File) formData.append("images", image);
       });
       tags.forEach((tag) => {
         formData.append("tags", tag);
@@ -39,12 +68,23 @@ const CreatePost: React.FC = () => {
       formData.append("caption", caption);
       formData.append("publishedFor", publishedFor);
 
-      setLoading("Posting...");
-      await apiClient.post("/posts/create", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      if (postId) {
+        removedImages.forEach((image) => {
+          formData.append("removedImages[]", image);
+        });
+
+        await apiClient.put(`/posts/edit/${postId}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      } else {
+        await apiClient.post("/posts/create", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
       navigate("/profile");
     } catch (error: any) {
       toast({
@@ -69,7 +109,14 @@ const CreatePost: React.FC = () => {
         }}
       >
         <form method="post" onSubmit={handleSubmit}>
-          <ImageInput values={images} onChange={setImages} />
+          <ImageInput
+            values={images}
+            onChange={setImages}
+            onRemove={(image) => {
+              if (typeof image === "string")
+                setRemovedImages([...removedImages, image]);
+            }}
+          />
           <InputBox
             className="mt-2"
             placeholder="Write a caption"

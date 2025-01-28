@@ -39,6 +39,7 @@ function App() {
           <Route path="create-post" element={<CreatePost />} />
           <Route path="saved-post" element={<SavedPost />} />
           <Route path=":username" element={<Profile />} />
+          <Route path="edit-post/:postId" element={<CreatePost />} />
         </Route>
 
         <Route path="admin" element={<Admin />}>
