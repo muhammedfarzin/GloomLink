@@ -6,7 +6,7 @@ interface ThemeState {
 }
 
 const defaultTheme: ThemeState = {
-  colorTheme: colorThemes.light,
+  colorTheme: colorThemes.dark,
 };
 
 const initialState: ThemeState = defaultTheme;
