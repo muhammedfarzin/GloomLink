@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
+import { postRepository } from "../../infrastructure/repositories/PostRepository";
 
 export const fetchMyProfile: RequestHandler = async (req, res, next) => {
   try {
@@ -126,6 +127,28 @@ export const fetchFollowing: RequestHandler = async (req, res, next) => {
     );
 
     res.status(200).json(followers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const search: RequestHandler = async (req, res, next) => {
+  try {
+    const query = req.query.query || "";
+    
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    } else if (typeof query !== "string") {
+      throw new HttpError(400, "Invalid query type");
+    }
+    
+    const userId = req.user._id;
+    const [users, posts] = await Promise.all([
+      userRepository.search(userId, query),
+      postRepository.search(userId, query),
+    ]);
+
+    res.status(200).json([...users, ...posts]);
   } catch (error) {
     next(error);
   }

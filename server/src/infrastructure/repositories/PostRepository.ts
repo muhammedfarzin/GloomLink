@@ -12,6 +12,79 @@ import { ReportModel } from "../database/models/ReportModel";
 import fs from "fs";
 import path from "path";
 
+const postDataAggregate = (userId: string) => [
+  {
+    $lookup: {
+      from: "users",
+      localField: "userId",
+      foreignField: "_id",
+      as: "uploadedBy",
+      pipeline: [
+        {
+          $project: {
+            username: 1,
+            image: 1,
+            firstname: 1,
+            lastname: 1,
+          },
+        },
+      ],
+    },
+  },
+  { $unwind: "$uploadedBy" },
+  {
+    $lookup: {
+      from: "likes",
+      localField: "_id",
+      foreignField: "targetId",
+      as: "liked",
+      pipeline: [
+        {
+          $match: {
+            userId: Types.ObjectId.createFromHexString(userId),
+          },
+        },
+      ],
+    },
+  },
+  {
+    $lookup: {
+      from: "comments",
+      localField: "_id",
+      foreignField: "targetId",
+      as: "commentsCount",
+    },
+  },
+  {
+    $lookup: {
+      from: "likes",
+      localField: "_id",
+      foreignField: "targetId",
+      as: "likesCount",
+    },
+  },
+  {
+    $addFields: {
+      liked: { $gt: [{ $size: "$liked" }, 0] },
+      commentsCount: { $size: "$commentsCount" },
+      likesCount: { $size: "$likesCount" },
+    },
+  },
+];
+
+async function addSavedPostField(userId: string, posts: any[]) {
+  const user = await userRepository.findById(userId, { savedPosts: 1 });
+  if (!user) throw new HttpError(401, "Unauthorized");
+  const savedPosts = user.savedPosts.map((post) => post.toString());
+
+  const resPosts = posts.map((post) => {
+    post.saved = savedPosts.includes(post._id.toString());
+    return post;
+  });
+
+  return resPosts;
+}
+
 class PostRepository {
   async createPost(
     postData: Omit<Post, "_id" | "status" | "userId"> & { userId: string }
@@ -236,10 +309,6 @@ class PostRepository {
   }
 
   async getPostsForUser(userId: string) {
-    const user = await userRepository.findById(userId, { savedPosts: 1 });
-    if (!user) throw new HttpError(401, "Unauthorized");
-    const savedPosts = user.savedPosts.map((post) => post.toString());
-
     const posts = await PostModel.aggregate([
       {
         $match: {
@@ -247,69 +316,10 @@ class PostRepository {
         },
       },
       { $limit: 20 },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "_id",
-          as: "uploadedBy",
-          pipeline: [
-            {
-              $project: {
-                username: 1,
-                image: 1,
-                firstname: 1,
-                lastname: 1,
-              },
-            },
-          ],
-        },
-      },
-      { $unwind: "$uploadedBy" },
-      {
-        $lookup: {
-          from: "likes",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "liked",
-          pipeline: [
-            {
-              $match: {
-                userId: Types.ObjectId.createFromHexString(userId),
-              },
-            },
-          ],
-        },
-      },
-      {
-        $lookup: {
-          from: "comments",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "commentsCount",
-        },
-      },
-      {
-        $lookup: {
-          from: "likes",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "likesCount",
-        },
-      },
-      {
-        $addFields: {
-          liked: { $gt: [{ $size: "$liked" }, 0] },
-          commentsCount: { $size: "$commentsCount" },
-          likesCount: { $size: "$likesCount" },
-        },
-      },
+      ...postDataAggregate(userId),
     ]);
 
-    const resPosts = posts.map((post) => {
-      post.saved = savedPosts.includes(post._id.toString());
-      return post;
-    });
+    const resPosts = await addSavedPostField(userId, posts);
 
     return resPosts;
   }
@@ -405,6 +415,39 @@ class PostRepository {
   async deletePost(postId: string) {
     await PostModel.findByIdAndUpdate(postId, { status: "deleted" });
     await ReportModel.deleteMany({ targetId: postId });
+  }
+
+  async search(userId: string, query: string) {
+    const searchRegex = new RegExp(query, "i");
+    const searchWords = query.split(/\s+/).map((word) => new RegExp(word, "i"));
+
+    const posts = await PostModel.aggregate([
+      {
+        $match: {
+          $or: [
+            { caption: searchRegex },
+            { tags: { $elemMatch: { $in: searchWords } } },
+          ],
+        },
+      },
+      ...postDataAggregate(userId),
+      { $addFields: { type: "post" } },
+    ]);
+
+    const postsWithSaved = await addSavedPostField(userId, posts);
+
+    const sortedPosts = postsWithSaved.sort((a, b) => {
+      const aTagMatches = a.tags.filter((tag: string) =>
+        searchWords.some((word) => tag.match(word))
+      ).length;
+      const bTagMatches = b.tags.filter((tag: string) =>
+        searchWords.some((word) => tag.match(word))
+      ).length;
+
+      return bTagMatches - aTagMatches;
+    });
+
+    return sortedPosts;
   }
 }
 

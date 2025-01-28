@@ -42,7 +42,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
             </DialogBox>
           </div>
 
-          {(followersCount ?? 0) >= 10 ? (
+          {(followersCount ?? 0) >= 5 ? (
             <div className="flex gap-2">
               <Button className="w-full">Enable Subscription</Button>
             </div>

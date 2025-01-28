@@ -5,36 +5,41 @@ import ProfileImage from "@/components/ProfileImage";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { Button } from "@/components/ui/button";
+import type { SearchResultType } from "../Search";
 
-export interface FollowUserData {
+export interface UserDataType {
   _id: string;
   username: string;
   firstname: string;
   lastname: string;
-  image: string;
-  isFollowing: boolean;
+  image?: string;
+  isFollowing?: boolean;
 }
 
 interface UserListCardProps {
-  userData: FollowUserData;
-  handleChange?: React.Dispatch<React.SetStateAction<FollowUserData[]>>;
+  userData: UserDataType;
+  className?: string;
+  handleChange?:
+    | React.Dispatch<React.SetStateAction<UserDataType[]>>
+    | React.Dispatch<React.SetStateAction<SearchResultType[]>>;
 }
 
 const UserListCard: React.FC<UserListCardProps> = ({
-  userData,
+  userData: { isFollowing = false, ...userData },
+  className,
   handleChange,
 }) => {
   const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
   const { toast } = useToast();
 
   const handleFollowUser = async (
-    userId: string,
     type: "follow" | "unfollow"
   ) => {
+    const userId = userData._id;
     function toggleFollowStatus() {
-      handleChange?.((prevState) =>
+      handleChange?.((prevState: any[]) =>
         prevState.map((user) => {
-          if (userData._id === userId) {
+          if (user._id === userId && (!user.type || user.type === "user")) {console.log(user._id===userId)
             user.isFollowing = !user.isFollowing;
           }
           return user;
@@ -60,7 +65,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
   return (
     <div
       key={userData._id}
-      className="flex items-center justify-between bg-[#6b728033] my-2 p-2 rounded-lg"
+      className={`flex items-center justify-between bg-[#6b728033] p-2 rounded-lg ${className}`}
     >
       <div className="flex items-center gap-1">
         <Link to={`/${userData.username}`}>
@@ -76,13 +81,10 @@ const UserListCard: React.FC<UserListCardProps> = ({
         <Button
           className="h-7"
           onClick={() =>
-            handleFollowUser(
-              userData._id,
-              userData.isFollowing ? "unfollow" : "follow"
-            )
+            handleFollowUser(isFollowing ? "unfollow" : "follow")
           }
         >
-          {userData.isFollowing ? "Unfollow" : "Follow"}
+          {isFollowing ? "Unfollow" : "Follow"}
         </Button>
       ) : null}
     </div>

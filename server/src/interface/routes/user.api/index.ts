@@ -1,10 +1,8 @@
 import { Router } from "express";
 import * as authController from "../../controllers/auth.controller.js";
-import * as postController from "../../controllers/post.controller.js";
 import * as userController from "../../controllers/user.controller.js";
 import { authenticateToken } from "../../middleware/authenticate-token.middleware.js";
 import { authorizeRole } from "../../middleware/authorize-role.middleware.js";
-import { uploadImage } from "../../middleware/file-upload.middleware.js";
 import { profileRouter } from "./profile.router.js";
 import { postsRouter } from "./posts.router.js";
 
@@ -40,5 +38,8 @@ router.use("/profile", profileRouter);
 // Post management
 
 router.use("/posts", postsRouter);
+
+// Search
+router.get("/search", authenticateToken, authorizeRole("user"), userController.search);
 
 export { router as userApiRouter };

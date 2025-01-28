@@ -15,6 +15,7 @@ import CreatePost from "./pages/user/CreatePost";
 import SavedPost from "./pages/user/SavedPost";
 import EditProfile from "./pages/user/EditProfile";
 import AdminPostLists from "./pages/admin/AdminPostLists";
+import Search from "./pages/user/Search";
 
 function App() {
   const { background, text: textColor } = useSelector(
@@ -34,6 +35,7 @@ function App() {
 
         <Route path="" element={<User />}>
           <Route index element={<Home />} />
+          <Route path="/search" element={<Search />} />
           <Route path="profile" element={<Profile self />} />
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="create-post" element={<CreatePost />} />

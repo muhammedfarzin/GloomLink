@@ -1,0 +1,98 @@
+import SearchBox from "@/components/SearchBox";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import UserListCard, { UserDataType } from "./components/UserListCard";
+import PostListCard, { Post } from "@/components/post/PostListCard";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import apiClient from "@/apiClient";
+import { useToast } from "@/hooks/use-toast";
+
+export type SearchResultType =
+  | (UserDataType & { type: "user" })
+  | (Post & { type: "post" });
+
+const Search: React.FC = () => {
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>(
+    searchParams.get("query") || ""
+  );
+  const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
+
+  const handleApiError = (error?: any) => {
+    toast({
+      description:
+        error.response.data.message || error.message || "Something went wrong",
+      variant: "destructive",
+    });
+  };
+
+  useEffect(() => {
+    if (searchQuery) {
+      setLoading("Fetching...");
+      const params = Object.fromEntries(searchParams.entries());
+
+      apiClient
+        .get("/search", { params })
+        .then((response) => setSearchResult(response.data))
+        .catch((error) => handleApiError(error))
+        .finally(() => setLoading(null));
+    }
+  }, [searchParams]);
+
+  return (
+    <div className="m-auto max-w-[704px]">
+      <div className="m-2 mt-0">
+        <div
+          className="sticky top-0 pt-2 rounded-b-lg z-30"
+          style={{ background: colorTheme.background }}
+        >
+          <SearchBox
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onSubmit={() => {
+              if (searchQuery)
+                setSearchParams({
+                  ...Object.fromEntries(searchParams.entries()),
+                  query: searchQuery,
+                });
+            }}
+          />
+        </div>
+
+        {loading || !searchParams.get("query") || !searchResult.length ? (
+          <div className="flex h-[80vh] justify-center items-center text-lg font-bold">
+            {loading ||
+              (!searchParams.get("query") &&
+                "Search to list users and posts") ||
+              "No result found"}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 mt-4">
+            {searchResult.map((data) =>
+              data.type === "user" ? (
+                <UserListCard
+                  key={data.type + data._id}
+                  className="w-full"
+                  userData={data}
+                  handleChange={setSearchResult}
+                />
+              ) : (
+                <PostListCard
+                  key={data.type + data._id}
+                  postId={data._id}
+                  postData={data}
+                />
+              )
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Search;

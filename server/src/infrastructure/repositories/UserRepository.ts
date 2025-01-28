@@ -202,6 +202,8 @@ class UserRepository {
                 status: { $ne: "deleted", ...(self ? {} : { $eq: "active" }) },
               },
             },
+            { $sort: { createdAt: -1 } },
+            { $limit: 20 },
           ],
         },
       },
@@ -334,6 +336,67 @@ class UserRepository {
     ]);
 
     return followers;
+  }
+
+  async search(userId: string, query: string) {
+    const searchRegex = new RegExp(query, "i");
+    const users = await UserModel.aggregate([
+      {
+        $match: {
+          status: "active",
+          _id: { $ne: Types.ObjectId.createFromHexString(userId) },
+          $or: [
+            { username: searchRegex },
+            { firstname: searchRegex },
+            { lastname: searchRegex },
+          ],
+        },
+      },
+      { $limit: 5 },
+      { $project: { firstname: 1, lastname: 1, username: 1, image: 1 } },
+      { $addFields: { type: "user" } },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followingTo",
+          as: "isFollowing",
+          pipeline: [
+            {
+              $match: {
+                followedBy: Types.ObjectId.createFromHexString(userId),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          isFollowing: { $gt: [{ $size: "$isFollowing" }, 0] },
+        },
+      },
+    ]);
+
+    const sortedUsers = users.sort((a, b) => {
+      const aUsernameMatch = a.username === query ? 1 : 0;
+      const bUsernameMatch = b.username === query ? 1 : 0;
+
+      // First, prioritize username matches
+      if (aUsernameMatch !== bUsernameMatch) {
+        return bUsernameMatch - aUsernameMatch;
+      }
+
+      const aMatches = [a.username, a.firstname + a.lastname].filter(
+        (field: string) => field.match(searchRegex)
+      ).length;
+      const bMatches = [b.username, b.firstname + b.lastname].filter(
+        (field: string) => field.match(searchRegex)
+      ).length;
+
+      return bMatches - aMatches;
+    });
+
+    return sortedUsers;
   }
 }
 

@@ -1,7 +1,7 @@
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import UserListCard, {
-  type FollowUserData,
+  type UserDataType,
 } from "@/pages/user/components/UserListCard";
 import { useEffect, useState } from "react";
 
@@ -12,7 +12,7 @@ interface UsersListProps {
 
 const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
   const { toast } = useToast();
-  const [users, setUsers] = useState<FollowUserData[]>([]);
+  const [users, setUsers] = useState<UserDataType[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +39,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
           <UserListCard
             key={user._id}
             userData={user}
+            className="my-2"
             handleChange={setUsers}
           />
         ))
