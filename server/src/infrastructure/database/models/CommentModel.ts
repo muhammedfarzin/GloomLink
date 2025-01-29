@@ -6,7 +6,7 @@ export interface CommentType {
   targetId: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   comment: string;
-  type: "post";
+  type: "post" | "comment";
 }
 
 const commentSchama = new Schema({
@@ -25,7 +25,7 @@ const commentSchama = new Schema({
   type: {
     type: String,
     default: "post",
-    enum: ["post"],
+    enum: ["post", "comment"],
   },
 });
 

@@ -56,6 +56,16 @@ class CommentRepository {
         },
       },
       { $unwind: "$uploadedBy" },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "replies",
+          pipeline: [{ $match: { type: "comment" } }],
+        },
+      },
+      { $addFields: { replies: { $size: "$replies" } } },
     ]);
 
     return comments;

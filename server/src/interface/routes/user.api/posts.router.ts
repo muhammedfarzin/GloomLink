@@ -71,29 +71,6 @@ router.get(
   postController.fetchPost
 );
 
-// Comments
-
-router.get(
-  "/:postId/comments",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.getComments
-);
-
-router.get(
-  "/:postId/mycomments",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.getMyComments
-);
-
-router.post(
-  "/:postId/comment",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.addComment
-);
-
 router.get(
   "/:postId/likes",
   authenticateToken,

@@ -5,6 +5,7 @@ import { authenticateToken } from "../../middleware/authenticate-token.middlewar
 import { authorizeRole } from "../../middleware/authorize-role.middleware.js";
 import { profileRouter } from "./profile.router.js";
 import { postsRouter } from "./posts.router.js";
+import { commentsRouter } from "./comments.router.js";
 
 const router = Router();
 
@@ -31,6 +32,9 @@ router.post("/auth/google", authController.signInUsingGoogle);
 
 router.post("/auth/refresh", authController.refreshToken);
 
+// Search
+router.get("/search", authenticateToken, authorizeRole("user"), userController.search);
+
 // Profiles
 
 router.use("/profile", profileRouter);
@@ -39,7 +43,8 @@ router.use("/profile", profileRouter);
 
 router.use("/posts", postsRouter);
 
-// Search
-router.get("/search", authenticateToken, authorizeRole("user"), userController.search);
+// Comments
+
+router.use("/comments", commentsRouter)
 
 export { router as userApiRouter };
