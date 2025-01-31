@@ -1,6 +1,4 @@
 import SearchBox from "@/components/SearchBox";
-import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
 import UserListCard, { UserDataType } from "./components/UserListCard";
 import PostListCard, { Post } from "@/components/post/PostListCard";
 import { useEffect, useState } from "react";
@@ -13,7 +11,6 @@ export type SearchResultType =
   | (Post & { type: "post" });
 
 const Search: React.FC = () => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
@@ -46,10 +43,7 @@ const Search: React.FC = () => {
   return (
     <div className="m-auto max-w-[704px]">
       <div className="m-2 mt-0">
-        <div
-          className="sticky top-0 pt-2 rounded-b-lg z-30"
-          style={{ background: colorTheme.background }}
-        >
+        <div className="sticky top-0 pt-2 rounded-b-lg z-30 bg-background">
           <SearchBox
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

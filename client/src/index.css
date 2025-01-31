@@ -22,7 +22,7 @@ select:focus {
 }
 
 .btn-primary {
-  @apply bg-[#353535] hover:bg-[#353535bb] text-white;
+  @apply bg-primary hover:opacity-75 text-foreground;
 }
 
 .btn-dark {
@@ -40,6 +40,10 @@ select.white option {
 
 select.black option {
   @apply text-black;
+}
+
+.bg-foreground\/5 {
+  background-color: hsl(var(--foreground), 0.05);
 }
 
 .search-box {
@@ -90,7 +94,6 @@ select.black option {
     top: env(safe-area-inset-bottom, 0px);
     right: env(safe-area-inset-right, 0px);
     padding: 20px;
-    background-color: #fff;
   }
 }
 

@@ -16,16 +16,18 @@ import SavedPost from "./pages/user/SavedPost";
 import EditProfile from "./pages/user/EditProfile";
 import AdminPostLists from "./pages/admin/AdminPostLists";
 import Search from "./pages/user/Search";
+import { useEffect } from "react";
 
 function App() {
-  const { background, text: textColor } = useSelector(
-    (state: RootState) => state.theme.colorTheme
-  );
+  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", colorTheme)
+  }, [colorTheme]);
 
   return (
     <div
-      className="h-screen w-screen overflow-y-scroll no-scrollbar"
-      style={{ backgroundColor: background, color: textColor }}
+      className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar"
     >
       <Routes>
         <Route path="login" element={<UserLogin />} />

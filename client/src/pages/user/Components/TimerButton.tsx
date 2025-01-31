@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../redux/store";
 
 interface TimerButtonProps {
   children?: React.ReactNode;
   onClick?: () => void;
-  color?: string;
   disableDuration?: number;
   isDisabledByDefault?: boolean;
   showTimer?: boolean;
@@ -15,18 +12,14 @@ interface TimerButtonProps {
 const TimerButton: React.FC<TimerButtonProps> = ({
   children,
   onClick,
-  color,
   disableDuration = 300,
   isDisabledByDefault = true,
   showTimer = true,
   className,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [remainingSeconds, setRemainingSeconds] =
     useState<number>(disableDuration);
-
-  const textColor = color || colorTheme.text;
 
   const startTimer = () => {
     setIsDisabled(true);
@@ -51,19 +44,14 @@ const TimerButton: React.FC<TimerButtonProps> = ({
     e.preventDefault();
     onClick?.();
     startTimer();
-  }
+  };
 
   return (
     <div
-      className={className || "cursor-pointer"}
+      className={`cursor-pointer text-foreground ${
+        isDisabled ? "text-opacity-35 cursor-not-allowed" : ""
+      } ${className}`}
       onClick={!isDisabled ? handleOnClick : undefined}
-      onMouseEnter={(e) =>
-        !isDisabled ? (e.currentTarget.style.color = textColor + "cc") : null
-      }
-      onMouseLeave={(e) =>
-        !isDisabled ? (e.currentTarget.style.color = textColor) : null
-      }
-      style={{ color: textColor + (isDisabled ? "55" : "") }}
     >
       {children}
       {showTimer && isDisabled ? (

@@ -3,8 +3,6 @@ import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 
 interface DateInputProps {
   date?: Date;
@@ -19,23 +17,16 @@ const DateInput: React.FC<DateInputProps> = ({
   className,
   maxDate,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           className={cn(
-            "w-[240px] justify-start text-left font-normal text-base",
+            "w-[240px] justify-start text-left font-normal text-base text-foreground bg-primary border-border",
             !date && "text-muted-foreground",
             className
           )}
-          style={{
-            color: colorTheme.text,
-            backgroundColor: colorTheme.primary,
-            borderColor: colorTheme.border,
-          }}
         >
           {date ? (
             format(date, "PPP")
@@ -46,11 +37,7 @@ const DateInput: React.FC<DateInputProps> = ({
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
-          style={{
-            backgroundColor: colorTheme.primary,
-            color: colorTheme.text,
-            borderColor: colorTheme.border,
-          }}
+          className="bg-primary text-foreground border-border"
           toDate={maxDate}
           pagedNavigation
           mode="single"

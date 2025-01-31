@@ -1,30 +1,23 @@
-import { setColorTheme } from "@/redux/reducers/theme";
-import { colorThemes } from "@/redux/reducers/themes/colorThemes";
+import { ColorTheme, setColorTheme } from "@/redux/reducers/theme";
 import { useDispatch } from "react-redux";
 
 const ColorThemeList: React.FC = () => {
   const dispatch = useDispatch();
 
   return (
-    <div className="flex flex-wrap justify-center items-center h-full">
-      {Object.entries(colorThemes).map(([title, colorTheme]) => {
+    <div className="flex flex-wrap justify-center items-center bg-background text-foreground h-full">
+      {Object.keys(ColorTheme).map((themeTitle) => {
         return (
           <div
-            className="flex justify-center items-center font-bold capitalize rounded-full h-12 w-5/12 m-2 cursor-pointer"
-            onClick={() => dispatch(setColorTheme(title))}
-            style={{
-              backgroundColor: colorTheme.primary,
-              color: colorTheme.text,
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                colorTheme.primary + "bb")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = colorTheme.primary)
+            data-theme={themeTitle}
+            className="flex justify-center items-center bg-primary text-foreground hover:opacity-75 font-bold capitalize rounded-full h-12 w-5/12 m-2 cursor-pointer"
+            onClick={() =>
+              dispatch(
+                setColorTheme(ColorTheme[themeTitle as keyof typeof ColorTheme])
+              )
             }
           >
-            {title}
+            {themeTitle}
           </div>
         );
       })}

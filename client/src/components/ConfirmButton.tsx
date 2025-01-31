@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "./ui/button";
 import React, { useRef } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 
 interface ConfirmButtonProps {
   children: React.ReactElement;
@@ -33,7 +31,6 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
   confirmButtonText,
   className,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const alertBtnRef = useRef<HTMLButtonElement | null>(null);
   const { onClick: childOnClick, ...childProps } = children.props;
 
@@ -51,10 +48,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
         <Button ref={alertBtnRef} className="hidden" />
       </AlertDialogTrigger>
 
-      <AlertDialogContent
-        className="border-none"
-        style={{ color: colorTheme.text, background: colorTheme.background }}
-      >
+      <AlertDialogContent className="border-none bg-background text-foreground">
         <AlertDialogHeader>
           <AlertDialogTitle>{title || "Are you sure?"}</AlertDialogTitle>
           {description ? (
@@ -64,25 +58,14 @@ const ConfirmButton: React.FC<ConfirmButtonProps> = ({
 
         <AlertDialogFooter>
           <AlertDialogCancel
-            className="border-gray-500 hover:opacity-75 transition-all"
+            className="border-gray-500 hover:opacity-75 transition-all bg-background text-foreground"
             onClick={onCancel}
-            style={{
-              color: colorTheme.text,
-              background: colorTheme.background,
-            }}
           >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onSuccess}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                colorTheme.primary + "bb")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = colorTheme.primary)
-            }
-            style={{ color: colorTheme.text, background: colorTheme.primary }}
+            className="text-foreground bg-primary"
           >
             {confirmButtonText || "Continue"}
           </AlertDialogAction>

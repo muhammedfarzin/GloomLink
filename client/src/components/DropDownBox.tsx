@@ -24,13 +24,12 @@ const DropDownBox: React.FC<DropDownBoxProps> = ({
   return (
     <select
       id="gender"
-      className={`py-2 my-1 ${placeholderClassName} ${className} ${
-        colorTheme.text === "#ffffff" ? "white" : "black"
+      className={`py-2 my-1 bg-primary text-foreground ${placeholderClassName} ${className} ${
+        colorTheme === "dark" ? "white" : "black"
       }`}
       value={value || placeholder}
       style={{
-        backgroundColor: colorTheme.primary,
-        color: value || !placeholder ? colorTheme.text : "#9ca3af",
+        color: value || !placeholder ? "currentcolor" : "#9ca3af",
       }}
       {...props}
     >

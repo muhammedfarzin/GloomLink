@@ -1,12 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { colorThemes, type ColorThemeState } from "./themes/colorThemes";
+
+export enum ColorTheme {
+  dark = "dark",
+  light = "light",
+  blue = "blue",
+  purple = "purple",
+}
 
 interface ThemeState {
-  colorTheme: ColorThemeState;
+  colorTheme: ColorTheme;
 }
 
 const defaultTheme: ThemeState = {
-  colorTheme: colorThemes.dark,
+  colorTheme: ColorTheme.dark,
 };
 
 const initialState: ThemeState = defaultTheme;
@@ -15,8 +21,8 @@ const themeSlice = createSlice({
   name: "theme",
   initialState,
   reducers: {
-    setColorTheme: (state, action: PayloadAction<keyof typeof colorThemes>) => {
-      state.colorTheme = colorThemes[action.payload];
+    setColorTheme: (state, action: PayloadAction<ThemeState["colorTheme"]>) => {
+      state.colorTheme = action.payload;
     },
   },
 });

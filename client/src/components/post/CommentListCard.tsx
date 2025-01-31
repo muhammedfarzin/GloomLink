@@ -1,5 +1,3 @@
-import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
 import ProfileImage from "../ProfileImage";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -44,15 +42,14 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
   showReplies = false,
   handleReplyOnClick,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toast } = useToast();
   const [showReply, setShowReply] = useState<boolean>(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [replies, setReplies] = useState<Comment[]>([]);
 
   const handleReplyComment: HandleReplyCommentType = (newReply) => {
-   setReplies([newReply, ...replies]);
-     setShowReply(true);
+    setReplies([newReply, ...replies]);
+    setShowReply(true);
   };
 
   const handleShowReplyClick = async () => {
@@ -84,10 +81,7 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
 
   return (
     <>
-      <div
-        className="flex p-2 rounded-lg items-start"
-        style={{ backgroundColor: colorTheme.primary }}
-      >
+      <div className="flex p-2 rounded-lg items-start bg-primary">
         <Link to={`/${username}`}>
           <ProfileImage className="w-10" profileImage={image} />
         </Link>

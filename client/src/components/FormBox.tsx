@@ -1,6 +1,4 @@
-import { RootState } from "@/redux/store";
 import React from "react";
-import { useSelector } from "react-redux";
 
 interface FormBoxProps
   extends React.DetailedHTMLProps<
@@ -20,20 +18,12 @@ const FormBox: React.FC<FormBoxProps> = ({
   errorMessage,
   ...props
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-
   return (
     <div
-      className="w-full max-w-[450px] mx-auto rounded-2xl p-4"
+      className="w-full max-w-[450px] mx-auto rounded-2xl p-4 bg-formBox"
       id="login-box"
-      style={{
-        backgroundColor: colorTheme.formBackground,
-      }}
     >
-      <h3
-        className={`text-center text-3xl font-bold mb-2`}
-        style={{ color: colorTheme.text }}
-      >
+      <h3 className="text-center text-3xl font-bold mb-2 text-foreground">
         {title}
       </h3>
       <form method={method} {...props}>

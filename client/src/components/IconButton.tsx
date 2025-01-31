@@ -24,18 +24,12 @@ const IconButton: React.FC<IconButtonProps> = ({
   return (
     <Button
       variant="ghost"
-      className={className + " aspect-square p-1"}
+      className={className + " aspect-square p-1 hover:bg-[#9ca3af66]"}
       onClick={onClick}
       disabled={disabled}
       style={{
-        filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+        filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
       }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.backgroundColor = "#9ca3af66")
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.backgroundColor = "transparent")
-      }
     >
       <img src={icon} alt={alt} className={iconClassName} />
     </Button>

@@ -14,7 +14,6 @@ const CreatePost: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { postId } = useParams();
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
 
   const [caption, setCaption] = useState<string>("");
@@ -102,11 +101,7 @@ const CreatePost: React.FC = () => {
   return (
     <div className="mx-4 mt-4">
       <div
-        className="border rounded-lg md:rounded-2xl my-1 p-4"
-        style={{
-          backgroundColor: colorTheme.secondary,
-          borderColor: colorTheme.border,
-        }}
+        className="border border-border bg-secondary rounded-lg md:rounded-2xl my-1 p-4"
       >
         <form method="post" onSubmit={handleSubmit}>
           <ImageInput

@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import PostListCard from "./PostListCard";
 import CommentBox from "./CommentBox";
@@ -15,15 +13,10 @@ const PostGridCard: React.FC<PostGridCardProps> = ({
   caption,
   postId,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div
-          className="border rounded-md md:rounded-3xl cursor-pointer aspect-square w-[calc(33.73%-0.5rem)]"
-          style={{ borderColor: colorTheme.border }}
-        >
+        <div className="border rounded-md md:rounded-3xl cursor-pointer border-border aspect-square w-[calc(33.73%-0.5rem)]">
           {image ? (
             <img
               className="rounded-md md:rounded-3xl h-full w-full object-cover"

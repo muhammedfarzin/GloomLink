@@ -8,8 +8,6 @@ import CommentListCard, {
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
 
@@ -24,7 +22,6 @@ interface CommentBoxProps {
 }
 
 const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toast } = useToast();
   const [commentInput, setCommentInput] = useState<string>("");
   const [comments, setComments] = useState<Comment[]>([]);
@@ -137,10 +134,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
 
       <div className="relative">
         {replyComment && (
-          <div
-            className="absolute -top-12 flex justify-between items-center w-full border-t border-[#6b728033] py-1 px-2"
-            style={{ backgroundColor: colorTheme.secondary }}
-          >
+          <div className="absolute -top-12 flex justify-between items-center w-full border-t bg-secondary border-[#6b728033] py-1 px-2">
             <span>Replying to {replyComment?.username}</span>
             <Button
               variant="ghost"
@@ -152,10 +146,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
           </div>
         )}
 
-        <div
-          className="flex items-center gap-2 w-full border-t border-[#6b728033] py-1 px-2 rounded-br-lg"
-          style={{ backgroundColor: colorTheme.secondary }}
-        >
+        <div className="flex items-center gap-2 w-full border-t bg-secondary border-[#6b728033] py-1 px-2 rounded-br-lg">
           <InputBox
             type="text"
             placeholder={`Add a ${replyComment ? "reply" : "comment"}...`}

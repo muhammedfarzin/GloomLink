@@ -7,26 +7,26 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
 
 export function Toaster() {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toasts } = useToast();
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, variant, ...props }) {
+      {toasts.map(function ({
+        id,
+        title,
+        description,
+        action,
+        variant,
+        ...props
+      }) {
         return (
           <Toast
             key={id}
             variant={variant}
+            className="border-border text-foreground"
             {...props}
-            style={{
-              backgroundColor: variant === "destructive" ? colorTheme.danger : colorTheme.background,
-              borderColor: colorTheme.border,
-              color: colorTheme.text,
-            }}
           >
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}

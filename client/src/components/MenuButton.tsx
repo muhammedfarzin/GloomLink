@@ -20,18 +20,12 @@ const MenuButton: React.FC<MenuButtonProps> = ({
   ...props
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-  const backgroundColor = selected ? colorTheme.selection : colorTheme.primary;
 
   return (
     <Link
-      className={`btn-flex btn-primary ${className || ""}`}
-      style={{ backgroundColor, color: colorTheme.text }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.backgroundColor = backgroundColor + "bb")
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.backgroundColor = backgroundColor)
-      }
+      className={`btn-flex btn text-foreground ${
+        selected ? "bg-selection" : "bg-primary"
+      } ${className || ""}`}
       {...props}
     >
       {icon ? (
@@ -40,7 +34,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
           alt={alt ?? text}
           className={`inline w-6 h-6 mr-4 ${iconClassName || ""}`}
           style={{
-            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+            filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
           }}
         />
       ) : null}

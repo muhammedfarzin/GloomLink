@@ -8,8 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 interface ImageInputProps {
   className?: string;
   cardClassName?: string;
-  backgroundColor?: `#${string}`;
-  color?: `#${string}`;
   values?: (File | string)[];
   onChange?: (imageList: (File | string)[]) => void;
   onRemove?: (imageList: File | string) => void;
@@ -18,8 +16,6 @@ interface ImageInputProps {
 const ImageInput: React.FC<ImageInputProps> = ({
   className,
   cardClassName = "",
-  backgroundColor,
-  color,
   values = [],
   onChange,
   onRemove,
@@ -27,11 +23,6 @@ const ImageInput: React.FC<ImageInputProps> = ({
   const { toast } = useToast();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const imageInputRef = useRef<HTMLInputElement>(null);
-
-  const cardStyle = {
-    backgroundColor: backgroundColor || colorTheme.background,
-    borderColor: colorTheme.border,
-  };
 
   const handleOnUpload: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.files) {
@@ -63,8 +54,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
         {values.map((image, index) => (
           <div
             key={index}
-            className={`flex relative justify-center items-center rounded-lg border h-40 ${cardClassName}`}
-            style={cardStyle}
+            className={`flex relative justify-center items-center bg-background border-border rounded-lg border h-40 ${cardClassName}`}
           >
             <img
               className="h-full w-full object-contain rounded-lg"
@@ -83,20 +73,14 @@ const ImageInput: React.FC<ImageInputProps> = ({
 
             {/* Remove Image Icon */}
             <div
-              className="absolute border rounded-tr-lg rounded-bl-lg cursor-pointer p-2 top-0 right-0"
-              style={{
-                backgroundColor: cardStyle.backgroundColor,
-                borderColor: cardStyle.borderColor,
-              }}
+              className="absolute border border-border bg-background rounded-tr-lg rounded-bl-lg cursor-pointer p-2 top-0 right-0"
               onClick={() => handleOnRemove(image)}
             >
               <img
                 src={CloseIcon}
                 alt="close"
                 style={{
-                  filter: `invert(${
-                    (color || colorTheme.text) === "#ffffff" ? 0 : 1
-                  })`,
+                  filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
                 }}
               />
             </div>
@@ -105,8 +89,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
 
         {/* Add Image Button */}
         <div
-          className={`flex justify-center items-center border cursor-pointer rounded-lg h-40 w-72 ${cardClassName}`}
-          style={cardStyle}
+          className={`flex justify-center items-center border border-border bg-background cursor-pointer rounded-lg h-40 w-72 ${cardClassName}`}
           onClick={() => imageInputRef.current?.click()}
         >
           <input
@@ -123,9 +106,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
             src={AddImageIcon}
             alt="close"
             style={{
-              filter: `invert(${
-                (color || colorTheme.text) === "#ffffff" ? 0 : 1
-              })`,
+              filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
             }}
           />
         </div>

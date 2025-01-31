@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import ProfileImage from "../../components/ProfileImage";
 import PostGridCard from "../../components/post/PostGridCard";
 import { useEffect, useState } from "react";
@@ -37,7 +35,6 @@ interface PostsType {
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const { toast } = useToast();
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { username } = useParams();
   const [userData, setUserData] = useState<UserDataType>();
   const [posts, setPosts] = useState<PostsType[]>([]);
@@ -86,13 +83,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
         </div>
       ) : (
         <div className="m-2">
-          <div
-            className="border rounded-lg md:rounded-2xl mt-8 p-4 md:p-8"
-            style={{
-              backgroundColor: colorTheme.secondary,
-              borderColor: colorTheme.border,
-            }}
-          >
+          <div className="border border-border bg-secondary rounded-lg md:rounded-2xl mt-8 p-4 md:p-8">
             <div className="flex gap-4 md:gap-8 max-h-16 items-center">
               <ProfileImage
                 profileImage={userData.image}

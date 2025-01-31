@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import ProfileImage from "../ProfileImage";
 import { Link } from "react-router-dom";
 import {
@@ -71,7 +69,6 @@ const PostListCard: React.FC<PostListCardProps> = ({
   hideComment,
   captionLine = 3,
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toast } = useToast();
   const [postDataState, setPostDataState] =
     useState<PostListCardProps["postData"]>(postData);
@@ -163,12 +160,9 @@ const PostListCard: React.FC<PostListCardProps> = ({
 
   return (
     <div
-      className={`flex flex-col gap-3 border border-[#9ca3af33] p-4 w-full max-w-lg ${
+      className={`flex flex-col gap-3 border bg-primary border-[#9ca3af33] p-4 w-full max-w-lg ${
         className || "rounded-2xl"
       }`}
-      style={{
-        backgroundColor: colorTheme.primary,
-      }}
     >
       {/* Uploaded By */}
       <div className="flex justify-between">
@@ -207,13 +201,9 @@ const PostListCard: React.FC<PostListCardProps> = ({
             {images.map((image, index) => (
               <CarouselItem key={index}>
                 <img
-                  className="mt-1 w-full object-contain rounded-xl min-h-40 max-h-80 border"
+                  className="mt-1 w-full bg-foreground/5 border-border object-contain rounded-xl min-h-40 max-h-80 border"
                   src={image}
                   alt="post"
-                  style={{
-                    borderColor: colorTheme.border,
-                    backgroundColor: colorTheme.text + "05",
-                  }}
                 />
               </CarouselItem>
             ))}

@@ -15,17 +15,14 @@ const SideMenuBar: React.FC<SideMenuBarProps> = ({
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   return (
-    <div
-      className="w-1/5 max-w-[300px] h-screen py-6 px-4 overflow-y-scroll no-scrollbar fixed left-0 top-0"
-      style={{ backgroundColor: colorTheme.secondary }}
-    >
+    <div className="w-1/5 max-w-[300px] h-screen bg-secondary py-6 px-4 overflow-y-scroll no-scrollbar fixed left-0 top-0">
       <Link to={homePath}>
         <img
           src={GloomLinkLogo}
           alt="GloomLink"
           className="w-48 m-auto"
           style={{
-            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+            filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
           }}
         />
       </Link>

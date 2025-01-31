@@ -85,7 +85,7 @@ const Signup = () => {
           alt="GloomLink"
           className="w-44 md:w-64"
           style={{
-            filter: `invert(${colorTheme.text === "#ffffff" ? 0 : 1})`,
+            filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
           }}
         />
       </div>

@@ -5,8 +5,6 @@ import { useState } from "react";
 
 interface TagsInputProps {
   className?: string;
-  backgroundColor?: `#${string}`;
-  color?: `#${string}`;
   placeholder?: string;
   values?: string[];
   onChange?: (values: string[]) => void;
@@ -14,14 +12,11 @@ interface TagsInputProps {
 
 const TagsInput: React.FC<TagsInputProps> = ({
   className = "",
-  backgroundColor,
-  color,
   placeholder = "Add tags",
   values = [],
   onChange,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-  const backgroundColorTheme = backgroundColor || colorTheme.primary;
   const [tagInput, setTagInput] = useState<string>("");
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -40,19 +35,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
   };
 
   return (
-    <div
-      className={`rounded-lg ${className}`}
-      onFocus={(e) =>
-        (e.currentTarget.style.backgroundColor = backgroundColorTheme + "bb")
-      }
-      onBlur={(e) =>
-        (e.currentTarget.style.backgroundColor = backgroundColorTheme)
-      }
-      style={{
-        backgroundColor: backgroundColorTheme,
-        color: color || colorTheme.text,
-      }}
-    >
+    <div className={`rounded-lg bg-primary text-foreground ${className}`}>
       {values.length ? (
         <div className="flex gap-1 px-1 py-1 overflow-x-scroll no-scrollbar">
           {values.map((value) => (
@@ -67,9 +50,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
                 src={CloseIcon}
                 alt="close"
                 style={{
-                  filter: `invert(${
-                    (color || colorTheme.text) === "#ffffff" ? 0 : 1
-                  })`,
+                  filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
                 }}
               />
             </div>

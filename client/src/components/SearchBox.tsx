@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 import InputBox, { type InputBoxProps } from "./InputBox";
 import SearchIcon from "../assets/icons/Search.svg";
 
@@ -9,26 +7,13 @@ interface SearchBoxProps extends InputBoxProps {
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
-  backgroundColor,
   className = "",
   showSearchIcon = true,
   onSubmit,
   ...props
 }) => {
-  const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-  const backgroundColorTheme = backgroundColor || colorTheme.primary;
-
   return (
-    <div
-      className={"search-box w-full " + className}
-      style={{ backgroundColor: `${backgroundColorTheme}bb` }}
-      onFocus={(e) =>
-        (e.currentTarget.style.backgroundColor = backgroundColorTheme + "cf")
-      }
-      onBlur={(e) =>
-        (e.currentTarget.style.backgroundColor = `${backgroundColorTheme}bb`)
-      }
-    >
+    <div className={"search-box w-full bg-primary " + className}>
       <InputBox
         type="search"
         id="searchBox"
@@ -45,16 +30,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
       {showSearchIcon ? (
         <button
-          className="p-2 rounded-lg"
-          style={{ backgroundColor: backgroundColorTheme }}
+          className="p-2 rounded-lg bg-primary"
           onClick={() => onSubmit?.()}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              colorTheme.selection + "55")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = backgroundColorTheme)
-          }
         >
           <img src={SearchIcon} alt="Search" />
         </button>
