@@ -28,7 +28,7 @@ const FormBox: React.FC<FormBoxProps> = ({
       </h3>
       <form method={method} {...props}>
         {errorMessage ? (
-          <p className="text-red-500 font-bold text-xs">{errorMessage}</p>
+          <p className="text-destructive font-bold text-xs">{errorMessage}</p>
         ) : null}
         {children}
       </form>

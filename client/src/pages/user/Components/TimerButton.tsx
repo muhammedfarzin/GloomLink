@@ -48,8 +48,10 @@ const TimerButton: React.FC<TimerButtonProps> = ({
 
   return (
     <div
-      className={`cursor-pointer text-foreground ${
-        isDisabled ? "text-opacity-35 cursor-not-allowed" : ""
+      className={`${
+        isDisabled
+          ? "text-foreground/35 cursor-not-allowed"
+          : "text-foreground cursor-pointer"
       } ${className}`}
       onClick={!isDisabled ? handleOnClick : undefined}
     >

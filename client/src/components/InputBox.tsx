@@ -11,7 +11,7 @@ const InputBox: React.FC<InputBoxProps> = ({
   return (
     <input
       type={type}
-      className={`my-1 disabled:opacity-50 bg-input opacity-85 focus:opacity-100 text-foreground ${className}`}
+      className={`my-1 disabled:opacity-50 bg-input/80 focus:bg-input text-foreground ${className}`}
       {...props}
     />
   );

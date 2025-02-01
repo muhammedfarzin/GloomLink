@@ -21,6 +21,7 @@ interface UserDataType {
   fullname: string;
   followersCount: number;
   followingCount: number;
+  subscriptionAmount?: number;
 }
 
 interface PostsType {
@@ -122,6 +123,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
               followersCount={userData.followersCount}
               isFollowing={isFollowing}
               handleFollow={handleFollow}
+              subscriptionAmount={userData.subscriptionAmount}
             />
           </div>
 

@@ -16,6 +16,7 @@ export interface User {
   dob?: Date;
   blockedUsers: Schema.Types.ObjectId[];
   savedPosts: Schema.Types.ObjectId[];
+  subscriptionAmount?: number;
 }
 
 export type UserDocument = User & Document;
@@ -43,6 +44,7 @@ const userSchema = new Schema<User>(
     dob: { type: Date, default: null },
     blockedUsers: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
     savedPosts: { type: [Schema.Types.ObjectId], ref: "Post", default: [] },
+    subscriptionAmount: Number,
   },
   { timestamps: true }
 );

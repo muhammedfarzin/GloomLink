@@ -233,6 +233,7 @@ class UserRepository {
           followersCount: { $size: "$followers" },
           followingCount: { $size: "$following" },
           posts: 1,
+          subscriptionAmount: 1,
         },
       },
     ]);

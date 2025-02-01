@@ -10,6 +10,7 @@ interface ProfileActionsProps {
   self?: boolean;
   isFollowing?: boolean;
   followersCount?: number;
+  subscriptionAmount?: number;
   handleFollow?: (type: "follow" | "unfollow") => Promise<void>;
 }
 
@@ -18,6 +19,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
   username,
   followersCount,
   isFollowing,
+  subscriptionAmount,
   handleFollow,
 }) => {
   const navigate = useNavigate();
@@ -37,14 +39,23 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
               Edit Profile
             </Button>
 
-            <DialogBox dialogElement={<ColorThemeList />} title="Color Themes" dialogClassName="h-auto">
+            <DialogBox
+              dialogElement={<ColorThemeList />}
+              title="Color Themes"
+              dialogClassName="h-auto"
+            >
               <Button className="w-full">Switch Theme</Button>
             </DialogBox>
           </div>
 
-          {(followersCount ?? 0) >= 5 ? (
+          {(followersCount ?? 0) >= 5 && !subscriptionAmount ? (
             <div className="flex gap-2">
-              <Button className="w-full">Enable Subscription</Button>
+              <Button
+                className="w-full"
+                onClick={() => navigate("/subscription/enable")}
+              >
+                Enable Subscription
+              </Button>
             </div>
           ) : null}
         </>
@@ -63,9 +74,11 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
             <Button className="w-full" disabled={username === myUsername}>
               Message
             </Button>
-            <Button className="w-full" disabled={username === myUsername}>
-              Subscribe
-            </Button>
+            {subscriptionAmount && (
+              <Button className="w-full" disabled={username === myUsername}>
+                Subscribe
+              </Button>
+            )}
           </div>
         </>
       )}

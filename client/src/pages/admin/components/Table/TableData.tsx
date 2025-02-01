@@ -11,7 +11,7 @@ const TableData: React.FC<TableDataProps> = ({
       {...props}
     >
       <div
-        className={"border w-full h-full rounded-lg px-2 py-1 bg-background bg-opacity-35 border-foreground border-opacity-15 " + className}
+        className={"border w-full h-full rounded-lg px-2 py-1 bg-background/35 border-foreground/15 " + className}
       >
         {children}
       </div>

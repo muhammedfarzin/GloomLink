@@ -6,6 +6,7 @@ import { authorizeRole } from "../../middleware/authorize-role.middleware.js";
 import { profileRouter } from "./profile.router.js";
 import { postsRouter } from "./posts.router.js";
 import { commentsRouter } from "./comments.router.js";
+import { subscriptionRouter } from "./subscription.router.js";
 
 const router = Router();
 
@@ -46,5 +47,9 @@ router.use("/posts", postsRouter);
 // Comments
 
 router.use("/comments", commentsRouter)
+
+// Subscriptions
+
+router.use("/subscriptions", subscriptionRouter);
 
 export { router as userApiRouter };

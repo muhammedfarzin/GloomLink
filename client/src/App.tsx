@@ -17,6 +17,7 @@ import EditProfile from "./pages/user/EditProfile";
 import AdminPostLists from "./pages/admin/AdminPostLists";
 import Search from "./pages/user/Search";
 import { useEffect } from "react";
+import SubscriptionEnableForm from "./pages/user/SubscriptionEnableForm";
 
 function App() {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
@@ -37,13 +38,14 @@ function App() {
 
         <Route path="" element={<User />}>
           <Route index element={<Home />} />
-          <Route path="/search" element={<Search />} />
+          <Route path="search" element={<Search />} />
           <Route path="profile" element={<Profile self />} />
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="create-post" element={<CreatePost />} />
           <Route path="saved-post" element={<SavedPost />} />
           <Route path=":username" element={<Profile />} />
           <Route path="edit-post/:postId" element={<CreatePost />} />
+          <Route path="subscription/enable" element={<SubscriptionEnableForm />} />
         </Route>
 
         <Route path="admin" element={<Admin />}>

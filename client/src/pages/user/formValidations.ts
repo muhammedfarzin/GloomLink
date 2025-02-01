@@ -129,7 +129,7 @@ export const validateOtpForm = (
   return true;
 };
 
-function validateRequiredFields(
+export function validateRequiredFields(
   datas: Record<string, any>,
   errorCallback: ErrorCallbackType
 ) {
