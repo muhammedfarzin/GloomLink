@@ -1,3 +1,4 @@
+import { useNavigate, useParams } from "react-router-dom";
 import ProfileImage from "../../../components/ProfileImage";
 
 interface ChatItemProps {
@@ -7,8 +8,19 @@ interface ChatItemProps {
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({ username, unread, online }) => {
+  const navigate = useNavigate();
+  const { username: currentUsername } = useParams();
+
   return (
-    <div className="flex items-center py-2 px-3 bg-primary text-foreground rounded-2xl cursor-pointer">
+    <div
+      className={`flex items-center py-2 px-3 ${
+        currentUsername === username &&
+        /^\/messages\/[^/]+\/?$/.test(location.pathname)
+          ? "bg-selection"
+          : "bg-primary hover:bg-primary/75"
+      } text-foreground rounded-2xl cursor-pointer`}
+      onClick={() => navigate(`/messages/${username}`)}
+    >
       <ProfileImage isOnline={online} />
 
       <span className="text-base w-full font-bold">{username}</span>

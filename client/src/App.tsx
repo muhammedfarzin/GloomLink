@@ -18,18 +18,17 @@ import AdminPostLists from "./pages/admin/AdminPostLists";
 import Search from "./pages/user/Search";
 import { useEffect } from "react";
 import SubscriptionEnableForm from "./pages/user/SubscriptionEnableForm";
+import MessageViewer from "./pages/user/MessageViewer";
 
 function App() {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", colorTheme)
+    document.documentElement.setAttribute("data-theme", colorTheme);
   }, [colorTheme]);
 
   return (
-    <div
-      className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar"
-    >
+    <div className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar">
       <Routes>
         <Route path="login" element={<UserLogin />} />
         <Route path="signup" element={<Signup />} />
@@ -44,8 +43,12 @@ function App() {
           <Route path="create-post" element={<CreatePost />} />
           <Route path="saved-post" element={<SavedPost />} />
           <Route path=":username" element={<Profile />} />
+          <Route path="messages/:username" element={<MessageViewer />} />
           <Route path="edit-post/:postId" element={<CreatePost />} />
-          <Route path="subscription/enable" element={<SubscriptionEnableForm />} />
+          <Route
+            path="subscription/enable"
+            element={<SubscriptionEnableForm />}
+          />
         </Route>
 
         <Route path="admin" element={<Admin />}>
