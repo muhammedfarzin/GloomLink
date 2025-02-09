@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDatabase } from "./infrastructure/database";
 import router from "./interface/routes";
+import { setupSocket } from "./interface/websocket";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use(cors());
 app.use(express.static("public"));
 
 app.use(router);
+
+setupSocket(server);
 
 server.listen(PORT, () => {
   connectDatabase();

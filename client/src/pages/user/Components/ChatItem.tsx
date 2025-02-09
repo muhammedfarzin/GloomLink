@@ -5,9 +5,15 @@ interface ChatItemProps {
   username: string;
   unread?: number;
   online?: boolean;
+  image?: string;
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({ username, unread, online }) => {
+const ChatItem: React.FC<ChatItemProps> = ({
+  username,
+  unread,
+  online,
+  image,
+}) => {
   const navigate = useNavigate();
   const { username: currentUsername } = useParams();
 
@@ -21,7 +27,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ username, unread, online }) => {
       } text-foreground rounded-2xl cursor-pointer`}
       onClick={() => navigate(`/messages/${username}`)}
     >
-      <ProfileImage isOnline={online} />
+      <ProfileImage profileImage={image} isOnline={online} />
 
       <span className="text-base w-full font-bold">{username}</span>
 

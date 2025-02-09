@@ -7,6 +7,7 @@ import { profileRouter } from "./profile.router.js";
 import { postsRouter } from "./posts.router.js";
 import { commentsRouter } from "./comments.router.js";
 import { subscriptionRouter } from "./subscription.router.js";
+import { conversationRouter } from "./conversation.router.js";
 
 const router = Router();
 
@@ -51,5 +52,9 @@ router.use("/comments", commentsRouter)
 // Subscriptions
 
 router.use("/subscriptions", subscriptionRouter);
+
+// Conversations
+
+router.use("/conversations", conversationRouter);
 
 export { router as userApiRouter };

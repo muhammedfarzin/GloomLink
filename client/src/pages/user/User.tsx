@@ -5,6 +5,7 @@ import ChatList from "./components/ChatList";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { logout } from "../../redux/reducers/auth";
+import SocketProvider from "@/context/SocketContext";
 
 const User = () => {
   const navigate = useNavigate();
@@ -30,13 +31,13 @@ const User = () => {
   }, [location]);
 
   return (
-    <div>
+    <SocketProvider>
       <UserSideMenuBar selected={selectedValue} />
       <div className="w-3/5 max-w-[840px] m-auto">
         <Outlet />
       </div>
       <ChatList />
-    </div>
+    </SocketProvider>
   );
 };
 

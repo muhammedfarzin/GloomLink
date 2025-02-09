@@ -399,6 +399,56 @@ class UserRepository {
 
     return sortedUsers;
   }
+
+  async usernameToUserId(...username: string[]) {
+    const users = await UserModel.find(
+      { username: { $in: username } },
+      { _id: 1 }
+    );
+
+    return users.map((user) => user._id);
+  }
+
+  async userIdToUsername(
+    ...userId: (Types.ObjectId | Schema.Types.ObjectId)[]
+  ) {
+    const users = await UserModel.find(
+      { _id: { $in: userId } },
+      { username: 1 }
+    );
+
+    const response: Record<string, string> = {};
+    users.forEach((user) => (response[user._id.toString()] = user.username));
+    return response;
+  }
+
+  async fetchSuggestedUsers(
+    userId: string,
+    notUsers?: Schema.Types.ObjectId[]
+  ) {
+    const users = await FollowModel.aggregate([
+      {
+        $match: {
+          followingTo: { $nin: notUsers },
+          followedBy: Types.ObjectId.createFromHexString(userId),
+        },
+      },
+      { $sample: { size: 5 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "followingTo",
+          foreignField: "_id",
+          as: "userData",
+        },
+      },
+      { $unwind: "$userData" },
+      { $replaceRoot: { newRoot: "$userData" } },
+      { $project: { firstname: 1, lastname: 1, username: 1, image: 1 } },
+    ]);
+
+    return users;
+  }
 }
 
 export const userRepository = new UserRepository();
