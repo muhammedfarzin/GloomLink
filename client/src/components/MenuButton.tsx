@@ -1,9 +1,15 @@
 import { useSelector } from "react-redux";
 import { Link, type LinkProps } from "react-router-dom";
-import { RootState } from "../redux/store";
+import type { RootState } from "../redux/store";
+import type { LucideProps } from "lucide-react";
+import React from "react";
 
 interface MenuButtonProps extends LinkProps {
-  icon?: string;
+  icon?:
+    | string
+    | React.ForwardRefExoticComponent<
+        Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+      >;
   text: string;
   iconClassName?: string;
   alt?: string;
@@ -28,7 +34,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
       } ${className || ""}`}
       {...props}
     >
-      {icon ? (
+      {typeof icon === "string" ? (
         <img
           src={icon}
           alt={alt ?? text}
@@ -37,7 +43,12 @@ const MenuButton: React.FC<MenuButtonProps> = ({
             filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
           }}
         />
-      ) : null}
+      ) : (
+        icon &&
+        React.createElement(icon, {
+          className: `inline w-6 h-6 mr-4 ${iconClassName || ""}`,
+        })
+      )}
       {text}
     </Link>
   );

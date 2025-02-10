@@ -6,16 +6,23 @@ import GloomLinkLogo from "../assets/images/GloomLink-Logo.svg";
 interface SideMenuBarProps {
   children?: React.ReactNode;
   homePath?: string;
+  className?: string;
 }
 
 const SideMenuBar: React.FC<SideMenuBarProps> = ({
   children,
   homePath = "/",
+  className,
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   return (
-    <div className="w-1/5 max-w-[300px] h-screen bg-secondary py-6 px-4 overflow-y-scroll no-scrollbar fixed left-0 top-0">
+    <div
+      className={`bg-secondary h-screen py-6 px-4 overflow-y-scroll no-scrollbar ${
+        className ??
+        "hidden sm:block w-1/3 md:w-1/4 lg:w-1/5 max-w-[300px] fixed left-0 top-0"
+      }`}
+    >
       <Link to={homePath}>
         <img
           src={GloomLinkLogo}

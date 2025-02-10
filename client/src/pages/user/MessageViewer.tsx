@@ -1,5 +1,5 @@
 import ProfileImage from "@/components/ProfileImage";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import MessageInput from "./components/message/MessageInput";
 import { useEffect, useRef, useState } from "react";
 import apiClient from "@/apiClient";
@@ -7,9 +7,12 @@ import { useSocket } from "@/hooks/use-socket";
 import MessageCard, { MessageType } from "./components/message/MessageCard";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const MessageViewer: React.FC = () => {
   const socket = useSocket();
+  const navigate = useNavigate();
   const myUsername = useSelector(
     (state: RootState) => state.auth.userData?.username
   );
@@ -99,8 +102,17 @@ const MessageViewer: React.FC = () => {
 
   return (
     <div className="h-screen">
-      <div className="sticky top-0 bg-secondary/75 border-b border-border w-full flex px-4 py-2">
+      <div className="sticky top-0 bg-secondary/75 border-b border-border w-full flex px-2 sm:px-4 py-2">
         <div className="flex gap-1 items-center">
+          <div>
+            <Button
+              variant="ghost"
+              className="sm:hidden aspect-square [&_svg]:size-5"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={60} />
+            </Button>
+          </div>
           <Link to={`/${username}`}>
             <ProfileImage className="w-10" />
           </Link>

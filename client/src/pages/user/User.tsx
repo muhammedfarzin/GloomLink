@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { logout } from "../../redux/reducers/auth";
 import SocketProvider from "@/context/SocketContext";
+import XsTopMenuBar from "./XsTopMenuBar";
 
 const User = () => {
   const navigate = useNavigate();
@@ -33,7 +34,9 @@ const User = () => {
   return (
     <SocketProvider>
       <UserSideMenuBar selected={selectedValue} />
-      <div className="w-3/5 max-w-[840px] m-auto">
+      {!/^\/messages\/[^/]+\/?$/.test(location.pathname) ? <XsTopMenuBar /> : null}
+
+      <div className="w-full sm:w-2/3 md:w-3/4 lg:w-3/5 max-w-[840px] ml-auto lg:m-auto">
         <Outlet />
       </div>
       <ChatList />

@@ -27,9 +27,9 @@ const ChatItem: React.FC<ChatItemProps> = ({
       } text-foreground rounded-2xl cursor-pointer`}
       onClick={() => navigate(`/messages/${username}`)}
     >
-      <ProfileImage profileImage={image} isOnline={online} />
+      <ProfileImage profileImage={image} isOnline={online} className="!max-w-12" />
 
-      <span className="text-base w-full font-bold">{username}</span>
+      <span className="text-base w-2/3 font-bold overflow-x-clip">{username}</span>
 
       {unread ? (
         <span className="text-xs font-bold p-1 rounded-full bg-background w-5 h-5 flex items-center justify-center">

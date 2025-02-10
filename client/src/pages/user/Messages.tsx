@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import ChatItem from "./ChatItem";
+import type { ChatUserDataType } from "./components/ChatList";
 import apiClient from "@/apiClient";
-import { UserDataType } from "./UserListCard";
+import ChatItem from "./components/ChatItem";
 
-export type ChatUserDataType = Omit<UserDataType, "isFollowing">;
-
-const ChatList = () => {
+const Messages = () => {
   const [chats, setChats] = useState<ChatUserDataType[]>([]);
   const [suggested, setSuggested] = useState<ChatUserDataType[]>([]);
 
@@ -17,7 +15,7 @@ const ChatList = () => {
   }, []);
 
   return (
-    <div className="hidden lg:flex flex-col gap-3 w-1/5 max-w-[300px] h-screen bg-secondary text-foreground py-6 px-4 overflow-y-scroll no-scrollbar fixed right-0 top-0">
+    <div className="flex flex-col gap-3 m-4">
       {/* Chat List */}
       {chats.length || (!chats.length && !suggested.length) ? (
         <div>
@@ -59,4 +57,4 @@ const ChatList = () => {
   );
 };
 
-export default ChatList;
+export default Messages;

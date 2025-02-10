@@ -71,7 +71,11 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </Button>
-            <Button className="w-full" disabled={username === myUsername}>
+            <Button
+              className="w-full"
+              disabled={username === myUsername}
+              onClick={() => navigate(`/messages/${username}`)}
+            >
               Message
             </Button>
             {subscriptionAmount && (
