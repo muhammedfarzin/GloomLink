@@ -7,10 +7,12 @@ import {
 } from "./ui/dialog";
 
 interface DialogBoxProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   dialogElement: React.ReactNode;
-  title: string;
+  title?: string;
   dialogClassName?: string;
+  open?: boolean;
+  closeClassName?: string;
 }
 
 const DialogBox: React.FC<DialogBoxProps> = ({
@@ -18,13 +20,16 @@ const DialogBox: React.FC<DialogBoxProps> = ({
   dialogElement,
   title,
   dialogClassName = "",
+  open,
+  closeClassName,
 }) => {
   return (
-    <Dialog>
+    <Dialog open={open}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent
         className={`flex flex-col w-full md:w-80 h-full md:max-h-[80vh] p-4 ${dialogClassName}`}
+        closeClassName={closeClassName}
       >
         <DialogHeader>
           <DialogTitle className="capitalize">{title}</DialogTitle>

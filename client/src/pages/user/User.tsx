@@ -5,8 +5,8 @@ import ChatList from "./components/ChatList";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { logout } from "../../redux/reducers/auth";
-import SocketProvider from "@/context/SocketContext";
 import XsTopMenuBar from "./XsTopMenuBar";
+import IncomeCallListener from "./components/IncomeCallListener";
 
 const User = () => {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ const User = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
   const [selectedValue, setSelectedValue] = useState("home");
+  const [userAuthenticated, setUserAuthenticated] = useState(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -23,7 +24,7 @@ const User = () => {
       dispatch(logout({ type: "user" }));
     } else if (userData.status === "not-verified") {
       navigate("/signup/verify");
-    }
+    } else setUserAuthenticated(true);
   }, [userData]);
 
   useEffect(() => {
@@ -31,17 +32,20 @@ const User = () => {
     setSelectedValue(selected || "home");
   }, [location]);
 
-  return (
-    <SocketProvider>
+  return userAuthenticated ? (
+    <>
       <UserSideMenuBar selected={selectedValue} />
-      {!/^\/messages\/[^/]+\/?$/.test(location.pathname) ? <XsTopMenuBar /> : null}
+      {!/^\/messages\/[^/]+\/?$/.test(location.pathname) ? (
+        <XsTopMenuBar />
+      ) : null}
 
       <div className="w-full sm:w-2/3 md:w-3/4 lg:w-3/5 max-w-[840px] ml-auto lg:m-auto">
         <Outlet />
+        <IncomeCallListener />
       </div>
       <ChatList />
-    </SocketProvider>
-  );
+    </>
+  ) : null;
 };
 
 export default User;

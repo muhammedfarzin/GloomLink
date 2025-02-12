@@ -7,12 +7,15 @@ import { Provider } from "react-redux";
 import store, { persistor } from "./redux/store.ts";
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "./components/ui/toaster.tsx";
+import SocketProvider from "./context/SocketContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <App />
+        <SocketProvider>
+          <App />
+        </SocketProvider>
         <Toaster />
       </PersistGate>
     </Provider>

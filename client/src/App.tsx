@@ -20,6 +20,7 @@ import { useEffect } from "react";
 import SubscriptionEnableForm from "./pages/user/SubscriptionEnableForm";
 import MessageViewer from "./pages/user/MessageViewer";
 import Messages from "./pages/user/Messages";
+import CallViewer from "./pages/user/CallViewer";
 
 function App() {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
@@ -35,6 +36,7 @@ function App() {
         <Route path="signup" element={<Signup />} />
         <Route path="signup/verify" element={<OtpVerification />} />
         <Route path="admin/login" element={<AdminLogin />} />
+          <Route path="call" element={<CallViewer />} />
 
         <Route path="" element={<User />}>
           <Route index element={<Home />} />

@@ -1,6 +1,7 @@
 import apiClient from "@/apiClient";
 import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import CallProvider from "./CallContext";
 
 interface SocketProviderProps {
   children: React.ReactNode;
@@ -39,7 +40,9 @@ const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={socket}>
+      <CallProvider>{children}</CallProvider>
+    </SocketContext.Provider>
   );
 };
 

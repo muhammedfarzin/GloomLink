@@ -32,14 +32,12 @@ const UserListCard: React.FC<UserListCardProps> = ({
   const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
   const { toast } = useToast();
 
-  const handleFollowUser = async (
-    type: "follow" | "unfollow"
-  ) => {
+  const handleFollowUser = async (type: "follow" | "unfollow") => {
     const userId = userData._id;
     function toggleFollowStatus() {
       handleChange?.((prevState: any[]) =>
         prevState.map((user) => {
-          if (user._id === userId && (!user.type || user.type === "user")) {console.log(user._id===userId)
+          if (user._id === userId && (!user.type || user.type === "user")) {
             user.isFollowing = !user.isFollowing;
           }
           return user;
@@ -80,9 +78,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
       {myUserId !== userData._id ? (
         <Button
           className="h-7"
-          onClick={() =>
-            handleFollowUser(isFollowing ? "unfollow" : "follow")
-          }
+          onClick={() => handleFollowUser(isFollowing ? "unfollow" : "follow")}
         >
           {isFollowing ? "Unfollow" : "Follow"}
         </Button>

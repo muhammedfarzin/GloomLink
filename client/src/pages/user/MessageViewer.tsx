@@ -8,11 +8,13 @@ import MessageCard, { MessageType } from "./components/message/MessageCard";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Video } from "lucide-react";
+import { useCall } from "@/hooks/use-call";
 
 const MessageViewer: React.FC = () => {
   const socket = useSocket();
   const navigate = useNavigate();
+  const callHandler = useCall();
   const myUsername = useSelector(
     (state: RootState) => state.auth.userData?.username
   );
@@ -102,7 +104,7 @@ const MessageViewer: React.FC = () => {
 
   return (
     <div className="h-screen">
-      <div className="sticky top-0 bg-secondary/75 border-b border-border w-full flex px-2 sm:px-4 py-2">
+      <div className="sticky top-0 bg-secondary/75 border-b border-border w-full flex justify-between px-2 sm:px-4 py-2">
         <div className="flex gap-1 items-center">
           <div>
             <Button
@@ -119,6 +121,16 @@ const MessageViewer: React.FC = () => {
           <Link to={`/${username}`}>
             <span className="font-bold">{username}</span>
           </Link>
+        </div>
+
+        <div className="flex gap-1 items-center [&_svg]:size-7">
+          <Button
+            variant="ghost"
+            className="aspect-square p-1"
+            onClick={() => callHandler?.callUser(username ?? "")}
+          >
+            <Video />
+          </Button>
         </div>
       </div>
 

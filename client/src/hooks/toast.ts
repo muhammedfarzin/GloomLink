@@ -8,3 +8,11 @@ export const toastError = (message?: string) => {
     variant: "destructive",
   });
 };
+
+export const toastMessage = (message: string) => {
+  const { toast } = useToast();
+
+  toast({
+    description: message,
+  });
+};
