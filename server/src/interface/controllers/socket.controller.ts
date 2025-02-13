@@ -3,6 +3,7 @@ import { Message } from "../../infrastructure/database/models/MessageModel";
 import { urlPattern } from "../../shared/regexPatterns";
 import { conversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 import { activeUsers } from "../websocket";
+import { Error, Types } from "mongoose";
 
 export class SocketController {
   socket: Socket;
@@ -19,7 +20,6 @@ export class SocketController {
   ) => {
     try {
       const { message, image, type } = data;
-
       if (!message?.trim() && !image?.trim())
         throw new Error("Message or image either one is required");
       if (image && !urlPattern.test(image))
@@ -46,12 +46,30 @@ export class SocketController {
       );
 
       const responseMessage = { ...messageDocument, from: this.username };
-      const targetUsers = [...activeUsers[username].values()] as string[];
+      const targetUserSocketIds = activeUsers[username];
 
       this.socket.emit("send-message-success", responseMessage);
+
+      if (!targetUserSocketIds || !targetUserSocketIds.size) return;
+
+      const targetUsers = [...targetUserSocketIds.values()] as string[];
       this.socket.to(targetUsers).emit("send-message", responseMessage);
     } catch (error: any) {
-      this.socket.emit("error-send-message", error.message);
+      console.log(error);
+      this.socket.emit("error-send-message", error.message, data);
+    }
+  };
+
+  markAsSeen = async (
+    message: Omit<Message, "conversation" | "from"> & {
+      _id: string;
+      from: string;
+    }
+  ) => {
+    conversationRepository.markAsRead(message._id, this.socket.user._id);
+    const targetUserSocketIds = activeUsers[message.from];
+    if (targetUserSocketIds && targetUserSocketIds.size) {
+      this.socket.to([...targetUserSocketIds]).emit("message-seen", message);
     }
   };
 }

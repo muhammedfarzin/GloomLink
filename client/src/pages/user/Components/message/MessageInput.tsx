@@ -1,10 +1,11 @@
 import IconButton from "@/components/IconButton";
 import InputBox from "@/components/InputBox";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
-import { useState } from "react";
 import { toastError } from "@/hooks/toast";
 
 interface MessageInputProps {
+  value?: string;
+  onChange?: (value: string) => void;
   onSubmit?: (message: {
     message?: string;
     image?: string;
@@ -12,22 +13,24 @@ interface MessageInputProps {
   }) => void;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSubmit }) => {
-  const [message, setMessage] = useState<string>("");
-
+const MessageInput: React.FC<MessageInputProps> = ({
+  value,
+  onChange,
+  onSubmit,
+}) => {
   const handleSubmit = () => {
-    if (!message.trim()) return toastError("Please enter a message");
+    if (!value?.trim()) return toastError("Please enter a message");
 
-    onSubmit?.({ message, type: "text" });
-    setMessage("");
+    onSubmit?.({ message: value, type: "text" });
+    onChange?.("");
   };
 
   return (
     <div className="bg-secondary/75 border-t border-border w-full flex gap-2 items-center px-2 py-1">
       <InputBox
         placeholder="Message"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();

@@ -53,4 +53,11 @@ export interface IConversationRepository {
       from: string;
     })[]
   >;
+
+  markAllMessageRead(
+    conversationId: Types.ObjectId,
+    userId: string
+  ): Promise<void>;
+
+  markAsRead(messageId: Types.ObjectId, userId: string): Promise<void>;
 }

@@ -20,7 +20,7 @@ export const createConversation: RequestHandler = async (req, res, next) => {
         ? await userRepository.usernameToUserId(...users)
         : await userRepository.usernameToUserId(users);
 
-    if (!userData.length) throw new HttpError(404, "Invalid username444");
+    if (!userData.length) throw new HttpError(404, "Invalid username");
 
     const participants = [req.user._id, ...userData];
     const conversationId = await conversationRepository.create(participants);
@@ -46,7 +46,9 @@ export const fetchAllConversations: RequestHandler = async (req, res, next) => {
         (conversation) => conversation._id
       );
       var suggested: any[] | undefined =
-        await userRepository.fetchSuggestedUsers(userId, noSuggestionUsers);
+        await userRepository.fetchSuggestedUsers(userId, [
+          ...noSuggestionUsers,
+        ]);
     }
 
     res.status(200).json({ conversations, suggested });
@@ -103,6 +105,10 @@ export const getConversationMessages: RequestHandler = async (
       throw new HttpError(403, "You are not included in this conversation");
 
     const messages = await conversationRepository.fetchMessages(conversationId);
+    await conversationRepository.markAllMessageRead(
+      conversationId,
+      req.user._id
+    );
 
     res.status(200).json(messages);
   } catch (error) {

@@ -9,6 +9,7 @@ export const handleSocketConnection = async (socket: Socket) => {
 
   // Handle Messages
   socket.on("send-message", controller.handleSendMessage);
+  socket.on("message-seen", controller.markAsSeen)
 
   // Handle Calls
   socket.on("call:outgoing", callController.outgoingCall);

@@ -101,6 +101,7 @@ const CallProvider: React.FC<CallProviderType> = ({ children }) => {
         variant: "destructive",
       });
       clearState();
+      navigate(-1);
     };
 
     socket?.on("call:negotiationneeded", handleIncomeCallNegotiationNeeded);

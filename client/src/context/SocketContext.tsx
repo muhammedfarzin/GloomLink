@@ -2,6 +2,8 @@ import apiClient from "@/apiClient";
 import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import CallProvider from "./CallContext";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface SocketProviderProps {
   children: React.ReactNode;
@@ -11,6 +13,9 @@ export const SocketContext = createContext<Socket | null>(null);
 const SERVER_HOST = import.meta.env.VITE_API_BASE_URL as string;
 
 const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
+  const username = useSelector(
+    (state: RootState) => state.auth.userData?.username
+  );
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
@@ -37,7 +42,9 @@ const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         console.log(error);
       }
     }
-  }, []);
+
+    return () => socket?.disconnect();
+  }, [username]);
 
   return (
     <SocketContext.Provider value={socket}>

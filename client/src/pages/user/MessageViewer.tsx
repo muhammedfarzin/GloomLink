@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Video } from "lucide-react";
 import { useCall } from "@/hooks/use-call";
+import { useToast } from "@/hooks/use-toast";
 
 const MessageViewer: React.FC = () => {
   const socket = useSocket();
@@ -19,11 +20,16 @@ const MessageViewer: React.FC = () => {
     (state: RootState) => state.auth.userData?.username
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   const { username } = useParams();
-  const [conversationId, setConversationId] = useState<string>();
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
+  const [messageInput, setMessageInput] = useState<string>("");
 
   useEffect(() => {
+    setMessages([]);
+    setConversationId(null);
     apiClient
       .get(`/conversations/${username}/conversationId`)
       .then((response) => {
@@ -41,10 +47,20 @@ const MessageViewer: React.FC = () => {
       if (newMessage.from === username) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         scrollChatViewToBottom();
+        socket?.emit("message-seen", newMessage);
       }
     };
 
-    const handleSendSuccessMessgae = (newMessage: MessageType) => {
+    const handleSeenMessage = (seenMessage: MessageType) => {
+      setMessages((prevState) =>
+        prevState.map((message) => {
+          if (message._id === seenMessage._id) message.status = "seen";
+          return message;
+        })
+      );
+    };
+
+    const handleSendSuccessMessage = (newMessage: MessageType) => {
       setMessages((prevMessages) =>
         prevMessages.map((message) => {
           if (
@@ -58,12 +74,39 @@ const MessageViewer: React.FC = () => {
       );
     };
 
+    const handleSendMessageError = (
+      message: string,
+      messageData: Partial<Pick<MessageType, "message" | "type">>
+    ) => {
+      if (messageInputRef.current) {
+        messageInputRef.current.value = messageData.message ?? "";
+      }
+      setMessageInput(messageData.message ?? "");
+      setMessages((prevMessages) =>
+        prevMessages.filter((message) => {
+          if (
+            message.status === "pending" &&
+            message.message === messageData.message &&
+            message.type === messageData.type
+          ) {
+            return false;
+          } else return true;
+        })
+      );
+
+      toast({ description: message, variant: "destructive" });
+    };
+
     socket?.on("send-message", handleIncomingMessage);
-    socket?.on("send-message-success", handleSendSuccessMessgae);
+    socket?.on("message-seen", handleSeenMessage);
+    socket?.on("send-message-success", handleSendSuccessMessage);
+    socket?.on("error-send-message", handleSendMessageError);
 
     return () => {
       socket?.off("send-message", handleIncomingMessage);
-      socket?.off("send-message-success", handleSendSuccessMessgae);
+      socket?.on("message-seen", handleSeenMessage);
+      socket?.off("send-message-success", handleSendSuccessMessage);
+      socket?.on("error-send-message", handleSendMessageError);
     };
   }, [socket, username]);
 
@@ -147,7 +190,11 @@ const MessageViewer: React.FC = () => {
         ))}
       </div>
 
-      <MessageInput onSubmit={handleSendMessage} />
+      <MessageInput
+        value={messageInput}
+        onChange={setMessageInput}
+        onSubmit={handleSendMessage}
+      />
     </div>
   );
 };

@@ -169,7 +169,7 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
         throw new HttpError(400, "Please use previous method you used");
       userData = existUser;
     } else {
-      const { name, picture: image, email, uid: password } = decodedData;
+      const { name, email, uid: password } = decodedData;
       const [firstname, ...restName] = name.split(" ");
       const lastname = restName.join(" ");
       const username = `${email?.split("@")[0]}-${Date.now()}${
@@ -181,7 +181,6 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
         firstname,
         lastname,
         email,
-        image,
         password,
         status: "active",
         authType: "google",

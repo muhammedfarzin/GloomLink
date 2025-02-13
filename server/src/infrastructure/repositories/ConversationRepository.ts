@@ -89,7 +89,50 @@ class ConversationRepository implements IConversationRepository {
           ],
         },
       },
-      { $replaceRoot: { newRoot: { $arrayElemAt: ["$userData", 0] } } },
+      {
+        $lookup: {
+          from: "messages",
+          localField: "_id",
+          foreignField: "conversation",
+          as: "messages",
+          pipeline: [
+            {
+              $facet: {
+                unread: [
+                  {
+                    $match: {
+                      status: "sent",
+                      from: { $ne: Types.ObjectId.createFromHexString(userId) },
+                    },
+                  },
+                ],
+                lastMessage: [{ $sort: { createdAt: -1 } }, { $limit: 1 }],
+              },
+            },
+            {
+              $project: {
+                unread: 1,
+                lastMessage: { $arrayElemAt: ["$lastMessage", 0] },
+              },
+            },
+          ],
+        },
+      },
+      { $unwind: "$messages" },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: [
+              { $arrayElemAt: ["$userData", 0] },
+              { unread: { $size: "$messages.unread" } },
+              {
+                lastMessageTime: "$messages.lastMessage.createdAt",
+              },
+            ],
+          },
+        },
+      },
+      { $sort: { lastMessageTime: -1 } },
     ]);
 
     return conversations;
@@ -126,6 +169,27 @@ class ConversationRepository implements IConversationRepository {
       ...message.toObject(),
       from: fromUsername[message.from.toString()],
     }));
+  }
+
+  async markAllMessageRead(conversation: Types.ObjectId, userId: string) {
+    await MessageModel.updateMany(
+      { conversation, from: { $ne: userId } },
+      { status: "seen" }
+    );
+  }
+
+  async markAsRead(messageId: string | Types.ObjectId, userId: string) {
+    const message = await MessageModel.findById(messageId);
+    if (!message) return;
+
+    const conversation = await ConversationModel.findById(message.conversation);
+    const hasPermission = !!conversation?.participants.find(
+      (user) => user.toString() === userId
+    );
+
+    if (!hasPermission) return;
+
+    await message.updateOne({ status: "seen" });
   }
 }
 

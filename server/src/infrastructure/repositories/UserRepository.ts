@@ -424,9 +424,10 @@ class UserRepository {
 
   async fetchSuggestedUsers(
     userId: string,
-    notUsers?: Schema.Types.ObjectId[]
+    notUsers: Schema.Types.ObjectId[] = []
   ) {
-    const users = await FollowModel.aggregate([
+    const suggestionLimit = 5;
+    let users = await FollowModel.aggregate([
       {
         $match: {
           followingTo: { $nin: notUsers },
@@ -446,6 +447,30 @@ class UserRepository {
       { $replaceRoot: { newRoot: "$userData" } },
       { $project: { firstname: 1, lastname: 1, username: 1, image: 1 } },
     ]);
+
+    if (users.length < suggestionLimit) {
+      const userIdObj = Types.ObjectId.createFromHexString(userId);
+      const otherUsers = await UserModel.aggregate([
+        {
+          $match: {
+            _id: {
+              $nin: [...notUsers, userIdObj, ...users.map((user) => user._id)],
+            },
+          },
+        },
+        { $sample: { size: suggestionLimit - users.length } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "followingTo",
+            foreignField: "_id",
+            as: "userData",
+          },
+        },
+        { $project: { firstname: 1, lastname: 1, username: 1, image: 1 } },
+      ]);
+      users = [...users, ...otherUsers];
+    }
 
     return users;
   }
