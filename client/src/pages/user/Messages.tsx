@@ -38,8 +38,8 @@ const Messages = () => {
         /^\/messages\/[^/]+\/?$/.test(location.pathname) &&
         selectedUsername === newMessage.from
       ) {
-        chat.unread = chat.unread ? chat.unread + 1 : 1;
-      } else chat.unread = 0;
+        chat.unread = 0;
+      } else chat.unread = chat.unread ? chat.unread + 1 : 1;
 
       const remaining = chats.filter(
         (chat) => chat.username !== newMessage.from
@@ -54,8 +54,8 @@ const Messages = () => {
           /^\/messages\/[^/]+\/?$/.test(location.pathname) &&
           selectedUsername === newMessage.from
         ) {
-          chat.unread = chat.unread ? chat.unread + 1 : 1;
-        } else chat.unread = 0;
+          chat.unread = 0;
+        } else chat.unread = chat.unread ? chat.unread + 1 : 1;
 
         const remaining = prevState.filter(
           (chat) => chat.username !== newMessage.from

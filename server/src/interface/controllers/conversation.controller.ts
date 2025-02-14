@@ -105,10 +105,6 @@ export const getConversationMessages: RequestHandler = async (
       throw new HttpError(403, "You are not included in this conversation");
 
     const messages = await conversationRepository.fetchMessages(conversationId);
-    await conversationRepository.markAllMessageRead(
-      conversationId,
-      req.user._id
-    );
 
     res.status(200).json(messages);
   } catch (error) {

@@ -30,6 +30,9 @@ const MessageViewer: React.FC = () => {
   useEffect(() => {
     setMessages([]);
     setConversationId(null);
+
+    if (!socket) return;
+
     apiClient
       .get(`/conversations/${username}/conversationId`)
       .then((response) => {
@@ -38,9 +41,17 @@ const MessageViewer: React.FC = () => {
         apiClient.get(`/conversations/${conversationId}`).then((response) => {
           setMessages(response.data);
           scrollChatViewToBottom();
+
+          const unreadMessages = (response.data as MessageType[]).filter(
+            (chat) => chat.status !== "seen" && chat.from !== myUsername
+          );
+
+          unreadMessages.forEach((message) =>
+            socket.emit("message-seen", message)
+          );
         });
       });
-  }, [username]);
+  }, [username, socket]);
 
   useEffect(() => {
     const handleIncomingMessage = (newMessage: MessageType) => {

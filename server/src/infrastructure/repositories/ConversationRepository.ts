@@ -171,13 +171,6 @@ class ConversationRepository implements IConversationRepository {
     }));
   }
 
-  async markAllMessageRead(conversation: Types.ObjectId, userId: string) {
-    await MessageModel.updateMany(
-      { conversation, from: { $ne: userId } },
-      { status: "seen" }
-    );
-  }
-
   async markAsRead(messageId: string | Types.ObjectId, userId: string) {
     const message = await MessageModel.findById(messageId);
     if (!message) return;
