@@ -1,6 +1,8 @@
 import { isObjectIdOrHexString, Types } from "mongoose";
 import { type Like, LikeModel } from "../database/models/LikeModel";
 import { HttpError } from "../errors/HttpError";
+import { postRepository } from "./PostRepository";
+import { userRepository } from "./UserRepository";
 
 class LikeRepository {
   async createLike(
@@ -19,6 +21,12 @@ class LikeRepository {
     });
 
     await like.save();
+
+    if (type === "post") {
+      const post = await postRepository.findById(targetId);
+      if (post)
+        await userRepository.addInterestedKeywords(userId, post.tags.join(" "));
+    }
   }
 
   async getCount(postId: string) {

@@ -14,6 +14,7 @@ import {
   type Schema,
 } from "mongoose";
 import { FollowModel } from "../database/models/FollowModel";
+import { extractKeywords } from "../../application/services/keyword.service";
 
 class UserRepository {
   async create(
@@ -57,7 +58,7 @@ class UserRepository {
     userId: string,
     projection?: ProjectionType<User> | null,
     returnDocument: boolean = false
-  ) {
+  ): Promise<any> {
     const user = await UserModel.findById(
       userId,
       projection || {
@@ -293,7 +294,8 @@ class UserRepository {
   async fetchFollowing(
     userId: string,
     myId: string,
-    type: "followers" | "following"
+    type: "followers" | "following",
+    limit?: number
   ) {
     if (!isObjectIdOrHexString(userId))
       throw new HttpError(400, "Invalid userId");
@@ -305,7 +307,7 @@ class UserRepository {
             Types.ObjectId.createFromHexString(userId),
         },
       },
-      { $limit: 20 },
+      { $sample: { size: limit || 20 } },
       {
         $lookup: {
           from: "users",
@@ -473,6 +475,22 @@ class UserRepository {
     }
 
     return users;
+  }
+
+  async addInterestedKeywords(userId: string, keywordString: string) {
+    const user = await UserModel.findById(userId);
+
+    if (!user) return;
+
+    const keywords = extractKeywords(keywordString);
+    console.log("got some keywords to store:", keywords);
+    user.interestKeywords = [...keywords, ...user.interestKeywords];
+    await user.save();
+  }
+
+  async fetchInterestKeywords(userId: string) {
+    const user = await UserModel.findById(userId);
+    return user?.interestKeywords || [];
   }
 }
 

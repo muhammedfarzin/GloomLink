@@ -17,9 +17,12 @@ export interface User {
   blockedUsers: Schema.Types.ObjectId[];
   savedPosts: Schema.Types.ObjectId[];
   subscriptionAmount?: number;
+  interestKeywords: string[];
 }
 
 export type UserDocument = User & Document;
+
+const INTEREST_KEYWORDS_LIMIT = 100;
 
 const userSchema = new Schema<User>(
   {
@@ -45,6 +48,10 @@ const userSchema = new Schema<User>(
     blockedUsers: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
     savedPosts: { type: [Schema.Types.ObjectId], ref: "Post", default: [] },
     subscriptionAmount: Number,
+    interestKeywords: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );
@@ -52,6 +59,16 @@ const userSchema = new Schema<User>(
 userSchema.pre("save", async function (next) {
   if (this.isModified("password") || this.isNew) {
     this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  if (
+    this.interestKeywords &&
+    this.interestKeywords.length > INTEREST_KEYWORDS_LIMIT
+  ) {
+    const uniqueKeywords = [...new Set(this.interestKeywords)];
+    console.log("new before keywords:", this.interestKeywords);
+    this.interestKeywords = uniqueKeywords.slice(0, INTEREST_KEYWORDS_LIMIT);
+    console.log("new after keywords:", this.interestKeywords);
   }
 
   next();

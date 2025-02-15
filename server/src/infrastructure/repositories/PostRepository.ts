@@ -174,7 +174,7 @@ class PostRepository {
     postId: string,
     projection?: ProjectionType<Post> | null,
     returnDocument: boolean = true
-  ) {
+  ): Promise<any> {
     const post = await PostModel.findById(postId, projection);
 
     return returnDocument ? post : post?.toObject();
@@ -309,14 +309,50 @@ class PostRepository {
   }
 
   async getPostsForUser(userId: string) {
+    const interestKeywords = await userRepository.fetchInterestKeywords(userId);
+    const interestKeywordsRegex = interestKeywords.map(
+      (word) => new RegExp(word, "i")
+    );
+    const followingUsers = await userRepository.fetchFollowing(
+      userId,
+      userId,
+      "following"
+    );
+    const followingUserIds: string[] = followingUsers.map((user) =>
+      user._id.toString()
+    );
+
     const posts = await PostModel.aggregate([
       {
         $match: {
           status: "active",
         },
       },
-      { $limit: 20 },
       ...postDataAggregate(userId),
+      {
+        $addFields: {
+          relevanceScore: {
+            $sum: [
+              {
+                $size: {
+                  $setIntersection: ["$tags", interestKeywords],
+                },
+              },
+              { $cond: [{ $in: ["$caption", interestKeywordsRegex] }, 1, 0] },
+              {
+                $cond: [
+                  { $in: [{ $toString: "$userId" }, followingUserIds] },
+                  1,
+                  0,
+                ],
+              },
+              { $cond: [{ $eq: [{ $toString: "$userId" }, userId] }, -2, 0] },
+            ],
+          },
+        },
+      },
+      { $sort: { relevanceScore: -1, updatedAt: -1 } },
+      { $limit: 20 },
     ]);
 
     const resPosts = await addSavedPostField(userId, posts);
