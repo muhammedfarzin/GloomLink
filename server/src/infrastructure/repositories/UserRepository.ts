@@ -18,7 +18,10 @@ import { extractKeywords } from "../../application/services/keyword.service";
 
 class UserRepository {
   async create(
-    userData: Omit<User, "_id" | "status" | "blockedUsers" | "savedPosts">
+    userData: Omit<
+      User,
+      "_id" | "status" | "blockedUsers" | "savedPosts" | "interestKeywords"
+    >
   ): Promise<UserDocument> {
     await this.userExists(userData, true);
 
@@ -483,8 +486,8 @@ class UserRepository {
     if (!user) return;
 
     const keywords = extractKeywords(keywordString);
-    console.log("got some keywords to store:", keywords);
     user.interestKeywords = [...keywords, ...user.interestKeywords];
+
     await user.save();
   }
 

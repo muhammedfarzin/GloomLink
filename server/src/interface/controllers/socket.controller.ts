@@ -55,7 +55,6 @@ export class SocketController {
       const targetUsers = [...targetUserSocketIds.values()] as string[];
       this.socket.to(targetUsers).emit("send-message", responseMessage);
     } catch (error: any) {
-      console.log(error);
       this.socket.emit("error-send-message", error.message, data);
     }
   };

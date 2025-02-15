@@ -66,9 +66,7 @@ userSchema.pre("save", async function (next) {
     this.interestKeywords.length > INTEREST_KEYWORDS_LIMIT
   ) {
     const uniqueKeywords = [...new Set(this.interestKeywords)];
-    console.log("new before keywords:", this.interestKeywords);
     this.interestKeywords = uniqueKeywords.slice(0, INTEREST_KEYWORDS_LIMIT);
-    console.log("new after keywords:", this.interestKeywords);
   }
 
   next();
