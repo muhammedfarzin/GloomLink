@@ -297,7 +297,10 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
     if (req.user.authType === "email") {
       if (!password) throw new HttpError(400, "Please enter password.");
 
-      const userVerified = await userRepository.verifyUser(username, password);
+      const userVerified = await userRepository.verifyUser(
+        user.username,
+        password
+      );
 
       if (!userVerified)
         throw new HttpError(400, "Invalid password. Please try again");
