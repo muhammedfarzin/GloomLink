@@ -1,17 +1,19 @@
+const configuration = {
+  iceServers: [
+    {
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:global.stun.twilio.com:3478",
+      ],
+    },
+  ],
+};
+
 class PeerService {
   peer: RTCPeerConnection;
 
   constructor() {
-    this.peer = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: [
-            "stun:stun.l.google.com:19302",
-            "stun:global.stun.twilio.com:3478",
-          ],
-        },
-      ],
-    });
+    this.peer = new RTCPeerConnection(configuration);
   }
 
   async getOffer() {
@@ -32,17 +34,15 @@ class PeerService {
   }
 
   resetConnection() {
-    this.peer.close();
-    this.peer = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: [
-            "stun:stun.l.google.com:19302",
-            "stun:global.stun.twilio.com:3478",
-          ],
-        },
-      ],
+    this.peer.getSenders().forEach((sender) => {
+      if (sender.track) {
+        sender.track.stop();
+      }
+      this.peer.removeTrack(sender);
     });
+
+    this.peer.close();
+    this.peer = new RTCPeerConnection(configuration);
   }
 }
 

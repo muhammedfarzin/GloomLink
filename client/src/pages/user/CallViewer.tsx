@@ -15,20 +15,26 @@ const CallViewer: React.FC = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
 
-  const endLocalStream = () =>
-    localStream?.getTracks().forEach((track) => track.stop());
+  const endLocalStream = () => {
+    localStream?.getTracks().forEach((track) => {
+      track.stop();
+      localStream.removeTrack(track);
+    });
+  };
 
   useEffect(() => {
     if (!callHandler?.callData || !socket) return;
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => setLocalStream(stream));
+    if (!localStream) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true, video: true })
+        .then((stream) => setLocalStream(stream));
+    }
 
-    callHandler.peer.addEventListener("track", async (e) => {
+    const handleRemoteStream = async (e: RTCTrackEvent) => {
       const remoteStream = e.streams;
       setRemoteStream(remoteStream[0]);
-    });
+    };
 
     const handleCallAccepted = async (
       username: string,
@@ -48,16 +54,22 @@ const CallViewer: React.FC = () => {
       callHandler.endCall(false);
     };
 
+    callHandler.peer.addEventListener("track", handleRemoteStream);
+
     socket.on("call:accepted", handleCallAccepted);
     socket.on("call:end", handleEndCall);
     socket.on("call:error", handleCallError);
+    socket.on("call:declined", endLocalStream);
 
     return () => {
+      callHandler.peer.removeEventListener("track", handleRemoteStream);
+
       socket.off("call:accepted", handleCallAccepted);
       socket.off("call:end", handleEndCall);
       socket.off("call:error", handleCallError);
+      socket.off("call:declined", endLocalStream);
     };
-  }, [socket]);
+  }, [socket, localStream]);
 
   useEffect(() => {
     if (callHandler?.status === "connected") {

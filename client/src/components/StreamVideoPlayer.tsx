@@ -13,6 +13,12 @@ const StreamVideoPlayer: React.FC<StreamVideoPlayerType> = ({
 
   useEffect(() => {
     if (videoRef.current && stream) videoRef.current.srcObject = stream;
+
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    };
   }, [stream]);
 
   return (
