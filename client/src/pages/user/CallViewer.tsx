@@ -104,7 +104,8 @@ const CallViewer: React.FC = () => {
       ) : (
         <StreamVideoPlayer
           stream={remoteStream}
-          className="h-[90vh] w-11/12 max-w-[1100px]"
+          className="max-h-[90vh] max-w-[90vw]"
+          expand
         />
       )}
 
