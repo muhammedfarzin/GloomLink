@@ -15,13 +15,6 @@ const CallViewer: React.FC = () => {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
 
-  const endLocalStream = () => {
-    localStream?.getTracks().forEach((track) => {
-      track.stop();
-      localStream.removeTrack(track);
-    });
-  };
-
   useEffect(() => {
     if (!callHandler?.callData || !socket) return;
 
@@ -44,13 +37,11 @@ const CallViewer: React.FC = () => {
 
     const handleEndCall = () => {
       toast({ description: `Call ended by ${callHandler.callData?.username}` });
-      endLocalStream();
       callHandler.endCall(false);
     };
 
     const handleCallError = (message: string) => {
       toast({ description: message, variant: "destructive" });
-      endLocalStream();
       callHandler.endCall(false);
     };
 
@@ -59,7 +50,6 @@ const CallViewer: React.FC = () => {
     socket.on("call:accepted", handleCallAccepted);
     socket.on("call:end", handleEndCall);
     socket.on("call:error", handleCallError);
-    socket.on("call:declined", endLocalStream);
 
     return () => {
       callHandler.peer.removeEventListener("track", handleRemoteStream);
@@ -67,7 +57,6 @@ const CallViewer: React.FC = () => {
       socket.off("call:accepted", handleCallAccepted);
       socket.off("call:end", handleEndCall);
       socket.off("call:error", handleCallError);
-      socket.off("call:declined", endLocalStream);
     };
   }, [socket, localStream]);
 
@@ -80,10 +69,16 @@ const CallViewer: React.FC = () => {
         })
         .then((stream) => callHandler.sendStreams(stream));
     }
+
+    return () => {
+      localStream?.getTracks().forEach((track) => {
+        track.stop();
+        localStream.removeTrack(track);
+      });
+    };
   }, [callHandler?.status]);
 
   const handleEndCall = () => {
-    endLocalStream();
     callHandler?.endCall(true);
   };
 
