@@ -5,7 +5,6 @@ import SignUpIllustrationDark from "../../assets/images/SignUp-Illustration-Dark
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DropDownBox from "../../components/DropDownBox";
-import axios, { AxiosError } from "axios";
 import { validateSignUpForm, type SignUpFormType } from "./formValidations";
 import {
   logout,
@@ -16,6 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import DateInput from "@/components/DateInput";
+import apiClient from "@/apiClient";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
@@ -53,7 +53,7 @@ const Signup = () => {
       const isValidated = validateSignUpForm(formData, setErrorMessage);
       if (!isValidated) return;
 
-      const response = await axios.post("/api/user/signup", {
+      const response = await apiClient.post("/signup", {
         ...formData,
         dob: dob?.toISOString(),
         gender: gender,
@@ -64,10 +64,8 @@ const Signup = () => {
 
       dispatch(setAuthUser({ userData, tokens }));
       navigate("/signup/verify");
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        setErrorMessage(error.response.data.message);
-      } else setErrorMessage("Something went wrong");
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(null);
     }

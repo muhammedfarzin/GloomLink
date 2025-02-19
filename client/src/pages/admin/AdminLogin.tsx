@@ -13,7 +13,7 @@ import {
   TokensState,
 } from "../../redux/reducers/auth";
 import { LoginFormType, validateLoginForm } from "../user/formValidations";
-import axios, { AxiosError } from "axios";
+import adminApiClient from "@/adminApiClient";
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -44,16 +44,14 @@ const AdminLogin: React.FC = () => {
     if (!isValidated) return;
 
     try {
-      const response = await axios.post("/api/admin/login", formData);
+      const response = await adminApiClient.post("/login", formData);
       const adminData = response.data.userData as AdminAuthState;
       const tokens = response.data.tokens as TokensState;
 
       dispatch(setAuthAdmin({ adminData, tokens }));
       navigate("/admin");
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        setErrorMessage(error.response.data.message);
-      } else setErrorMessage("Something went wrong");
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message || "Something went wrong");
     }
   };
 

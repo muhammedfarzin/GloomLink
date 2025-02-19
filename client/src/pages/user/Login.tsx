@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
 import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
 import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.svg";
 import EnvelopeIcon from "../../assets/icons/Envelope.svg";
@@ -19,6 +18,7 @@ import { RootState } from "../../redux/store";
 import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleAuthProvider } from "@/firebase";
 import { FirebaseError } from "firebase/app";
+import apiClient from "@/apiClient";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -58,12 +58,12 @@ const Login: React.FC = () => {
 
     if (isValidated) {
       try {
-        const response = await axios.post("/api/user/login", formData);
+        const response = await apiClient.post("/login", formData);
         handleSuccessLogin(response.data);
-      } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-          setErrorMessage(error.response.data.message);
-        } else setErrorMessage("Something went wrong");
+      } catch (error: any) {
+        setErrorMessage(
+          error.response?.data?.message || "Something went wrong"
+        );
       } finally {
         setLoading(null);
       }
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
         googleAuthProvider
       );
       const token = await credentials.user.getIdToken();
-      const response = await axios.post("/api/user/auth/google", {
+      const response = await apiClient.post("/auth/google", {
         token,
       });
 
@@ -90,9 +90,10 @@ const Login: React.FC = () => {
     } catch (error: any) {
       if (error instanceof FirebaseError) {
         setErrorMessage("Google authentication failed");
-      } else if (error instanceof AxiosError && error.response) {
-        setErrorMessage(error.response.data.message);
-      } else setErrorMessage(error.message || "Something went wrong");
+      } else
+        setErrorMessage(
+          error.response.data.message || error.message || "Something went wrong"
+        );
     } finally {
       setLoading(null);
     }

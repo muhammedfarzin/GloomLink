@@ -5,7 +5,6 @@ import FormBox from "../../components/FormBox";
 import InputBox from "../../components/InputBox";
 import TimerButton from "./components/TimerButton";
 import { validateOtpForm } from "./formValidations";
-import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import {
   logout,
@@ -15,6 +14,7 @@ import {
 } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
+import apiClient from "@/apiClient";
 
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
@@ -24,32 +24,18 @@ const OtpVerification: React.FC = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [otp, setOtp] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>();
-  const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
-    if (!accessToken || !userData || userData.status !== "not-verified")
-      navigate("/login");
+    if (!userData || userData.status !== "not-verified") navigate("/login");
   }, [userData]);
 
   const handleResendOtp = async () => {
     try {
       setLoading("Resending OTP...");
-      const response = await axios.post(
-        "/api/user/signup/resend-otp",
-        {
-          accessToken,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await apiClient.post("/signup/resend-otp");
       setErrorMessage(response.data.message || "");
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        setErrorMessage(error.response.data.message);
-      } else setErrorMessage("Something went wrong");
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(null);
     }
@@ -66,17 +52,9 @@ const OtpVerification: React.FC = () => {
         throw new Error(errorMessage);
       });
 
-      const response = await axios.post(
-        "/api/user/signup/verify-otp",
-        {
-          otp,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await apiClient.post("/signup/verify-otp", {
+        otp,
+      });
       const userData = response.data.userData as UserAuthState;
       const tokens = response.data.tokens as TokensState;
 
