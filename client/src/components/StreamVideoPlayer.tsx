@@ -3,13 +3,15 @@ import { useEffect, useRef } from "react";
 interface StreamVideoPlayerType {
   stream?: MediaStream;
   className?: string;
-  expand?: true;
+  expand?: boolean;
+  muted?: boolean;
 }
 
 const StreamVideoPlayer: React.FC<StreamVideoPlayerType> = ({
   stream,
   className = "",
   expand = false,
+  muted = false,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -61,7 +63,7 @@ const StreamVideoPlayer: React.FC<StreamVideoPlayerType> = ({
       ref={videoRef}
       className={`bg-secondary border border-border rounded-xl object-cover ${className}`}
       autoPlay
-      muted
+      muted={muted}
     />
   );
 };

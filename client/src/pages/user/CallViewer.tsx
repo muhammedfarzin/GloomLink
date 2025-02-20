@@ -107,6 +107,7 @@ const CallViewer: React.FC = () => {
       <StreamVideoPlayer
         stream={localStream}
         className="absolute top-5 right-5 md:top-auto md:bottom-10 md:right-10 max-w-36 max-h-36 md:max-h-60 md:max-w-60"
+        muted
       />
 
       {/* Controller */}
