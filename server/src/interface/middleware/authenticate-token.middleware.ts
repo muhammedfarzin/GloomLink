@@ -19,7 +19,6 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
 
     if (data.role === "user") {
       var userData = await userRepository.findById(data._id);
-      console.log(userData)
       if (!userData) throw new HttpError(401, "Unauthorized: Invalid token");
       if (userData.status === "blocked")
         throw new HttpError(401, "Unauthorized: User has been blocked");

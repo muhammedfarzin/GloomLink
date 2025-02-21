@@ -210,7 +210,11 @@ class PostRepository {
                   status: { $ne: "deleted" },
                   $or: [
                     { caption: { $regex: query || "", $options: "i" } },
-                    { tags: { $in: query?.toLowerCase().split(" ") } },
+                    {
+                      tags: query
+                        ? { $in: query?.toLowerCase().split(" ") }
+                        : {},
+                    },
                   ],
                 },
               },
