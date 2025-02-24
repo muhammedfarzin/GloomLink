@@ -18,8 +18,9 @@ export const createPost: RequestHandler = async (req, res, next) => {
       tags: string[];
       publishedFor: Post["publishedFor"];
     };
-    const images = (req.files as Express.Multer.File[])?.map((file) =>
-      file.path.replace("public", "")
+
+    const images = (req.files as Express.Multer.File[])?.map(
+      (image) => image.path
     );
 
     const post = await postRepository.createPost({
@@ -53,9 +54,6 @@ export const editPost: RequestHandler = async (req, res, next) => {
       publishedFor?: string;
       removedImages?: string[];
     };
-    const images = (req.files as Express.Multer.File[])?.map((file) =>
-      file.path.replace("public", "")
-    );
 
     if (
       !publishedFor ||
@@ -63,6 +61,10 @@ export const editPost: RequestHandler = async (req, res, next) => {
     ) {
       throw new HttpError(400, "Please provide valid publishedFor");
     }
+
+    const images = (req.files as Express.Multer.File[])?.map(
+      (image) => image.path
+    );
 
     const newPost = await postRepository.editPost(postId, {
       caption,

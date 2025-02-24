@@ -9,8 +9,10 @@ import { UserModel } from "../database/models/UserModel";
 import { HttpError } from "../errors/HttpError";
 import { userRepository } from "./UserRepository";
 import { ReportModel } from "../database/models/ReportModel";
-import fs from "fs";
-import path from "path";
+import {
+  removeFromCloudinary,
+  uploadToCloudinary,
+} from "../../application/services/cloudinary.service";
 
 const postDataAggregate = (userId: string) => [
   {
@@ -89,7 +91,7 @@ class PostRepository {
   async createPost(
     postData: Omit<Post, "_id" | "status" | "userId"> & { userId: string }
   ) {
-    const { caption, images, publishedFor, tags, userId } = postData;
+    const { caption, publishedFor, tags, userId } = postData;
 
     if (
       !publishedFor ||
@@ -97,6 +99,10 @@ class PostRepository {
     ) {
       throw new HttpError(400, "Please provide valid publishedFor");
     }
+
+    const images = await Promise.all(
+      postData.images.map((image) => uploadToCloudinary(image, "posts"))
+    );
 
     const newPost = new PostModel({
       caption,
@@ -116,14 +122,11 @@ class PostRepository {
       removedImages: string[];
     }
   ) {
-    const { caption, images, publishedFor, tags, removedImages } = postData;
+    const { caption, publishedFor, tags, removedImages } = postData;
 
-    if (
-      !publishedFor ||
-      (publishedFor !== "public" && publishedFor !== "subscriber")
-    ) {
-      throw new HttpError(400, "Please provide valid publishedFor");
-    }
+    const images = await Promise.all(
+      postData.images.map((image) => uploadToCloudinary(image, "posts"))
+    );
 
     await PostModel.findByIdAndUpdate(postId, {
       $set: { caption, publishedFor, tags },
@@ -136,10 +139,8 @@ class PostRepository {
       { new: true }
     );
 
-    removedImages.map((image) =>
-      fs.unlink(path.join("public", image), (err) => {
-        if (err) console.error(err);
-      })
+    await Promise.all(
+      removedImages.map((image) => removeFromCloudinary(image))
     );
 
     return post?.toObject();

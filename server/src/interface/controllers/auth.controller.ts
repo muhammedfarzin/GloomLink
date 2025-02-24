@@ -16,6 +16,10 @@ import { otpRepository } from "../../infrastructure/repositories/OtpRepository.j
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
 import { Schema } from "mongoose";
 import fs from "fs";
+import {
+  removeFromCloudinary,
+  uploadToCloudinary,
+} from "../../application/services/cloudinary.service.js";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -284,7 +288,7 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       password,
       newPassword,
     } = req.body as Partial<User> & { newPassword?: string };
-    const image = req.file?.path.replace("public", "");
+    let image = req.file?.path;
     let existImage: string | undefined;
 
     if (!firstname) throw new HttpError(400, "Please enter firstname.");
@@ -308,7 +312,10 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       if (newPassword) user.password = newPassword;
     }
 
-    if (image && user.image) existImage = user.image;
+    if (image) {
+      existImage = user.image;
+      image = await uploadToCloudinary(image, "profile");
+    }
 
     user.username = username;
     user.firstname = firstname;
@@ -336,11 +343,7 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       authType,
     };
 
-    if (existImage) {
-      fs.unlink("public" + existImage, (err) => {
-        if (err) console.log("Image is not deleted");
-      });
-    }
+    if (existImage) removeFromCloudinary(existImage);
 
     const tokenPayload: TokenPayloadType = {
       role: "user",
