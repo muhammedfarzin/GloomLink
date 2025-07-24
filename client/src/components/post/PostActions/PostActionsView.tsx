@@ -1,23 +1,18 @@
-import IconButton from "../IconButton";
-import HeartIcon from "../../assets/icons/Heart.svg";
-import HeartFilledIcon from "../../assets/icons/HeartFilled.svg";
-import ShareIcon from "../../assets/icons/Share.svg";
-import SaveIcon from "../../assets/icons/Save.svg";
-import SavedIcon from "../../assets/icons/Saved.svg";
-import CommentButton from "./CommentButton";
-import type { Props as PostListCardProps } from "./PostListCard";
-import { Post } from "./types/Post";
+import IconButton from "@/components/IconButton";
+import HeartIcon from "@/assets/icons/Heart.svg";
+import HeartFilledIcon from "@/assets/icons/HeartFilled.svg";
+import ShareIcon from "@/assets/icons/Share.svg";
+import SaveIcon from "@/assets/icons/Save.svg";
+import SavedIcon from "@/assets/icons/Saved.svg";
+import CommentButton from "../CommentButton";
+import { Props as PostActionsProps } from ".";
 
-interface PostActionsProps {
-  postData?: PostListCardProps["postData"];
-  hideComment?: boolean;
-  isAdmin?: boolean;
+interface Props extends PostActionsProps {
   handleLikePost?: (type: "like" | "dislike") => Promise<void>;
   handleSavePost?: (postId: string, type: "save" | "unsave") => Promise<void>;
-  handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
-const PostActions: React.FC<PostActionsProps> = ({
+const PostActionsView: React.FC<Props> = ({
   postData,
   hideComment,
   isAdmin,
@@ -83,4 +78,4 @@ const PostActions: React.FC<PostActionsProps> = ({
   );
 };
 
-export default PostActions;
+export default PostActionsView;
