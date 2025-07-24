@@ -5,7 +5,8 @@ import ShareIcon from "../../assets/icons/Share.svg";
 import SaveIcon from "../../assets/icons/Save.svg";
 import SavedIcon from "../../assets/icons/Saved.svg";
 import CommentButton from "./CommentButton";
-import type { Post, PostListCardProps } from "./PostListCard";
+import type { Props as PostListCardProps } from "./PostListCard";
+import { Post } from "./types/Post";
 
 interface PostActionsProps {
   postData?: PostListCardProps["postData"];

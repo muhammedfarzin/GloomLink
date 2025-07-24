@@ -1,6 +1,7 @@
 import adminApiClient from "@/adminApiClient";
 import DropDownBox from "@/components/DropDownBox";
-import PostListCard, { type Post } from "@/components/post/PostListCard";
+import PostListCard from "@/components/post/PostListCard";
+import { Post } from "@/components/post/types/Post";
 import SearchBox from "@/components/SearchBox";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";

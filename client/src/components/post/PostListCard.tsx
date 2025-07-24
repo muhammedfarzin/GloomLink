@@ -1,12 +1,3 @@
-import ProfileImage from "../ProfileImage";
-import { Link } from "react-router-dom";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "../ui/carousel";
 import apiClient from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
 import { useEffect, useState } from "react";
@@ -14,31 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import PostActions from "./PostActions";
 import DialogBox from "../DialogBox";
 import UsersList from "../UsersList";
+import CarouselImageView from "./CarouselImageView";
+import { Post } from "./types/Post";
+import AccountViewCard from "../AccountViewCard";
 
-export interface Post {
-  _id: string;
-  userId: string;
-  caption: string;
-  images: string[];
-  tags: string[];
-  publishedFor: "public" | "subscriber";
-  createdAt: string;
-  saved?: boolean;
-  liked?: boolean;
-  status?: "active" | "blocked" | "deleted";
-  likesCount?: number;
-  commentsCount?: number;
-  uploadedBy: {
-    _id: string;
-    firstname: string;
-    lastname: string;
-    username: string;
-    image?: string;
-  };
-  reportCount?: number;
-}
-
-export interface PostListCardProps {
+export interface Props {
   postId: string;
   postData?: Pick<
     Post,
@@ -60,7 +31,7 @@ export interface PostListCardProps {
   captionLine?: number;
 }
 
-const PostListCard: React.FC<PostListCardProps> = ({
+const PostListCard: React.FC<Props> = ({
   postId,
   postData,
   isAdmin = false,
@@ -71,7 +42,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
 }) => {
   const { toast } = useToast();
   const [postDataState, setPostDataState] =
-    useState<PostListCardProps["postData"]>(postData);
+    useState<Props["postData"]>(postData);
 
   useEffect(() => {
     if (!postData) {
@@ -166,19 +137,8 @@ const PostListCard: React.FC<PostListCardProps> = ({
     >
       {/* Uploaded By */}
       <div className="flex justify-between">
-        <div className="flex flex-row items-center">
-          <Link to={`/${uploadedBy.username}`}>
-            <ProfileImage
-              className="w-10 cursor-pointer"
-              profileImage={uploadedBy.image}
-            />
-          </Link>
-          <Link to={`/${uploadedBy.username}`}>
-            <span className="text-base font-bold cursor-pointer line-clamp-1">
-              {uploadedBy.username}
-            </span>
-          </Link>
-        </div>
+        <AccountViewCard userData={uploadedBy} />
+
         <PostActionsDropDown
           postId={_id}
           userId={uploadedBy._id}
@@ -196,21 +156,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
           {caption}
         </p>
 
-        <Carousel className="relative w-full">
-          <CarouselContent>
-            {images.map((image, index) => (
-              <CarouselItem key={index}>
-                <img
-                  className="mt-1 w-full bg-foreground/5 border-border object-contain rounded-xl min-h-40 max-h-80 border"
-                  src={image}
-                  alt="post"
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absulute left-2 bg-transparent opacity-10 hover:opacity-100 disabled:opacity-0 hidden md:inline-flex" />
-          <CarouselNext className="absulute right-2 bg-transparent opacity-10 hover:opacity-100 disabled:opacity-0 hidden md:inline-flex" />
-        </Carousel>
+        <CarouselImageView images={images} />
       </div>
 
       {likesCount || commentsCount ? (

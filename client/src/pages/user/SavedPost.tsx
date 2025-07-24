@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import PostListCard, { type Post } from "../../components/post/PostListCard";
+import PostListCard from "../../components/post/PostListCard";
 import apiClient from "@/apiClient";
 import EmptyIllustrationDark from "../../assets/images/Empty-Illustration-Dark.svg";
 import { useToast } from "@/hooks/use-toast";
+import { Post } from "@/components/post/types/Post";
 
 const SavedPost = () => {
   const { toast } = useToast();

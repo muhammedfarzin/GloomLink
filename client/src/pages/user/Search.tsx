@@ -1,10 +1,11 @@
 import SearchBox from "@/components/SearchBox";
 import UserListCard, { UserDataType } from "./components/UserListCard";
-import PostListCard, { Post } from "@/components/post/PostListCard";
+import PostListCard from "@/components/post/PostListCard";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
+import { Post } from "@/components/post/types/Post";
 
 export type SearchResultType =
   | (UserDataType & { type: "user" })
