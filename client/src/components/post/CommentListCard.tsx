@@ -4,24 +4,8 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-
-export interface Comment {
-  _id: string;
-  comment: string;
-  targetId: string;
-  userId: string;
-  type: "post";
-  replies: number;
-  uploadedBy: {
-    _id: string;
-    firstname: string;
-    lastname: string;
-    username: string;
-    image?: string;
-  };
-}
-
-export type HandleReplyCommentType = (newReply: Comment) => void;
+import type { HandleReplyCommentType } from "./types/ReplyCommentType";
+import type Comment from "./types/Comment";
 
 interface CommentListCardProps {
   commentId: string;
