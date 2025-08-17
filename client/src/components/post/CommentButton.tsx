@@ -1,7 +1,7 @@
 import IconButton from "../IconButton";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import CommentIcon from "@/assets/icons/Comment.svg";
-import PostListCard, { type PostListCardProps } from "./PostListCard";
+import PostListCard, { type Props as PostListCardProps } from "./PostListCard";
 import CommentBox from "./CommentBox";
 
 interface CommentButtonProps {
