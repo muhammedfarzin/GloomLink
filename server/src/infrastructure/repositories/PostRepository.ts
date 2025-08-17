@@ -313,7 +313,7 @@ class PostRepository {
     return posts;
   }
 
-  async getPostsForUser(userId: string) {
+  async getPostsForUser(userId: string, { page = 1, pageSize = 5 } = {}) {
     const interestKeywords = await userRepository.fetchInterestKeywords(userId);
     const interestKeywordsRegex = interestKeywords.map(
       (word) => new RegExp(word, "i")
@@ -326,6 +326,8 @@ class PostRepository {
     const followingUserIds: string[] = followingUsers.map((user) =>
       user._id.toString()
     );
+
+    const skip = (page - 1) * pageSize;
 
     const posts = await PostModel.aggregate([
       {
@@ -357,7 +359,8 @@ class PostRepository {
         },
       },
       { $sort: { relevanceScore: -1, updatedAt: -1 } },
-      { $limit: 20 },
+      { $skip: skip },
+      { $limit: pageSize },
     ]);
 
     const resPosts = await addSavedPostField(userId, posts);

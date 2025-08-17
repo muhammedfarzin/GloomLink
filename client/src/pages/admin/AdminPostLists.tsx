@@ -20,7 +20,7 @@ const AdminPostLists: React.FC = () => {
     adminApiClient
       .get("/posts", { params: query })
       .then((response) => {
-        setPosts(response.data as Post[]);
+        setPosts(response.data.posts as Post[]);
       })
       .catch((error) => {
         toast({

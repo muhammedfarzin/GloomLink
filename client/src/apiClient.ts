@@ -60,6 +60,10 @@ apiClient.interceptors.response.use(
         return Promise.reject(responseError);
       }
     }
+
+    error.message =
+      error.response?.data?.message || error.message || "Something went wrong";
+
     return Promise.reject(error);
   }
 );
