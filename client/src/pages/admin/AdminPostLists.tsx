@@ -1,11 +1,13 @@
 import adminApiClient from "@/adminApiClient";
 import DropDownBox from "@/components/DropDownBox";
-import PostListCard from "@/components/post/PostListCard";
 import { Post } from "@/components/post/types/Post";
 import SearchBox from "@/components/SearchBox";
+import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
+const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
 
 const AdminPostLists: React.FC = () => {
   const { toast } = useToast();
@@ -79,12 +81,14 @@ const AdminPostLists: React.FC = () => {
             {posts.length ? (
               posts.map((post) => (
                 <div className="w-full md:w-1/2 p-1">
-                  <PostListCard
-                    postId={post._id}
-                    isAdmin
-                    postData={post}
-                    handleChange={setPosts}
-                  />
+                  <Suspense fallback={<PostSkeleton />}>
+                    <PostListCard
+                      postId={post._id}
+                      isAdmin
+                      postData={post}
+                      handleChange={setPosts}
+                    />
+                  </Suspense>
                 </div>
               ))
             ) : (

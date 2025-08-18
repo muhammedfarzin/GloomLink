@@ -1,11 +1,13 @@
 import SearchBox from "@/components/SearchBox";
 import UserListCard, { UserDataType } from "./components/UserListCard";
-import PostListCard from "@/components/post/PostListCard";
-import { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import { Post } from "@/components/post/types/Post";
+import PostSkeleton from "@/components/skeleton/PostSkeleton";
+
+const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
 
 export type SearchResultType =
   | (UserDataType & { type: "user" })
@@ -76,11 +78,13 @@ const Search: React.FC = () => {
                   handleChange={setSearchResult}
                 />
               ) : (
-                <PostListCard
-                  key={data.type + data._id}
-                  postId={data._id}
-                  postData={data}
-                />
+                <Suspense fallback={<PostSkeleton />}>
+                  <PostListCard
+                    key={data.type + data._id}
+                    postId={data._id}
+                    postData={data}
+                  />
+                </Suspense>
               )
             )}
           </div>

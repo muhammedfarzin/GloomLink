@@ -8,6 +8,7 @@ import AccountViewCard from "@/components/AccountViewCard";
 import type PostDataType from "./types/PostDataType";
 import PostInteractionCount from "./PostInteractionCount";
 import PostView from "./PostView";
+import PostSkeleton from "../skeleton/PostSkeleton";
 
 export interface Props {
   postId: string;
@@ -52,16 +53,15 @@ const PostListCard: React.FC<Props> = ({
     }
   }, [postData]);
 
-  if (!postDataState) return null;
-
   const onSavePost = useCallback(
     (isSaved: boolean) =>
-      setPostDataState({ ...postDataState, saved: isSaved }),
+      postDataState && setPostDataState({ ...postDataState, saved: isSaved }),
     [postDataState, setPostDataState]
   );
 
   const onLikePost = useCallback(
     (isLiked: boolean, count?: number) =>
+      postDataState &&
       setPostDataState({
         ...postDataState,
         liked: isLiked,
@@ -69,6 +69,9 @@ const PostListCard: React.FC<Props> = ({
       }),
     [postDataState, setPostDataState]
   );
+
+  if (!postDataState)
+    return <PostSkeleton className="h-full rounded-s-lg rounded-e-none" />;
 
   return (
     <div

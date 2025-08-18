@@ -1,6 +1,9 @@
+import React, { Suspense } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import PostListCard from "./PostListCard";
 import CommentBox from "./CommentBox";
+import PostSkeleton from "../skeleton/PostSkeleton";
+
+const PostListCard = React.lazy(() => import("./PostListCard"));
 
 interface PostGridCardProps {
   image?: string;
@@ -39,12 +42,18 @@ const PostGridCard: React.FC<PostGridCardProps> = ({
         <div className="flex">
           {/* Post Card */}
           <div className="w-full md:w-1/2 h-screen md:h-[82vh]">
-            <PostListCard
-              postId={postId}
-              className="h-full rounded-s-lg"
-              hideComment
-              captionLine={1}
-            />
+            <Suspense
+              fallback={
+                <PostSkeleton className="h-full rounded-s-lg rounded-e-none" />
+              }
+            >
+              <PostListCard
+                postId={postId}
+                className="h-full rounded-s-lg"
+                hideComment
+                captionLine={1}
+              />
+            </Suspense>
           </div>
 
           {/* Comment Box */}

@@ -1,8 +1,12 @@
+import React, { Suspense } from "react";
 import IconButton from "../IconButton";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import CommentIcon from "@/assets/icons/Comment.svg";
-import PostListCard, { type Props as PostListCardProps } from "./PostListCard";
+import { type Props as PostListCardProps } from "./PostListCard";
 import CommentBox from "./CommentBox";
+import PostSkeleton from "../skeleton/PostSkeleton";
+
+const PostListCard = React.lazy(() => import("./PostListCard"));
 
 interface CommentButtonProps {
   postCardData: PostListCardProps;
@@ -22,12 +26,14 @@ const CommentButton: React.FC<CommentButtonProps> = ({
         <div className="flex">
           {/* Post Card */}
           <div className="hidden md:block w-1/2 h-screen md:h-[82vh]">
-            <PostListCard
-              className="h-full rounded-s-lg"
-              hideComment
-              captionLine={1}
-              {...postCardData}
-            />
+            <Suspense fallback={<PostSkeleton />}>
+              <PostListCard
+                className="h-full rounded-s-lg"
+                hideComment
+                captionLine={1}
+                {...postCardData}
+              />
+            </Suspense>
           </div>
 
           {/* Comment Box */}

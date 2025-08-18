@@ -1,11 +1,18 @@
 import { useToast } from "@/hooks/use-toast";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import throttle from "lodash/throttle";
 import { Post } from "./types/Post";
 import apiClient from "@/apiClient";
-import PostListCard from "./PostListCard";
-import PostSkeleton from "../skeleton/PostSkeleton";
 import EmptyIllustrationDark from "../../assets/images/Empty-Illustration-Dark.svg";
+import PostSkeletonList from "../skeleton/PostSkeletonList";
+
+const PostListCard = React.lazy(() => import("./PostListCard"));
 
 interface Props {
   apiUrl: string;
@@ -63,31 +70,33 @@ const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
   return (
     <div ref={containerRef} className="overflow-y-scroll no-scrollbar h-screen">
       <div className="flex flex-col items-center gap-2 mt-5">
-        {posts.map((post) => (
-          <PostListCard
-            key={post._id}
-            postId={post._id}
-            postData={post}
-            handleChange={setPosts}
-          />
-        ))}
+        <Suspense fallback={<PostSkeletonList />}>
+          {posts.map((post) => (
+            <PostListCard
+              key={post._id}
+              postId={post._id}
+              postData={post}
+              handleChange={setPosts}
+            />
+          ))}
+        </Suspense>
 
-        {loading
-          ? Array.from({ length: 3 }).map((_, index) => (
-              <PostSkeleton key={`post-skeleton-${index}`} />
-            ))
-          : !posts.length && (
-              <div className="flex flex-col justify-center items-center w-full h-screen">
-                <img
-                  src={EmptyIllustrationDark}
-                  alt="empty"
-                  className="w-96 max-w-full"
-                />
-                <span className="text-xl font-bold">
-                  {emptyLabel ?? "There is no post to show!"}
-                </span>
-              </div>
-            )}
+        {loading ? (
+          <PostSkeletonList />
+        ) : (
+          !posts.length && (
+            <div className="flex flex-col justify-center items-center w-full h-screen">
+              <img
+                src={EmptyIllustrationDark}
+                alt="empty"
+                className="w-96 max-w-full"
+              />
+              <span className="text-xl font-bold">
+                {emptyLabel ?? "There is no post to show!"}
+              </span>
+            </div>
+          )
+        )}
 
         {isEnd && (
           <p className="my-10 text-center">
