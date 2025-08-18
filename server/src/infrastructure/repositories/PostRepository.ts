@@ -368,9 +368,11 @@ class PostRepository {
     return resPosts;
   }
 
-  async getSavedPost(userId: string) {
+  async getSavedPost(userId: string, { page = 1, pageSize = 5 } = {}) {
     const user = await UserModel.findOne({ _id: userId });
     if (!user) throw new HttpError(404, "User not found");
+
+    const skip = (page - 1) * pageSize;
 
     const savedPosts = await PostModel.aggregate([
       { $match: { _id: { $in: user.savedPosts }, status: "active" } },
@@ -392,7 +394,8 @@ class PostRepository {
           ],
         },
       },
-      { $limit: 20 },
+      { $skip: skip },
+      { $limit: pageSize },
       { $unwind: "$uploadedBy" },
       {
         $lookup: {

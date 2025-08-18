@@ -5,12 +5,14 @@ import { Post } from "./types/Post";
 import apiClient from "@/apiClient";
 import PostListCard from "./PostListCard";
 import PostSkeleton from "../skeleton/PostSkeleton";
+import EmptyIllustrationDark from "../../assets/images/Empty-Illustration-Dark.svg";
 
 interface Props {
   apiUrl: string;
+  emptyLabel?: string;
 }
 
-const PostFeed: React.FC<Props> = ({ apiUrl }) => {
+const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
   const pageRef = useRef(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -70,10 +72,22 @@ const PostFeed: React.FC<Props> = ({ apiUrl }) => {
           />
         ))}
 
-        {loading &&
-          Array.from({ length: 3 }).map((_, index) => (
-            <PostSkeleton key={`post-skeleton-${index}`} />
-          ))}
+        {loading
+          ? Array.from({ length: 3 }).map((_, index) => (
+              <PostSkeleton key={`post-skeleton-${index}`} />
+            ))
+          : !posts.length && (
+              <div className="flex flex-col justify-center items-center w-full h-screen">
+                <img
+                  src={EmptyIllustrationDark}
+                  alt="empty"
+                  className="w-96 max-w-full"
+                />
+                <span className="text-xl font-bold">
+                  {emptyLabel ?? "There is no post to show!"}
+                </span>
+              </div>
+            )}
 
         {isEnd && (
           <p className="my-10 text-center">

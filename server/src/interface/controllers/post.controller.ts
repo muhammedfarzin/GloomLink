@@ -86,9 +86,14 @@ export const fetchSavedPosts: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const posts = await postRepository.getSavedPost(req.user._id);
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 5;
+    const posts = await postRepository.getSavedPost(req.user._id, {
+      page,
+      pageSize,
+    });
 
-    res.status(200).json(posts);
+    res.status(200).json({ posts, isEnd: posts.length < pageSize });
   } catch (error) {
     next(error);
   }
@@ -165,17 +170,15 @@ export const fetchPost: RequestHandler = async (req, res, next) => {
 
 export const fetchPosts: RequestHandler = async (req, res, next) => {
   try {
-    let page = Number(req.query.page);
-    let pageSize = Number(req.query.pageSize);
-
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
-    if (isNaN(page)) page = 1;
-    if (isNaN(pageSize)) pageSize = 5;
 
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 5;
     const posts = await postRepository.getPostsForUser(req.user._id, {
       page,
+      pageSize,
     });
 
     res.status(200).json({ posts, isEnd: posts.length < pageSize });
