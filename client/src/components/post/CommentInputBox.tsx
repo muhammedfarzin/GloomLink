@@ -77,7 +77,7 @@ const CommentInputBox: React.FC<Props> = ({
         </div>
       )}
 
-      <div className="flex items-center gap-2 w-full border-t bg-secondary border-[#6b728033] py-1 px-2 rounded-br-lg">
+      <div className="flex items-center gap-2 w-full border-t bg-secondary border-[#6b728033] py-1 px-2 rounded-b-lg md:rounded-bl-none">
         <InputBox
           type="text"
           placeholder={`Add a ${replyComment ? "reply" : "comment"}...`}

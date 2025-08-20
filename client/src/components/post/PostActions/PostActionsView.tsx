@@ -15,6 +15,7 @@ interface Props extends PostActionsProps {
 const PostActionsView: React.FC<Props> = ({
   postData,
   hideComment,
+  showCommentsForSm,
   isAdmin,
   handleLikePost,
   handleSavePost,
@@ -23,9 +24,12 @@ const PostActionsView: React.FC<Props> = ({
   return !isAdmin ? (
     <div className="flex justify-between w-full">
       <div
-        className={`flex justify-around rounded-xl bg-[#6b728033] p-1 w-1/${
-          hideComment ? "3" : "2"
-        }`}
+        className={[
+          "flex justify-around rounded-xl bg-[#6b728033] p-1",
+          hideComment
+            ? `${showCommentsForSm ? "w-1/2 md:" : ""}w-1/3`
+            : "w-1/2",
+        ].join(" ")}
       >
         <IconButton
           icon={postData?.liked ? HeartFilledIcon : HeartIcon}
@@ -36,9 +40,9 @@ const PostActionsView: React.FC<Props> = ({
               : handleLikePost?.("like")
           }
         />
-
-        {!hideComment && postData ? (
+        {(hideComment && !showCommentsForSm) || (
           <CommentButton
+            className={hideComment && showCommentsForSm ? "md:hidden" : ""}
             postId={postData._id}
             postCardData={{
               postId: postData._id,
@@ -46,7 +50,8 @@ const PostActionsView: React.FC<Props> = ({
               handleChange,
             }}
           />
-        ) : null}
+        )}
+
         <IconButton icon={ShareIcon} alt="share" />
       </div>
       <div className="p-1">

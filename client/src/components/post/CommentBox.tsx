@@ -54,32 +54,35 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
     <>
       <h3 className="text-lg font-bold my-2 mx-4">Comments</h3>
       <div className="px-4 overflow-y-scroll no-scrollbar">
-        {loading || !comments.length ? (
-          <div className="flex justify-center items-center gap-2 w-full h-[calc(100vh-6.35rem)] md:h-[calc(82vh-6.35rem)]">
-            {loading || "No comments yet!"}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2 w-full h-[calc(100vh-6.35rem)] md:h-[calc(82vh-6.35rem)]">
-            {comments.map((comment) => (
-              <div key={comment._id}>
-                <CommentListCard
-                  commentId={comment._id}
-                  comment={comment.comment}
-                  username={comment.uploadedBy.username}
-                  image={comment.uploadedBy.image}
-                  showReplies={!!comment.replies}
-                  handleReplyOnClick={(handleReplyComment) =>
-                    setReplyComment({
-                      commentId: comment._id,
-                      username: comment.uploadedBy.username,
-                      handleReplyComment,
-                    })
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        <div
+          className={[
+            "flex gap-2 w-full h-[calc(95vh-6.35rem)] md:h-[calc(82vh-6.35rem)]",
+            loading || !comments.length
+              ? "justify-center items-center"
+              : "flex-col",
+          ].join(" ")}
+        >
+          {loading || !comments.length
+            ? loading || "No comments yet!"
+            : comments.map((comment) => (
+                <div key={comment._id}>
+                  <CommentListCard
+                    commentId={comment._id}
+                    comment={comment.comment}
+                    username={comment.uploadedBy.username}
+                    image={comment.uploadedBy.image}
+                    showReplies={!!comment.replies}
+                    handleReplyOnClick={(handleReplyComment) =>
+                      setReplyComment({
+                        commentId: comment._id,
+                        username: comment.uploadedBy.username,
+                        handleReplyComment,
+                      })
+                    }
+                  />
+                </div>
+              ))}
+        </div>
       </div>
 
       <CommentInputBox

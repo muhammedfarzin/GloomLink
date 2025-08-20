@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "./redux/store";
 import User from "./pages/user/User";
@@ -21,9 +21,11 @@ import SubscriptionEnableForm from "./pages/user/SubscriptionEnableForm";
 import MessageViewer from "./pages/user/MessageViewer";
 import Messages from "./pages/user/Messages";
 import CallViewer from "./pages/user/CallViewer";
+import PostViewPage from "./pages/user/PostViewPage";
 
 function App() {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", colorTheme);
@@ -31,12 +33,12 @@ function App() {
 
   return (
     <div className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar">
-      <Routes>
+      <Routes location={location.state?.backgroundLocation || location}>
         <Route path="login" element={<UserLogin />} />
         <Route path="signup" element={<Signup />} />
         <Route path="signup/verify" element={<OtpVerification />} />
         <Route path="admin/login" element={<AdminLogin />} />
-          <Route path="call" element={<CallViewer />} />
+        <Route path="call" element={<CallViewer />} />
 
         <Route path="" element={<User />}>
           <Route index element={<Home />} />
@@ -48,6 +50,7 @@ function App() {
           <Route path="saved-post" element={<SavedPost />} />
           <Route path=":username" element={<Profile />} />
           <Route path="messages/:username" element={<MessageViewer />} />
+          <Route path="post/:postId" element={<PostViewPage />} />
           <Route path="edit-post/:postId" element={<CreatePost />} />
           <Route
             path="subscription/enable"
@@ -61,6 +64,12 @@ function App() {
           <Route path="posts" element={<AdminPostLists />} />
         </Route>
       </Routes>
+
+      {location.state?.backgroundLocation && (
+        <Routes>
+          <Route path="post/:postId" element={<PostViewPage />} />
+        </Routes>
+      )}
     </div>
   );
 }

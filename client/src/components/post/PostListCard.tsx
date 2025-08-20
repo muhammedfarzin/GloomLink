@@ -14,20 +14,22 @@ export interface Props {
   postId: string;
   postData?: PostDataType;
   isAdmin?: boolean;
-  handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
   className?: string;
   hideComment?: boolean;
+  showCommentsForSm?: boolean;
   captionLine?: number;
+  handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
 const PostListCard: React.FC<Props> = ({
   postId,
   postData,
   isAdmin = false,
-  handleChange,
   className,
   hideComment,
+  showCommentsForSm,
   captionLine,
+  handleChange,
 }) => {
   const { toast } = useToast();
   const [postDataState, setPostDataState] = useState<PostDataType | undefined>(
@@ -108,6 +110,7 @@ const PostListCard: React.FC<Props> = ({
         postData={postDataState}
         isAdmin={isAdmin}
         hideComment={hideComment}
+        showCommentsForSm={showCommentsForSm}
         handleChange={handleChange}
         onSave={onSavePost}
         onLike={onLikePost}

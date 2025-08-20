@@ -6,6 +6,7 @@ import PostDataType from "../types/PostDataType";
 export interface Props {
   postData: PostDataType;
   hideComment?: boolean;
+  showCommentsForSm?: boolean;
   isAdmin?: boolean;
   handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
   onSave?: (isSaved: boolean) => void;
@@ -15,6 +16,7 @@ export interface Props {
 const PostActions: React.FC<Props> = ({
   postData,
   hideComment,
+  showCommentsForSm,
   isAdmin,
   handleChange,
   onSave,
@@ -70,6 +72,7 @@ const PostActions: React.FC<Props> = ({
     <PostActionsView
       postData={postData}
       hideComment={hideComment}
+      showCommentsForSm={showCommentsForSm}
       isAdmin={isAdmin}
       handleLikePost={handleLikePost}
       handleSavePost={handleSavePost}
