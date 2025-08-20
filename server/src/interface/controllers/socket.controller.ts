@@ -24,7 +24,7 @@ export class SocketController {
         throw new Error("Message or image either one is required");
       if (image && !urlPattern.test(image))
         throw new Error("Invalid image URL");
-      if (type !== "text" && type !== "image")
+      if (type !== "text" && type !== "image" && type !== "post")
         throw new Error("Invalid message type");
 
       const conversationId =
@@ -45,7 +45,11 @@ export class SocketController {
         }
       );
 
-      const responseMessage = { ...messageDocument, from: this.username };
+      const responseMessage = {
+        ...messageDocument,
+        from: this.username,
+        to: username,
+      };
       const targetUserSocketIds = activeUsers[username];
 
       this.socket.emit("send-message-success", responseMessage);

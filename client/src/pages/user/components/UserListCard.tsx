@@ -6,18 +6,11 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import type { SearchResultType } from "../Search";
-
-export interface UserDataType {
-  _id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  image?: string;
-  isFollowing?: boolean;
-}
+import { UserDataType } from "@/components/types/user-data-types";
 
 interface UserListCardProps {
   userData: UserDataType;
+  actions?: React.ReactNode;
   className?: string;
   handleChange?:
     | React.Dispatch<React.SetStateAction<UserDataType[]>>
@@ -27,6 +20,7 @@ interface UserListCardProps {
 const UserListCard: React.FC<UserListCardProps> = ({
   userData: { isFollowing = false, ...userData },
   className,
+  actions,
   handleChange,
 }) => {
   const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
@@ -75,14 +69,18 @@ const UserListCard: React.FC<UserListCardProps> = ({
           </span>
         </Link>
       </div>
-      {myUserId !== userData._id ? (
-        <Button
-          className="h-7"
-          onClick={() => handleFollowUser(isFollowing ? "unfollow" : "follow")}
-        >
-          {isFollowing ? "Unfollow" : "Follow"}
-        </Button>
-      ) : null}
+
+      {actions ??
+        (myUserId !== userData._id || (
+          <Button
+            className="h-7"
+            onClick={() =>
+              handleFollowUser(isFollowing ? "unfollow" : "follow")
+            }
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
+          </Button>
+        ))}
     </div>
   );
 };

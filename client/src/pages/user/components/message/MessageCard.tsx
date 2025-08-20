@@ -1,13 +1,4 @@
-export type MessageType = {
-  _id: string;
-  message?: string;
-  image?: string;
-  type: "text" | "image";
-  createdAt: string;
-} & (
-  | { from: string; status: "sent" | "seen" }
-  | { from?: null; status: "pending" }
-);
+import { MessageType } from "@/types/message-type";
 
 interface MessageCardProps {
   data: MessageType;
@@ -17,7 +8,7 @@ interface MessageCardProps {
 const MessageCard: React.FC<MessageCardProps> = ({ data, sender }) => {
   return (
     <div
-      className={`border border-border my-2 p-4 w-fit max-w-5/6 rounded-xl ${
+      className={`border border-border my-2 p-4 w-fit max-w-[85%] max-w-5/6 rounded-xl ${
         sender
           ? `${data.status === "seen" ? "bg-primary" : "bg-secondary"} ml-auto`
           : "bg-secondary mr-auto"

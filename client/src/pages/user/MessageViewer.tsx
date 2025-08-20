@@ -4,13 +4,14 @@ import MessageInput from "./components/message/MessageInput";
 import { useEffect, useRef, useState } from "react";
 import apiClient from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
-import MessageCard, { MessageType } from "./components/message/MessageCard";
+import MessageCard from "./components/message/MessageCard";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Video } from "lucide-react";
 import { useCall } from "@/hooks/use-call";
 import { useToast } from "@/hooks/use-toast";
+import { MessageType } from "@/types/message-type";
 
 const MessageViewer: React.FC = () => {
   const socket = useSocket();
@@ -115,9 +116,9 @@ const MessageViewer: React.FC = () => {
 
     return () => {
       socket?.off("send-message", handleIncomingMessage);
-      socket?.on("message-seen", handleSeenMessage);
+      socket?.off("message-seen", handleSeenMessage);
       socket?.off("send-message-success", handleSendSuccessMessage);
-      socket?.on("error-send-message", handleSendMessageError);
+      socket?.off("error-send-message", handleSendMessageError);
     };
   }, [socket, username]);
 

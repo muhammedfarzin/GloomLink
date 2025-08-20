@@ -1,9 +1,8 @@
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import UserListCard, {
-  type UserDataType,
-} from "@/pages/user/components/UserListCard";
+import UserListCard from "@/pages/user/components/UserListCard";
 import { useEffect, useState } from "react";
+import { UserDataType } from "./types/user-data-types";
 
 interface UsersListProps {
   apiUrl: string;

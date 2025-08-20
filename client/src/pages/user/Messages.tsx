@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import type { ChatUserDataType } from "./components/ChatList";
+import type { ChatUserDataType } from "@/components/types/user-data-types";
 import apiClient from "@/apiClient";
 import ChatItem from "./components/ChatItem";
 import { useSocket } from "@/hooks/use-socket";
 import { useParams } from "react-router-dom";
-import type { MessageType } from "./components/message/MessageCard";
+import type { MessageType } from "@/types/message-type";
 
 const Messages = () => {
   const socket = useSocket();

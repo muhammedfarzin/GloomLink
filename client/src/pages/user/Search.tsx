@@ -1,10 +1,11 @@
 import SearchBox from "@/components/SearchBox";
-import UserListCard, { UserDataType } from "./components/UserListCard";
+import UserListCard from "./components/UserListCard";
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import { Post } from "@/components/post/types/Post";
+import { UserDataType } from "@/components/types/user-data-types";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
 
 const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));

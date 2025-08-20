@@ -6,6 +6,8 @@ import SaveIcon from "@/assets/icons/Save.svg";
 import SavedIcon from "@/assets/icons/Saved.svg";
 import CommentButton from "../CommentButton";
 import { Props as PostActionsProps } from ".";
+import DialogBox from "@/components/DialogBox";
+import ShareList from "@/components/ShareList";
 
 interface Props extends PostActionsProps {
   handleLikePost?: (type: "like" | "dislike") => Promise<void>;
@@ -40,6 +42,7 @@ const PostActionsView: React.FC<Props> = ({
               : handleLikePost?.("like")
           }
         />
+
         {(hideComment && !showCommentsForSm) || (
           <CommentButton
             className={hideComment && showCommentsForSm ? "md:hidden" : ""}
@@ -52,7 +55,14 @@ const PostActionsView: React.FC<Props> = ({
           />
         )}
 
-        <IconButton icon={ShareIcon} alt="share" />
+        <DialogBox
+          dialogElement={
+            <ShareList data={{ message: postData._id, type: "post" }} />
+          }
+          title="Share post"
+        >
+          <IconButton icon={ShareIcon} alt="share" />
+        </DialogBox>
       </div>
       <div className="p-1">
         <IconButton

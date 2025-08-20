@@ -6,7 +6,7 @@ export interface Message {
   image: string;
   from: Schema.Types.ObjectId;
   status: "sent" | "delivered" | "seen";
-  type: "text" | "image";
+  type: "text" | "image" | "post";
 }
 
 const messageSchema = new Schema<Message>(
@@ -29,6 +29,7 @@ const messageSchema = new Schema<Message>(
     type: {
       type: String,
       required: true,
+      enum: ["text", "image", "post"],
     },
   },
   { timestamps: true }

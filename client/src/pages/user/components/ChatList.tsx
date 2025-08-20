@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import ChatItem from "./ChatItem";
 import apiClient from "@/apiClient";
-import { UserDataType } from "./UserListCard";
 import { useSocket } from "@/hooks/use-socket";
-import type { MessageType } from "./message/MessageCard";
+import type { MessageType } from "@/types/message-type";
 import { useParams } from "react-router-dom";
-
-export type ChatUserDataType = Omit<UserDataType, "isFollowing"> & {
-  unread?: number;
-};
+import { ChatUserDataType } from "@/components/types/user-data-types";
 
 const ChatList = () => {
   const socket = useSocket();
