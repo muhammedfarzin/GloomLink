@@ -1,12 +1,15 @@
-import { model, Schema } from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import { HttpError } from "../../errors/HttpError";
 import { PostModel } from "./PostModel";
 
 export interface Like {
+  _id: Schema.Types.ObjectId;
   targetId: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   type: "post";
 }
+
+export type LikeDocument = Like & Document;
 
 const likeSchema = new Schema<Like>({
   targetId: {

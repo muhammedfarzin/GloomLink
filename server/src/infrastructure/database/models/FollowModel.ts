@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 import { HttpError } from "../../errors/HttpError";
 
 export interface FollowType {
@@ -6,6 +6,8 @@ export interface FollowType {
   followedBy: Schema.Types.ObjectId;
   followingTo: Schema.Types.ObjectId;
 }
+
+export type FollowDocument = FollowType & Document;
 
 const followSchema = new Schema<FollowType>(
   {

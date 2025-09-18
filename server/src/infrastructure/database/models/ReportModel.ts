@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 import { PostModel } from "./PostModel";
 import { UserModel } from "./UserModel";
 
@@ -8,6 +8,8 @@ interface ReportType {
   targetId: Schema.Types.ObjectId;
   reportedBy: Schema.Types.ObjectId;
 }
+
+export type ReportDocument = ReportType & Document;
 
 const ReportSchema = new Schema<ReportType>(
   {

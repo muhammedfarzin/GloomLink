@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 import { HttpError } from "../../errors/HttpError";
 
 export interface Post {
@@ -10,6 +10,8 @@ export interface Post {
   publishedFor: "public" | "subscriber";
   status: "active" | "blocked" | "deleted";
 }
+
+export type PostDocument = Post & Document;
 
 const postSchema = new Schema<Post>(
   {

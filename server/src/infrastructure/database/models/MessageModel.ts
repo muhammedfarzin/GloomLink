@@ -1,6 +1,7 @@
-import { model, Schema } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 
 export interface Message {
+  _id: Schema.Types.ObjectId;
   conversation: Schema.Types.ObjectId;
   message: string;
   image: string;
@@ -8,6 +9,8 @@ export interface Message {
   status: "sent" | "delivered" | "seen";
   type: "text" | "image" | "post";
 }
+
+export type MessageDocument = Message & Document;
 
 const messageSchema = new Schema<Message>(
   {

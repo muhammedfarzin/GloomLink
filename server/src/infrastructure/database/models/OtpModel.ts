@@ -9,12 +9,12 @@ export interface Otp {
   createdAt: Date;
 }
 
-export interface OtpDocument extends Document {}
+export type OtpDocument = Otp & Document;
 
 const otpSchema = new Schema<Otp>({
   email: {
     type: String,
-    required: true
+    required: true,
   },
   otp: {
     type: String,
@@ -29,9 +29,9 @@ const otpSchema = new Schema<Otp>({
 
 export async function sendVerificationEmail(email: string, otp: string) {
   const mailResponse = await sendMail(
-      email,
-      'GloomLink Verification Email',
-      `<h1>Please confirm your OTP</h1>
+    email,
+    "GloomLink Verification Email",
+    `<h1>Please confirm your OTP</h1>
        <p>Here is your OTP code: ${otp}</p>`
   );
   return mailResponse;
@@ -43,4 +43,4 @@ otpSchema.pre("save", async function (next) {
   next();
 });
 
-export const OtpModel = model('Otp', otpSchema, 'otps');
+export const OtpModel = model("Otp", otpSchema, "otps");

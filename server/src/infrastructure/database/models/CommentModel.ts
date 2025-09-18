@@ -1,13 +1,16 @@
-import { model, Schema } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 import { PostModel } from "./PostModel";
 import { HttpError } from "../../errors/HttpError";
 
 export interface CommentType {
+  _id: Schema.Types.ObjectId;
   targetId: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   comment: string;
   type: "post" | "comment";
 }
+
+export type CommentDocument = CommentType & Document;
 
 const commentSchama = new Schema({
   targetId: {

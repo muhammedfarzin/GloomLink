@@ -1,11 +1,14 @@
-import { model, Schema } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 
 export interface BankAccountType {
+  _id: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   name: string;
   accountNumber: string;
   ifsc: string;
 }
+
+export type BankAccountDocument = BankAccountType & Document;
 
 export const ifscRegex = /^[A-Z]{4}0\d{6}$/;
 export const bankAccountNumberRegex = /^\d+$/;
