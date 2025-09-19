@@ -36,6 +36,17 @@ export class UserRepository implements IUserRepository {
     return userModel ? UserMapper.toDomain(userModel) : null;
   }
 
+  async findByIdentifier(identifier: string): Promise<User | null> {
+    const userModel = await UserModel.findOne({
+      $or: [
+        { username: identifier },
+        { email: identifier },
+        { mobile: identifier },
+      ],
+    });
+    return userModel ? UserMapper.toDomain(userModel) : null;
+  }
+
   async checkUserExist(
     query: Pick<User, "username" | "email" | "mobile">
   ): Promise<{ exist: false } | { exist: true; data: User; field: string }> {

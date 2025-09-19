@@ -57,10 +57,6 @@ const userSchema = new Schema<User>(
 );
 
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-
   if (
     this.interestKeywords &&
     this.interestKeywords.length > INTEREST_KEYWORDS_LIMIT

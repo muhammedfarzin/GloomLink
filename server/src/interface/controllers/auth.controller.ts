@@ -18,12 +18,17 @@ import {
   removeFromCloudinary,
   uploadToCloudinary,
 } from "../../application/services/cloudinary.service.js";
-import { otpInputSchema, signupInputSchema } from "../validation/authSchemas";
+import {
+  loginInputSchema,
+  otpInputSchema,
+  signupInputSchema,
+} from "../validation/authSchemas";
 import { OtpService } from "../../infrastructure/services/OtpService";
 import { MailService } from "../../infrastructure/services/MailService";
 import { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
+import { LoginUser } from "../../application/use-cases/LoginUser";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -32,31 +37,38 @@ firebaseAdmin.initializeApp({
 });
 
 export const login: RequestHandler = async (req, res, next) => {
-  const { username, password }: Pick<User, "username" | "password"> = req.body;
-
   try {
-    if (!username || !password) {
-      throw new HttpError(400, "Username and password are required.");
+    const validatedBody = loginInputSchema.parse(req.body);
+
+    const userRepository = new UserRepository();
+    const passwordHasher = new BcryptPasswordHasher();
+    const loginUserUseCase = new LoginUser(userRepository, passwordHasher);
+    const user = await loginUserUseCase.execute(validatedBody);
+
+    if (user.status === "not-verified") {
+      const otpRepository = new OtpRepository();
+      const otpService = new OtpService(otpRepository);
+      const mailService = new MailService();
+      const sendEmailUseCase = new SendVerificationEmail(
+        otpService,
+        mailService
+      );
+      await sendEmailUseCase.execute({ email: user.email });
     }
 
-    const userData = await userRepository.verifyUser(username, password, true);
+    const { password: _, ...userResponse } = user;
+    const tokens = generateToken(
+      { role: "user", id: userResponse._id },
+      user.status !== "not-verified"
+    );
+    const messageResponse =
+      user.status === "not-verified" ? "Verify your email" : "Login successful";
 
-    if (!userData) {
-      throw new HttpError(403, "Invalid username or password");
-    } else if (userData.status === "blocked") {
-      throw new HttpError(403, "Your account has been blocked");
-    } else if (userData.status === "not-verified") {
-      await otpRepository.resendOtp(userData.email);
-    }
-
-    const { password: _, ...resUser } = userData.toObject();
-
-    const payload: TokenPayloadType = { role: "user", ...resUser };
-    const tokens = generateToken(payload, userData.status !== "not-verified");
-
-    res
-      .status(200)
-      .json({ userData: resUser, tokens, message: "Login successful" });
+    res.status(200).json({
+      userData: userResponse,
+      tokens,
+      message: messageResponse,
+    });
   } catch (error) {
     next(error);
   }
