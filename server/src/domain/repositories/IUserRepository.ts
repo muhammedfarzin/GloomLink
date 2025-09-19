@@ -7,7 +7,6 @@ export interface IUserRepository {
   findById(id: string): Promise<User | null>;
   checkUserExist: (
     query: Pick<User, "username" | "email" | "mobile">
-  ) => Promise<
-    { exist: false; data: never } | { exist: true; data: { field: string } }
-  >;
+  ) => Promise<{ exist: false } | { exist: true; data: User; field: string }>;
+  update(id: string, userData: Partial<User>): Promise<User | null>;
 }

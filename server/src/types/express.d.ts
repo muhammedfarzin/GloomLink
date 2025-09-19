@@ -5,10 +5,10 @@ import type { TokenPayloadType } from "../application/services/token.service";
 declare module "express-serve-static-core" {
   interface Request {
     user?:
-      | { role: "admin"; username: string }
+      | { role: "admin"; id: string }
       | {
           role: "user";
-          _id: string;
+          id: string;
           firstname: string;
           lastname: string;
           username: string;

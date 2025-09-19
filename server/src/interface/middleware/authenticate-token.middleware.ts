@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TokenPayloadType } from "../../application/services/token.service";
-import { userRepository } from "../../infrastructure/repositories/UserRepository";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 
 export const authenticateToken: RequestHandler = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -17,9 +17,11 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
       process.env.JWT_ACCESS_SECRET || "secret"
     ) as TokenPayloadType;
 
+    const userRepository = new UserRepository();
+
     if (data.role === "user") {
-      var userData = await userRepository.findById(data._id);
-      if (!userData) throw new HttpError(401, "Unauthorized: Invalid token");
+      const userData = await userRepository.findById(data.id);
+      if (!userData) throw new HttpError(401, "Unauthorized: User not found");
       if (userData.status === "blocked")
         throw new HttpError(401, "Unauthorized: User has been blocked");
 
@@ -28,10 +30,10 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
       req.user = {
         role: "user",
         ...userData,
-        _id: userId.toString(),
+        id: userId.toString(),
         authType,
       };
-    } else req.user = data;
+    } else req.user = { role: "admin", id: data.id };
 
     next();
   } catch (error) {

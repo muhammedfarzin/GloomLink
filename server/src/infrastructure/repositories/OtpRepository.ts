@@ -1,47 +1,26 @@
-import { OtpModel, sendVerificationEmail } from "../database/models/OtpModel";
-import { User } from "../database/models/UserModel";
-import otpGenerator from "otp-generator";
-import { HttpError } from "../errors/HttpError";
-import bcrypt from "bcryptjs";
+import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
+import { OtpModel } from "../database/models/OtpModel";
+import { Otp } from "../../domain/entities/Otp";
+import { OtpMapper } from "../database/mappers/OtpMapper";
 
-class OtpRepository {
-  async generateOtp({ email }: Pick<User, "email">): Promise<void> {
-    const otp = otpGenerator.generate(6, {
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
-    });
+export class OtpRepository implements IOtpRepository {
+  async save(
+    otpData: Pick<Otp, "email" | "otp"> & Partial<Omit<Otp, "email" | "otp">>
+  ): Promise<Otp> {
+    await OtpModel.findOneAndDelete({ email: otpData.email });
 
-    await OtpModel.findOneAndDelete({ email });
-    const newOtp = new OtpModel({ otp, email });
-
-    await newOtp.save();
+    const otpToPersist = OtpMapper.toPersistence(otpData);
+    const newOtpModel = new OtpModel(otpToPersist);
+    const savedOtp = await newOtpModel.save();
+    return OtpMapper.toDomain(savedOtp);
   }
 
-  async verifyOtp(
-    { email }: Pick<User, "email">,
-    otp: string
-  ): Promise<boolean> {
-    const existOtp = await OtpModel.findOne({ email });
-
-    if (!existOtp) {
-      throw new HttpError(
-        404,
-        "Otp not found, please check your email address"
-      );
-    }
-
-    const isOtpMatched = await bcrypt.compare(otp, existOtp.otp);
-    if (!isOtpMatched) return false;
-
-    await existOtp.deleteOne();
-
-    return true;
+  async findByEmail(email: string): Promise<Otp | null> {
+    const otpModel = await OtpModel.findOne({ email });
+    return otpModel ? OtpMapper.toDomain(otpModel) : null;
   }
 
-  async resendOtp(email: string) {
-    this.generateOtp({ email });
+  async delete(email: string): Promise<void> {
+    await OtpModel.deleteOne({ email });
   }
 }
-
-export const otpRepository = new OtpRepository();

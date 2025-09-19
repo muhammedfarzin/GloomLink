@@ -1,7 +1,7 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 
-export type TokenPayloadType = NonNullable<Request["user"]>;
+export type TokenPayloadType = { role: "user" | "admin"; id: string };
 export interface TokensType {
   accessToken: string;
   refreshToken?: string;
@@ -11,12 +11,7 @@ export const generateToken = (
   payload: TokenPayloadType,
   withRefreshToken: boolean = true
 ): TokensType => {
-  const { role, username } = payload;
-  if (role !== "admin") {
-    var { _id, email, status, authType } = payload as Partial<typeof payload>;
-  }
-
-  const data = { role, _id, username, email, status, authType };
+  const data = { role: payload.role, id: payload.id };
   const accessToken = jwt.sign(
     data,
     process.env.JWT_ACCESS_SECRET || "secret",

@@ -1,11 +1,9 @@
 import { RequestHandler } from "express";
 import firebaseAdmin from "firebase-admin";
-import {
-  UserModel,
-  type User,
-} from "../../infrastructure/database/models/UserModel.js";
-import { HttpError } from "../../infrastructure/errors/HttpError.js";
-import { userRepository } from "../../infrastructure/repositories/UserRepository.js";
+import { CreateUser } from "../../application/use-cases/CreateUser";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
+import { OtpRepository } from "../../infrastructure/repositories/OtpRepository.js";
+import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
 import {
   generateToken,
   verifyToken,
@@ -20,6 +18,12 @@ import {
   removeFromCloudinary,
   uploadToCloudinary,
 } from "../../application/services/cloudinary.service.js";
+import { otpInputSchema, signupInputSchema } from "../validation/authSchemas";
+import { OtpService } from "../../infrastructure/services/OtpService";
+import { MailService } from "../../infrastructure/services/MailService";
+import { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
+import { HttpError } from "../../infrastructure/errors/HttpError";
+import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -59,53 +63,34 @@ export const login: RequestHandler = async (req, res, next) => {
 };
 
 export const signup: RequestHandler = async (req, res, next) => {
-  const {
-    firstname,
-    lastname,
-    username,
-    mobile,
-    email,
-    gender,
-    password,
-  }: User = req.body;
-  let dob: Date | undefined;
-
   try {
-    if (
-      !firstname ||
-      !lastname ||
-      !username ||
-      !mobile ||
-      !email ||
-      !password
-    ) {
-      throw new HttpError(400, "All fields are required.");
-    }
+    const validatedBody = signupInputSchema.parse(req.body);
 
-    if (gender && gender !== "m" && gender !== "f") {
-      throw new HttpError(400, "Invalid gender");
-    }
-    if (req.body.dob) {
-      dob = new Date(req.body.dob);
-    }
-
-    const newUser = await userRepository.create({
-      firstname,
-      lastname,
-      username,
-      mobile,
-      email,
-      password,
-      gender,
-      dob,
+    // --- Create User ---
+    const userRepository = new UserRepository();
+    const passwordHasher = new BcryptPasswordHasher();
+    const createUserUseCase = new CreateUser(userRepository, passwordHasher);
+    const newUser = await createUserUseCase.execute({
+      ...validatedBody,
+      authType: "email",
     });
 
-    const { password: _, ...resUser } = newUser.toObject();
-    const tokens = generateToken({ role: "user", ...resUser }, false);
+    // --- Send Verification Email ---
+    const otpRepository = new OtpRepository();
+    const otpService = new OtpService(otpRepository);
+    const mailService = new MailService();
+    const sendEmailUseCase = new SendVerificationEmail(otpService, mailService);
+    await sendEmailUseCase.execute({ email: newUser.email });
 
-    res
-      .status(201)
-      .json({ userData: resUser, tokens, message: "User created" });
+    // --- Generate Token & Respond ---
+    const { password: _, ...userResponse } = newUser;
+    const tokens = generateToken({ role: "user", id: userResponse._id }, false);
+
+    res.status(201).json({
+      tokens,
+      userData: userResponse,
+      message: "User created successfully. Please check your email for OTP.",
+    });
   } catch (err) {
     next(err);
   }
@@ -116,7 +101,12 @@ export const resendOTP: RequestHandler = async (req, res, next) => {
     if (!req.user || req.user.role !== "user")
       throw new HttpError(401, "Unauthorized");
 
-    await otpRepository.resendOtp(req.user.email);
+    const otpRepository = new OtpRepository();
+    const otpService = new OtpService(otpRepository);
+    const mailService = new MailService();
+    const sendEmailUseCase = new SendVerificationEmail(otpService, mailService);
+    await sendEmailUseCase.execute({ email: req.user.email });
+
     res.status(200).json({ message: "Otp has been send successfully" });
   } catch (error) {
     next(error);
@@ -128,24 +118,27 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
     if (!req.user || req.user.role !== "user")
       throw new HttpError(401, "Unauthorized");
 
-    const otp: string | undefined = req.body.otp;
-    if (!otp) throw new HttpError(400, "Please enter a valid otp");
+    const { otp } = otpInputSchema.parse(req.body);
 
-    const isOtpMatched = await otpRepository.verifyOtp(req.user, otp);
+    const otpRepository = new OtpRepository();
+    const userRepository = new UserRepository();
+    const passwordHasher = new BcryptPasswordHasher();
+    const verifyOtpUseCase = new VerifyOtp(
+      otpRepository,
+      userRepository,
+      passwordHasher
+    );
+    const updatedUser = await verifyOtpUseCase.execute({
+      email: req.user.email,
+      otp,
+    });
 
-    if (!isOtpMatched) {
-      throw new HttpError(400, "Invalid OTP, please try again");
-    }
+    const { password: _, ...userResponse } = updatedUser;
 
-    await userRepository.updateById(req.user._id, { status: "active" });
-    const updatedUser = await userRepository.findByUsername(req.user.username);
-    if (!updatedUser) throw new HttpError(404, "User not found");
-
-    const { role, ...userWithoutRole } = req.user;
-    const tokens = generateToken({ role: "user", ...userWithoutRole });
+    const tokens = generateToken({ role: "user", id: userResponse._id }, true);
 
     res.status(200).json({
-      userData: updatedUser,
+      userData: userResponse,
       tokens,
       message: "OTP verified successfully",
     });
