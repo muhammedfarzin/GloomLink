@@ -47,7 +47,10 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (responseError: any) {
         if (
-          responseError.response?.data?.message === "Refresh token is required."
+          responseError.response?.data?.message ===
+            "Refresh token is required." ||
+          responseError.response?.data?.message ===
+            "Invalid or expired refresh token."
         ) {
           store.dispatch(logout({ type: "user" }));
           return Promise.reject(

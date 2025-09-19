@@ -4,13 +4,7 @@ import { CreateUser } from "../../application/use-cases/CreateUser";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { OtpRepository } from "../../infrastructure/repositories/OtpRepository.js";
 import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
-import {
-  generateToken,
-  verifyToken,
-  type TokensType,
-  type TokenPayloadType,
-} from "../../application/services/token.service.js";
-import { otpRepository } from "../../infrastructure/repositories/OtpRepository.js";
+import { type TokenPayloadType } from "../../application/services/token.service.js";
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
 import { Schema } from "mongoose";
 import fs from "fs";
@@ -22,6 +16,7 @@ import {
   googleAuthSchema,
   loginInputSchema,
   otpInputSchema,
+  refreshTokenSchema,
   signupInputSchema,
 } from "../validation/authSchemas";
 import { OtpService } from "../../infrastructure/services/OtpService";
@@ -31,6 +26,8 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
 import { LoginUser } from "../../application/use-cases/LoginUser";
 import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
+import { JwtTokenService } from "../../infrastructure/services/JwtTokenService";
+import { RefreshToken } from "../../application/use-cases/RefreshToken";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -59,7 +56,8 @@ export const login: RequestHandler = async (req, res, next) => {
     }
 
     const { password: _, ...userResponse } = user;
-    const tokens = generateToken(
+    const tokenService = new JwtTokenService();
+    const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
       user.status !== "not-verified"
     );
@@ -98,7 +96,12 @@ export const signup: RequestHandler = async (req, res, next) => {
 
     // --- Generate Token & Respond ---
     const { password: _, ...userResponse } = newUser;
-    const tokens = generateToken({ role: "user", id: userResponse._id }, false);
+
+    const tokenService = new JwtTokenService();
+    const tokens = tokenService.generate(
+      { role: "user", id: userResponse._id },
+      false
+    );
 
     res.status(201).json({
       tokens,
@@ -149,7 +152,11 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
 
     const { password: _, ...userResponse } = updatedUser;
 
-    const tokens = generateToken({ role: "user", id: userResponse._id }, true);
+    const tokenService = new JwtTokenService();
+    const tokens = tokenService.generate(
+      { role: "user", id: userResponse._id },
+      true
+    );
 
     res.status(200).json({
       userData: userResponse,
@@ -176,7 +183,12 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
     });
 
     const { password: _, ...userResponse } = user;
-    const tokens = generateToken({ role: "user", id: userResponse._id }, true);
+
+    const tokenService = new JwtTokenService();
+    const tokens = tokenService.generate(
+      { role: "user", id: userResponse._id },
+      true
+    );
 
     res.status(200).json({
       userData: userResponse,
@@ -196,57 +208,13 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
 };
 
 export const refreshToken: RequestHandler = async (req, res, next) => {
-  const { token } = req.body as { token?: string };
-
   try {
-    if (!token) {
-      throw new HttpError(400, "Refresh token is required.");
-    }
+    const { token } = refreshTokenSchema.parse(req.body);
 
-    const decoded = verifyToken(token, "refresh");
-    let newTokens: TokensType;
-
-    if (!decoded) {
-      throw new HttpError(403, "Invalid refresh token.");
-    }
-
-    if (decoded.role === "user") {
-      const user = await userRepository.findByUsername(decoded.username);
-      if (!user) {
-        throw new HttpError(404, "User not found.");
-      } else if (user.status === "blocked") {
-        throw new HttpError(401, "Your account is blocked");
-      }
-
-      const {
-        _id,
-        email,
-        firstname,
-        lastname,
-        username,
-        mobile,
-        status,
-        authType,
-      } = user;
-
-      const resData = {
-        _id: _id.toString(),
-        email,
-        firstname,
-        lastname,
-        username,
-        mobile,
-        status,
-        authType: authType || "email",
-      };
-
-      newTokens = generateToken({ role: "user", ...resData }, true);
-    } else if (decoded.role === "admin") {
-      newTokens = generateToken({
-        role: "admin",
-        username: decoded.username,
-      });
-    } else throw new HttpError(401, "Unauthorized");
+    const tokenService = new JwtTokenService();
+    const userRepository = new UserRepository();
+    const refreshTokenUseCase = new RefreshToken(tokenService, userRepository);
+    const newTokens = await refreshTokenUseCase.execute({ token });
 
     res.status(200).json({
       tokens: newTokens,

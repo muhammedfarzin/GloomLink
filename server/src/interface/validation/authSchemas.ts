@@ -103,3 +103,11 @@ export const googleAuthSchema = z.object({
 });
 
 export type GoogleAuth = z.infer<typeof googleAuthSchema>;
+
+export const refreshTokenSchema = z.object({
+  token: z
+    .string(validateRequiredString("Refresh token"))
+    .min(1, { message: "Refresh token is required" }),
+});
+
+export type RefreshToken = z.infer<typeof refreshTokenSchema>;
