@@ -95,3 +95,11 @@ export const otpInputSchema = z.object({
 });
 
 export type OtpInput = z.infer<typeof otpInputSchema>;
+
+export const googleAuthSchema = z.object({
+  token: z
+    .string(validateRequiredString("Google auth token"))
+    .min(1, { message: "Google auth token is required" }),
+});
+
+export type GoogleAuth = z.infer<typeof googleAuthSchema>;

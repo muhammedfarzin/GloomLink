@@ -19,6 +19,7 @@ import {
   uploadToCloudinary,
 } from "../../application/services/cloudinary.service.js";
 import {
+  googleAuthSchema,
   loginInputSchema,
   otpInputSchema,
   signupInputSchema,
@@ -29,6 +30,7 @@ import { SendVerificationEmail } from "../../application/use-cases/SendVerificat
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
 import { LoginUser } from "../../application/use-cases/LoginUser";
+import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -161,56 +163,34 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
 
 export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
   try {
-    const { token } = req.body as { token?: string };
-
-    if (!token) throw new HttpError(400, "Please provide auth token");
+    const { token } = googleAuthSchema.parse(req.body);
 
     const decodedData = await firebaseAdmin.auth().verifyIdToken(token);
-    const email = decodedData.email;
-    const existUser = await userRepository.findOne({ email });
-    let userData: User &
-      Required<{
-        _id: Schema.Types.ObjectId;
-      }>;
 
-    if (existUser) {
-      if (existUser.authType !== "google")
-        throw new HttpError(400, "Please use previous method you used");
-      userData = existUser;
-    } else {
-      const { name, email, uid: password } = decodedData;
-      const [firstname, ...restName] = name.split(" ");
-      const lastname = restName.join(" ");
-      const username = `${email?.split("@")[0]}-${Date.now()}${
-        Math.random() * 90000
-      }`;
+    const userRepository = new UserRepository();
+    const signInWithGoogleUseCase = new SignInWithGoogle(userRepository);
+    const user = await signInWithGoogleUseCase.execute({
+      email: decodedData.email,
+      name: decodedData.name,
+      uid: decodedData.uid,
+    });
 
-      const newUser = new UserModel({
-        username,
-        firstname,
-        lastname,
-        email,
-        password,
-        status: "active",
-        authType: "google",
-      });
-      userData = await newUser.save();
-    }
-
-    const tokenPayload: TokenPayloadType = {
-      role: "user",
-      ...userData,
-      _id: userData._id.toString(),
-      authType: userData.authType || "email",
-    };
-    const tokens = generateToken(tokenPayload);
+    const { password: _, ...userResponse } = user;
+    const tokens = generateToken({ role: "user", id: userResponse._id }, true);
 
     res.status(200).json({
-      userData,
+      userData: userResponse,
       tokens,
       message: "Google login successfully",
     });
   } catch (error) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "auth/id-token-expired"
+    ) {
+      return next(new HttpError(401, "Google auth token has expired."));
+    }
     next(error);
   }
 };
