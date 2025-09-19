@@ -51,7 +51,7 @@ const AdminLogin: React.FC = () => {
       dispatch(setAuthAdmin({ adminData, tokens }));
       navigate("/admin");
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || "Something went wrong");
+      setErrorMessage(error.message || "Something went wrong");
     }
   };
 

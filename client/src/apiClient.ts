@@ -28,11 +28,17 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    error.message =
+      error.response?.data?.message || error.message || "Something went wrong";
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("refreshToken");
-        if (!refreshToken) return store.dispatch(logout({ type: "user" }));
+        if (!refreshToken) {
+          store.dispatch(logout({ type: "user" }));
+          return Promise.reject(error);
+        }
         const response = await axios.post("/api/user/auth/refresh", {
           token: refreshToken,
         });
@@ -63,9 +69,6 @@ apiClient.interceptors.response.use(
         return Promise.reject(responseError);
       }
     }
-
-    error.message =
-      error.response?.data?.message || error.message || "Something went wrong";
 
     return Promise.reject(error);
   }

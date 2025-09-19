@@ -13,6 +13,7 @@ import {
   uploadToCloudinary,
 } from "../../application/services/cloudinary.service.js";
 import {
+  adminLoginInputSchema,
   googleAuthSchema,
   loginInputSchema,
   otpInputSchema,
@@ -28,6 +29,7 @@ import { LoginUser } from "../../application/use-cases/LoginUser";
 import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
 import { JwtTokenService } from "../../infrastructure/services/JwtTokenService";
 import { RefreshToken } from "../../application/use-cases/RefreshToken";
+import { AdminLogin } from "../../application/use-cases/AdminLogin";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -317,29 +319,18 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
 };
 
 export const adminLogin: RequestHandler = async (req, res, next) => {
-  const { username, password } = req.body as {
-    username?: string;
-    password?: string;
-  };
-
   try {
-    if (!username || !password) {
-      throw new HttpError(400, "Username and password are required.");
-    }
+    const validatedBody = adminLoginInputSchema.parse(req.body);
 
-    if (
-      process.env.ADMIN_USERNAME !== username ||
-      process.env.ADMIN_PASSWORD !== password
-    ) {
-      throw new HttpError(403, "Invalid username or password!");
-    }
+    const tokenService = new JwtTokenService();
+    const adminLoginUseCase = new AdminLogin(tokenService);
+    const tokens = await adminLoginUseCase.execute(validatedBody);
 
-    const payload: TokenPayloadType = { role: "admin", username };
-    const tokens = generateToken(payload);
-
-    res
-      .status(200)
-      .json({ userData: { username }, tokens, message: "Login successful" });
+    res.status(200).json({
+      tokens,
+      userData: { username: validatedBody.username },
+      message: "Admin login successful",
+    });
   } catch (error) {
     next(error);
   }

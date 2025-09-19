@@ -111,3 +111,14 @@ export const refreshTokenSchema = z.object({
 });
 
 export type RefreshToken = z.infer<typeof refreshTokenSchema>;
+
+export const adminLoginInputSchema = z.object({
+  username: z
+    .string(validateRequiredString("Username", "Invalid credentials!"))
+    .min(1, { message: "Username is required" }),
+  password: z
+    .string(validateRequiredString("Password", "Invalid credentials!"))
+    .min(1, { message: "Password is required" }),
+});
+
+export type AdminLoginInput = z.infer<typeof adminLoginInputSchema>;
