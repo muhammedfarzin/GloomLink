@@ -10,7 +10,7 @@ router.get(
   "/",
   authenticateToken,
   authorizeRole("user"),
-  postController.fetchPosts
+  postController.getPosts
 );
 
 router.post(

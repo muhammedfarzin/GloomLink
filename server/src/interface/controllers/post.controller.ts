@@ -9,6 +9,8 @@ import { likeRepository } from "../../infrastructure/repositories/LikeRepository
 import { createPostSchema } from "../validation/postSchemas";
 import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
 import { CreatePost } from "../../application/use-cases/CreatePost";
+import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
+import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -177,20 +179,35 @@ export const fetchPost: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const fetchPosts: RequestHandler = async (req, res, next) => {
+export const getPosts: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const page = Number(req.query.page) || 1;
-    const pageSize = Number(req.query.pageSize) || 5;
-    const posts = await postRepository.getPostsForUser(req.user._id, {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+
+    const postRepository = new PostRepository();
+    const userRepository = new UserRepository();
+    const followRepository = new FollowRepository();
+
+    const getFeedPostsUseCase = new GetFeedPosts(
+      postRepository,
+      userRepository,
+      followRepository
+    );
+    const posts = await getFeedPostsUseCase.execute({
+      userId: req.user.id,
       page,
-      pageSize,
+      limit,
     });
 
-    res.status(200).json({ posts, isEnd: posts.length < pageSize });
+    res.status(200).json({
+      posts,
+      isEnd: posts.length < limit,
+      message: "Posts fetched successfully",
+    });
   } catch (error) {
     next(error);
   }

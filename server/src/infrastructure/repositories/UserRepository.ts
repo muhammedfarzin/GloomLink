@@ -2,16 +2,6 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../database/mappers/UserMapper";
-import bcrypt from "bcryptjs";
-import { HttpError } from "../errors/HttpError";
-import {
-  isObjectIdOrHexString,
-  Types,
-  type ProjectionType,
-  type Schema,
-} from "mongoose";
-import { FollowModel } from "../database/models/FollowModel";
-import { extractKeywords } from "../../application/services/keyword.service";
 
 export class UserRepository implements IUserRepository {
   async create(userData: Partial<User>): Promise<User> {

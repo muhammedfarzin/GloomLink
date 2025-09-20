@@ -4,7 +4,7 @@ import { PostDocument } from "../models/PostModel";
 
 export class PostMapper {
   public static toDomain(postModel: PostDocument): Post {
-    const postObject = postModel.toObject<PostDocument>();
+    const postObject = postModel.toObject<PostDocument>?.() || postModel;
 
     return {
       ...postObject,
