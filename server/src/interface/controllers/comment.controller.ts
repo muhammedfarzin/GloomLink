@@ -1,8 +1,9 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
-import { userRepository } from "../../infrastructure/repositories/UserRepository";
-import { isObjectIdOrHexString } from "mongoose";
+import { CommentRepository } from "../../infrastructure/repositories/CommentRepository";
+import { PostRepository } from "../../infrastructure/repositories/PostRepository";
+import { addCommentSchema } from "../validation/commentSchemas";
+import { AddComment } from "../../application/use-cases/AddComment";
 
 export const addComment: RequestHandler = async (req, res, next) => {
   try {
@@ -10,31 +11,18 @@ export const addComment: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const userId = req.user._id;
-    const { comment, type, targetId }: Partial<Record<string, string>> =
-      req.body;
+    const validatedBody = addCommentSchema.parse(req.body);
 
-    if (!comment?.trim()) throw new HttpError(400, "Please provide a comment");
-    if (type !== "post" && type !== "comment")
-      throw new HttpError(400, "Please provide a valid comment type");
-    if (!targetId || !isObjectIdOrHexString(targetId))
-      throw new HttpError(400, "Please provide a valid targetId");
-
-    const newComment = await commentRepository.addComment(
-      targetId,
-      userId,
-      comment,
-      type
-    );
-    const uploadedBy = await userRepository.findById(userId, {
-      username: 1,
-      firstname: 1,
-      lastname: 1,
-      image: 1,
+    const commentRepository = new CommentRepository();
+    const postRepository = new PostRepository();
+    const addCommentUseCase = new AddComment(commentRepository, postRepository);
+    const newComment = await addCommentUseCase.execute({
+      ...validatedBody,
+      userId: req.user.id,
     });
 
     res.status(201).json({
-      comment: { ...newComment, uploadedBy },
+      commentData: newComment,
       message: "Comment added successfully",
     });
   } catch (error) {
