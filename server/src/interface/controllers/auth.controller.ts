@@ -6,8 +6,6 @@ import { OtpRepository } from "../../infrastructure/repositories/OtpRepository.j
 import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
 import { type TokenPayloadType } from "../../application/services/token.service.js";
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
-import { Schema } from "mongoose";
-import fs from "fs";
 import {
   removeFromCloudinary,
   uploadToCloudinary,
@@ -30,6 +28,7 @@ import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
 import { JwtTokenService } from "../../infrastructure/services/JwtTokenService";
 import { RefreshToken } from "../../application/use-cases/RefreshToken";
 import { AdminLogin } from "../../application/use-cases/AdminLogin";
+import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -57,7 +56,7 @@ export const login: RequestHandler = async (req, res, next) => {
       await sendEmailUseCase.execute({ email: user.email });
     }
 
-    const { password: _, ...userResponse } = user;
+    const userResponse = UserMapper.toAuthResponse(user);
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
@@ -97,7 +96,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     await sendEmailUseCase.execute({ email: newUser.email });
 
     // --- Generate Token & Respond ---
-    const { password: _, ...userResponse } = newUser;
+    const userResponse = UserMapper.toAuthResponse(newUser);
 
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(
@@ -152,7 +151,7 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
       otp,
     });
 
-    const { password: _, ...userResponse } = updatedUser;
+    const userResponse = UserMapper.toAuthResponse(updatedUser);
 
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(
@@ -184,7 +183,7 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
       uid: decodedData.uid,
     });
 
-    const { password: _, ...userResponse } = user;
+    const userResponse = UserMapper.toAuthResponse(user);
 
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(

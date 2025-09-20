@@ -8,6 +8,8 @@ import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
 import apiClient from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import Comment from "./types/Comment";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   replyComment?: ReplyCommentType | null;
@@ -25,6 +27,7 @@ const CommentInputBox: React.FC<Props> = ({
   const { toast } = useToast();
   const [commentInput, setCommentInput] = useState<string>("");
   const [disableForm, setDisableForm] = useState<boolean>(false);
+  const userData = useSelector((state: RootState) => state.auth.userData);
 
   const handlePostComment = async () => {
     try {
@@ -46,9 +49,9 @@ const CommentInputBox: React.FC<Props> = ({
 
       setCommentInput("");
       onReplyCancel?.(null);
-      const newComment = response.data.comment;
+      const newComment = response.data.commentData;
 
-      onPublished?.(newComment);
+      onPublished?.({ ...newComment, uploadedBy: userData });
     } catch (error: any) {
       toast({
         description:

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { User } from "../../../domain/entities/User";
 import { UserDocument } from "../models/UserModel";
+import { UserAuthResponseDto } from "../../../application/dtos/UserAuthResponseDto";
 
 export class UserMapper {
   public static toDomain(userModel: UserDocument): User {
@@ -26,5 +27,17 @@ export class UserMapper {
     }
 
     return persistenceUser;
+  }
+
+  public static toAuthResponse(user: User): UserAuthResponseDto {
+    return {
+      _id: user._id,
+      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      status: user.status,
+      email: user.email,
+      image: user.image,
+    };
   }
 }

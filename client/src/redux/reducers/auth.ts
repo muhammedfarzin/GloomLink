@@ -7,6 +7,7 @@ export interface UserAuthState {
   lastname: string;
   status: "not-verified" | "active" | "inactive" | "blocked";
   email: string;
+  image?: string;
 }
 
 export interface AdminAuthState {
