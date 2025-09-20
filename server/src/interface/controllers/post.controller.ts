@@ -1,11 +1,14 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { postRepository } from "../../infrastructure/repositories/PostRepository";
+import { PostRepository } from "../../infrastructure/repositories/PostRepository";
 import type { Post } from "../../infrastructure/database/models/PostModel";
 import { UserModel } from "../../infrastructure/database/models/UserModel";
-import { userRepository } from "../../infrastructure/repositories/UserRepository";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
 import { likeRepository } from "../../infrastructure/repositories/LikeRepository";
+import { createPostSchema } from "../validation/postSchemas";
+import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
+import { CreatePost } from "../../application/use-cases/CreatePost";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -13,25 +16,31 @@ export const createPost: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const { caption, tags, publishedFor } = req.body as {
-      caption?: string;
-      tags: string[];
-      publishedFor: Post["publishedFor"];
-    };
+    const validatedBody = createPostSchema.parse(req.body);
+    const files = req.files as Express.Multer.File[];
 
-    const images = (req.files as Express.Multer.File[])?.map(
-      (image) => image.path
+    if (!validatedBody.caption && (!files || files.length === 0)) {
+      throw new HttpError(400, "Post must have either a caption or an image.");
+    }
+
+    const postRepository = new PostRepository();
+    const fileStorageService = new CloudinaryStorageService();
+    const createPostUseCase = new CreatePost(
+      postRepository,
+      fileStorageService
     );
-
-    const post = await postRepository.createPost({
-      caption,
-      images,
-      publishedFor,
-      tags,
-      userId: req.user._id,
+    const newPost = await createPostUseCase.execute({
+      userId: req.user.id,
+      caption: validatedBody.caption,
+      tags: validatedBody.tags,
+      publishedFor: validatedBody.publishedFor,
+      files: files || [],
     });
 
-    res.status(201).json({ post, message: "Post created successfully" });
+    res.status(201).json({
+      postData: newPost,
+      message: "Post created successfully",
+    });
   } catch (error) {
     next(error);
   }
