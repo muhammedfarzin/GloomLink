@@ -5,12 +5,13 @@ import type { Post } from "../../infrastructure/database/models/PostModel";
 import { UserModel } from "../../infrastructure/database/models/UserModel";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
-import { likeRepository } from "../../infrastructure/repositories/LikeRepository";
+import { LikeRepository } from "../../infrastructure/repositories/LikeRepository";
 import { createPostSchema } from "../validation/postSchemas";
 import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
 import { CreatePost } from "../../application/use-cases/CreatePost";
 import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
 import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
+import { ToggleLikePost } from "../../application/use-cases/ToggleLikePost";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -299,35 +300,26 @@ export const getLikedUsers: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const likePost: RequestHandler = async (req, res, next) => {
+export const toggleLikePost: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const postId = req.params.postId;
-    const userId = req.user._id;
+    const likeRepository = new LikeRepository();
+    const postRepository = new PostRepository();
+    const toggleLikeUseCase = new ToggleLikePost(
+      likeRepository,
+      postRepository
+    );
+    const result = await toggleLikeUseCase.execute({
+      postId: req.params.postId,
+      userId: req.user.id,
+    });
 
-    await likeRepository.createLike(postId, userId, "post");
-
-    res.status(200).json({ message: "Liked post successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const dislikePost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const postId = req.params.postId;
-    const userId = req.user._id;
-
-    await likeRepository.removeLike(postId, userId, "post");
-
-    res.status(200).json({ message: "Disliked post successfully" });
+    res.status(200).json({
+      message: `Post successfully ${result.status}`,
+    });
   } catch (error) {
     next(error);
   }

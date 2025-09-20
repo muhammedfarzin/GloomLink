@@ -10,7 +10,7 @@ import DialogBox from "@/components/DialogBox";
 import ShareList from "@/components/ShareList";
 
 interface Props extends PostActionsProps {
-  handleLikePost?: (type: "like" | "dislike") => Promise<void>;
+  handleLikePost?: (type: "like" | "unlike") => Promise<void>;
   handleSavePost?: (postId: string, type: "save" | "unsave") => Promise<void>;
 }
 
@@ -36,11 +36,7 @@ const PostActionsView: React.FC<Props> = ({
         <IconButton
           icon={postData?.liked ? HeartFilledIcon : HeartIcon}
           alt="favorite"
-          onClick={() =>
-            postData?.liked
-              ? handleLikePost?.("dislike")
-              : handleLikePost?.("like")
-          }
+          onClick={() => handleLikePost?.(postData?.liked ? "unlike" : "like")}
         />
 
         {(hideComment && !showCommentsForSm) || (

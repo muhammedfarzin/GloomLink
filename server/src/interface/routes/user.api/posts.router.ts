@@ -50,18 +50,11 @@ router.put(
   postController.unsavePost
 );
 
-router.put(
+router.post(
   "/like/:postId",
   authenticateToken,
   authorizeRole("user"),
-  postController.likePost
-);
-
-router.put(
-  "/dislike/:postId",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.dislikePost
+  postController.toggleLikePost
 );
 
 router.get(

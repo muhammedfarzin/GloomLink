@@ -38,7 +38,7 @@ const PostActions: React.FC<Props> = ({
     }
   };
 
-  const handleLikePost = async (type: "like" | "dislike") => {
+  const handleLikePost = async (type: "like" | "unlike") => {
     const handleLikedState = (state: Post[]) =>
       state.map((post) => {
         if (post._id === postData._id) {
@@ -60,7 +60,7 @@ const PostActions: React.FC<Props> = ({
       }
 
       handleChange?.(handleLikedState);
-      await apiClient.put(`/posts/${type}/${postData._id}`);
+      await apiClient.post(`/posts/like/${postData._id}`);
     } catch (error) {
       if (!handleChange && postData)
         onLike?.(!!postData.liked, postData.likesCount);
