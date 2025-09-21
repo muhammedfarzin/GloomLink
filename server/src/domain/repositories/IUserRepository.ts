@@ -1,4 +1,5 @@
 import { User } from "../entities/User";
+import { EnrichedPost } from "./IPostRepository";
 
 export interface IUserRepository {
   create: (data: Partial<User>) => Promise<User>;
@@ -10,4 +11,9 @@ export interface IUserRepository {
     query: Pick<User, "username" | "email" | "mobile">
   ) => Promise<{ exist: false } | { exist: true; data: User; field: string }>;
   update(id: string, userData: Partial<User>): Promise<User | null>;
+  findSavedPosts(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<EnrichedPost[]>;
 }

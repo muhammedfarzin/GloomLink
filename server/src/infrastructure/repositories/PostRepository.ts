@@ -78,7 +78,6 @@ export class PostRepository implements IPostRepository {
     ];
 
     const results = await PostModel.aggregate(aggregationPipeline);
-    console.log(results);
 
     if (results.length === 0) {
       return null;

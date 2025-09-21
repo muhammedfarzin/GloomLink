@@ -33,7 +33,7 @@ router.get(
   "/saved",
   authenticateToken,
   authorizeRole("user"),
-  postController.fetchSavedPosts
+  postController.getSavedPosts
 );
 
 router.put(

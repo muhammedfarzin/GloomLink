@@ -2,6 +2,9 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../database/mappers/UserMapper";
+import { EnrichedPost } from "../../domain/repositories/IPostRepository";
+import mongoose, { PipelineStage } from "mongoose";
+import { PostMapper } from "../database/mappers/PostMapper";
 
 export class UserRepository implements IUserRepository {
   async create(userData: Partial<User>): Promise<User> {
@@ -72,5 +75,82 @@ export class UserRepository implements IUserRepository {
       { new: true }
     );
     return updatedUser ? UserMapper.toDomain(updatedUser) : null;
+  }
+
+  async findSavedPosts(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<EnrichedPost[]> {
+    const skip = (page - 1) * limit;
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    const aggregationPipeline: PipelineStage[] = [
+      { $match: { _id: userObjectId } },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "savedPosts",
+          foreignField: "_id",
+          as: "savedPostsData",
+          pipeline: [
+            { $match: { status: "active" } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "targetId",
+                as: "likes",
+              },
+            },
+            {
+              $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "targetId",
+                as: "comments",
+              },
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "uploadedBy",
+                pipeline: [
+                  {
+                    $project: {
+                      username: 1,
+                      firstname: 1,
+                      lastname: 1,
+                      image: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            { $unwind: "$uploadedBy" },
+            {
+              $addFields: {
+                likeCount: { $size: "$likes" },
+                commentCount: { $size: "$comments" },
+                isLiked: { $in: [userObjectId, "$likes.userId"] },
+                isSaved: true,
+              },
+            },
+            { $project: { likes: 0, comments: 0 } },
+          ],
+        },
+      },
+      { $project: { _id: 0, savedPostsData: 1 } },
+    ];
+
+    const results = await UserModel.aggregate(aggregationPipeline);
+
+    return results[0].savedPostsData.map((post: any) =>
+      PostMapper.toResponse(post)
+    );
   }
 }

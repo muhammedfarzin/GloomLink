@@ -11,6 +11,7 @@ import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
 import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
 import { ToggleLikePost } from "../../application/use-cases/ToggleLikePost";
 import { GetPostById } from "../../application/use-cases/GetPostById";
+import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -91,20 +92,28 @@ export const editPost: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const fetchSavedPosts: RequestHandler = async (req, res, next) => {
+export const getSavedPosts: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
     const page = Number(req.query.page) || 1;
-    const pageSize = Number(req.query.pageSize) || 5;
-    const posts = await postRepository.getSavedPost(req.user._id, {
-      page,
-      pageSize,
-    });
+    const limit = Number(req.query.limit) || 5;
 
-    res.status(200).json({ posts, isEnd: posts.length < pageSize });
+    const userRepository = new UserRepository();
+    const getSavedPostsUseCase = new GetSavedPosts(userRepository);
+    const savedPosts = await getSavedPostsUseCase.execute(
+      req.user.id,
+      page,
+      limit
+    );
+
+    res.status(200).json({
+      postsData: savedPosts,
+      isEnd: savedPosts.length < limit,
+      message: "Saved posts fetched successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -191,15 +200,15 @@ export const getPosts: RequestHandler = async (req, res, next) => {
       userRepository,
       followRepository
     );
-    const postDatas = await getFeedPostsUseCase.execute({
+    const postsData = await getFeedPostsUseCase.execute({
       userId: req.user.id,
       page,
       limit,
     });
 
     res.status(200).json({
-      postDatas,
-      isEnd: postDatas.length < limit,
+      postsData,
+      isEnd: postsData.length < limit,
       message: "Posts fetched successfully",
     });
   } catch (error) {
