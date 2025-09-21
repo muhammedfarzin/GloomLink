@@ -32,7 +32,7 @@ const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
       const response = await apiClient.get(`${apiUrl}?page=${pageRef.current}`);
       setPosts((prevState) => [
         ...prevState,
-        ...(response.data.posts as Post[]),
+        ...(response.data.postDatas as Post[]),
       ]);
       pageRef.current++;
       setIsEnd(response.data.isEnd);

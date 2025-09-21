@@ -34,9 +34,11 @@ const PostActionsView: React.FC<Props> = ({
         ].join(" ")}
       >
         <IconButton
-          icon={postData?.liked ? HeartFilledIcon : HeartIcon}
+          icon={postData?.isLiked ? HeartFilledIcon : HeartIcon}
           alt="favorite"
-          onClick={() => handleLikePost?.(postData?.liked ? "unlike" : "like")}
+          onClick={() =>
+            handleLikePost?.(postData?.isLiked ? "unlike" : "like")
+          }
         />
 
         {(hideComment && !showCommentsForSm) || (
@@ -62,11 +64,11 @@ const PostActionsView: React.FC<Props> = ({
       </div>
       <div className="p-1">
         <IconButton
-          icon={postData?.saved ? SavedIcon : SaveIcon}
+          icon={postData?.isSaved ? SavedIcon : SaveIcon}
           alt="save"
           onClick={() =>
             postData &&
-            (postData?.saved
+            (postData?.isSaved
               ? handleSavePost?.(postData._id, "unsave")
               : handleSavePost?.(postData._id, "save"))
           }

@@ -61,7 +61,7 @@ router.get(
   "/:postId",
   authenticateToken,
   authorizeRole("user"),
-  postController.fetchPost
+  postController.getPostById
 );
 
 router.get(

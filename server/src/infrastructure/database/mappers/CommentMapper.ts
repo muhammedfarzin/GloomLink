@@ -40,11 +40,11 @@ export class CommentMapper {
       type: data.type,
       repliesCount: data.repliesCount || 0,
       uploadedBy: {
-        _id: data.uploadedBy._id?.toString(),
-        firstname: data.uploadedBy.firstname,
-        lastname: data.uploadedBy.lastname,
-        username: data.uploadedBy.username,
-        image: data.uploadedBy.image,
+        _id: data.uploadedBy?._id?.toString(),
+        firstname: data.uploadedBy?.firstname,
+        lastname: data.uploadedBy?.lastname,
+        username: data.uploadedBy?.username,
+        image: data.uploadedBy?.image,
       },
     };
   }

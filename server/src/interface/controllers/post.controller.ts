@@ -1,10 +1,8 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { PostRepository } from "../../infrastructure/repositories/PostRepository";
-import type { Post } from "../../infrastructure/database/models/PostModel";
 import { UserModel } from "../../infrastructure/database/models/UserModel";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import { commentRepository } from "../../infrastructure/repositories/CommentRepository";
 import { LikeRepository } from "../../infrastructure/repositories/LikeRepository";
 import { createPostSchema } from "../validation/postSchemas";
 import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
@@ -12,6 +10,7 @@ import { CreatePost } from "../../application/use-cases/CreatePost";
 import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
 import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
 import { ToggleLikePost } from "../../application/use-cases/ToggleLikePost";
+import { GetPostById } from "../../application/use-cases/GetPostById";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -149,32 +148,26 @@ export const unsavePost: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const fetchPost: RequestHandler = async (req, res, next) => {
+export const getPostById: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const postId = req.params.postId;
-    const post = await postRepository.findById(postId, null, false);
+    const currentUserId = req.user.id;
+    const { postId } = req.params;
 
-    if (!post) throw new HttpError(404, "Post not found");
-
-    const uploadedBy = await userRepository.findById(post.userId.toString(), {
-      username: 1,
-      firstname: 1,
-      lastname: 1,
-      image: 1,
+    const postRepository = new PostRepository();
+    const getPostByIdUseCase = new GetPostById(postRepository);
+    const post = await getPostByIdUseCase.execute({
+      postId: postId,
+      userId: currentUserId,
     });
 
-    const saved = await postRepository.checkIsSaved(req.user._id, postId);
-    const liked = await likeRepository.checkIsLiked(req.user._id, postId);
-    const likesCount = await likeRepository.getCount(postId);
-    const commentsCount = await commentRepository.getCount(postId);
-
-    res
-      .status(200)
-      .json({ ...post, uploadedBy, saved, liked, likesCount, commentsCount });
+    res.status(200).json({
+      postData: post,
+      message: "Post fetched successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -198,15 +191,15 @@ export const getPosts: RequestHandler = async (req, res, next) => {
       userRepository,
       followRepository
     );
-    const posts = await getFeedPostsUseCase.execute({
+    const postDatas = await getFeedPostsUseCase.execute({
       userId: req.user.id,
       page,
       limit,
     });
 
     res.status(200).json({
-      posts,
-      isEnd: posts.length < limit,
+      postDatas,
+      isEnd: postDatas.length < limit,
       message: "Posts fetched successfully",
     });
   } catch (error) {

@@ -41,14 +41,11 @@ const PostListCard: React.FC<Props> = ({
       apiClient
         .get(`/posts/${postId}`)
         .then((response) => {
-          setPostDataState(response.data);
+          setPostDataState(response.data.postData);
         })
         .catch((error) => {
           toast({
-            description:
-              error.response?.data?.message ||
-              error.message ||
-              "Something went wrong",
+            description: error.message || "Something went wrong",
             variant: "destructive",
           });
         });
@@ -57,7 +54,7 @@ const PostListCard: React.FC<Props> = ({
 
   const onSavePost = useCallback(
     (isSaved: boolean) =>
-      postDataState && setPostDataState({ ...postDataState, saved: isSaved }),
+      postDataState && setPostDataState({ ...postDataState, isSaved }),
     [postDataState, setPostDataState]
   );
 
@@ -66,7 +63,7 @@ const PostListCard: React.FC<Props> = ({
       postDataState &&
       setPostDataState({
         ...postDataState,
-        liked: isLiked,
+        isLiked,
         likesCount: count,
       }),
     [postDataState, setPostDataState]

@@ -20,6 +20,73 @@ export class PostRepository implements IPostRepository {
     return postModel ? PostMapper.toDomain(postModel) : null;
   }
 
+  async findEnrichedById(
+    postId: string,
+    userId: string
+  ): Promise<EnrichedPost | null> {
+    const currentUserId = new mongoose.Types.ObjectId(userId);
+    const postObjectId = new mongoose.Types.ObjectId(postId);
+
+    const aggregationPipeline = [
+      { $match: { _id: postObjectId, status: "active" } },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "likes",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "uploadedBy",
+          pipeline: [
+            {
+              $project: {
+                username: 1,
+                firstname: 1,
+                lastname: 1,
+                image: 1,
+                savedPosts: 1,
+              },
+            },
+          ],
+        },
+      },
+      { $unwind: "$uploadedBy" },
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" },
+          commentsCount: { $size: "$comments" },
+          isLiked: { $in: [currentUserId, "$likes.userId"] },
+          isSaved: { $in: [postObjectId, "$uploadedBy.savedPosts"] },
+        },
+      },
+
+      { $project: { likes: 0, comments: 0, "uploadedBy.savedPosts": 0 } },
+    ];
+
+    const results = await PostModel.aggregate(aggregationPipeline);
+    console.log(results);
+
+    if (results.length === 0) {
+      return null;
+    }
+
+    return PostMapper.toResponse(results[0]);
+  }
+
   async findAndSortFeed(options: {
     userId: string;
     interestKeywords: string[];
@@ -84,6 +151,7 @@ export class PostRepository implements IPostRepository {
                 image: 1,
                 firstname: 1,
                 lastname: 1,
+                savedPosts: 1,
               },
             },
           ],
@@ -108,7 +176,8 @@ export class PostRepository implements IPostRepository {
       },
       {
         $addFields: {
-          liked: { $in: [currentUserId, "$likes.userId"] },
+          isLiked: { $in: [currentUserId, "$likes.userId"] },
+          isSaved: { $in: ["$_id", "$uploadedBy.savedPosts"] },
           commentsCount: { $size: "$comments" },
           likesCount: { $size: "$likes" },
         },
@@ -117,13 +186,14 @@ export class PostRepository implements IPostRepository {
         $project: {
           likes: 0,
           comments: 0,
-          relevanceScore: 0
+          relevanceScore: 0,
+          "uploadedBy.savedPosts": 0,
         },
       },
     ];
 
     const postModels = await PostModel.aggregate(aggregationPipeline);
 
-    return postModels.map((data) => PostMapper.toDomain(data) as EnrichedPost);
+    return postModels.map((data) => PostMapper.toResponse(data));
   }
 }

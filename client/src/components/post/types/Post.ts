@@ -6,8 +6,8 @@ export interface Post {
   tags: string[];
   publishedFor: "public" | "subscriber";
   createdAt: string;
-  saved?: boolean;
-  liked?: boolean;
+  isSaved?: boolean;
+  isLiked?: boolean;
   status?: "active" | "blocked" | "deleted";
   likesCount?: number;
   commentsCount?: number;
