@@ -13,17 +13,10 @@ router.post(
 );
 
 router.get(
-  "/:targetId",
+  "/",
   authenticateToken,
   authorizeRole("user"),
   commentController.getComments
-);
-
-router.get(
-  "/:targetId/self",
-  authenticateToken,
-  authorizeRole("user"),
-  commentController.getMyComments
 );
 
 export { router as commentsRouter };

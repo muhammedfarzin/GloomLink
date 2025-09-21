@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Comment } from "../../../domain/entities/Comment";
 import { CommentDocument } from "../models/CommentModel";
+import { CommentResponseDto } from "../../../application/dtos/CommentResponseDto";
 
 export class CommentMapper {
   public static toDomain(commentModel: CommentDocument): Comment {
@@ -28,5 +29,23 @@ export class CommentMapper {
     }
 
     return persistenceComment;
+  }
+
+  public static toResponseDto(data: any): CommentResponseDto {
+    return {
+      _id: data._id?.toString(),
+      targetId: data.targetId?.toString(),
+      userId: data.userId?.toString(),
+      comment: data.comment,
+      type: data.type,
+      repliesCount: data.repliesCount || 0,
+      uploadedBy: {
+        _id: data.uploadedBy._id?.toString(),
+        firstname: data.uploadedBy.firstname,
+        lastname: data.uploadedBy.lastname,
+        username: data.uploadedBy.username,
+        image: data.uploadedBy.image,
+      },
+    };
   }
 }

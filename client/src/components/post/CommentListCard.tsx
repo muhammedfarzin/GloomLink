@@ -41,15 +41,10 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
     try {
       if (!showReply) {
         setLoading("Fetching replies...");
-        const response = await apiClient.get(`/comments/${commentId}`, {
-          params: { type: "comment" },
+        const response = await apiClient.get(`/comments`, {
+          params: { targetId: commentId, type: "comment" },
         });
-        setReplies(response.data);
-
-        const myResponse = await apiClient.get(`/comments/${commentId}/self`, {
-          params: { type: "comment" },
-        });
-        setReplies((prevState) => [...myResponse.data, ...prevState]);
+        setReplies(response.data.commentsData);
       }
     } catch (error: any) {
       setShowReply(false);

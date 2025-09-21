@@ -31,18 +31,9 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
     };
 
     apiClient
-      .get(`/comments/${postId}`, { params: { type: "post" } })
+      .get(`/comments`, { params: { targetId: postId, type: "post" } })
       .then((response) => {
-        setComments(response.data);
-
-        apiClient
-          .get(`/comments/${postId}/self`, { params: { type: "post" } })
-          .then((response) => {
-            setComments((prevState) => [...response.data, ...prevState]);
-          })
-          .catch((error) => {
-            toastError(error);
-          });
+        setComments(response.data.commentsData);
       })
       .catch((error) => {
         toastError(error);
@@ -71,7 +62,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
                     comment={comment.comment}
                     username={comment.uploadedBy.username}
                     image={comment.uploadedBy.image}
-                    showReplies={!!comment.replies}
+                    showReplies={!!comment.repliesCount}
                     handleReplyOnClick={(handleReplyComment) =>
                       setReplyComment({
                         commentId: comment._id,

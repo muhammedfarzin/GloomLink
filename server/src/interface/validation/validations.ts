@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import z from "zod";
 
 type ValidateRequired = (
@@ -21,3 +22,7 @@ export const validateRequiredString: ValidateRequired = (
     },
   };
 };
+
+export const isValidObjectId = (str: string) =>
+  mongoose.Types.ObjectId.isValid(str) &&
+  String(new mongoose.Types.ObjectId(str)) === str;

@@ -47,7 +47,7 @@ router.use("/posts", postsRouter);
 
 // Comments
 
-router.use("/comments", commentsRouter)
+router.use("/comments", commentsRouter);
 
 // Subscriptions
 

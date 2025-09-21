@@ -2,8 +2,12 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { CommentRepository } from "../../infrastructure/repositories/CommentRepository";
 import { PostRepository } from "../../infrastructure/repositories/PostRepository";
-import { addCommentSchema } from "../validation/commentSchemas";
+import {
+  addCommentSchema,
+  getCommentsSchema,
+} from "../validation/commentSchemas";
 import { AddComment } from "../../application/use-cases/AddComment";
+import { GetComments } from "../../application/use-cases/GetComments";
 
 export const addComment: RequestHandler = async (req, res, next) => {
   try {
@@ -32,46 +36,23 @@ export const addComment: RequestHandler = async (req, res, next) => {
 
 export const getComments: RequestHandler = async (req, res, next) => {
   try {
-    const targetId = req.params.targetId;
-    const type = req.query.type;
-    const userId = req.user?.role === "user" ? req.user._id : undefined;
-
-    if (type !== "post" && type !== "comment")
-      throw new HttpError(400, "Invalid comment type");
-
-    const comments = await commentRepository.getComments(
-      targetId,
-      type,
-      userId
-    );
-
-    res.status(200).json(comments);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getMyComments: RequestHandler = async (req, res, next) => {
-  try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const targetId = req.params.targetId;
-    const type = req.query.type;
-    const userId = req.user._id;
+    const validatedQuery = getCommentsSchema.parse(req.query);
 
-    if (type !== "post" && type !== "comment")
-      throw new HttpError(400, "Invalid comment type");
+    const commentRepository = new CommentRepository();
+    const getCommentsUseCase = new GetComments(commentRepository);
+    const comments = await getCommentsUseCase.execute({
+      ...validatedQuery,
+      userId: req.user.id,
+    });
 
-    const comments = await commentRepository.getComments(
-      targetId,
-      type,
-      userId,
-      true
-    );
-
-    res.status(200).json(comments);
+    res.status(200).json({
+      commentsData: comments,
+      message: "Comments fetched successfully",
+    });
   } catch (error) {
     next(error);
   }

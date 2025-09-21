@@ -4,7 +4,7 @@ export default interface Comment {
   targetId: string;
   userId: string;
   type: "post";
-  replies: number;
+  repliesCount: number;
   uploadedBy: {
     _id: string;
     firstname: string;

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateRequiredString } from "./requiredValidation";
+import { validateRequiredString } from "./validations";
 
 export const createPostSchema = z.object({
   caption: z.string(validateRequiredString("Caption")).optional(),

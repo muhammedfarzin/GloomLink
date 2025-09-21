@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateRequiredString } from "./requiredValidation";
+import { validateRequiredString } from "./validations";
 
 const passwordSchema = z
   .string(validateRequiredString("Password", "Invalid credentials"))
