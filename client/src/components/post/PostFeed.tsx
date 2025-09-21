@@ -30,10 +30,9 @@ const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
   const fetchPost = useCallback(async () => {
     try {
       const response = await apiClient.get(`${apiUrl}?page=${pageRef.current}`);
-      setPosts((prevState) => [
-        ...prevState,
-        ...(response.data.postsData as Post[]),
-      ]);
+      const { postsData } = response.data;
+
+      setPosts((prevState) => [...prevState, ...(postsData as Post[])]);
       pageRef.current++;
       setIsEnd(response.data.isEnd);
     } catch (error: any) {
@@ -59,7 +58,7 @@ const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
         !isEnd
       ) {
         setLoading(true);
-      }
+      } else if (isEnd) setLoading(false);
     }, 300);
 
     containerRef.current?.addEventListener("scroll", handleScroll);

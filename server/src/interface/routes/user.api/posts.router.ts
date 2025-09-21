@@ -36,18 +36,11 @@ router.get(
   postController.getSavedPosts
 );
 
-router.put(
+router.post(
   "/save/:postId",
   authenticateToken,
   authorizeRole("user"),
-  postController.savePost
-);
-
-router.put(
-  "/unsave/:postId",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.unsavePost
+  postController.toggleSavePost
 );
 
 router.post(

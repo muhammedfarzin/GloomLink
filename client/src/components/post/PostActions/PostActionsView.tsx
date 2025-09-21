@@ -11,7 +11,7 @@ import ShareList from "@/components/ShareList";
 
 interface Props extends PostActionsProps {
   handleLikePost?: (type: "like" | "unlike") => Promise<void>;
-  handleSavePost?: (postId: string, type: "save" | "unsave") => Promise<void>;
+  handleSavePost?: (postId: string) => Promise<void>;
 }
 
 const PostActionsView: React.FC<Props> = ({
@@ -66,12 +66,7 @@ const PostActionsView: React.FC<Props> = ({
         <IconButton
           icon={postData?.isSaved ? SavedIcon : SaveIcon}
           alt="save"
-          onClick={() =>
-            postData &&
-            (postData?.isSaved
-              ? handleSavePost?.(postData._id, "unsave")
-              : handleSavePost?.(postData._id, "save"))
-          }
+          onClick={() => postData && handleSavePost?.(postData._id)}
         />
       </div>
     </div>

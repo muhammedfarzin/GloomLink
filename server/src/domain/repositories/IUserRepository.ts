@@ -16,4 +16,6 @@ export interface IUserRepository {
     page: number,
     limit: number
   ): Promise<EnrichedPost[]>;
+  savePost(userId: string, postId: string): Promise<void>;
+  unsavePost(userId: string, postId: string): Promise<void>;
 }

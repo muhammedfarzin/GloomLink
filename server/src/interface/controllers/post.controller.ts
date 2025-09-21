@@ -12,6 +12,7 @@ import { FollowRepository } from "../../infrastructure/repositories/FollowReposi
 import { ToggleLikePost } from "../../application/use-cases/ToggleLikePost";
 import { GetPostById } from "../../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
+import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -119,39 +120,23 @@ export const getSavedPosts: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const savePost: RequestHandler = async (req, res, next) => {
+export const toggleSavePost: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const postId = req.params.postId;
+    const { postId } = req.params;
 
-    await UserModel.updateOne(
-      { _id: req.user._id },
-      { $push: { savedPosts: postId } }
+    const userRepository = new UserRepository();
+    const postRepository = new PostRepository();
+    const toggleSavePostUseCase = new ToggleSavePost(
+      userRepository,
+      postRepository
     );
+    const result = await toggleSavePostUseCase.execute(req.user.id, postId);
 
-    res.status(200).json({ postId, message: "Post saved successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const unsavePost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const postId = req.params.postId;
-
-    await UserModel.updateOne(
-      { _id: req.user._id },
-      { $pull: { savedPosts: postId } }
-    );
-
-    res.status(200).json({ postId, message: "Post saved successfully" });
+    res.status(200).json({ message: `Post successfully ${result.status}` });
   } catch (error) {
     next(error);
   }

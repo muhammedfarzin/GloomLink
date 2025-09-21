@@ -153,4 +153,18 @@ export class UserRepository implements IUserRepository {
       PostMapper.toResponse(post)
     );
   }
+
+  async savePost(userId: string, postId: string): Promise<void> {
+    await UserModel.updateOne(
+      { _id: userId },
+      { $addToSet: { savedPosts: postId } }
+    );
+  }
+
+  async unsavePost(userId: string, postId: string): Promise<void> {
+    await UserModel.updateOne(
+      { _id: userId },
+      { $pull: { savedPosts: postId } }
+    );
+  }
 }

@@ -65,12 +65,25 @@ export class PostRepository implements IPostRepository {
         },
       },
       { $unwind: "$uploadedBy" },
+
+      {
+        $lookup: {
+          from: "users",
+          let: { currentUserId: currentUserId },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$currentUserId"] } } },
+            { $project: { savedPosts: 1 } },
+          ],
+          as: "currentUserInfo",
+        },
+      },
+      { $unwind: "$currentUserInfo" },
       {
         $addFields: {
           likesCount: { $size: "$likes" },
           commentsCount: { $size: "$comments" },
           isLiked: { $in: [currentUserId, "$likes.userId"] },
-          isSaved: { $in: [postObjectId, "$uploadedBy.savedPosts"] },
+          isSaved: { $in: [postObjectId, "$currentUserInfo.savedPosts"] },
         },
       },
 
@@ -150,7 +163,6 @@ export class PostRepository implements IPostRepository {
                 image: 1,
                 firstname: 1,
                 lastname: 1,
-                savedPosts: 1,
               },
             },
           ],
@@ -174,9 +186,21 @@ export class PostRepository implements IPostRepository {
         },
       },
       {
+        $lookup: {
+          from: "users",
+          let: { currentUserId: currentUserId },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$currentUserId"] } } },
+            { $project: { savedPosts: 1 } },
+          ],
+          as: "currentUserInfo",
+        },
+      },
+      { $unwind: "$currentUserInfo" },
+      {
         $addFields: {
           isLiked: { $in: [currentUserId, "$likes.userId"] },
-          isSaved: { $in: ["$_id", "$uploadedBy.savedPosts"] },
+          isSaved: { $in: ["$_id", "$currentUserInfo.savedPosts"] },
           commentsCount: { $size: "$comments" },
           likesCount: { $size: "$likes" },
         },
@@ -186,7 +210,7 @@ export class PostRepository implements IPostRepository {
           likes: 0,
           comments: 0,
           relevanceScore: 0,
-          "uploadedBy.savedPosts": 0,
+          currentUserInfo: 0,
         },
       },
     ];

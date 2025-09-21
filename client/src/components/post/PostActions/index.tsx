@@ -2,6 +2,7 @@ import apiClient from "@/apiClient";
 import { Post } from "../types/Post";
 import PostActionsView from "./PostActionsView";
 import PostDataType from "../types/PostDataType";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Props {
   postData: PostDataType;
@@ -22,7 +23,9 @@ const PostActions: React.FC<Props> = ({
   onSave,
   onLike,
 }) => {
-  const handleSavePost = async (postId: string, type: "save" | "unsave") => {
+  const { toast } = useToast();
+
+  const handleSavePost = async (postId: string) => {
     const handleSavedState = (state: Post[]) =>
       state.map((post) => {
         if (post._id === postId) post.isSaved = !postData.isSaved;
@@ -31,10 +34,12 @@ const PostActions: React.FC<Props> = ({
     try {
       if (!handleChange && postData) onSave?.(!postData.isSaved);
       handleChange?.(handleSavedState);
-      await apiClient.put(`/posts/${type}/${postId}`);
+      const response = await apiClient.post(`/posts/save/${postId}`);
+      toast({ description: response.data.message });
     } catch (error) {
       if (!handleChange && postData) onSave?.(!!postData.isSaved);
       handleChange?.(handleSavedState);
+      toast({ description: (error as any).message, variant: "destructive" });
     }
   };
 
