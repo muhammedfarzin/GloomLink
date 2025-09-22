@@ -29,4 +29,5 @@ export interface IPostRepository {
     limit: number;
   }): Promise<EnrichedPost[]>;
   update(postId: string, postData: Partial<Post>): Promise<Post | null>;
+  deleteById(postId: string): Promise<void>;
 }

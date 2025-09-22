@@ -229,4 +229,8 @@ export class PostRepository implements IPostRepository {
     );
     return updatedPost ? PostMapper.toDomain(updatedPost) : null;
   }
+
+  async deleteById(postId: string): Promise<void> {
+    await PostModel.findByIdAndUpdate(postId, { status: "deleted" });
+  }
 }

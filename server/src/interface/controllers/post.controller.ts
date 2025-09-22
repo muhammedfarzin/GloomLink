@@ -13,6 +13,7 @@ import { GetPostById } from "../../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
 import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
 import { EditPost } from "../../application/use-cases/EditPost";
+import { DeletePost } from "../../application/use-cases/DeletePost";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -246,15 +247,18 @@ export const unblockPost: RequestHandler = async (req, res, next) => {
 
 export const deletePost: RequestHandler = async (req, res, next) => {
   try {
-    const postId = req.params.postId;
-
-    if (req.user?.role === "user") {
-      const post = await postRepository.findById(postId);
-      if (post?.userId.toString() !== req.user._id)
-        throw new HttpError(403, "You are not allowed to delete this post");
+    if (!req.user) {
+      throw new HttpError(401, "Unauthorized");
     }
 
-    await postRepository.deletePost(postId);
+    const postRepository = new PostRepository();
+    const deletePostUseCase = new DeletePost(postRepository);
+    await deletePostUseCase.execute({
+      postId: req.params.postId,
+      userId: req.user.id,
+      userRole: req.user.role,
+    });
+
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
     next(error);
