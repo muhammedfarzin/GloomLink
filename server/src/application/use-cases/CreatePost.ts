@@ -27,11 +27,9 @@ export class CreatePost {
       input.files,
       "posts"
     );
-    const imagesPath: string[] = [];
-
-    uploadedMedia.forEach((media) => {
-      if (media.mediaType === "image") imagesPath.push(media.url);
-    });
+    const imagesPath = uploadedMedia
+      .filter((file) => file.mediaType === "image")
+      .map((file) => file.url);
 
     // ---Creating Post---
     const postToCreate: Partial<Post> = {

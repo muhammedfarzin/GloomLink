@@ -28,7 +28,8 @@ const CreatePost: React.FC = () => {
       apiClient
         .get(`/posts/${postId}`)
         .then((response) => {
-          const { userId, images, caption, tags, publishedFor } = response.data;
+          const { userId, images, caption, tags, publishedFor } =
+            response.data.postData;
           if (userId !== myUserId) return navigate("/profile");
 
           setImages(images);
@@ -45,12 +46,17 @@ const CreatePost: React.FC = () => {
             variant: "destructive",
           });
         });
+    } else {
+      setCaption("");
+      setImages([]);
+      setTags([]);
+      setpublishedFor("pubilc");
     }
   }, [postId]);
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    setLoading("Posting...");
+    setLoading(postId ? "Updating..." : "Posting...");
 
     try {
       if (!images.length && !caption.trim()) {
@@ -100,9 +106,7 @@ const CreatePost: React.FC = () => {
 
   return (
     <div className="mx-4 mt-4">
-      <div
-        className="border border-border bg-secondary rounded-lg md:rounded-2xl my-1 p-4"
-      >
+      <div className="border border-border bg-secondary rounded-lg md:rounded-2xl my-1 p-4">
         <form method="post" onSubmit={handleSubmit}>
           <ImageInput
             values={images}
@@ -134,9 +138,9 @@ const CreatePost: React.FC = () => {
             <Button
               className="border border-[#9ca3af33] font-bold w-32 my-1"
               type="submit"
-              disabled={loading ? true : false}
+              disabled={!!loading}
             >
-              {loading || "Post"}
+              {loading || (postId ? "Update" : "Post")}
             </Button>
           </div>
         </form>

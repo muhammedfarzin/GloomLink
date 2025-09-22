@@ -219,4 +219,14 @@ export class PostRepository implements IPostRepository {
 
     return postModels.map((data) => PostMapper.toResponse(data));
   }
+
+  async update(postId: string, postData: Partial<Post>): Promise<Post | null> {
+    const postToPersist = PostMapper.toPersistence(postData);
+    const updatedPost = await PostModel.findByIdAndUpdate(
+      postId,
+      postToPersist,
+      { new: true }
+    );
+    return updatedPost ? PostMapper.toDomain(updatedPost) : null;
+  }
 }

@@ -1,10 +1,9 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { PostRepository } from "../../infrastructure/repositories/PostRepository";
-import { UserModel } from "../../infrastructure/database/models/UserModel";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { LikeRepository } from "../../infrastructure/repositories/LikeRepository";
-import { createPostSchema } from "../validation/postSchemas";
+import { createPostSchema, editPostSchema } from "../validation/postSchemas";
 import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
 import { CreatePost } from "../../application/use-cases/CreatePost";
 import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
@@ -13,6 +12,7 @@ import { ToggleLikePost } from "../../application/use-cases/ToggleLikePost";
 import { GetPostById } from "../../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
 import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
+import { EditPost } from "../../application/use-cases/EditPost";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -55,39 +55,24 @@ export const editPost: RequestHandler = async (req, res, next) => {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
-    const postId = req.params.postId;
-    const {
-      caption,
-      tags = [],
-      publishedFor,
-      removedImages = [],
-    } = req.body as {
-      caption?: string;
-      tags?: string[];
-      publishedFor?: string;
-      removedImages?: string[];
-    };
+    const { postId } = req.params;
+    const { removedImages, ...validatedBody } = editPostSchema.parse(req.body);
+    const newFiles = (req.files as Express.Multer.File[]) || [];
 
-    if (
-      !publishedFor ||
-      (publishedFor !== "public" && publishedFor !== "subscriber")
-    ) {
-      throw new HttpError(400, "Please provide valid publishedFor");
-    }
-
-    const images = (req.files as Express.Multer.File[])?.map(
-      (image) => image.path
-    );
-
-    const newPost = await postRepository.editPost(postId, {
-      caption,
-      tags,
-      publishedFor,
-      images,
-      removedImages,
+    const postRepository = new PostRepository();
+    const fileStorageService = new CloudinaryStorageService();
+    const editPostUseCase = new EditPost(postRepository, fileStorageService);
+    const updatedPost = await editPostUseCase.execute({
+      ...validatedBody,
+      removedFiles: removedImages,
+      newFiles,
+      postId,
+      userId: req.user.id,
     });
 
-    res.status(200).json(newPost);
+    res
+      .status(200)
+      .json({ postData: updatedPost, message: "Post updated successfully" });
   } catch (error) {
     next(error);
   }

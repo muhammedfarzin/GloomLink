@@ -8,4 +8,5 @@ export interface IFileStorageService {
     files: Express.Multer.File[],
     folder?: string
   ): Promise<UploadedFile[]>;
+  delete(urls: string[], type?: "image"): Promise<void>;
 }

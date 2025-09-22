@@ -28,4 +28,5 @@ export interface IPostRepository {
     page: number;
     limit: number;
   }): Promise<EnrichedPost[]>;
+  update(postId: string, postData: Partial<Post>): Promise<Post | null>;
 }

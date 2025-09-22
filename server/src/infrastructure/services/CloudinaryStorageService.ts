@@ -6,7 +6,7 @@ import {
 import { HttpError } from "../errors/HttpError";
 
 export class CloudinaryStorageService implements IFileStorageService {
-  constructor() {console.log(process.env)
+  constructor() {
     cloudinary.config({
       cloud_name: process.env.CLOUD_NAME,
       api_key: process.env.CLOUD_API_KEY,
@@ -38,6 +38,31 @@ export class CloudinaryStorageService implements IFileStorageService {
     } catch (error) {
       console.error("Cloudinary upload failed:", error);
       throw new HttpError(500, "Failed to upload files to cloud storage.");
+    }
+  }
+
+  async delete(urls: string[], type?: "image"): Promise<void> {
+    const getPublicId = (url: string) => {
+      const afterUploadIndex = url.indexOf("/upload/") + 8;
+      const pathWithVersion = url.substring(afterUploadIndex);
+      const pathWithoutVersion = pathWithVersion.substring(
+        pathWithVersion.indexOf("/") + 1
+      );
+      return pathWithoutVersion.split(".")[0];
+    };
+
+    const deletePromises = urls.map((url) => {
+      const publicId = getPublicId(url);
+      return cloudinary.uploader.destroy(
+        publicId,
+        type && { resource_type: type }
+      );
+    });
+
+    try {
+      await Promise.all(deletePromises);
+    } catch (error) {
+      console.error("Cloudinary deletion failed:", error);
     }
   }
 }
