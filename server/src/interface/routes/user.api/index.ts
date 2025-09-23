@@ -9,6 +9,7 @@ import { postsRouter } from "./posts.router.js";
 import { commentsRouter } from "./comments.router.js";
 import { subscriptionRouter } from "./subscription.router.js";
 import { conversationRouter } from "./conversation.router.js";
+import * as likeController from "../../controllers/like.controller.js";
 
 const router = Router();
 
@@ -34,6 +35,13 @@ router.post(
 router.post("/auth/google", authController.signInUsingGoogle);
 
 router.post("/auth/refresh", authController.refreshToken);
+
+router.get(
+  "/likes/:type/:targetId",
+  authenticateToken,
+  authorizeRole("user"),
+  likeController.getLikedUsers
+);
 
 router.get(
   "/search",

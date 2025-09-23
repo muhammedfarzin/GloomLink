@@ -57,13 +57,6 @@ router.get(
   postController.getPostById
 );
 
-router.get(
-  "/:postId/likes",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.getLikedUsers
-);
-
 router.delete(
   "/:postId",
   authenticateToken,

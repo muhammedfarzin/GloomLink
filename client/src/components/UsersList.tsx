@@ -18,7 +18,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
     setLoading("Fetching users...");
     apiClient
       .get(apiUrl)
-      .then((response) => setUsers(response.data))
+      .then((response) => setUsers(response.data.usersData))
       .catch((error) => {
         toast({
           description:

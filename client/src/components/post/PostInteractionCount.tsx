@@ -18,7 +18,7 @@ const PostInteractionCount: React.FC<Props> = ({
         {likesCount ? (
           <DialogBox
             dialogElement={
-              <UsersList apiUrl={`/posts/${postId}/likes`} title="users" />
+              <UsersList apiUrl={`/likes/post/${postId}`} title="users" />
             }
             title="Liked by"
           >

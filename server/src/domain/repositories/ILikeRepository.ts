@@ -1,3 +1,4 @@
+import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
 import { Like } from "../entities/Like";
 
 export type LikeableType = "post";
@@ -14,4 +15,10 @@ export interface ILikeRepository {
     type: LikeableType;
   }): Promise<Like>;
   delete(id: string): Promise<void>;
+  findLikersByTarget(
+    targetId: string,
+    type: LikeableType,
+    page: number,
+    limit: number
+  ): Promise<UserListResponseDto[]>;
 }
