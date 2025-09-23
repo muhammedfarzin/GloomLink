@@ -8,7 +8,6 @@ import { CloudinaryStorageService } from "../../infrastructure/services/Cloudina
 import { CreatePost } from "../../application/use-cases/CreatePost";
 import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
 import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
-import { ToggleLikePost } from "../../application/use-cases/ToggleLikePost";
 import { GetPostById } from "../../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
 import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
@@ -241,42 +240,6 @@ export const deletePost: RequestHandler = async (req, res, next) => {
     });
 
     res.status(200).json({ message: "Post deleted successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getLikedUsers: RequestHandler = async (req, res, next) => {
-  try {
-    const postId = req.params.postId;
-    const users = await likeRepository.getLikedUsers(postId, "post");
-
-    res.status(200).json(users);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const toggleLikePost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const likeRepository = new LikeRepository();
-    const postRepository = new PostRepository();
-    const toggleLikeUseCase = new ToggleLikePost(
-      likeRepository,
-      postRepository
-    );
-    const result = await toggleLikeUseCase.execute({
-      postId: req.params.postId,
-      userId: req.user.id,
-    });
-
-    res.status(200).json({
-      message: `Post successfully ${result.status}`,
-    });
   } catch (error) {
     next(error);
   }

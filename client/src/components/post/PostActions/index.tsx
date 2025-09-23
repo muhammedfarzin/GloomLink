@@ -65,7 +65,7 @@ const PostActions: React.FC<Props> = ({
       }
 
       handleChange?.(handleLikedState);
-      await apiClient.post(`/posts/like/${postData._id}`);
+      await apiClient.post(`/likes/post/${postData._id}`);
     } catch (error) {
       if (!handleChange && postData)
         onLike?.(!!postData.isLiked, postData.likesCount);

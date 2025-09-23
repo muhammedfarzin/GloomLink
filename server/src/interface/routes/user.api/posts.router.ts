@@ -43,13 +43,6 @@ router.post(
   postController.toggleSavePost
 );
 
-router.post(
-  "/like/:postId",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.toggleLikePost
-);
-
 router.get(
   "/:postId",
   authenticateToken,
