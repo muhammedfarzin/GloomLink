@@ -24,7 +24,7 @@ const UserPostActionsMenu: React.FC<Props> = ({
 
   const reportPost = () => {
     apiClient
-      .post(`/posts/report/${postId}`)
+      .post(`/report`, { targetId: postId, type: "post" })
       .then((response) => {
         toast({
           description: response.data?.message || "Post reported successfully",
@@ -32,10 +32,7 @@ const UserPostActionsMenu: React.FC<Props> = ({
       })
       .catch((error) => {
         toast({
-          description:
-            error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
+          description: error.message || "Something went wrong",
           variant: "destructive",
         });
       });

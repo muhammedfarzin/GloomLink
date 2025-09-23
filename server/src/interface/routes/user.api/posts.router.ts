@@ -71,13 +71,4 @@ router.delete(
   postController.deletePost
 );
 
-// Report
-
-router.post(
-  "/report/:postId",
-  authenticateToken,
-  authorizeRole("user"),
-  postController.reportPost
-);
-
 export { router as postsRouter };

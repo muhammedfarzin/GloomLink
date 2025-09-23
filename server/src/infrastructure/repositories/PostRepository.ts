@@ -117,6 +117,29 @@ export class PostRepository implements IPostRepository {
     const aggregationPipeline: PipelineStage[] = [
       { $match: { status: "active" } },
 
+      // ---Excluding current user reported post---
+      {
+        $lookup: {
+          from: "reports",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$targetId", "$$postId"] },
+                    { $eq: ["$reportedBy", currentUserId] },
+                    { $eq: ["$type", "post"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "userReport",
+        },
+      },
+      { $match: { userReport: { $size: 0 } } },
+
       // ---Add a 'relevanceScore' field to each document---
       {
         $addFields: {
@@ -211,6 +234,7 @@ export class PostRepository implements IPostRepository {
           comments: 0,
           relevanceScore: 0,
           currentUserInfo: 0,
+          userReport: 0,
         },
       },
     ];

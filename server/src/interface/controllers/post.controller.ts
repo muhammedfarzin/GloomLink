@@ -206,25 +206,6 @@ export const fetchPostsForAdmin: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const reportPost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const postId = req.params.postId;
-    const isPostExist = await postRepository.findById(postId);
-
-    if (!isPostExist) throw new HttpError(404, "Post not found");
-
-    await postRepository.reportPost(postId, req.user._id);
-
-    res.status(200).json({ message: "Reported successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const blockPost: RequestHandler = async (req, res, next) => {
   try {
     const postId = req.params.postId;
