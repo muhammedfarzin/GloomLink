@@ -3,6 +3,7 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { PostRepository } from "../../infrastructure/repositories/PostRepository";
 import { GetUserProfile } from "../../application/use-cases/GetUserProfile";
+import { GetUserDataForForm } from "../../application/use-cases/GetUserDataForForm";
 
 export const getUserProfile: RequestHandler = async (req, res, next) => {
   try {
@@ -26,25 +27,20 @@ export const getUserProfile: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const fetchMyData: RequestHandler = async (req, res, next) => {
+export const fetchUserDataForForm: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const userData = await userRepository.findById(req.user._id, {
-      firstname: 1,
-      lastname: 1,
-      username: 1,
-      email: 1,
-      mobile: 1,
-      gender: 1,
-      dob: 1,
-      image: 1,
-      authType: 1,
-    });
+    const userRepository = new UserRepository();
+    const getUserDataForEditUseCase = new GetUserDataForForm(userRepository);
+    const userData = await getUserDataForEditUseCase.execute(req.user.id);
 
-    res.status(200).json(userData);
+    res.status(200).json({
+      userData,
+      message: "User data for form fetched successfully",
+    });
   } catch (error) {
     next(error);
   }

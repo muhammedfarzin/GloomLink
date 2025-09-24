@@ -8,10 +8,10 @@ import * as authController from "../../controllers/auth.controller";
 const router = Router();
 
 router.get(
-  "/edit",
+  "/form",
   authenticateToken,
   authorizeRole("user"),
-  userController.fetchMyData
+  profileController.fetchUserDataForForm
 );
 
 router.put(

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { User } from "../../../domain/entities/User";
 import { UserDocument } from "../models/UserModel";
 import { UserAuthResponseDto } from "../../../application/dtos/UserAuthResponseDto";
+import { UserFormViewDto } from "../../../application/dtos/UserFormViewDto";
 
 export class UserMapper {
   public static toDomain(userModel: UserDocument): User {
@@ -31,12 +32,27 @@ export class UserMapper {
 
   public static toAuthResponse(user: User): UserAuthResponseDto {
     return {
-      _id: user._id,
+      _id: user._id?.toString(),
       username: user.username,
       firstname: user.firstname,
       lastname: user.lastname,
       status: user.status,
       email: user.email,
+      image: user.image,
+    };
+  }
+
+  public static toFormView(user: User): UserFormViewDto {
+    return {
+      _id: user._id?.toString(),
+      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      mobile: user.mobile,
+      authType: user.authType,
+      dob: user.dob,
+      gender: user.gender,
       image: user.image,
     };
   }

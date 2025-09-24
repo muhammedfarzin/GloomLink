@@ -46,9 +46,10 @@ const EditProfile: React.FC = () => {
   useEffect(() => {
     setLoading("Loading...");
     apiClient
-      .get("/profile/edit")
+      .get("/profile/form")
       .then((response) => {
-        const { dob, gender, image, authType, ...userData } = response.data;
+        const { dob, gender, image, authType, ...userData } =
+          response.data.userData;
         setDob(dob);
         setGender(gender);
         setImage(image);
@@ -57,10 +58,7 @@ const EditProfile: React.FC = () => {
       })
       .catch((error) => {
         toast({
-          description:
-            error.response.data.message ||
-            error.message ||
-            "Something went wrong",
+          description: error.message || "Something went wrong",
           variant: "destructive",
         });
       })

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import * as authController from "../../controllers/auth.controller.js";
-import * as userController from "../../controllers/user.controller.js";
 import * as reportController from "../../controllers/report.controller.js";
 import { authenticateToken } from "../../middleware/authenticate-token.middleware.js";
 import { authorizeRole } from "../../middleware/authorize-role.middleware.js";
