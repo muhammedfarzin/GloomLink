@@ -13,18 +13,11 @@ router.get(
   adminController.getPosts
 );
 
-router.put(
+router.patch(
   "/block/:postId",
   authenticateToken,
   authorizeRole("admin"),
-  postController.blockPost
-);
-
-router.put(
-  "/unblock/:postId",
-  authenticateToken,
-  authorizeRole("admin"),
-  postController.unblockPost
+  adminController.togglePostStatus
 );
 
 router.delete(

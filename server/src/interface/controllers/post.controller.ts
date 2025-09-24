@@ -186,26 +186,6 @@ export const getPosts: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const blockPost: RequestHandler = async (req, res, next) => {
-  try {
-    const postId = req.params.postId;
-    await postRepository.blockPost(postId);
-    res.status(200).json({ message: "Post blocked successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const unblockPost: RequestHandler = async (req, res, next) => {
-  try {
-    const postId = req.params.postId;
-    await postRepository.unblockPost(postId);
-    res.status(200).json({ message: "Post unblocked successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const deletePost: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user) {

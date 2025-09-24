@@ -24,7 +24,7 @@ const AdminPostActionsMenu: React.FC<Props> = ({
 
   const handleBlockPost = (type: "block" | "unblock") => {
     adminApiClient
-      .put(`/posts/${type}/${postId}`)
+      .patch(`/posts/block/${postId}`)
       .then((response) => {
         onBlockStatusChange?.(type === "block" ? "blocked" : "active");
         toast({
@@ -33,10 +33,7 @@ const AdminPostActionsMenu: React.FC<Props> = ({
       })
       .catch((error) => {
         toast({
-          description:
-            error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
+          description: error.message || "Something went wrong",
           variant: "destructive",
         });
       });

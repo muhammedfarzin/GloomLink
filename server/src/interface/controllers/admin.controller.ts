@@ -5,6 +5,9 @@ import { GetAllPosts } from "../../application/use-cases/GetAllPosts";
 import { GetPostsByStatus } from "../../application/use-cases/GetPostsByStatus";
 import { EnrichedPost } from "../../domain/repositories/IPostRepository";
 import { GetReportedPosts } from "../../application/use-cases/GetReportedPosts";
+import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TogglePostStatus } from "../../application/use-cases/TogglePostStatus";
+import { isValidObjectId } from "../validation/validations";
 
 export const fetchAllUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -79,6 +82,27 @@ export const getPosts: RequestHandler = async (req, res, next) => {
       postsData: posts,
       isEnd: posts.length < validatedQuery.limit,
       message: "All posts fetched successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const togglePostStatus: RequestHandler = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    if (!postId) {
+      throw new HttpError(400, "Post ID is required.");
+    } else if (!isValidObjectId(postId)) {
+      throw new HttpError(400, "Invalid Post ID.");
+    }
+
+    const postRepository = new PostRepository();
+    const togglePostStatusUseCase = new TogglePostStatus(postRepository);
+    const result = await togglePostStatusUseCase.execute({ postId });
+
+    res.status(200).json({
+      message: `Post is now ${result.updatedStatus}`,
     });
   } catch (error) {
     next(error);
