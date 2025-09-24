@@ -40,6 +40,7 @@ export class PostMapper {
       commentsCount: data.commentsCount,
       likesCount: data.likesCount,
       publishedFor: data.publishedFor,
+      reportCount: data.reportCount,
       uploadedBy: {
         _id: data.uploadedBy?._id?.toString(),
         firstname: data.uploadedBy?.firstname,

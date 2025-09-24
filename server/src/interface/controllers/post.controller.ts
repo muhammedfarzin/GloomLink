@@ -186,25 +186,6 @@ export const getPosts: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const fetchPostsForAdmin: RequestHandler = async (req, res, next) => {
-  try {
-    const { filter, query } = req.query;
-    if (
-      (filter !== undefined &&
-        filter !== "active" &&
-        filter !== "blocked" &&
-        filter !== "reported") ||
-      (query && typeof query !== "string")
-    )
-      throw new HttpError(400, "Invalid request");
-
-    const posts = await postRepository.getPostsForAdmin(filter, query);
-    res.status(200).json(posts);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const blockPost: RequestHandler = async (req, res, next) => {
   try {
     const postId = req.params.postId;

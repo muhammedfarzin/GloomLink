@@ -8,6 +8,43 @@ import { PostModel } from "../database/models/PostModel";
 import mongoose, { PipelineStage } from "mongoose";
 
 export class PostRepository implements IPostRepository {
+  private enrichedPipeline: PipelineStage[] = [
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "targetId",
+        as: "likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "targetId",
+        as: "comments",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "uploadedBy",
+        pipeline: [
+          { $project: { username: 1, firstname: 1, lastname: 1, image: 1 } },
+        ],
+      },
+    },
+    { $unwind: "$uploadedBy" },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+        commentsCount: { $size: "$comments" },
+      },
+    },
+  ];
+
   async create(postData: Partial<Post>): Promise<Post> {
     const postToPersist = PostMapper.toPersistence(postData);
     const newPostModel = new PostModel(postToPersist);
@@ -29,43 +66,7 @@ export class PostRepository implements IPostRepository {
 
     const aggregationPipeline = [
       { $match: { _id: postObjectId, status: "active" } },
-      {
-        $lookup: {
-          from: "likes",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "likes",
-        },
-      },
-      {
-        $lookup: {
-          from: "comments",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "comments",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "_id",
-          as: "uploadedBy",
-          pipeline: [
-            {
-              $project: {
-                username: 1,
-                firstname: 1,
-                lastname: 1,
-                image: 1,
-                savedPosts: 1,
-              },
-            },
-          ],
-        },
-      },
-      { $unwind: "$uploadedBy" },
-
+      ...this.enrichedPipeline,
       {
         $lookup: {
           from: "users",
@@ -80,14 +81,11 @@ export class PostRepository implements IPostRepository {
       { $unwind: "$currentUserInfo" },
       {
         $addFields: {
-          likesCount: { $size: "$likes" },
-          commentsCount: { $size: "$comments" },
           isLiked: { $in: [currentUserId, "$likes.userId"] },
           isSaved: { $in: [postObjectId, "$currentUserInfo.savedPosts"] },
         },
       },
-
-      { $project: { likes: 0, comments: 0, "uploadedBy.savedPosts": 0 } },
+      { $project: { likes: 0, comments: 0 } },
     ];
 
     const results = await PostModel.aggregate(aggregationPipeline);
@@ -242,6 +240,150 @@ export class PostRepository implements IPostRepository {
     const postModels = await PostModel.aggregate(aggregationPipeline);
 
     return postModels.map((data) => PostMapper.toResponse(data));
+  }
+
+  async findAll(options: {
+    page: number;
+    limit: number;
+    searchQuery: string;
+    withReports?: boolean;
+  }): Promise<EnrichedPost[]> {
+    const { page, limit, searchQuery = "" } = options;
+    const skip = (page - 1) * limit;
+
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $match: {
+          status: { $ne: "deleted" },
+          $or: [
+            { caption: { $regex: searchQuery, $options: "i" } },
+            { tags: searchQuery.toLowerCase().split(" ") },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      ...this.enrichedPipeline,
+      { $project: { likes: 0, comments: 0 } },
+    ];
+
+    if (options.withReports) {
+      aggregationPipeline.push(
+        {
+          $lookup: {
+            from: "reports",
+            localField: "_id",
+            foreignField: "targetId",
+            as: "reports",
+          },
+        },
+        {
+          $addFields: {
+            reportCount: { $size: "$reports" },
+          },
+        },
+        { $project: { reports: 0 } }
+      );
+    }
+
+    const results = await PostModel.aggregate(aggregationPipeline);
+    return results.map(PostMapper.toResponse);
+  }
+
+  async findByStatus(
+    status: "active" | "blocked",
+    options: {
+      page: number;
+      limit: number;
+      searchQuery: string;
+      withReports?: boolean;
+    }
+  ): Promise<EnrichedPost[]> {
+    const { page, limit, searchQuery = "" } = options;
+    const skip = (page - 1) * limit;
+
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $match: {
+          status,
+          $or: [
+            { caption: { $regex: searchQuery, $options: "i" } },
+            { tags: searchQuery.toLowerCase().split(" ") },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      ...this.enrichedPipeline,
+      { $project: { likes: 0, comments: 0 } },
+    ];
+
+    if (options.withReports) {
+      aggregationPipeline.push(
+        {
+          $lookup: {
+            from: "reports",
+            localField: "_id",
+            foreignField: "targetId",
+            as: "reports",
+          },
+        },
+        {
+          $addFields: {
+            reportCount: { $size: "$reports" },
+          },
+        },
+        { $project: { reports: 0 } }
+      );
+    }
+
+    const results = await PostModel.aggregate(aggregationPipeline);
+    return results.map(PostMapper.toResponse);
+  }
+
+  async findReported(options: {
+    page: number;
+    limit: number;
+    searchQuery?: string;
+  }): Promise<EnrichedPost[]> {
+    const { page, limit, searchQuery = "" } = options;
+    const skip = (page - 1) * limit;
+
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: "reports",
+          localField: "_id",
+          foreignField: "targetId",
+          as: "reports",
+        },
+      },
+      {
+        $addFields: {
+          reportCount: { $size: "$reports" },
+        },
+      },
+      {
+        $match: {
+          reportCount: { $gt: 0 },
+          status: { $ne: "deleted" },
+          $or: [
+            { caption: { $regex: searchQuery, $options: "i" } },
+            { tags: searchQuery.toLowerCase().split(" ") },
+          ],
+        },
+      },
+      { $sort: { reportCount: -1, createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      ...this.enrichedPipeline,
+      { $project: { reports: 0, likes: 0, comments: 0 } },
+    ];
+
+    const results = await PostModel.aggregate(aggregationPipeline);
+    return results.map(PostMapper.toResponse);
   }
 
   async update(postId: string, postData: Partial<Post>): Promise<Post | null> {

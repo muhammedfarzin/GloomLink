@@ -5,6 +5,7 @@ export type EnrichedPost = Post & {
   commentsCount: number;
   isLiked: boolean;
   isSaved: boolean;
+  reportCount?: number;
   uploadedBy: {
     _id: string;
     username: string;
@@ -27,6 +28,26 @@ export interface IPostRepository {
     followingUserIds: string[];
     page: number;
     limit: number;
+  }): Promise<EnrichedPost[]>;
+  findAll(options: {
+    page: number;
+    limit: number;
+    searchQuery?: string;
+    withReports?: boolean;
+  }): Promise<EnrichedPost[]>;
+  findByStatus(
+    status: "active" | "blocked",
+    options: {
+      page: number;
+      limit: number;
+      searchQuery?: string;
+      withReports?: boolean;
+    }
+  ): Promise<EnrichedPost[]>;
+  findReported(options: {
+    page: number;
+    limit: number;
+    searchQuery?: string;
   }): Promise<EnrichedPost[]>;
   update(postId: string, postData: Partial<Post>): Promise<Post | null>;
   deleteById(postId: string): Promise<void>;

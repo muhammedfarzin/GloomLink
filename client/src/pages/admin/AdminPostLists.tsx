@@ -12,7 +12,9 @@ const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
 const AdminPostLists: React.FC = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(
+    searchParams.get("q") || ""
+  );
   const [loading, setLoading] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
 
@@ -22,7 +24,7 @@ const AdminPostLists: React.FC = () => {
     adminApiClient
       .get("/posts", { params: query })
       .then((response) => {
-        setPosts(response.data.posts as Post[]);
+        setPosts(response.data.postsData as Post[]);
       })
       .catch((error) => {
         toast({
@@ -46,7 +48,7 @@ const AdminPostLists: React.FC = () => {
   const handleSearch = () => {
     setSearchParams({
       ...Object.fromEntries(searchParams.entries()),
-      query: searchQuery,
+      q: searchQuery,
     });
   };
 
@@ -63,9 +65,9 @@ const AdminPostLists: React.FC = () => {
           <DropDownBox
             className="max-w-28"
             onChange={handleFilter}
-            placeholder="All"
             value={searchParams.get("filter") || undefined}
           >
+            <option value="all">All</option>
             <option value="active">Active</option>
             <option value="blocked">Blocked</option>
             <option value="reported">Reported</option>
@@ -80,7 +82,7 @@ const AdminPostLists: React.FC = () => {
           <div className="flex flex-wrap mt-3" id="posts-list">
             {posts.length ? (
               posts.map((post) => (
-                <div className="w-full md:w-1/2 p-1">
+                <div key={post._id} className="w-full md:w-1/2 p-1">
                   <Suspense fallback={<PostSkeleton />}>
                     <PostListCard
                       postId={post._id}
