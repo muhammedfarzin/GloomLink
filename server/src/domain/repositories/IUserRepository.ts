@@ -1,3 +1,4 @@
+import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
 import { User } from "../entities/User";
 import { EnrichedPost } from "./IPostRepository";
 
@@ -18,4 +19,9 @@ export interface IUserRepository {
   ): Promise<EnrichedPost[]>;
   savePost(userId: string, postId: string): Promise<void>;
   unsavePost(userId: string, postId: string): Promise<void>;
+  findProfileByUsername(
+    username: string,
+    currentUserId: string,
+    limit?: number
+  ): Promise<UserProfileResponseDto | null>;
 }

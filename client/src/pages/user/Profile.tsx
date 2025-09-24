@@ -7,6 +7,8 @@ import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
 import FollowDialogButton from "./components/FollowDialogButton";
 import ProfileActions from "./components/ProfileActions";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface ProfileProps {
   self?: boolean;
@@ -36,6 +38,9 @@ interface PostsType {
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const { toast } = useToast();
+  const myUsername = useSelector(
+    (state: RootState) => state.auth.userData?.username
+  );
   const { username } = useParams();
   const [userData, setUserData] = useState<UserDataType>();
   const [posts, setPosts] = useState<PostsType[]>([]);
@@ -45,9 +50,9 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   useEffect(() => {
     setLoading("Loading...");
     apiClient
-      .get(`/profile/${username || ""}`)
+      .get(`/profile/${username || myUsername}`)
       .then((response) => {
-        const { posts, isFollowing, ...userData } = response.data;
+        const { posts, isFollowing, ...userData } = response.data.userData;
         setIsFollowing(isFollowing);
         setUserData(userData);
         setPosts(posts);

@@ -2,17 +2,10 @@ import { Router } from "express";
 import { authenticateToken } from "../../middleware/authenticate-token.middleware";
 import { authorizeRole } from "../../middleware/authorize-role.middleware";
 import { uploadImage } from "../../middleware/file-upload.middleware";
-import * as userController from "../../controllers/user.controller";
+import * as profileController from "../../controllers/profile.controller";
 import * as authController from "../../controllers/auth.controller";
 
 const router = Router();
-
-router.get(
-  "/",
-  authenticateToken,
-  authorizeRole("user"),
-  userController.fetchMyProfile
-);
 
 router.get(
   "/edit",
@@ -33,7 +26,7 @@ router.get(
   "/:username",
   authenticateToken,
   authorizeRole("user"),
-  userController.fetchProfile
+  profileController.getUserProfile
 );
 
 router.post(

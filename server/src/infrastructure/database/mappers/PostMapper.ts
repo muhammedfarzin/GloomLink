@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Post } from "../../../domain/entities/Post";
 import { PostDocument } from "../models/PostModel";
 import { EnrichedPost } from "../../../domain/repositories/IPostRepository";
+import { UserProfileResponseDto } from "../../../application/dtos/UserProfileResponseDto";
 
 export class PostMapper {
   public static toDomain(postModel: PostDocument): Post {
@@ -48,6 +49,28 @@ export class PostMapper {
         username: data.uploadedBy?.username,
         image: data.uploadedBy?.image,
       },
+    };
+  }
+
+  public static toProfileResponse(data: any): UserProfileResponseDto {
+    return {
+      _id: data._id.toString(),
+      username: data.username,
+      firstname: data.firstname,
+      lastname: data.lastname,
+      fullname: `${data.firstname} ${data.lastname}`,
+      image: data.image,
+      posts: data.posts.map((post: Post) => ({
+        _id: post._id,
+        userId: post.userId,
+        caption: post.caption,
+        images: post.images,
+        publishedFor: post.publishedFor,
+        status: post.status,
+      })),
+      followersCount: data.followersCount,
+      followingCount: data.followingCount,
+      isFollowing: data.isFollowing,
     };
   }
 }

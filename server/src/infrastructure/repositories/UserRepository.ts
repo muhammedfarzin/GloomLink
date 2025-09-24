@@ -5,6 +5,7 @@ import { UserMapper } from "../database/mappers/UserMapper";
 import { EnrichedPost } from "../../domain/repositories/IPostRepository";
 import mongoose, { PipelineStage } from "mongoose";
 import { PostMapper } from "../database/mappers/PostMapper";
+import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
 
 export class UserRepository implements IUserRepository {
   async create(userData: Partial<User>): Promise<User> {
@@ -166,5 +167,86 @@ export class UserRepository implements IUserRepository {
       { _id: userId },
       { $pull: { savedPosts: postId } }
     );
+  }
+
+  async findProfileByUsername(
+    username: string,
+    currentUserId: string,
+    limit = 15
+  ): Promise<UserProfileResponseDto | null> {
+    const viewerId = currentUserId
+      ? new mongoose.Types.ObjectId(currentUserId)
+      : null;
+
+    const aggregationPipeline: PipelineStage[] = [
+      { $match: { username: username, status: "active" } },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followingTo",
+          as: "followers",
+        },
+      },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followedBy",
+          as: "following",
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "userId",
+          as: "posts",
+          pipeline: [
+            { $match: { status: "active" } },
+            { $sort: { createdAt: -1 } },
+            { $limit: limit },
+            { $project: { tags: 0 } },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          followersCount: { $size: "$followers" },
+          followingCount: { $size: "$following" },
+          isFollowing: viewerId
+            ? { $in: [viewerId, "$followers.followedBy"] }
+            : undefined,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          firstname: 1,
+          lastname: 1,
+          fullname: 1,
+          image: 1,
+          posts: 1,
+          followersCount: 1,
+          followingCount: 1,
+          isFollowing: 1,
+        },
+      },
+    ];
+
+    const results = await UserModel.aggregate(aggregationPipeline);
+
+    if (results.length === 0) {
+      return null;
+    }
+
+    const profileData = results[0];
+
+    if (viewerId && viewerId.toString() === profileData._id.toString()) {
+      delete profileData.isFollowing;
+    }
+
+    return PostMapper.toProfileResponse(profileData);
   }
 }

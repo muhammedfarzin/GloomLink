@@ -1,18 +1,26 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { userRepository } from "../../infrastructure/repositories/UserRepository";
-import { postRepository } from "../../infrastructure/repositories/PostRepository";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
+import { PostRepository } from "../../infrastructure/repositories/PostRepository";
+import { GetUserProfile } from "../../application/use-cases/GetUserProfile";
 
-export const fetchMyProfile: RequestHandler = async (req, res, next) => {
+export const getUserProfile: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const username = req.user.username;
-    const userData = await userRepository.fetchProfileDetails(username, true);
+    const userRepository = new UserRepository();
+    const getUserProfileUseCase = new GetUserProfile(userRepository);
+    const userProfile = await getUserProfileUseCase.execute({
+      username: req.params.username,
+      currentUserId: req.user.id,
+    });
 
-    res.json(userData);
+    res.status(200).json({
+      userData: userProfile,
+      message: "User profile fetched successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -37,26 +45,6 @@ export const fetchMyData: RequestHandler = async (req, res, next) => {
     });
 
     res.status(200).json(userData);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const fetchProfile: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const username = req.params.username;
-    const userData = await userRepository.fetchProfileDetails(username, false);
-    if (!userData) throw new HttpError(404, "Not found");
-    const isFollowing = await userRepository.checkIsFollowing(
-      req.user._id,
-      userData._id
-    );
-
-    res.json({ ...userData, isFollowing });
   } catch (error) {
     next(error);
   }
