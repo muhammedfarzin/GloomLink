@@ -15,11 +15,11 @@ router.get(
 );
 
 router.put(
-  "/edit",
+  "/update",
   authenticateToken,
   authorizeRole("user"),
   uploadImage.single("image"),
-  authController.updateProfile
+  profileController.updateProfile
 );
 
 router.get(

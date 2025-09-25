@@ -13,9 +13,8 @@ import CropperDialogBox from "@/components/CropperDialogBox";
 import apiClient from "@/apiClient";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
 import { useDispatch } from "react-redux";
-import { setAuthUser } from "@/redux/reducers/auth";
+import { updateUserData } from "@/redux/reducers/auth";
 import DateInput from "@/components/DateInput";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
@@ -126,28 +125,19 @@ const EditProfile: React.FC = () => {
         formDatas.append(key, value);
       }
 
-      const {
-        data: { userData, tokens },
-      } = await apiClient.put("/profile/edit", formDatas, {
+      const response = await apiClient.put("/profile/update", formDatas, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      dispatch(setAuthUser({ userData, tokens }));
+      dispatch(updateUserData(response.data.userData));
       navigate("/profile");
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast({
-          description: error.response?.data?.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          description: (error as Error).message || "Something went wrong",
-          variant: "destructive",
-        });
-      }
+    } catch (error: any) {
+      toast({
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
     } finally {
       setLoading(null);
     }

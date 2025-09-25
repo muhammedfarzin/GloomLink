@@ -7,3 +7,5 @@ export const urlPattern = new RegExp(
     "(\\#[-a-z\\d_]*)?$",
   "i" // fragment locator
 );
+
+export const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]{2,19}$/;

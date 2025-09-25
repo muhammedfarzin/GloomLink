@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { validateRequiredString } from "./validations";
+import { usernameRegex } from "../../shared/regexPatterns";
 
-const passwordSchema = z
+export const passwordSchema = z
   .string(validateRequiredString("Password", "Invalid credentials"))
   .trim()
   .min(8, { message: "Password must be at least 8 characters long" })
@@ -36,7 +37,7 @@ export const signupInputSchema = z.object({
   username: z
     .string(validateRequiredString("Username"))
     .trim()
-    .min(1, { message: "Username is required" }),
+    .regex(usernameRegex, { message: "Invalid username format" }),
   email: z.email({ message: "Invalid email address" }),
   mobile: z
     .string(validateRequiredString("Mobile number"))

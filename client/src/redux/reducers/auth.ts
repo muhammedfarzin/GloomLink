@@ -53,6 +53,9 @@ const authSlice = createSlice({
 
       state.userData = userData;
     },
+    updateUserData: (state, action: PayloadAction<UserAuthState>) => {
+      state.userData = action.payload;
+    },
     setAuthAdmin: (state, action: PayloadAction<AdminAuthWithTokenState>) => {
       const { adminData, tokens } = action.payload;
 
@@ -76,5 +79,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAuthUser, setAuthAdmin, logout } = authSlice.actions;
+export const { setAuthUser, updateUserData, setAuthAdmin, logout } =
+  authSlice.actions;
 export default authSlice.reducer;
