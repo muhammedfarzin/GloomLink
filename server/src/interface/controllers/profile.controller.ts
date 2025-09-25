@@ -9,6 +9,9 @@ import { CloudinaryStorageService } from "../../infrastructure/services/Cloudina
 import { UpdateProfile } from "../../application/use-cases/UpdateProfile";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
+import { isValidObjectId } from "../validation/validations";
+import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
+import { ToggleFollow } from "../../application/use-cases/ToggleFollow";
 
 export const getUserProfile: RequestHandler = async (req, res, next) => {
   try {
@@ -86,33 +89,33 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const followUser: RequestHandler = async (req, res, next) => {
+export const toggleFollow: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    await userRepository.followUser(req.user._id, req.params.userId);
+    const { userId: targetUserId } = req.params;
 
-    res
-      .status(200)
-      .json({ userId: req.params.userId, message: "Followed successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const unfollowUser: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+    if (!isValidObjectId(targetUserId)) {
+      throw new HttpError(400, "Invalid userId");
     }
 
-    await userRepository.unfollowUser(req.user._id, req.params.userId);
+    const followRepository = new FollowRepository();
+    const userRepository = new UserRepository();
 
-    res
-      .status(200)
-      .json({ userId: req.params.userId, message: "Unfollowed successfully" });
+    const toggleFollowUseCase = new ToggleFollow(
+      followRepository,
+      userRepository
+    );
+    const result = await toggleFollowUseCase.execute({
+      currentUserId: req.user.id,
+      targetUserId,
+    });
+
+    res.status(200).json({
+      message: `Successfully ${result.status} the user.`,
+    });
   } catch (error) {
     next(error);
   }

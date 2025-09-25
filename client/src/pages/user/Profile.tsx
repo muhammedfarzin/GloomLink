@@ -65,10 +65,10 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
       });
   }, [username]);
 
-  const handleFollow = async (type: "follow" | "unfollow") => {
+  const handleFollow = async () => {
     try {
       setIsFollowing(!isFollowing);
-      await apiClient.post(`/profile/${type}/${userData?._id}`);
+      if (userData) await apiClient.post(`/profile/follow/${userData._id}`);
     } catch (error: any) {
       setIsFollowing(isFollowing);
       toast({

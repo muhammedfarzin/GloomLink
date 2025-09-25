@@ -33,14 +33,7 @@ router.post(
   "/follow/:userId",
   authenticateToken,
   authorizeRole("user"),
-  userController.followUser
-);
-
-router.post(
-  "/unfollow/:userId",
-  authenticateToken,
-  authorizeRole("user"),
-  userController.unfollowUser
+  profileController.toggleFollow
 );
 
 router.get(
