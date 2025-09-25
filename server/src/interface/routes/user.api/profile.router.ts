@@ -3,7 +3,7 @@ import { authenticateToken } from "../../middleware/authenticate-token.middlewar
 import { authorizeRole } from "../../middleware/authorize-role.middleware";
 import { uploadImage } from "../../middleware/file-upload.middleware";
 import * as profileController from "../../controllers/profile.controller";
-import * as authController from "../../controllers/auth.controller";
+import { followRouter } from "./follow.router";
 
 const router = Router();
 
@@ -29,25 +29,6 @@ router.get(
   profileController.getUserProfile
 );
 
-router.post(
-  "/follow/:userId",
-  authenticateToken,
-  authorizeRole("user"),
-  profileController.toggleFollow
-);
-
-router.get(
-  "/followers/:userId",
-  authenticateToken,
-  authorizeRole("user"),
-  userController.fetchFollowers
-);
-
-router.get(
-  "/following/:userId",
-  authenticateToken,
-  authorizeRole("user"),
-  userController.fetchFollowing
-);
+router.use("/follow", followRouter);
 
 export { router as profileRouter };

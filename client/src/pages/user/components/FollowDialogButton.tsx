@@ -32,7 +32,7 @@ const FollowDialogButton: React.FC<FollowDialogButtonProps> = ({
           <DialogTitle className="capitalize">{type}</DialogTitle>
         </DialogHeader>
 
-        <UsersList apiUrl={`/profile/${type}/${userId}`} title={type} />
+        <UsersList apiUrl={`/profile/follow/${userId}/${type}`} title={type} />
       </DialogContent>
     </Dialog>
   );

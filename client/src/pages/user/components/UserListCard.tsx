@@ -71,7 +71,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
       </div>
 
       {actions ??
-        (myUserId !== userData._id || (
+        (myUserId !== userData._id && (
           <Button className="h-7" onClick={handleFollowUser}>
             {isFollowing ? "Unfollow" : "Follow"}
           </Button>

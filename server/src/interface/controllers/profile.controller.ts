@@ -9,9 +9,6 @@ import { CloudinaryStorageService } from "../../infrastructure/services/Cloudina
 import { UpdateProfile } from "../../application/use-cases/UpdateProfile";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
-import { isValidObjectId } from "../validation/validations";
-import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
-import { ToggleFollow } from "../../application/use-cases/ToggleFollow";
 
 export const getUserProfile: RequestHandler = async (req, res, next) => {
   try {
@@ -84,76 +81,6 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       userData: userResponse,
       message: "Profile updated successfully",
     });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const toggleFollow: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const { userId: targetUserId } = req.params;
-
-    if (!isValidObjectId(targetUserId)) {
-      throw new HttpError(400, "Invalid userId");
-    }
-
-    const followRepository = new FollowRepository();
-    const userRepository = new UserRepository();
-
-    const toggleFollowUseCase = new ToggleFollow(
-      followRepository,
-      userRepository
-    );
-    const result = await toggleFollowUseCase.execute({
-      currentUserId: req.user.id,
-      targetUserId,
-    });
-
-    res.status(200).json({
-      message: `Successfully ${result.status} the user.`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const fetchFollowers: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const userId = req.params.userId;
-    const followers = await userRepository.fetchFollowing(
-      userId,
-      req.user._id,
-      "followers"
-    );
-
-    res.status(200).json(followers);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const fetchFollowing: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const userId = req.params.userId;
-    const followers = await userRepository.fetchFollowing(
-      userId,
-      req.user._id,
-      "following"
-    );
-
-    res.status(200).json(followers);
   } catch (error) {
     next(error);
   }
