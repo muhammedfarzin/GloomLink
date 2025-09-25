@@ -50,7 +50,6 @@ export class LikeRepository implements ILikeRepository {
       {
         $match: {
           targetId: new mongoose.Types.ObjectId(targetId),
-          userId: { $ne: userId && new mongoose.Types.ObjectId(userId) },
           type: type,
         },
       },
@@ -63,6 +62,28 @@ export class LikeRepository implements ILikeRepository {
           localField: "userId",
           foreignField: "_id",
           as: "likerInfo",
+          pipeline: [
+            {
+              $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "followingTo",
+                as: "followers",
+              },
+            },
+            {
+              $addFields: {
+                isFollowing: userId
+                  ? {
+                      $in: [
+                        new mongoose.Types.ObjectId(userId),
+                        "$followers.followedBy",
+                      ],
+                    }
+                  : undefined,
+              },
+            },
+          ],
         },
       },
       { $unwind: "$likerInfo" },
@@ -73,6 +94,7 @@ export class LikeRepository implements ILikeRepository {
           firstname: "$likerInfo.firstname",
           lastname: "$likerInfo.lastname",
           image: "$likerInfo.image",
+          isFollowing: "$likerInfo.isFollowing",
         },
       },
     ];

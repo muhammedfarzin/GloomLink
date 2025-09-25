@@ -4,4 +4,5 @@ export interface UserListResponseDto {
   firstname: string;
   lastname: string;
   image?: string;
+  isFollowing?: boolean;
 }

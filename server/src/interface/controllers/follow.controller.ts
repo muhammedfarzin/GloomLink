@@ -24,6 +24,7 @@ export const getFollowers: RequestHandler = async (req, res, next) => {
 
     const users = await getFollowListUseCase.execute({
       ...validatedData,
+      currentUserId: req.user?.id,
       type: listType,
     });
 

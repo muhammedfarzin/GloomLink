@@ -10,7 +10,7 @@ export interface IFollowRepository {
   findFollowList(
     userId: string,
     type: FollowListType,
-    options: { page: number; limit: number }
+    options: { currentUserId?: string; page: number; limit: number }
   ): Promise<UserListResponseDto[]>;
   deleteById(id: string): Promise<void>;
 }

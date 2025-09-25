@@ -8,6 +8,7 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 
 export interface GetFollowListInput {
   userId: string;
+  currentUserId?: string;
   type: FollowListType;
   page: number;
   limit: number;

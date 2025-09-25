@@ -58,13 +58,14 @@ export class UserMapper {
     };
   }
 
-  public static toListView(user: User): UserListResponseDto {
+  public static toListView(user: any): UserListResponseDto {
     return {
       _id: user._id?.toString(),
       firstname: user.firstname,
       lastname: user.lastname,
       username: user.username,
       image: user.image,
+      isFollowing: user.isFollowing,
     };
   }
 }

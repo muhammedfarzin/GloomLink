@@ -38,9 +38,9 @@ export class FollowRepository implements IFollowRepository {
   async findFollowList(
     userId: string,
     type: FollowListType,
-    options: { page: number; limit: number }
+    options: { currentUserId?: string; page: number; limit: number }
   ): Promise<UserListResponseDto[]> {
-    const { page, limit } = options;
+    const { currentUserId, page, limit } = options;
     const skip = (page - 1) * limit;
 
     // ---Conditionally set the fields for our query based on the type---
@@ -60,6 +60,28 @@ export class FollowRepository implements IFollowRepository {
           localField: lookupLocalField,
           foreignField: "_id",
           as: lookupAs,
+          pipeline: [
+            {
+              $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "followingTo",
+                as: "followers",
+              },
+            },
+            {
+              $addFields: {
+                isFollowing: currentUserId
+                  ? {
+                      $in: [
+                        new mongoose.Types.ObjectId(currentUserId),
+                        "$followers.followedBy",
+                      ],
+                    }
+                  : undefined,
+              },
+            },
+          ],
         },
       },
       { $unwind: `$${lookupAs}` },
@@ -70,6 +92,7 @@ export class FollowRepository implements IFollowRepository {
           firstname: `$${lookupAs}.firstname`,
           lastname: `$${lookupAs}.lastname`,
           image: `$${lookupAs}.image`,
+          isFollowing: `$${lookupAs}.isFollowing`,
         },
       },
     ];
