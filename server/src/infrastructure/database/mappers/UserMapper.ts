@@ -3,6 +3,7 @@ import { User } from "../../../domain/entities/User";
 import { UserDocument } from "../models/UserModel";
 import { UserAuthResponseDto } from "../../../application/dtos/UserAuthResponseDto";
 import { UserFormViewDto } from "../../../application/dtos/UserFormViewDto";
+import { UserListResponseDto } from "../../../application/dtos/UserListResponseDto";
 
 export class UserMapper {
   public static toDomain(userModel: UserDocument): User {
@@ -53,6 +54,16 @@ export class UserMapper {
       authType: user.authType,
       dob: user.dob,
       gender: user.gender,
+      image: user.image,
+    };
+  }
+
+  public static toListView(user: User): UserListResponseDto {
+    return {
+      _id: user._id?.toString(),
+      firstname: user.firstname,
+      lastname: user.lastname,
+      username: user.username,
       image: user.image,
     };
   }

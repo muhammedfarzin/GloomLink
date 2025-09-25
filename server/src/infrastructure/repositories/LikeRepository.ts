@@ -7,6 +7,7 @@ import { LikeModel } from "../database/models/LikeModel";
 import { LikeMapper } from "../database/mappers/LikeMapper";
 import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
 import mongoose, { PipelineStage } from "mongoose";
+import { UserMapper } from "../database/mappers/UserMapper";
 
 export class LikeRepository implements ILikeRepository {
   async findByTargetAndUser(
@@ -35,16 +36,21 @@ export class LikeRepository implements ILikeRepository {
 
   async findLikersByTarget(
     targetId: string,
-    type: LikeableType,
-    page: number,
-    limit: number
+    options: {
+      userId?: string;
+      type: LikeableType;
+      page: number;
+      limit: number;
+    }
   ): Promise<UserListResponseDto[]> {
+    const { userId, type, page, limit } = options;
     const skip = (page - 1) * limit;
 
     const aggregationPipeline: PipelineStage[] = [
       {
         $match: {
           targetId: new mongoose.Types.ObjectId(targetId),
+          userId: { $ne: userId && new mongoose.Types.ObjectId(userId) },
           type: type,
         },
       },
@@ -71,10 +77,8 @@ export class LikeRepository implements ILikeRepository {
       },
     ];
 
-    const results: UserListResponseDto[] = await LikeModel.aggregate(
-      aggregationPipeline
-    );
+    const results = await LikeModel.aggregate(aggregationPipeline);
 
-    return results.map((user) => ({ ...user, _id: user._id.toString() }));
+    return results.map(UserMapper.toListView);
   }
 }

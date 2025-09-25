@@ -23,7 +23,10 @@ export const getLikedUsers: RequestHandler = async (req, res, next) => {
       likeRepository,
       targetRepository
     );
-    const users = await getLikedUsersUseCase.execute(validatedData);
+    const users = await getLikedUsersUseCase.execute({
+      ...validatedData,
+      userId: req.user?.id,
+    });
 
     res.status(200).json({
       usersData: users,

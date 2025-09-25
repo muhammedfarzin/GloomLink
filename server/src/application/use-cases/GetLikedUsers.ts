@@ -8,6 +8,7 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 
 export interface GetLikedUsersInput {
   targetId: string;
+  userId?: string;
   type: LikeableType;
   page: number;
   limit: number;
@@ -20,13 +21,13 @@ export class GetLikedUsers {
   ) {}
 
   async execute(input: GetLikedUsersInput): Promise<UserListResponseDto[]> {
-    const { targetId, type, page, limit } = input;
+    const { targetId, ...restInput } = input;
 
     const post = await this.targetRepository.findById(targetId);
     if (!post) {
       throw new HttpError(404, "Post not found or has been deleted.");
     }
 
-    return this.likeRepository.findLikersByTarget(targetId, type, page, limit);
+    return this.likeRepository.findLikersByTarget(targetId, restInput);
   }
 }

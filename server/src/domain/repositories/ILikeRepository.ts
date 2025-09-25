@@ -17,8 +17,11 @@ export interface ILikeRepository {
   delete(id: string): Promise<void>;
   findLikersByTarget(
     targetId: string,
-    type: LikeableType,
-    page: number,
-    limit: number
+    options: {
+      userId?: string;
+      type: LikeableType;
+      page: number;
+      limit: number;
+    }
   ): Promise<UserListResponseDto[]>;
 }
