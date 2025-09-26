@@ -34,4 +34,10 @@ export interface IUserRepository {
       limit: number;
     }
   ): Promise<UserListResponseDto[]>;
+  findAll(options: {
+    filter: "all" | "active" | "blocked";
+    searchQuery?: string;
+    page: number;
+    limit: number;
+  }): Promise<User[]>;
 }

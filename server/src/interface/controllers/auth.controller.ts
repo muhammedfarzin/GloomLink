@@ -56,7 +56,7 @@ export const login: RequestHandler = async (req, res, next) => {
       await sendEmailUseCase.execute({ email: user.email });
     }
 
-    const userResponse = UserMapper.toAuthResponse(user);
+    const userResponse = UserMapper.toResponse(user);
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
@@ -96,7 +96,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     await sendEmailUseCase.execute({ email: newUser.email });
 
     // --- Generate Token & Respond ---
-    const userResponse = UserMapper.toAuthResponse(newUser);
+    const userResponse = UserMapper.toResponse(newUser);
 
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(
@@ -151,7 +151,7 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
       otp,
     });
 
-    const userResponse = UserMapper.toAuthResponse(updatedUser);
+    const userResponse = UserMapper.toResponse(updatedUser);
 
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(
@@ -183,7 +183,7 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
       uid: decodedData.uid,
     });
 
-    const userResponse = UserMapper.toAuthResponse(user);
+    const userResponse = UserMapper.toResponse(user);
 
     const tokenService = new JwtTokenService();
     const tokens = tokenService.generate(

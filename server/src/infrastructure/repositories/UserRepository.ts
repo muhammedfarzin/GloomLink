@@ -310,4 +310,35 @@ export class UserRepository implements IUserRepository {
     const users = await UserModel.aggregate(aggregationPipeline);
     return users.map(UserMapper.toListView);
   }
+
+  async findAll(options: {
+    filter?: "all" | "active" | "blocked";
+    searchQuery?: string;
+    page: number;
+    limit: number;
+  }): Promise<User[]> {
+    const { filter = "all", searchQuery = "", page, limit } = options;
+    const skip = (page - 1) * limit;
+
+    const matchStage: PipelineStage.Match["$match"] = {
+      $or: [
+        { username: { $regex: searchQuery, $options: "i" } },
+        { email: { $regex: searchQuery, $options: "i" } },
+        { mobile: { $regex: searchQuery, $options: "i" } },
+      ],
+    };
+
+    if (filter !== "all") {
+      matchStage.status = filter;
+    }
+
+    const aggregationPipeline: PipelineStage[] = [
+      { $match: matchStage },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+
+    return await UserModel.aggregate(aggregationPipeline);
+  }
 }

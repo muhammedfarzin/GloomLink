@@ -9,7 +9,7 @@ router.get(
   "/",
   authenticateToken,
   authorizeRole("admin"),
-  adminController.fetchAllUsers
+  adminController.getUsers
 );
 
 router.put(

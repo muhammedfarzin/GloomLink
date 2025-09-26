@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { User } from "../../../domain/entities/User";
 import { UserDocument } from "../models/UserModel";
-import { UserAuthResponseDto } from "../../../application/dtos/UserAuthResponseDto";
+import { UserResponseDto } from "../../../application/dtos/UserResponseDto";
 import { UserFormViewDto } from "../../../application/dtos/UserFormViewDto";
 import { UserListResponseDto } from "../../../application/dtos/UserListResponseDto";
 
@@ -31,7 +31,7 @@ export class UserMapper {
     return persistenceUser;
   }
 
-  public static toAuthResponse(user: User): UserAuthResponseDto {
+  public static toResponse(user: User): UserResponseDto {
     return {
       _id: user._id?.toString(),
       username: user.username,
@@ -39,6 +39,7 @@ export class UserMapper {
       lastname: user.lastname,
       status: user.status,
       email: user.email,
+      mobile: user.mobile,
       image: user.image,
     };
   }

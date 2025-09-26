@@ -75,7 +75,7 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
       profileImageFile,
     });
 
-    const userResponse = UserMapper.toAuthResponse(updatedUser);
+    const userResponse = UserMapper.toResponse(updatedUser);
 
     res.status(200).json({
       userData: userResponse,
