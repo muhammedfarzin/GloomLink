@@ -11,6 +11,6 @@ router.post("/auth/refresh", authController.refreshToken);
 
 router.use("/users", usersRouter);
 
-router.use("/posts", postsRouter)
+router.use("/posts", postsRouter);
 
 export { router as adminApiRouter };

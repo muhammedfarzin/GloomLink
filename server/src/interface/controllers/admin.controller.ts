@@ -1,13 +1,10 @@
 import { RequestHandler } from "express";
 import { getPostsSchema } from "../validation/adminSchemas";
 import { PostRepository } from "../../infrastructure/repositories/PostRepository";
-import { GetAllPosts } from "../../application/use-cases/GetAllPosts";
-import { GetPostsByStatus } from "../../application/use-cases/GetPostsByStatus";
-import { EnrichedPost } from "../../domain/repositories/IPostRepository";
-import { GetReportedPosts } from "../../application/use-cases/GetReportedPosts";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TogglePostStatus } from "../../application/use-cases/TogglePostStatus";
 import { isValidObjectId } from "../validation/validations";
+import { GetAdminPosts } from "../../application/use-cases/GetAdminPosts";
 
 export const fetchAllUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -53,35 +50,18 @@ export const getPosts: RequestHandler = async (req, res, next) => {
     } = getPostsSchema.parse(req.query);
 
     const postRepository = new PostRepository();
-    let posts: EnrichedPost[];
-
-    if (filter === "all") {
-      const getAllPostsUseCase = new GetAllPosts(postRepository);
-      posts = await getAllPostsUseCase.execute({
-        ...validatedQuery,
-        searchQuery,
-        withReports: true,
-      });
-    } else if (filter === "reported") {
-      const getReportedPostsUseCase = new GetReportedPosts(postRepository);
-      posts = await getReportedPostsUseCase.execute({
-        ...validatedQuery,
-        searchQuery,
-      });
-    } else {
-      const GetPostsByStatusUseCase = new GetPostsByStatus(postRepository);
-      posts = await GetPostsByStatusUseCase.execute({
-        ...validatedQuery,
-        status: filter,
-        searchQuery,
-        withReports: true,
-      });
-    }
+    const getAdminPostsUseCase = new GetAdminPosts(postRepository);
+    const posts = await getAdminPostsUseCase.execute({
+      ...validatedQuery,
+      filter,
+      searchQuery,
+      withReports: true,
+    });
 
     res.status(200).json({
       postsData: posts,
       isEnd: posts.length < validatedQuery.limit,
-      message: "All posts fetched successfully",
+      message: "Posts fetched successfully",
     });
   } catch (error) {
     next(error);
