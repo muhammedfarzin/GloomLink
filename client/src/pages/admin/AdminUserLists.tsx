@@ -38,19 +38,26 @@ const AdminUserLists: React.FC = () => {
       .finally(() => setLoading(null));
   }, [searchParams]);
 
-  const blockUser = (userId: string, type: "block" | "unblock" = "block") => {
-    adminApiClient.put(`/users/${userId}/${type}`).then((response) => {
-      if (response.status === 200) {
-        setUsers(
-          users.map((user) => {
-            if (user._id === response.data.user._id) {
-              user.status = response.data.user.status;
-              return user;
-            } else return user;
-          })
-        );
-      }
-    });
+  const blockUser = async (userId: string) => {
+    try {
+      const response = await adminApiClient.patch(`/users/${userId}/status`);
+      toast({
+        description: response.data.message,
+      });
+      setUsers(
+        users.map((user) => {
+          if (user._id === userId) {
+            user.status = user.status === "active" ? "blocked" : "active";
+          }
+          return user;
+        })
+      );
+    } catch (error: any) {
+      toast({
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleFilter: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
@@ -118,24 +125,27 @@ const AdminUserLists: React.FC = () => {
                       <ConfirmButton
                         className="w-full"
                         description={`Do you really want to ${
-                          user.status === "blocked" ? "unblock" : "block"
+                          user.status === "active"
+                            ? "block"
+                            : user.status === "not-verified"
+                            ? "activate"
+                            : "unblock"
                         } ${user.username}`}
                         confirmButtonText={
-                          user.status === "blocked" ? "Unblock" : "Block"
+                          user.status === "active"
+                            ? "Block"
+                            : user.status === "not-verified"
+                            ? "Activate"
+                            : "Unblock"
                         }
-                        onSuccess={() =>
-                          user.status === "blocked"
-                            ? blockUser(user._id, "unblock")
-                            : blockUser(user._id)
-                        }
+                        onSuccess={() => blockUser(user._id)}
                       >
-                        <Button
-                          className="text-xs w-full"
-                          backgroundColor={
-                            user.status !== "blocked" ? "#991b1b" : undefined
-                          }
-                        >
-                          {user.status === "blocked" ? "Unblock" : "Block"}
+                        <Button className="text-xs w-full">
+                          {user.status === "active"
+                            ? "Block"
+                            : user.status === "not-verified"
+                            ? "Activate"
+                            : "Unblock"}
                         </Button>
                       </ConfirmButton>
                     </div>

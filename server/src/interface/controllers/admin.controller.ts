@@ -7,6 +7,7 @@ import { isValidObjectId } from "../validation/validations";
 import { GetAdminPosts } from "../../application/use-cases/GetAdminPosts";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { GetAdminUsers } from "../../application/use-cases/GetAdminUsers";
+import { ToggleUserStatus } from "../../application/use-cases/ToggleUserStatus";
 
 export const getUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -33,26 +34,19 @@ export const getUsers: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const blockUser: RequestHandler = async (req, res, next) => {
+export const toggleUserStatus: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
-    const updatedUser = await userRepository.updateStatusById(
-      userId,
-      "blocked"
-    );
+    const { userId } = req.params;
 
-    res.status(200).json({ user: updatedUser });
-  } catch (error) {
-    next(error);
-  }
-};
+    if (!isValidObjectId(userId)) throw new HttpError(400, "Invalid userId");
 
-export const unblockUser: RequestHandler = async (req, res, next) => {
-  try {
-    const userId = req.params.userId;
-    const updatedUser = await userRepository.updateStatusById(userId, "active");
+    const userRepository = new UserRepository();
+    const toggleUserStatusUseCase = new ToggleUserStatus(userRepository);
+    const result = await toggleUserStatusUseCase.execute(userId);
 
-    res.status(200).json({ user: updatedUser });
+    res.status(200).json({
+      message: `User is now ${result.updatedStatus}`,
+    });
   } catch (error) {
     next(error);
   }

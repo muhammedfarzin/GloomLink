@@ -12,18 +12,11 @@ router.get(
   adminController.getUsers
 );
 
-router.put(
-  "/:userId/block",
+router.patch(
+  "/:userId/status",
   authenticateToken,
   authorizeRole("admin"),
-  adminController.blockUser
-);
-
-router.put(
-  "/:userId/unblock",
-  authenticateToken,
-  authorizeRole("admin"),
-  adminController.unblockUser
+  adminController.toggleUserStatus
 );
 
 export { router as usersRouter };
