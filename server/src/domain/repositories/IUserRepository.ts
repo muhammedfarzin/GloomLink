@@ -1,3 +1,4 @@
+import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
 import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
 import { User } from "../entities/User";
 import { EnrichedPost } from "./IPostRepository";
@@ -24,4 +25,13 @@ export interface IUserRepository {
     currentUserId: string,
     limit?: number
   ): Promise<UserProfileResponseDto | null>;
+  findByStatus(
+    status: "active" | "blocked" | "inactive",
+    options: {
+      userId?: string;
+      searchQuery?: string;
+      page: number;
+      limit: number;
+    }
+  ): Promise<UserListResponseDto[]>;
 }

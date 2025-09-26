@@ -9,6 +9,7 @@ import { commentsRouter } from "./comments.router.js";
 import { subscriptionRouter } from "./subscription.router.js";
 import { conversationRouter } from "./conversation.router.js";
 import { likesRouter } from "./likes.router.js";
+import { searchRouter } from "./search.router.js";
 
 const router = Router();
 
@@ -35,19 +36,14 @@ router.post("/auth/google", authController.signInUsingGoogle);
 
 router.post("/auth/refresh", authController.refreshToken);
 
-router.get(
-  "/search",
-  authenticateToken,
-  authorizeRole("user"),
-  userController.search
-);
-
 router.post(
   "/report",
   authenticateToken,
   authorizeRole("user"),
   reportController.reportTarget
 );
+
+router.use("/search", searchRouter);
 
 router.use("/profile", profileRouter);
 

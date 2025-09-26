@@ -19,7 +19,7 @@ const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>(
-    searchParams.get("query") || ""
+    searchParams.get("q") || ""
   );
   const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
 
@@ -38,7 +38,7 @@ const Search: React.FC = () => {
 
       apiClient
         .get("/search", { params })
-        .then((response) => setSearchResult(response.data))
+        .then((response) => setSearchResult(response.data.resultsData))
         .catch((error) => handleApiError(error))
         .finally(() => setLoading(null));
     }
@@ -55,17 +55,16 @@ const Search: React.FC = () => {
               if (searchQuery)
                 setSearchParams({
                   ...Object.fromEntries(searchParams.entries()),
-                  query: searchQuery,
+                  q: searchQuery,
                 });
             }}
           />
         </div>
 
-        {loading || !searchParams.get("query") || !searchResult.length ? (
+        {loading || !searchParams.get("q") || !searchResult.length ? (
           <div className="flex h-[80vh] justify-center items-center text-lg font-bold">
             {loading ||
-              (!searchParams.get("query") &&
-                "Search to list users and posts") ||
+              (!searchParams.get("q") && "Search to list users and posts") ||
               "No result found"}
           </div>
         ) : (

@@ -13,6 +13,7 @@ export type EnrichedPost = Post & {
     lastname: string;
     image?: string;
   };
+  type: "post";
 };
 
 export interface IPostRepository {
@@ -24,6 +25,7 @@ export interface IPostRepository {
   ): Promise<EnrichedPost | null>;
   findAndSortFeed(options: {
     userId: string;
+    searchQuery?: string;
     interestKeywords: string[];
     followingUserIds: string[];
     page: number;

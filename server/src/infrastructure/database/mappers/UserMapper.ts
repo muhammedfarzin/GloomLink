@@ -66,6 +66,7 @@ export class UserMapper {
       username: user.username,
       image: user.image,
       isFollowing: user.isFollowing,
+      type: "user",
     };
   }
 }

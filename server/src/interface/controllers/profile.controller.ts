@@ -85,26 +85,3 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-
-export const search: RequestHandler = async (req, res, next) => {
-  try {
-    const query = req.query.query || "";
-
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    } else if (typeof query !== "string") {
-      throw new HttpError(400, "Invalid query type");
-    }
-
-    const userId = req.user._id;
-    const [users, posts] = await Promise.all([
-      userRepository.search(userId, query),
-      postRepository.search(userId, query),
-      userRepository.addInterestedKeywords(userId, query),
-    ]);
-
-    res.status(200).json([...users, ...posts]);
-  } catch (error) {
-    next(error);
-  }
-};

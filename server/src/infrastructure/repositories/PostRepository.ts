@@ -99,21 +99,30 @@ export class PostRepository implements IPostRepository {
 
   async findAndSortFeed(options: {
     userId: string;
+    searchQuery?: string;
     interestKeywords: string[];
     followingUserIds: string[];
     page: number;
     limit: number;
   }): Promise<EnrichedPost[]> {
-    const { userId, interestKeywords, followingUserIds, page, limit } = options;
+    const { interestKeywords, searchQuery = "", page, limit } = options;
     const skip = (page - 1) * limit;
-    const currentUserId = new mongoose.Types.ObjectId(userId);
+    const currentUserId = new mongoose.Types.ObjectId(options.userId);
 
     const interestKeywordsRegex = interestKeywords.map(
       (keyword) => new RegExp(keyword, "i")
     );
 
     const aggregationPipeline: PipelineStage[] = [
-      { $match: { status: "active" } },
+      {
+        $match: {
+          status: "active",
+          $or: [
+            { caption: { $regex: searchQuery, $options: "i" } },
+            { tags: searchQuery.toLowerCase().split(" ") },
+          ],
+        },
+      },
 
       // ---Excluding current user reported post---
       {
@@ -150,7 +159,7 @@ export class PostRepository implements IPostRepository {
                   {
                     $in: [
                       "$userId",
-                      followingUserIds.map(
+                      options.followingUserIds.map(
                         (id) => new mongoose.Types.ObjectId(id)
                       ),
                     ],

@@ -6,6 +6,7 @@ import { EnrichedPost } from "../../domain/repositories/IPostRepository";
 import mongoose, { PipelineStage } from "mongoose";
 import { PostMapper } from "../database/mappers/PostMapper";
 import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
+import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
 
 export class UserRepository implements IUserRepository {
   async create(userData: Partial<User>): Promise<User> {
@@ -248,5 +249,65 @@ export class UserRepository implements IUserRepository {
     }
 
     return PostMapper.toProfileResponse(profileData);
+  }
+
+  async findByStatus(
+    status: "active" | "blocked" | "inactive",
+    options: {
+      userId?: string;
+      searchQuery?: string;
+      page: number;
+      limit: number;
+    }
+  ): Promise<UserListResponseDto[]> {
+    const { userId, searchQuery = "", page, limit } = options;
+    const skip = (page - 1) * limit;
+
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $match: {
+          status,
+          $or: [
+            { username: { $regex: searchQuery, $options: "i" } },
+            { firstname: { $regex: searchQuery, $options: "i" } },
+            { lastname: { $regex: searchQuery, $options: "i" } },
+          ],
+        },
+      },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followingTo",
+          as: "followers",
+        },
+      },
+      {
+        $addFields: {
+          isFollowing: userId
+            ? {
+                $in: [
+                  new mongoose.Types.ObjectId(userId),
+                  "$followers.followedBy",
+                ],
+              }
+            : undefined,
+        },
+      },
+      {
+        $project: {
+          username: 1,
+          firstname: 1,
+          lastname: 1,
+          image: 1,
+          isFollowing: 1,
+        },
+      },
+    ];
+
+    const users = await UserModel.aggregate(aggregationPipeline);
+    return users.map(UserMapper.toListView);
   }
 }
