@@ -341,4 +341,81 @@ export class UserRepository implements IUserRepository {
 
     return await UserModel.aggregate(aggregationPipeline);
   }
+
+  async findSuggestions(
+    userId: string,
+    excludeIds: string[],
+    limit: number
+  ): Promise<UserListResponseDto[]> {
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const excludeObjectIds = excludeIds.map(
+      (id) => new mongoose.Types.ObjectId(id)
+    );
+
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $match: {
+          _id: { $nin: [...excludeObjectIds, userObjectId] },
+          status: "active",
+        },
+      },
+      {
+        $facet: {
+          following: [
+            {
+              $lookup: {
+                from: "follows",
+                let: { potentialUserId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $eq: ["$followedBy", userObjectId] },
+                          { $eq: ["$followingTo", "$$potentialUserId"] },
+                        ],
+                      },
+                    },
+                  },
+                ],
+                as: "followDoc",
+              },
+            },
+            { $match: { "followDoc.0": { $exists: true } } },
+          ],
+          random: [
+            {
+              $sample: { size: limit * 2 },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          suggestions: { $concatArrays: ["$following", "$random"] },
+        },
+      },
+      { $unwind: "$suggestions" },
+      {
+        $group: {
+          _id: "$suggestions._id",
+          doc: { $first: "$suggestions" },
+        },
+      },
+      { $limit: limit },
+      { $replaceRoot: { newRoot: "$doc" } },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          firstname: 1,
+          lastname: 1,
+          image: 1,
+        },
+      },
+    ];
+
+    const users = await UserModel.aggregate(aggregationPipeline);
+    return users.map(UserMapper.toListView);
+  }
 }

@@ -9,7 +9,7 @@ router.get(
   "/",
   authenticateToken,
   authorizeRole("user"),
-  conversationController.fetchAllConversations
+  conversationController.getConversations
 );
 
 router.post(

@@ -40,4 +40,9 @@ export interface IUserRepository {
     page: number;
     limit: number;
   }): Promise<User[]>;
+  findSuggestions(
+    userId: string,
+    excludeIds: string[],
+    limit: number
+  ): Promise<UserListResponseDto[]>;
 }

@@ -1,9 +1,12 @@
 import { Types } from "mongoose";
 import { Conversation } from "../../../domain/entities/Conversation";
 import { ConversationDocument } from "../models/ConversationModel";
+import { ConversationListDto } from "../../../application/dtos/ConversationListDto";
 
 export class ConversationMapper {
-  public static toDomain(conversationModel: ConversationDocument): Conversation {
+  public static toDomain(
+    conversationModel: ConversationDocument
+  ): Conversation {
     return {
       _id: conversationModel._id.toString(),
       participants: conversationModel.participants.map((id) => id.toString()),
@@ -23,5 +26,19 @@ export class ConversationMapper {
     }
 
     return persistenceConversation;
+  }
+
+  public static toListView(conversation: any): ConversationListDto {
+    return {
+      _id: conversation._id?.toString(),
+      conversationId: conversation.conversationId?.toString(),
+      username: conversation.username,
+      firstname: conversation.firstname,
+      lastname: conversation.lastname,
+      image: conversation.image,
+      unread: conversation.unread,
+      lastMessageTime: conversation.lastMessageTime,
+      type: "conversation",
+    };
   }
 }

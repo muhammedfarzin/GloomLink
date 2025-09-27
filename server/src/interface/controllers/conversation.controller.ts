@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
-import { conversationRepository } from "../../infrastructure/repositories/ConversationRepository";
+import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { userRepository } from "../../infrastructure/repositories/UserRepository";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { isObjectIdOrHexString, Schema } from "mongoose";
+import { GetConversations } from "../../application/use-cases/GetConversations";
 
 export const createConversation: RequestHandler = async (req, res, next) => {
   try {
@@ -31,27 +32,24 @@ export const createConversation: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const fetchAllConversations: RequestHandler = async (req, res, next) => {
+export const getConversations: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
-    const userId = req.user._id;
-    const conversations = await conversationRepository.fetchConversationList(
-      userId
+
+    const conversationRepository = new ConversationRepository();
+    const userRepository = new UserRepository();
+    const getConversationsUseCase = new GetConversations(
+      conversationRepository,
+      userRepository
     );
 
-    if (conversations.length <= 10) {
-      const noSuggestionUsers: Schema.Types.ObjectId[] = conversations.map(
-        (conversation) => conversation._id
-      );
-      var suggested: any[] | undefined =
-        await userRepository.fetchSuggestedUsers(userId, [
-          ...noSuggestionUsers,
-        ]);
-    }
+    const result = await getConversationsUseCase.execute(req.user.id);
 
-    res.status(200).json({ conversations, suggested });
+    res
+      .status(200)
+      .json({ ...result, message: "Conversations fetched successfully" });
   } catch (error) {
     next(error);
   }

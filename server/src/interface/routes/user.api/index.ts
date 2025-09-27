@@ -53,8 +53,8 @@ router.use("/likes", likesRouter);
 
 router.use("/comments", commentsRouter);
 
-router.use("/subscriptions", subscriptionRouter);
-
 router.use("/conversations", conversationRouter);
+
+router.use("/subscriptions", subscriptionRouter);
 
 export { router as userApiRouter };
