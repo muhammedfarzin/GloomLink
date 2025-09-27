@@ -6,6 +6,10 @@ import { isObjectIdOrHexString, Schema } from "mongoose";
 import { GetConversations } from "../../application/use-cases/GetConversations";
 import { createConversationSchema } from "../validation/conversationSchemas";
 import { CreateConversation } from "../../application/use-cases/CreateConversation";
+import { GetConversationId } from "../../application/use-cases/GetConversationId";
+import { getMessagesSchema } from "../validation/followSchemas";
+import { MessageRepository } from "../../infrastructure/repositories/MessageRepository";
+import { GetMessages } from "../../application/use-cases/GetMessages";
 
 export const createConversation: RequestHandler = async (req, res, next) => {
   try {
@@ -65,50 +69,57 @@ export const getConversationId: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const targetUser = await userRepository.findByUsername(req.params.username);
+    const { username: targetUsername } = req.params;
 
-    if (!targetUser) throw new HttpError(404, "Invalid username");
+    const conversationRepository = new ConversationRepository();
+    const userRepository = new UserRepository();
 
-    const conversationId = await conversationRepository.findConversationId([
-      req.user._id,
-      targetUser._id.toString(),
-    ]);
+    const getConversationIdUseCase = new GetConversationId(
+      conversationRepository,
+      userRepository
+    );
+    const conversation = await getConversationIdUseCase.execute({
+      participantsUsername: [req.user.username, targetUsername],
+    });
 
-    if (!conversationId) throw new HttpError(404, "Conversation not found");
-
-    // const messages = await conversationRepository.fetchMessages(conversationId);
-
-    res.status(200).json({ conversationId });
+    res.status(200).json({
+      conversationId: conversation._id,
+      message: "Conversation ID fetched successfully.",
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const getConversationMessages: RequestHandler = async (
-  req,
-  res,
-  next
-) => {
+export const getMessages: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "user") {
       throw new HttpError(401, "Unauthorized");
     }
 
-    if (!isObjectIdOrHexString(req.params.conversationId))
-      throw new HttpError(400, "Invalid conversation");
+    const { conversationId, page, limit } = getMessagesSchema.parse({
+      ...req.query,
+      conversationId: req.params.conversationId,
+    });
 
-    const conversationId =
-      await conversationRepository.validateConversationPermission(
-        req.user._id,
-        req.params.conversationId
-      );
+    const messageRepository = new MessageRepository();
+    const conversationRepository = new ConversationRepository();
 
-    if (!conversationId)
-      throw new HttpError(403, "You are not included in this conversation");
+    const getMessagesUseCase = new GetMessages(
+      messageRepository,
+      conversationRepository
+    );
+    const messages = await getMessagesUseCase.execute({
+      conversationId,
+      currentUserId: req.user.id,
+      page,
+      limit,
+    });
 
-    const messages = await conversationRepository.fetchMessages(conversationId);
-
-    res.status(200).json(messages);
+    res.status(200).json({
+      messagesData: messages,
+      message: "Messages fetched successfully.",
+    });
   } catch (error) {
     next(error);
   }

@@ -14,6 +14,13 @@ export class ConversationRepository implements IConversationRepository {
     return ConversationMapper.toDomain(savedDoc);
   }
 
+  async findById(id: string): Promise<Conversation | null> {
+    const conversationModel = await ConversationModel.findById(id);
+    return conversationModel
+      ? ConversationMapper.toDomain(conversationModel)
+      : null;
+  }
+
   async findByParticipants(
     participantIds: string[]
   ): Promise<Conversation | null> {

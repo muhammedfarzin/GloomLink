@@ -40,7 +40,7 @@ const MessageViewer: React.FC = () => {
         const conversationId = response.data.conversationId;
         setConversationId(conversationId);
         apiClient.get(`/conversations/${conversationId}`).then((response) => {
-          setMessages(response.data);
+          setMessages(response.data.messagesData);
           scrollChatViewToBottom();
 
           const unreadMessages = (response.data as MessageType[]).filter(

@@ -16,7 +16,7 @@ const PostMessage: React.FC<Props> = ({ data }) => {
   useEffect(() => {
     apiClient
       .get(`/posts/${data.message}`)
-      .then((response) => setPostData(response.data))
+      .then((response) => setPostData(response.data.postData))
       .catch((error) =>
         toast({
           description: error.message,
@@ -26,31 +26,36 @@ const PostMessage: React.FC<Props> = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="max-w-xs cursor-pointer">
-      {data.from && (
-        <span className="text-sm text-foreground/50">
-          Post from{" "}
-          <Link to={`/${data.from}`} className="cursor-pointer hover:underline">
-            {data.from}
-          </Link>
-        </span>
-      )}
-      {postData && (
-        <div>
-          <img
-            className="rounded-lg"
-            src={postData.images[0]}
-            alt="post image"
-          />
-          <span
-            tabIndex={0}
-            className="line-clamp-[1] focus:line-clamp-none mt-2"
-          >
-            {postData.caption}
+    postData && (
+      <div className="max-w-xs cursor-pointer">
+        {
+          <span className="text-sm text-foreground/50">
+            Post from{" "}
+            <Link
+              to={`/${postData.uploadedBy.username}`}
+              className="cursor-pointer hover:underline"
+            >
+              {postData.uploadedBy.username}
+            </Link>
           </span>
-        </div>
-      )}
-    </div>
+        }
+        {postData && (
+          <div>
+            <img
+              className="rounded-lg"
+              src={postData.images[0]}
+              alt="post image"
+            />
+            <span
+              tabIndex={0}
+              className="line-clamp-[1] focus:line-clamp-none mt-2"
+            >
+              {postData.caption}
+            </span>
+          </div>
+        )}
+      </div>
+    )
   );
 };
 

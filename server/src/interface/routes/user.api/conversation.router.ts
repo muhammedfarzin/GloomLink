@@ -30,7 +30,7 @@ router.get(
   "/:conversationId",
   authenticateToken,
   authorizeRole("user"),
-  conversationController.getConversationMessages
+  conversationController.getMessages
 );
 
 export { router as conversationRouter };

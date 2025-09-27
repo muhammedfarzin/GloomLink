@@ -4,13 +4,14 @@ import { MessageDocument } from "../models/MessageModel";
 
 export class MessageMapper {
   public static toDomain(messageModel: MessageDocument): Message {
-    const messageObject = messageModel.toObject<MessageDocument>();
+    const messageObject =
+      messageModel.toObject<MessageDocument>?.() || messageModel;
 
     return {
       ...messageObject,
-      _id: messageObject._id.toString(),
-      conversation: messageObject.conversation.toString(),
-      from: messageObject.from.toString(),
+      _id: messageObject._id?.toString(),
+      conversation: messageObject.conversation?.toString(),
+      from: messageObject.from?.toString(),
     };
   }
 
