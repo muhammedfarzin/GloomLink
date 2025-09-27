@@ -3,8 +3,31 @@ import { IConversationRepository } from "../../domain/repositories/IConversation
 import { ConversationListDto } from "../../application/dtos/ConversationListDto";
 import { ConversationModel } from "../database/models/ConversationModel";
 import { ConversationMapper } from "../database/mappers/ConversationMapper";
+import { Conversation } from "../../domain/entities/Conversation";
 
 export class ConversationRepository implements IConversationRepository {
+  async create(participantIds: string[]): Promise<Conversation> {
+    const newConversation = new ConversationModel({
+      participants: participantIds,
+    });
+    const savedDoc = await newConversation.save();
+    return ConversationMapper.toDomain(savedDoc);
+  }
+
+  async findByParticipants(
+    participantIds: string[]
+  ): Promise<Conversation | null> {
+    const conversationDoc = await ConversationModel.findOne({
+      participants: {
+        $all: participantIds,
+        $size: participantIds.length,
+      },
+    });
+    return conversationDoc
+      ? ConversationMapper.toDomain(conversationDoc)
+      : null;
+  }
+
   async findConversationsByUserId(
     userId: string
   ): Promise<ConversationListDto[]> {

@@ -1,0 +1,60 @@
+import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { Conversation } from "../../domain/entities/Conversation";
+import { HttpError } from "../../infrastructure/errors/HttpError";
+
+export interface CreateConversationInput {
+  currentUsername: string;
+  participantsUsername: string[];
+}
+
+export class CreateConversation {
+  constructor(
+    private conversationRepository: IConversationRepository,
+    private userRepository: IUserRepository
+  ) {}
+
+  async execute(input: CreateConversationInput): Promise<Conversation> {
+    input.participantsUsername = input.participantsUsername.filter(
+      (username) => username !== input.currentUsername
+    );
+
+    const { currentUsername, participantsUsername } = input;
+
+    if (participantsUsername.length === 0) {
+      throw new HttpError(
+        400,
+        "You cannot create a conversation without other users"
+      );
+    }
+
+    const pUsernames = [currentUsername, ...participantsUsername];
+    const users = await Promise.all(
+      pUsernames.map((username) => this.userRepository.findByUsername(username))
+    );
+
+    const participantsIds = users
+      .filter((user) => !!user)
+      .map((user) => user._id);
+
+    if (participantsIds.length !== pUsernames.length) {
+      throw new HttpError(
+        404,
+        "the user you are tryinng to message not found or has been removed"
+      );
+    }
+
+    // ---Check if a conversation already exists---
+    const existingConversation =
+      await this.conversationRepository.findByParticipants(participantsIds);
+    if (existingConversation) {
+      return existingConversation;
+    }
+
+    // ---If not, create a new one---
+    const newConversation = await this.conversationRepository.create(
+      participantsIds
+    );
+    return newConversation;
+  }
+}

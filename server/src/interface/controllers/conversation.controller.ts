@@ -4,6 +4,8 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { isObjectIdOrHexString, Schema } from "mongoose";
 import { GetConversations } from "../../application/use-cases/GetConversations";
+import { createConversationSchema } from "../validation/conversationSchemas";
+import { CreateConversation } from "../../application/use-cases/CreateConversation";
 
 export const createConversation: RequestHandler = async (req, res, next) => {
   try {
@@ -11,22 +13,24 @@ export const createConversation: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const users: any | undefined = req.body.participants;
+    const { participants } = createConversationSchema.parse(req.body);
 
-    if (!users || !users.length || (typeof users === "string" && !users.trim()))
-      throw new HttpError(400, "Participants required");
+    const conversationRepository = new ConversationRepository();
+    const userRepository = new UserRepository();
 
-    const userData =
-      users instanceof Array
-        ? await userRepository.usernameToUserId(...users)
-        : await userRepository.usernameToUserId(users);
+    const createConversationUseCase = new CreateConversation(
+      conversationRepository,
+      userRepository
+    );
+    const conversation = await createConversationUseCase.execute({
+      currentUsername: req.user.username,
+      participantsUsername: participants,
+    });
 
-    if (!userData.length) throw new HttpError(404, "Invalid username");
-
-    const participants = [req.user._id, ...userData];
-    const conversationId = await conversationRepository.create(participants);
-
-    res.status(201).json({ conversationId, message: "Conversation created" });
+    res.status(201).json({
+      conversationId: conversation._id,
+      message: "Conversation created or retrieved successfully.",
+    });
   } catch (error) {
     next(error);
   }
