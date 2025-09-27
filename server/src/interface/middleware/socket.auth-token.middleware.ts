@@ -1,7 +1,7 @@
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
-import { userRepository } from "../../infrastructure/repositories/UserRepository";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import type { ExtendedError, Socket } from "socket.io";
 import { activeUsers } from "../websocket";
 
@@ -21,8 +21,10 @@ export const authenticateTokenForSocket = async (
       process.env.JWT_ACCESS_SECRET || "secret"
     ) as TokenPayloadType;
 
+    const userRepository = new UserRepository();
+
     if (data.role === "user") {
-      var userData = await userRepository.findById(data._id);
+      var userData = await userRepository.findById(data.id);
       if (!userData) throw new Error("Unauthorized: Invalid user");
       if (userData.status === "blocked")
         throw new Error("Unauthorized: User has been blocked");
@@ -32,7 +34,7 @@ export const authenticateTokenForSocket = async (
       socket.user = {
         role: "user",
         ...userData,
-        _id: userId.toString(),
+        id: userId.toString(),
         authType,
       };
 
@@ -40,7 +42,7 @@ export const authenticateTokenForSocket = async (
         activeUsers[userData.username] = new Set();
 
       activeUsers[userData.username].add(socket.id);
-    } else socket.user = { ...data, _id: "admin" };
+    } else socket.user = { role: "admin", id: data.id, username: data.id };
 
     next();
   } catch (error: any) {

@@ -2,7 +2,6 @@ import { RequestHandler } from "express";
 import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import { isObjectIdOrHexString, Schema } from "mongoose";
 import { GetConversations } from "../../application/use-cases/GetConversations";
 import { createConversationSchema } from "../validation/conversationSchemas";
 import { CreateConversation } from "../../application/use-cases/CreateConversation";

@@ -9,16 +9,16 @@ export const handleSocketConnection = async (socket: Socket) => {
 
   // Handle Messages
   socket.on("send-message", controller.handleSendMessage);
-  socket.on("message-seen", controller.markAsSeen)
+  socket.on("message-seen", controller.markAsSeen);
 
   // Handle Calls
   socket.on("call:outgoing", callController.outgoingCall);
   socket.on("call:accepted", callController.callAccepted);
   socket.on("call:declined", callController.callDeclined);
-  socket.on("call:negotiationneeded", callController.negotiationNeeded)
-  socket.on("call:negotiationdone", callController.negotiationDone)
-  socket.on("call:ice-candidate", callController.iceCandidate)
-  socket.on("call:end", callController.endCall)
+  socket.on("call:negotiationneeded", callController.negotiationNeeded);
+  socket.on("call:negotiationdone", callController.negotiationDone);
+  socket.on("call:ice-candidate", callController.iceCandidate);
+  socket.on("call:end", callController.endCall);
 
   // Handle Disconnect
   socket.on("disconnect", () => {

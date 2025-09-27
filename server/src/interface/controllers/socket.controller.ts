@@ -37,7 +37,7 @@ export class SocketController {
 
       const messageDocument = await conversationRepository.addMessage(
         conversationId,
-        this.socket.user._id,
+        this.socket.user.id,
         {
           message,
           image,
@@ -69,7 +69,7 @@ export class SocketController {
       from: string;
     }
   ) => {
-    conversationRepository.markAsRead(message._id, this.socket.user._id);
+    conversationRepository.markAsRead(message._id, this.socket.user.id);
     const targetUserSocketIds = activeUsers[message.from];
     if (targetUserSocketIds && targetUserSocketIds.size) {
       this.socket.to([...targetUserSocketIds]).emit("message-seen", message);
