@@ -1,7 +1,6 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import { PostRepository } from "../../infrastructure/repositories/PostRepository";
 import { GetUserProfile } from "../../application/use-cases/GetUserProfile";
 import { GetUserDataForForm } from "../../application/use-cases/GetUserDataForForm";
 import { updateProfileSchema } from "../validation/profileSchemas";

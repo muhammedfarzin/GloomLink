@@ -2,7 +2,6 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { PostRepository } from "../../infrastructure/repositories/PostRepository";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import { LikeRepository } from "../../infrastructure/repositories/LikeRepository";
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
 import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
 import { CreatePost } from "../../application/use-cases/CreatePost";

@@ -1,6 +1,6 @@
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { TokenPayloadType } from "../../application/services/token.service";
+import { TokenPayloadType } from "../../types/tokens";
 import { userRepository } from "../../infrastructure/repositories/UserRepository";
 import type { ExtendedError, Socket } from "socket.io";
 import { activeUsers } from "../websocket";

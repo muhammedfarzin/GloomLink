@@ -6,7 +6,6 @@ import { authorizeRole } from "../../middleware/authorize-role.middleware.js";
 import { profileRouter } from "./profile.router.js";
 import { postsRouter } from "./posts.router.js";
 import { commentsRouter } from "./comments.router.js";
-import { subscriptionRouter } from "./subscription.router.js";
 import { conversationRouter } from "./conversation.router.js";
 import { likesRouter } from "./likes.router.js";
 import { searchRouter } from "./search.router.js";
@@ -54,7 +53,5 @@ router.use("/likes", likesRouter);
 router.use("/comments", commentsRouter);
 
 router.use("/conversations", conversationRouter);
-
-router.use("/subscriptions", subscriptionRouter);
 
 export { router as userApiRouter };

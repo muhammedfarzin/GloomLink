@@ -4,12 +4,7 @@ import { CreateUser } from "../../application/use-cases/CreateUser";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { OtpRepository } from "../../infrastructure/repositories/OtpRepository.js";
 import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
-import { type TokenPayloadType } from "../../application/services/token.service.js";
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
-import {
-  removeFromCloudinary,
-  uploadToCloudinary,
-} from "../../application/services/cloudinary.service.js";
 import {
   adminLoginInputSchema,
   googleAuthSchema,

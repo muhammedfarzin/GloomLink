@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { TokenPayloadType } from "../../application/services/token.service";
+import { TokenPayloadType } from "../../types/tokens";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 
 export const authenticateToken: RequestHandler = async (req, res, next) => {

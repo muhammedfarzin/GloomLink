@@ -1,6 +1,6 @@
 import type { Request } from "express";
 import type { User } from "../infrastructure/database/models/UserModel";
-import type { TokenPayloadType } from "../application/services/token.service";
+import type { TokenPayloadType } from "./tokens";
 
 declare module "express-serve-static-core" {
   interface Request {
