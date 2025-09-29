@@ -43,13 +43,13 @@ const MessageViewer: React.FC = () => {
           setMessages(response.data.messagesData);
           scrollChatViewToBottom();
 
-          const unreadMessages = (response.data as MessageType[]).filter(
-            (chat) => chat.status !== "seen" && chat.from !== myUsername
-          );
+          const unreadMessages = (response.data.messagesData as MessageType[])
+            .filter(
+              (chat) => chat.status !== "seen" && chat.from !== myUsername
+            )
+            .map((message) => ({ messageId: message._id, from: message.from }));
 
-          unreadMessages.forEach((message) =>
-            socket.emit("message-seen", message)
-          );
+          socket.emit("message-seen", ...unreadMessages);
         });
       });
   }, [username, socket]);
@@ -147,14 +147,16 @@ const MessageViewer: React.FC = () => {
     ]);
     scrollChatViewToBottom();
 
-    if (!conversationId) {
+    let conversation = conversationId;
+    if (!conversation) {
       const response = await apiClient.post("/conversations/create", {
         participants: username,
       });
+      conversation = response.data.conversationId;
       setConversationId(response.data.conversationId as string);
     }
 
-    socket?.emit("send-message", username, data);
+    socket?.emit("send-message", conversation, data);
   };
 
   return (

@@ -5,6 +5,31 @@ import { MessageMapper } from "../database/mappers/MessageMapper";
 import mongoose, { PipelineStage } from "mongoose";
 
 export class MessageRepository implements IMessageRepository {
+  async create(messageData: Partial<Message>): Promise<Message> {
+    const messageToPersist = MessageMapper.toPersistence(messageData);
+    const newMessageModel = new MessageModel(messageToPersist);
+    const savedDoc = await newMessageModel.save();
+    return MessageMapper.toDomain(savedDoc);
+  }
+
+  async findById(messageId: string): Promise<Message | null> {
+    const messageDoc = await MessageModel.findById(messageId);
+    return messageDoc ? MessageMapper.toDomain(messageDoc) : null;
+  }
+
+  async update(
+    messageId: string,
+    data: Partial<Message>
+  ): Promise<Message | null> {
+    const messageToPersist = MessageMapper.toPersistence(data);
+    const updatedDoc = await MessageModel.findByIdAndUpdate(
+      messageId,
+      { $set: messageToPersist },
+      { new: true }
+    );
+    return updatedDoc ? MessageMapper.toDomain(updatedDoc) : null;
+  }
+
   async findByConversationId(
     conversationId: string,
     options: { page: number; limit: number }

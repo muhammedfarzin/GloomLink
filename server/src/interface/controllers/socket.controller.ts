@@ -1,9 +1,15 @@
 import type { Socket } from "socket.io";
-import { Message } from "../../infrastructure/database/models/MessageModel";
-import { urlPattern } from "../../shared/regexPatterns";
-import { conversationRepository } from "../../infrastructure/repositories/ConversationRepository";
+import { Message } from "../../domain/entities/Message";
+import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 import { activeUsers } from "../websocket";
-import { Error, Types } from "mongoose";
+import { MessageRepository } from "../../infrastructure/repositories/MessageRepository";
+import { UserRepository } from "../../infrastructure/repositories/UserRepository";
+import { SendMessage } from "../../application/use-cases/SendMessage";
+import { MarkMessageAsSeen } from "../../application/use-cases/MarkMessageAsSeen";
+import {
+  markAsSeenSchema,
+  sendMessageSchema,
+} from "../validation/socketSchemas";
 
 export class SocketController {
   socket: Socket;
@@ -15,64 +21,72 @@ export class SocketController {
   }
 
   handleSendMessage = async (
-    username: string,
+    conversationId: string,
     data: Partial<Pick<Message, "message" | "image" | "type">>
   ) => {
     try {
-      const { message, image, type } = data;
-      if (!message?.trim() && !image?.trim())
-        throw new Error("Message or image either one is required");
-      if (image && !urlPattern.test(image))
-        throw new Error("Invalid image URL");
-      if (type !== "text" && type !== "image" && type !== "post")
-        throw new Error("Invalid message type");
-
-      const conversationId =
-        await conversationRepository.findConversationIdByUsername(
-          username,
-          this.socket.user.username
-        );
-
-      if (!conversationId) throw new Error("Conversation not found");
-
-      const messageDocument = await conversationRepository.addMessage(
+      const { message, image, type } = sendMessageSchema.parse({
+        ...data,
         conversationId,
-        this.socket.user.id,
-        {
-          message,
-          image,
-          type,
-        }
+      });
+
+      const messageRepository = new MessageRepository();
+      const conversationRepository = new ConversationRepository();
+      const userRepository = new UserRepository();
+
+      const sendMessageUseCase = new SendMessage(
+        messageRepository,
+        conversationRepository,
+        userRepository
       );
 
-      const responseMessage = {
-        ...messageDocument,
-        from: this.username,
-        to: username,
-      };
-      const targetUserSocketIds = activeUsers[username];
+      const newMessage = await sendMessageUseCase.execute({
+        message,
+        image,
+        type,
+        senderId: this.socket.user.id,
+        conversationId,
+      });
 
-      this.socket.emit("send-message-success", responseMessage);
-
-      if (!targetUserSocketIds || !targetUserSocketIds.size) return;
-
-      const targetUsers = [...targetUserSocketIds.values()] as string[];
-      this.socket.to(targetUsers).emit("send-message", responseMessage);
+      this.socket.to(conversationId).emit("send-message", newMessage);
+      this.socket.emit("send-message-success", newMessage);
     } catch (error: any) {
       this.socket.emit("error-send-message", error.message, data);
     }
   };
 
-  markAsSeen = async (
-    message: Omit<Message, "conversation" | "from"> & {
-      _id: string;
-      from: string;
-    }
-  ) => {
-    conversationRepository.markAsRead(message._id, this.socket.user.id);
-    const targetUserSocketIds = activeUsers[message.from];
-    if (targetUserSocketIds && targetUserSocketIds.size) {
-      this.socket.to([...targetUserSocketIds]).emit("message-seen", message);
+  markAsSeen = async (...messages: { messageId?: string; from?: string }[]) => {
+    try {
+      const validatedMessages = markAsSeenSchema.parse(messages);
+
+      const messageRepository = new MessageRepository();
+      const conversationRepository = new ConversationRepository();
+
+      const markAsSeenUseCase = new MarkMessageAsSeen(
+        messageRepository,
+        conversationRepository
+      );
+
+      for (const message of validatedMessages) {
+        const updatedMessage = await markAsSeenUseCase.execute({
+          messageId: message.messageId,
+          viewerId: this.socket.user.id,
+        });
+        const senderSocketIds = activeUsers[message.from];
+        if (senderSocketIds && senderSocketIds.size) {
+          this.socket
+            .to([...senderSocketIds])
+            .emit("message-seen", updatedMessage);
+        }
+      }
+    } catch (error: any) {
+      this.socket.emit(
+        "markAsSeenError",
+        {
+          message: error.message || "Something went wrong",
+        },
+        ...messages
+      );
     }
   };
 }

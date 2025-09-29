@@ -1,9 +1,10 @@
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
 import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import type { ExtendedError, Socket } from "socket.io";
 import { activeUsers } from "../websocket";
+import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 
 export const authenticateTokenForSocket = async (
   socket: Socket,
@@ -21,13 +22,20 @@ export const authenticateTokenForSocket = async (
       process.env.JWT_ACCESS_SECRET || "secret"
     ) as TokenPayloadType;
 
-    const userRepository = new UserRepository();
-
     if (data.role === "user") {
+      const userRepository = new UserRepository();
+      const conversationRepository = new ConversationRepository();
+
       var userData = await userRepository.findById(data.id);
       if (!userData) throw new Error("Unauthorized: Invalid user");
       if (userData.status === "blocked")
         throw new Error("Unauthorized: User has been blocked");
+
+      const conversations =
+        await conversationRepository.findConversationsByUserId(userData._id);
+      socket.join(
+        conversations.map((conversation) => conversation.conversationId)
+      );
 
       const { authType = "email", _id: userId } = userData;
 
