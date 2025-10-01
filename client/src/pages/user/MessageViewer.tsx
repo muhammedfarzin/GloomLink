@@ -59,7 +59,10 @@ const MessageViewer: React.FC = () => {
       if (newMessage.from === username) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         scrollChatViewToBottom();
-        socket?.emit("message-seen", newMessage);
+        socket?.emit("message-seen", {
+          messageId: newMessage._id,
+          from: newMessage.from,
+        });
       }
     };
 

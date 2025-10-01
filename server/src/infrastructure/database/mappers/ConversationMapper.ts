@@ -36,7 +36,7 @@ export class ConversationMapper {
       firstname: conversation.firstname,
       lastname: conversation.lastname,
       image: conversation.image,
-      unread: conversation.unread,
+      unread: conversation.unread || 0,
       lastMessageTime: conversation.lastMessageTime,
       type: "conversation",
     };

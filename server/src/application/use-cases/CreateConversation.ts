@@ -1,7 +1,8 @@
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { Conversation } from "../../domain/entities/Conversation";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { Conversation } from "../../domain/entities/Conversation";
+import appEmitter from "../events/appEmitter";
 
 export interface CreateConversationInput {
   currentUsername: string;
@@ -29,19 +30,26 @@ export class CreateConversation {
     }
 
     const pUsernames = [currentUsername, ...participantsUsername];
-    const users = await Promise.all(
-      pUsernames.map((username) => this.userRepository.findByUsername(username))
-    );
+    const users = (
+      await Promise.all(
+        pUsernames.map((username) =>
+          this.userRepository.findByUsername(username)
+        )
+      )
+    ).filter((user) => !!user);
 
-    const participantsIds = users
-      .filter((user) => !!user)
-      .map((user) => user._id);
+    const participantsIds = users.map((user) => user._id);
 
     if (participantsIds.length !== pUsernames.length) {
       throw new HttpError(
         404,
         "the user you are tryinng to message not found or has been removed"
       );
+    }
+
+    const currentUser = users.find((user) => user.username === currentUsername);
+    if (!currentUser) {
+      throw new HttpError(400, "You cannot create a conversation without you");
     }
 
     // ---Check if a conversation already exists---
@@ -55,6 +63,16 @@ export class CreateConversation {
     const newConversation = await this.conversationRepository.create(
       participantsIds
     );
+
+    // Inform to all participants
+    appEmitter.emit("conversationCreated", {
+      conversation: newConversation,
+      creator: currentUser,
+      otherParticipants: users.filter(
+        (user) => user.username !== currentUsername
+      ),
+    });
+
     return newConversation;
   }
 }

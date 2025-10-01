@@ -43,7 +43,9 @@ const User = () => {
         <Outlet />
         <IncomeCallListener />
       </div>
-      <ChatList />
+      <div className="hidden lg:flex flex-col gap-3 w-1/5 max-w-[300px] h-screen bg-secondary text-foreground py-6 px-4 overflow-y-scroll no-scrollbar fixed right-0 top-0">
+        <ChatList />
+      </div>
     </>
   ) : null;
 };

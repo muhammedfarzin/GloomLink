@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ChatItem from "./ChatItem";
 import apiClient from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
@@ -12,6 +12,44 @@ const ChatList = () => {
   const [chats, setChats] = useState<ChatUserDataType[]>([]);
   const [suggested, setSuggested] = useState<ChatUserDataType[]>([]);
 
+  const handleIncomeMessage = useCallback(
+    async (newMessage: MessageType) => {
+      let chat: ChatUserDataType | undefined = chats.find(
+        (chat) => chat.username === newMessage.from
+      );
+
+      if (chat) {
+        const newChat = { ...chat };
+
+        if (
+          /^\/messages\/[^/]+\/?$/.test(location.pathname) &&
+          selectedUsername === newMessage.from
+        ) {
+          newChat.unread = 0;
+        } else newChat.unread = (newChat.unread || 0) + 1;
+
+        const remaining = chats.filter(
+          (chat) => chat.username !== newMessage.from
+        );
+        return setChats([newChat, ...remaining]);
+      }
+    },
+    [chats, setChats]
+  );
+
+  const handleNewConversation = useCallback(
+    (conversation: ChatUserDataType) => {
+      const isExist = chats.find((chat) => chat._id === conversation._id);
+      if (isExist) return;
+
+      setChats((prevState) => [conversation, ...prevState]);
+      setSuggested((prevState) =>
+        prevState.filter((chat) => chat._id !== conversation._id)
+      );
+    },
+    [chats, setChats, setSuggested]
+  );
+
   useEffect(() => {
     apiClient.get("/conversations/").then((response) => {
       setChats(response.data.conversations);
@@ -20,60 +58,31 @@ const ChatList = () => {
   }, []);
 
   useEffect(() => {
+    if (/^\/messages\/([^\/]+)\/?$/.test(location.pathname)) {
+      setChats((prevState) =>
+        prevState.map((chat) => {
+          if (chat.username === selectedUsername) {
+            chat.unread = 0;
+          }
+          return chat;
+        })
+      );
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
     if (!socket) return;
 
     socket.on("send-message", handleIncomeMessage);
+    socket.on("new-conversation", handleNewConversation);
     return () => {
       socket.off("send-message", handleIncomeMessage);
+      socket.off("new-conversation", handleNewConversation);
     };
-  }, [socket, location.pathname, chats, suggested, selectedUsername]);
-
-  const handleIncomeMessage = async (newMessage: MessageType) => {
-    let chat: ChatUserDataType | undefined = chats.find(
-      (chat) => chat.username === newMessage.from
-    );
-
-    if (chat) {
-      if (
-        /^\/messages\/[^/]+\/?$/.test(location.pathname) &&
-        selectedUsername === newMessage.from
-      ) {
-        chat.unread = 0;
-      } else chat.unread = chat.unread ? chat.unread + 1 : 1;
-
-      const remaining = chats.filter(
-        (chat) => chat.username !== newMessage.from
-      );
-      return setChats([chat, ...remaining]);
-    }
-
-    setSuggested((prevState) => {
-      chat = prevState.find((chat) => chat.username === newMessage.from);
-      if (chat) {
-        if (
-          /^\/messages\/[^/]+\/?$/.test(location.pathname) &&
-          selectedUsername === newMessage.from
-        ) {
-          chat.unread = 0;
-        } else chat.unread = chat.unread ? chat.unread + 1 : 1;
-
-        const remaining = prevState.filter(
-          (chat) => chat.username !== newMessage.from
-        );
-        return [...remaining];
-      } else return prevState;
-    });
-
-    if (chat) return setChats([chat, ...chats]);
-
-    const response = await apiClient.get(`/profile/${newMessage.from}`);
-    const { _id, username, firstname, lastname, image } = response.data;
-    chat = { _id, username, firstname, lastname, image, unread: 1 };
-    setChats([chat, ...chats]);
-  };
+  }, [socket, handleIncomeMessage, handleNewConversation]);
 
   return (
-    <div className="hidden lg:flex flex-col gap-3 w-1/5 max-w-[300px] h-screen bg-secondary text-foreground py-6 px-4 overflow-y-scroll no-scrollbar fixed right-0 top-0">
+    <>
       {/* Chat List */}
       {chats.length || (!chats.length && !suggested.length) ? (
         <div>
@@ -122,7 +131,7 @@ const ChatList = () => {
           </div>
         </div>
       ) : null}
-    </div>
+    </>
   );
 };
 

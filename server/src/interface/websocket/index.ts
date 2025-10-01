@@ -2,6 +2,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { handleSocketConnection } from "./connection-handler";
 import { authenticateTokenForSocket } from "../middleware/socket.auth-token.middleware";
+import { SocketNotificationService } from "../../infrastructure/services/SocketNotificationService";
 
 export const activeUsers: Record<string, Set<string>> = {};
 
@@ -11,4 +12,6 @@ export const setupSocket = (server: http.Server) => {
   io.use(authenticateTokenForSocket);
 
   io.on("connection", handleSocketConnection);
+
+  new SocketNotificationService(io);
 };
