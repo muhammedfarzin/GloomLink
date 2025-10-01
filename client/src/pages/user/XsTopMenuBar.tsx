@@ -12,7 +12,7 @@ const XsTopMenuBar = () => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
 
   return (
-    <div className="flex sm:hidden justify-between items-center sticky top-0 bg-secondary border-b border-border p-2 z-50">
+    <div className="flex justify-between items-center sticky top-0 bg-secondary border-b border-border p-2 z-50">
       <Link to={"/"}>
         <img
           src={GloomLinkLogo}

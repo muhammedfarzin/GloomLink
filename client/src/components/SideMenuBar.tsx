@@ -20,7 +20,7 @@ const SideMenuBar: React.FC<SideMenuBarProps> = ({
     <div
       className={`bg-secondary h-screen py-6 px-4 overflow-y-scroll no-scrollbar ${
         className ??
-        "hidden sm:block w-1/3 md:w-1/4 lg:w-1/5 max-w-[300px] fixed left-0 top-0"
+        "block w-1/3 md:w-1/4 lg:w-1/5 max-w-[300px] fixed left-0 top-0"
       }`}
     >
       <Link to={homePath}>

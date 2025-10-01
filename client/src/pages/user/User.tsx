@@ -7,12 +7,14 @@ import { RootState } from "../../redux/store";
 import { logout } from "../../redux/reducers/auth";
 import XsTopMenuBar from "./XsTopMenuBar";
 import IncomeCallListener from "./components/IncomeCallListener";
+import { ScreenSizeEnum, useScreenSize } from "@/hooks/useScreenSize";
 
 const User = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const { screenGreaterThan, screenLessThan } = useScreenSize();
   const [selectedValue, setSelectedValue] = useState("home");
   const [userAuthenticated, setUserAuthenticated] = useState(false);
 
@@ -34,8 +36,12 @@ const User = () => {
 
   return userAuthenticated ? (
     <>
-      <UserSideMenuBar selected={selectedValue} />
-      {!/^\/messages\/[^/]+\/?$/.test(location.pathname) ? (
+      {screenGreaterThan(ScreenSizeEnum.xs) && (
+        <UserSideMenuBar selected={selectedValue} />
+      )}
+
+      {!/^\/messages\/[^/]+\/?$/.test(location.pathname) &&
+      screenLessThan(ScreenSizeEnum.sm) ? (
         <XsTopMenuBar />
       ) : null}
 
@@ -43,9 +49,12 @@ const User = () => {
         <Outlet />
         <IncomeCallListener />
       </div>
-      <div className="hidden lg:flex flex-col gap-3 w-1/5 max-w-[300px] h-screen bg-secondary text-foreground py-6 px-4 overflow-y-scroll no-scrollbar fixed right-0 top-0">
-        <ChatList />
-      </div>
+
+      {screenGreaterThan(ScreenSizeEnum.md) && (
+        <div className="flex flex-col gap-3 w-1/5 max-w-[300px] h-screen bg-secondary text-foreground py-6 px-4 overflow-y-scroll no-scrollbar fixed right-0 top-0">
+          <ChatList />
+        </div>
+      )}
     </>
   ) : null;
 };
