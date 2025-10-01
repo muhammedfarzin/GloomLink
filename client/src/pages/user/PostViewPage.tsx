@@ -1,14 +1,15 @@
 import CommentBox from "@/components/post/CommentBox";
-import PostListCard from "@/components/post/PostListCard";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import {
   Navigate,
   useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
+
+const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
 
 const PostViewPage = () => {
   const navigate = useNavigate();
