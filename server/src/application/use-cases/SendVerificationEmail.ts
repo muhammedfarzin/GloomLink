@@ -1,14 +1,17 @@
+import { injectable, inject } from "inversify";
 import { IOtpService } from "../services/IOtpService";
 import { IMailService } from "../services/IMailService";
+import { TYPES } from "../../shared/types";
 
 export interface SendVerificationEmailInput {
   email: string;
 }
 
+@injectable()
 export class SendVerificationEmail {
   constructor(
-    private otpService: IOtpService,
-    private mailService: IMailService
+    @inject(TYPES.IOtpService) private otpService: IOtpService,
+    @inject(TYPES.IMailService) private mailService: IMailService
   ) {}
 
   async execute(input: SendVerificationEmailInput): Promise<void> {

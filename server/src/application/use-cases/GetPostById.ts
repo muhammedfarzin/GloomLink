@@ -1,16 +1,21 @@
+import { injectable, inject } from "inversify";
 import {
   IPostRepository,
   EnrichedPost,
 } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface GetPostByIdInput {
   postId: string;
   userId: string;
 }
 
+@injectable()
 export class GetPostById {
-  constructor(private postRepository: IPostRepository) {}
+  constructor(
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+  ) {}
 
   async execute(input: GetPostByIdInput): Promise<EnrichedPost> {
     const post = await this.postRepository.findEnrichedById(

@@ -1,15 +1,14 @@
 import type { Socket } from "socket.io";
 import { Message } from "../../domain/entities/Message";
-import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 import { activeUsers } from "../websocket";
-import { MessageRepository } from "../../infrastructure/repositories/MessageRepository";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { SendMessage } from "../../application/use-cases/SendMessage";
 import { MarkMessageAsSeen } from "../../application/use-cases/MarkMessageAsSeen";
 import {
   markAsSeenSchema,
   sendMessageSchema,
 } from "../validation/socketSchemas";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export class SocketController {
   socket: Socket;
@@ -30,15 +29,7 @@ export class SocketController {
         conversationId,
       });
 
-      const messageRepository = new MessageRepository();
-      const conversationRepository = new ConversationRepository();
-      const userRepository = new UserRepository();
-
-      const sendMessageUseCase = new SendMessage(
-        messageRepository,
-        conversationRepository,
-        userRepository
-      );
+      const sendMessageUseCase = container.get<SendMessage>(TYPES.SendMessage);
 
       const newMessage = await sendMessageUseCase.execute({
         message,
@@ -59,12 +50,8 @@ export class SocketController {
     try {
       const validatedMessages = markAsSeenSchema.parse(messages);
 
-      const messageRepository = new MessageRepository();
-      const conversationRepository = new ConversationRepository();
-
-      const markAsSeenUseCase = new MarkMessageAsSeen(
-        messageRepository,
-        conversationRepository
+      const markAsSeenUseCase = container.get<MarkMessageAsSeen>(
+        TYPES.MarkMessageAsSeen
       );
 
       for (const message of validatedMessages) {

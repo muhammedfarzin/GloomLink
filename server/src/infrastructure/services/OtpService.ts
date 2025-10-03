@@ -1,10 +1,15 @@
+import { inject, injectable } from "inversify";
 import otpGenerator from "otp-generator";
 import { IOtpService } from "../../application/services/IOtpService";
-import { OtpRepository } from "../repositories/OtpRepository";
+import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { BcryptPasswordHasher } from "./BcryptPasswordHasher";
+import { TYPES } from "../../shared/types";
 
+@injectable()
 export class OtpService implements IOtpService {
-  constructor(private otpRepository: OtpRepository) {}
+  constructor(
+    @inject(TYPES.IOtpRepository) private otpRepository: IOtpRepository
+  ) {}
 
   async generate(email: string): Promise<string> {
     const otp = otpGenerator.generate(6, {

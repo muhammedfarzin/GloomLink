@@ -1,10 +1,9 @@
 import { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { searchSchema } from "../validation/searchSchemas";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import { PostRepository } from "../../infrastructure/repositories/PostRepository";
-import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
 import { SearchContent } from "../../application/use-cases/SearchContent";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const search: RequestHandler = async (req, res, next) => {
   try {
@@ -14,14 +13,8 @@ export const search: RequestHandler = async (req, res, next) => {
 
     const { q: searchQuery, ...validatedData } = searchSchema.parse(req.query);
 
-    const userRepository = new UserRepository();
-    const postRepository = new PostRepository();
-    const followRepository = new FollowRepository();
-
-    const searchContentUseCase = new SearchContent(
-      userRepository,
-      postRepository,
-      followRepository
+    const searchContentUseCase = container.get<SearchContent>(
+      TYPES.SearchContent
     );
 
     const results = await searchContentUseCase.execute({

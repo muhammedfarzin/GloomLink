@@ -1,19 +1,22 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface VerifyOtpInput {
   email: string;
   otp: string;
 }
 
+@injectable()
 export class VerifyOtp {
   constructor(
-    private otpRepository: IOtpRepository,
-    private userRepository: IUserRepository,
-    private passwordHasher: IPasswordHasher
+    @inject(TYPES.IOtpRepository) private otpRepository: IOtpRepository,
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(input: VerifyOtpInput): Promise<User> {

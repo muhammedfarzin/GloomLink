@@ -1,13 +1,12 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { GetUserProfile } from "../../application/use-cases/GetUserProfile";
 import { GetUserDataForForm } from "../../application/use-cases/GetUserDataForForm";
 import { updateProfileSchema } from "../validation/profileSchemas";
-import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
 import { UpdateProfile } from "../../application/use-cases/UpdateProfile";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
-import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const getUserProfile: RequestHandler = async (req, res, next) => {
   try {
@@ -15,8 +14,10 @@ export const getUserProfile: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const userRepository = new UserRepository();
-    const getUserProfileUseCase = new GetUserProfile(userRepository);
+    const getUserProfileUseCase = container.get<GetUserProfile>(
+      TYPES.GetUserProfile
+    );
+
     const userProfile = await getUserProfileUseCase.execute({
       username: req.params.username,
       currentUserId: req.user.id,
@@ -37,8 +38,10 @@ export const fetchUserDataForForm: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const userRepository = new UserRepository();
-    const getUserDataForEditUseCase = new GetUserDataForForm(userRepository);
+    const getUserDataForEditUseCase = container.get<GetUserDataForForm>(
+      TYPES.GetUserDataForForm
+    );
+
     const userData = await getUserDataForEditUseCase.execute(req.user.id);
 
     res.status(200).json({
@@ -59,13 +62,8 @@ export const updateProfile: RequestHandler = async (req, res, next) => {
     const validatedBody = updateProfileSchema.parse(req.body);
     const profileImageFile = req.file;
 
-    const userRepository = new UserRepository();
-    const fileStorageService = new CloudinaryStorageService();
-    const passwordHasher = new BcryptPasswordHasher();
-    const updateProfileUseCase = new UpdateProfile(
-      userRepository,
-      fileStorageService,
-      passwordHasher
+    const updateProfileUseCase = container.get<UpdateProfile>(
+      TYPES.UpdateProfile
     );
 
     const updatedUser = await updateProfileUseCase.execute({

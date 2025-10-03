@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import {
   IReportRepository,
   ReportableType,
@@ -6,6 +7,7 @@ import { Report } from "../../domain/entities/Report";
 import { ReportModel } from "../database/models/ReportModel";
 import { ReportMapper } from "../database/mappers/ReportMapper";
 
+@injectable()
 export class ReportRepository implements IReportRepository {
   async create(reportData: {
     targetId: string;

@@ -1,7 +1,9 @@
+import { injectable, inject } from "inversify";
 import {
   IPostRepository,
   EnrichedPost,
 } from "../../domain/repositories/IPostRepository";
+import { TYPES } from "../../shared/types";
 
 export interface GetAdminPostsInput {
   filter: "all" | "active" | "blocked" | "reported";
@@ -11,8 +13,11 @@ export interface GetAdminPostsInput {
   withReports?: boolean;
 }
 
+@injectable()
 export class GetAdminPosts {
-  constructor(private postRepository: IPostRepository) {}
+  constructor(
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+  ) {}
 
   async execute(input: GetAdminPostsInput): Promise<EnrichedPost[]> {
     const { filter, withReports = true, ...options } = input;

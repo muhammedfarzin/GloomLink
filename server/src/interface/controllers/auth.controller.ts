@@ -1,10 +1,18 @@
 import { RequestHandler } from "express";
 import firebaseAdmin from "firebase-admin";
 import { CreateUser } from "../../application/use-cases/CreateUser";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import { OtpRepository } from "../../infrastructure/repositories/OtpRepository.js";
-import { BcryptPasswordHasher } from "../../infrastructure/services/BcryptPasswordHasher";
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
+import { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
+import { HttpError } from "../../infrastructure/errors/HttpError";
+import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
+import { LoginUser } from "../../application/use-cases/LoginUser";
+import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
+import { RefreshToken } from "../../application/use-cases/RefreshToken";
+import { AdminLogin } from "../../application/use-cases/AdminLogin";
+import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
+import { ITokenService } from "../../application/services/ITokenService";
 import {
   adminLoginInputSchema,
   googleAuthSchema,
@@ -13,17 +21,6 @@ import {
   refreshTokenSchema,
   signupInputSchema,
 } from "../validation/authSchemas";
-import { OtpService } from "../../infrastructure/services/OtpService";
-import { MailService } from "../../infrastructure/services/MailService";
-import { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
-import { HttpError } from "../../infrastructure/errors/HttpError";
-import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
-import { LoginUser } from "../../application/use-cases/LoginUser";
-import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
-import { JwtTokenService } from "../../infrastructure/services/JwtTokenService";
-import { RefreshToken } from "../../application/use-cases/RefreshToken";
-import { AdminLogin } from "../../application/use-cases/AdminLogin";
-import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
@@ -35,24 +32,18 @@ export const login: RequestHandler = async (req, res, next) => {
   try {
     const validatedBody = loginInputSchema.parse(req.body);
 
-    const userRepository = new UserRepository();
-    const passwordHasher = new BcryptPasswordHasher();
-    const loginUserUseCase = new LoginUser(userRepository, passwordHasher);
+    const loginUserUseCase = container.get<LoginUser>(TYPES.LoginUser);
     const user = await loginUserUseCase.execute(validatedBody);
 
     if (user.status === "not-verified") {
-      const otpRepository = new OtpRepository();
-      const otpService = new OtpService(otpRepository);
-      const mailService = new MailService();
-      const sendEmailUseCase = new SendVerificationEmail(
-        otpService,
-        mailService
+      const sendEmailUseCase = container.get<SendVerificationEmail>(
+        TYPES.SendVerificationEmail
       );
       await sendEmailUseCase.execute({ email: user.email });
     }
 
     const userResponse = UserMapper.toResponse(user);
-    const tokenService = new JwtTokenService();
+    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
     const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
       user.status !== "not-verified"
@@ -75,25 +66,22 @@ export const signup: RequestHandler = async (req, res, next) => {
     const validatedBody = signupInputSchema.parse(req.body);
 
     // --- Create User ---
-    const userRepository = new UserRepository();
-    const passwordHasher = new BcryptPasswordHasher();
-    const createUserUseCase = new CreateUser(userRepository, passwordHasher);
+    const createUserUseCase = container.get<CreateUser>(TYPES.CreateUser);
     const newUser = await createUserUseCase.execute({
       ...validatedBody,
       authType: "email",
     });
 
     // --- Send Verification Email ---
-    const otpRepository = new OtpRepository();
-    const otpService = new OtpService(otpRepository);
-    const mailService = new MailService();
-    const sendEmailUseCase = new SendVerificationEmail(otpService, mailService);
+    const sendEmailUseCase = container.get<SendVerificationEmail>(
+      TYPES.SendVerificationEmail
+    );
     await sendEmailUseCase.execute({ email: newUser.email });
 
     // --- Generate Token & Respond ---
     const userResponse = UserMapper.toResponse(newUser);
 
-    const tokenService = new JwtTokenService();
+    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
     const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
       false
@@ -114,10 +102,10 @@ export const resendOTP: RequestHandler = async (req, res, next) => {
     if (!req.user || req.user.role !== "user")
       throw new HttpError(401, "Unauthorized");
 
-    const otpRepository = new OtpRepository();
-    const otpService = new OtpService(otpRepository);
-    const mailService = new MailService();
-    const sendEmailUseCase = new SendVerificationEmail(otpService, mailService);
+    const sendEmailUseCase = container.get<SendVerificationEmail>(
+      TYPES.SendVerificationEmail
+    );
+
     await sendEmailUseCase.execute({ email: req.user.email });
 
     res.status(200).json({ message: "Otp has been send successfully" });
@@ -133,14 +121,7 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
 
     const { otp } = otpInputSchema.parse(req.body);
 
-    const otpRepository = new OtpRepository();
-    const userRepository = new UserRepository();
-    const passwordHasher = new BcryptPasswordHasher();
-    const verifyOtpUseCase = new VerifyOtp(
-      otpRepository,
-      userRepository,
-      passwordHasher
-    );
+    const verifyOtpUseCase = container.get<VerifyOtp>(TYPES.VerifyOtp);
     const updatedUser = await verifyOtpUseCase.execute({
       email: req.user.email,
       otp,
@@ -148,7 +129,7 @@ export const verifyOTP: RequestHandler = async (req, res, next) => {
 
     const userResponse = UserMapper.toResponse(updatedUser);
 
-    const tokenService = new JwtTokenService();
+    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
     const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
       true
@@ -170,8 +151,10 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
 
     const decodedData = await firebaseAdmin.auth().verifyIdToken(token);
 
-    const userRepository = new UserRepository();
-    const signInWithGoogleUseCase = new SignInWithGoogle(userRepository);
+    const signInWithGoogleUseCase = container.get<SignInWithGoogle>(
+      TYPES.SignInWithGoogle
+    );
+
     const user = await signInWithGoogleUseCase.execute({
       email: decodedData.email,
       name: decodedData.name,
@@ -180,7 +163,7 @@ export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
 
     const userResponse = UserMapper.toResponse(user);
 
-    const tokenService = new JwtTokenService();
+    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
     const tokens = tokenService.generate(
       { role: "user", id: userResponse._id },
       true
@@ -207,9 +190,7 @@ export const refreshToken: RequestHandler = async (req, res, next) => {
   try {
     const { token } = refreshTokenSchema.parse(req.body);
 
-    const tokenService = new JwtTokenService();
-    const userRepository = new UserRepository();
-    const refreshTokenUseCase = new RefreshToken(tokenService, userRepository);
+    const refreshTokenUseCase = container.get<RefreshToken>(TYPES.RefreshToken);
     const newTokens = await refreshTokenUseCase.execute({ token });
 
     res.status(200).json({
@@ -225,8 +206,7 @@ export const adminLogin: RequestHandler = async (req, res, next) => {
   try {
     const validatedBody = adminLoginInputSchema.parse(req.body);
 
-    const tokenService = new JwtTokenService();
-    const adminLoginUseCase = new AdminLogin(tokenService);
+    const adminLoginUseCase = container.get<AdminLogin>(TYPES.AdminLogin);
     const tokens = await adminLoginUseCase.execute(validatedBody);
 
     res.status(200).json({

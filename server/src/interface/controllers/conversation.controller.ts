@@ -1,14 +1,13 @@
 import { RequestHandler } from "express";
-import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { GetConversations } from "../../application/use-cases/GetConversations";
 import { createConversationSchema } from "../validation/conversationSchemas";
 import { CreateConversation } from "../../application/use-cases/CreateConversation";
 import { GetConversationId } from "../../application/use-cases/GetConversationId";
 import { getMessagesSchema } from "../validation/followSchemas";
-import { MessageRepository } from "../../infrastructure/repositories/MessageRepository";
 import { GetMessages } from "../../application/use-cases/GetMessages";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const createConversation: RequestHandler = async (req, res, next) => {
   try {
@@ -18,13 +17,10 @@ export const createConversation: RequestHandler = async (req, res, next) => {
 
     const { participants } = createConversationSchema.parse(req.body);
 
-    const conversationRepository = new ConversationRepository();
-    const userRepository = new UserRepository();
-
-    const createConversationUseCase = new CreateConversation(
-      conversationRepository,
-      userRepository
+    const createConversationUseCase = container.get<CreateConversation>(
+      TYPES.CreateConversation
     );
+
     const conversation = await createConversationUseCase.execute({
       currentUsername: req.user.username,
       participantsUsername: participants,
@@ -45,11 +41,8 @@ export const getConversations: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const conversationRepository = new ConversationRepository();
-    const userRepository = new UserRepository();
-    const getConversationsUseCase = new GetConversations(
-      conversationRepository,
-      userRepository
+    const getConversationsUseCase = container.get<GetConversations>(
+      TYPES.GetConversations
     );
 
     const result = await getConversationsUseCase.execute(req.user.id);
@@ -70,12 +63,8 @@ export const getConversationId: RequestHandler = async (req, res, next) => {
 
     const { username: targetUsername } = req.params;
 
-    const conversationRepository = new ConversationRepository();
-    const userRepository = new UserRepository();
-
-    const getConversationIdUseCase = new GetConversationId(
-      conversationRepository,
-      userRepository
+    const getConversationIdUseCase = container.get<GetConversationId>(
+      TYPES.GetConversationId
     );
     const conversation = await getConversationIdUseCase.execute({
       participantsUsername: [req.user.username, targetUsername],
@@ -101,13 +90,7 @@ export const getMessages: RequestHandler = async (req, res, next) => {
       conversationId: req.params.conversationId,
     });
 
-    const messageRepository = new MessageRepository();
-    const conversationRepository = new ConversationRepository();
-
-    const getMessagesUseCase = new GetMessages(
-      messageRepository,
-      conversationRepository
-    );
+    const getMessagesUseCase = container.get<GetMessages>(TYPES.GetMessages);
     const messages = await getMessagesUseCase.execute({
       conversationId,
       currentUserId: req.user.id,

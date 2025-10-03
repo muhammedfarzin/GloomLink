@@ -1,6 +1,8 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 import { UserResponseDto } from "../dtos/UserResponseDto";
+import { TYPES } from "../../shared/types";
 
 export interface GetAdminUsersInput {
   filter: "all" | "active" | "blocked";
@@ -9,8 +11,11 @@ export interface GetAdminUsersInput {
   searchQuery?: string;
 }
 
+@injectable()
 export class GetAdminUsers {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+  ) {}
 
   async execute(input: GetAdminUsersInput): Promise<UserResponseDto[]> {
     const user = await this.userRepository.findAll(input);

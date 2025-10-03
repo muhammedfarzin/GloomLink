@@ -1,8 +1,13 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
+@injectable()
 export class ToggleUserStatus {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+  ) {}
 
   async execute(userId: string): Promise<{ updatedStatus: string }> {
     const user = await this.userRepository.findById(userId);

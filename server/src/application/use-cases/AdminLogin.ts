@@ -1,9 +1,14 @@
+import { injectable, inject } from "inversify";
 import { ITokenService, TokenPayload, Tokens } from "../services/ITokenService";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { AdminLoginInput } from "../../interface/validation/authSchemas";
+import { TYPES } from "../../shared/types";
 
+@injectable()
 export class AdminLogin {
-  constructor(private tokenService: ITokenService) {}
+  constructor(
+    @inject(TYPES.ITokenService) private tokenService: ITokenService
+  ) {}
 
   async execute(input: AdminLoginInput): Promise<Tokens> {
     const adminUsername = process.env.ADMIN_USERNAME || "admin";

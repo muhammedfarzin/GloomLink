@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { v2 as cloudinary } from "cloudinary";
 import {
   IFileStorageService,
@@ -5,6 +6,7 @@ import {
 } from "../../application/services/IFileStorageService";
 import { HttpError } from "../errors/HttpError";
 
+@injectable()
 export class CloudinaryStorageService implements IFileStorageService {
   constructor() {
     cloudinary.config({

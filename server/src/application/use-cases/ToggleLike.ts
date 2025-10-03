@@ -1,6 +1,8 @@
+import { injectable, inject } from "inversify";
 import { ILikeRepository } from "../../domain/repositories/ILikeRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface ToggleLikeInput {
   targetId: string;
@@ -12,14 +14,15 @@ export interface ToggleLikeOutput {
   status: "liked" | "unliked";
 }
 
+@injectable()
 export class ToggleLike {
   constructor(
-    private likeRepository: ILikeRepository,
-    private targetRepository: IPostRepository
+    @inject(TYPES.ILikeRepository) private likeRepository: ILikeRepository,
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
   ) {}
 
   async execute(input: ToggleLikeInput): Promise<ToggleLikeOutput> {
-    const target = await this.targetRepository.findById(input.targetId);
+    const target = await this.postRepository.findById(input.targetId);
     if (!target) {
       throw new HttpError(
         404,

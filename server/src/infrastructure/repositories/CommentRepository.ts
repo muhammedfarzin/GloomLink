@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import {
   ICommentRepository,
   CommentableType,
@@ -8,6 +9,7 @@ import { CommentMapper } from "../database/mappers/CommentMapper";
 import mongoose, { PipelineStage } from "mongoose";
 import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
 
+@injectable()
 export class CommentRepository implements ICommentRepository {
   async create(commentData: {
     targetId: string;

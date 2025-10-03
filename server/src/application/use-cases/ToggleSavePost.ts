@@ -1,11 +1,14 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
+@injectable()
 export class ToggleSavePost {
   constructor(
-    private userRepository: IUserRepository,
-    private postRepository: IPostRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
   ) {}
 
   async execute(

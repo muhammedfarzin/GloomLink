@@ -1,3 +1,4 @@
+import { injectable, inject } from "inversify";
 import {
   ICommentRepository,
   CommentableType,
@@ -5,6 +6,7 @@ import {
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { Comment } from "../../domain/entities/Comment";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface AddCommentInput {
   targetId: string;
@@ -13,9 +15,12 @@ export interface AddCommentInput {
   type: CommentableType;
 }
 
+@injectable()
 export class AddComment {
   constructor(
+    @inject(TYPES.ICommentRepository)
     private commentRepository: ICommentRepository,
+    @inject(TYPES.IPostRepository)
     private postRepository: IPostRepository
   ) {}
 

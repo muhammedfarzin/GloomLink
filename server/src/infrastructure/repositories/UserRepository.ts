@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { UserModel } from "../database/models/UserModel";
@@ -8,6 +9,7 @@ import { PostMapper } from "../database/mappers/PostMapper";
 import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
 import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
 
+@injectable()
 export class UserRepository implements IUserRepository {
   async create(userData: Partial<User>): Promise<User> {
     const userToPersist = UserMapper.toPersistence(userData);

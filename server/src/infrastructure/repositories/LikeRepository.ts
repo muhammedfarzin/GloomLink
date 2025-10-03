@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import {
   ILikeRepository,
   LikeableType,
@@ -9,6 +10,7 @@ import { UserListResponseDto } from "../../application/dtos/UserListResponseDto"
 import mongoose, { PipelineStage } from "mongoose";
 import { UserMapper } from "../database/mappers/UserMapper";
 
+@injectable()
 export class LikeRepository implements ILikeRepository {
   async findByTargetAndUser(
     targetId: string,

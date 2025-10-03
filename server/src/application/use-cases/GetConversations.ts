@@ -1,13 +1,17 @@
+import { injectable, inject } from "inversify";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { UserListResponseDto } from "../dtos/UserListResponseDto";
+import { TYPES } from "../../shared/types";
 
 const CONVERSATION_SUGGESTION_THRESHOLD = 10;
 
+@injectable()
 export class GetConversations {
   constructor(
+    @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,
-    private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
   ) {}
 
   async execute(userId: string) {

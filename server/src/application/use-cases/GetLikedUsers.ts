@@ -1,3 +1,4 @@
+import { injectable, inject } from "inversify";
 import {
   ILikeRepository,
   LikeableType,
@@ -5,6 +6,7 @@ import {
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { UserListResponseDto } from "../dtos/UserListResponseDto";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface GetLikedUsersInput {
   targetId: string;
@@ -14,16 +16,17 @@ export interface GetLikedUsersInput {
   limit: number;
 }
 
+@injectable()
 export class GetLikedUsers {
   constructor(
-    private likeRepository: ILikeRepository,
-    private targetRepository: IPostRepository
+    @inject(TYPES.ILikeRepository) private likeRepository: ILikeRepository,
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
   ) {}
 
   async execute(input: GetLikedUsersInput): Promise<UserListResponseDto[]> {
     const { targetId, ...restInput } = input;
 
-    const post = await this.targetRepository.findById(targetId);
+    const post = await this.postRepository.findById(targetId);
     if (!post) {
       throw new HttpError(404, "Post not found or has been deleted.");
     }

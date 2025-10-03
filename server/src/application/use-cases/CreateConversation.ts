@@ -1,18 +1,22 @@
+import { injectable, inject } from "inversify";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Conversation } from "../../domain/entities/Conversation";
 import appEmitter from "../events/appEmitter";
+import { TYPES } from "../../shared/types";
 
 export interface CreateConversationInput {
   currentUsername: string;
   participantsUsername: string[];
 }
 
+@injectable()
 export class CreateConversation {
   constructor(
+    @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,
-    private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
   ) {}
 
   async execute(input: CreateConversationInput): Promise<Conversation> {

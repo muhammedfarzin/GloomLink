@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import { getFollowListSchema } from "../validation/followSchemas";
-import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { GetFollowList } from "../../application/use-cases/GetFollowList";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
 import { ToggleFollow } from "../../application/use-cases/ToggleFollow";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const getFollowers: RequestHandler = async (req, res, next) => {
   try {
@@ -15,11 +15,8 @@ export const getFollowers: RequestHandler = async (req, res, next) => {
       listType: req.params.listType,
     });
 
-    const followRepository = new FollowRepository();
-    const userRepository = new UserRepository();
-    const getFollowListUseCase = new GetFollowList(
-      followRepository,
-      userRepository
+    const getFollowListUseCase = container.get<GetFollowList>(
+      TYPES.GetFollowList
     );
 
     const users = await getFollowListUseCase.execute({
@@ -49,13 +46,8 @@ export const toggleFollow: RequestHandler = async (req, res, next) => {
       throw new HttpError(400, "Invalid userId");
     }
 
-    const followRepository = new FollowRepository();
-    const userRepository = new UserRepository();
+    const toggleFollowUseCase = container.get<ToggleFollow>(TYPES.ToggleFollow);
 
-    const toggleFollowUseCase = new ToggleFollow(
-      followRepository,
-      userRepository
-    );
     const result = await toggleFollowUseCase.execute({
       currentUserId: req.user.id,
       targetUserId,

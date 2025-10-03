@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import jwt from "jsonwebtoken";
 import {
   ITokenService,
@@ -6,6 +7,7 @@ import {
 } from "../../application/services/ITokenService";
 import { HttpError } from "../errors/HttpError";
 
+@injectable()
 export class JwtTokenService implements ITokenService {
   private readonly accessSecret = process.env.JWT_ACCESS_SECRET || "secret";
   private readonly refreshSecret =

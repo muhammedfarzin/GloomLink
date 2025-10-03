@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import {
   FollowListType,
   IFollowRepository,
@@ -9,6 +10,7 @@ import { UserListResponseDto } from "../../application/dtos/UserListResponseDto"
 import mongoose, { PipelineStage } from "mongoose";
 import { UserMapper } from "../database/mappers/UserMapper";
 
+@injectable()
 export class FollowRepository implements IFollowRepository {
   async create(followerId: string, followingId: string): Promise<Follow> {
     const newFollow = new FollowModel({

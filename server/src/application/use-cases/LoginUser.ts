@@ -1,13 +1,16 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPasswordHasher } from "../services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { LoginInput } from "../../interface/validation/authSchemas";
+import { TYPES } from "../../shared/types";
 
+@injectable()
 export class LoginUser {
   constructor(
-    private userRepository: IUserRepository,
-    private passwordHasher: IPasswordHasher
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(input: LoginInput): Promise<User> {

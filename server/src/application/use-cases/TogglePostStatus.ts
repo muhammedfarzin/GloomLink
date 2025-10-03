@@ -1,5 +1,7 @@
+import { injectable, inject } from "inversify";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface TogglePostStatusInput {
   postId: string;
@@ -9,8 +11,11 @@ export interface TogglePostStatusOutput {
   updatedStatus: "active" | "blocked";
 }
 
+@injectable()
 export class TogglePostStatus {
-  constructor(private postRepository: IPostRepository) {}
+  constructor(
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+  ) {}
 
   async execute(input: TogglePostStatusInput): Promise<TogglePostStatusOutput> {
     const { postId } = input;

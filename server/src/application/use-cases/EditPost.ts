@@ -1,7 +1,9 @@
+import { injectable, inject } from "inversify";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Post } from "../../domain/entities/Post";
 import { IFileStorageService } from "../services/IFileStorageService";
+import { TYPES } from "../../shared/types";
 
 export interface EditPostInput {
   postId: string;
@@ -13,9 +15,11 @@ export interface EditPostInput {
   caption?: string | undefined;
 }
 
+@injectable()
 export class EditPost {
   constructor(
-    private postRepository: IPostRepository,
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
+    @inject(TYPES.IFileStorageService)
     private fileStorageService: IFileStorageService
   ) {}
 

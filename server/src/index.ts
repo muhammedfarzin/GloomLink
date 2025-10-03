@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import express, { type Express } from "express";
 import http from "http";
 import dotenv from "dotenv";

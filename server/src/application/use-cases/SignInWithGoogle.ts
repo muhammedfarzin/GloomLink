@@ -1,6 +1,8 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface SignInWithGoogleInput {
   name?: string;
@@ -8,8 +10,11 @@ export interface SignInWithGoogleInput {
   uid: string;
 }
 
+@injectable()
 export class SignInWithGoogle {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+  ) {}
 
   async execute(input: SignInWithGoogleInput): Promise<User> {
     if (!input.email) {

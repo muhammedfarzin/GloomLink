@@ -1,8 +1,10 @@
+import { injectable, inject } from "inversify";
 import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Message } from "../../domain/entities/Message";
+import { TYPES } from "../../shared/types";
 
 export interface SendMessageInput {
   conversationId: string;
@@ -12,11 +14,14 @@ export interface SendMessageInput {
   image?: string;
 }
 
+@injectable()
 export class SendMessage {
   constructor(
+    @inject(TYPES.IMessageRepository)
     private messageRepository: IMessageRepository,
+    @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,
-    private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
   ) {}
 
   async execute(input: SendMessageInput): Promise<Message> {

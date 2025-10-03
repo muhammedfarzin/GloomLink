@@ -1,20 +1,24 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IFileStorageService } from "../services/IFileStorageService";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UpdateProfileInputDto } from "../../interface/validation/profileSchemas";
 import { IPasswordHasher } from "../services/IPasswordHasher";
+import { TYPES } from "../../shared/types";
 
 export interface UpdateProfileInput extends UpdateProfileInputDto {
   userId: string;
   profileImageFile?: Express.Multer.File;
 }
 
+@injectable()
 export class UpdateProfile {
   constructor(
-    private userRepository: IUserRepository,
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.IFileStorageService)
     private fileStorageService: IFileStorageService,
-    private passwordHasher: IPasswordHasher
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(input: UpdateProfileInput): Promise<User> {

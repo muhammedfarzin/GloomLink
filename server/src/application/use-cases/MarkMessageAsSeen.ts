@@ -1,16 +1,21 @@
+import { injectable, inject } from "inversify";
 import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { Message } from "../../domain/entities/Message";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface MarkMessageAsSeenInput {
   messageId: string;
   viewerId: string;
 }
 
+@injectable()
 export class MarkMessageAsSeen {
   constructor(
+    @inject(TYPES.IMessageRepository)
     private messageRepository: IMessageRepository,
+    @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository
   ) {}
 

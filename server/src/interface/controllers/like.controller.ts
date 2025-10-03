@@ -4,10 +4,10 @@ import {
   toggleLikeSchema,
 } from "../validation/likeSchemas";
 import { GetLikedUsers } from "../../application/use-cases/GetLikedUsers";
-import { LikeRepository } from "../../infrastructure/repositories/LikeRepository";
-import { PostRepository } from "../../infrastructure/repositories/PostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { ToggleLike } from "../../application/use-cases/ToggleLike";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const getLikedUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -16,13 +16,11 @@ export const getLikedUsers: RequestHandler = async (req, res, next) => {
       type: req.params.type,
       targetId: req.params.targetId,
     });
-    const likeRepository = new LikeRepository();
-    const targetRepository = new PostRepository();
 
-    const getLikedUsersUseCase = new GetLikedUsers(
-      likeRepository,
-      targetRepository
+    const getLikedUsersUseCase = container.get<GetLikedUsers>(
+      TYPES.GetLikedUsers
     );
+
     const users = await getLikedUsersUseCase.execute({
       ...validatedData,
       userId: req.user?.id,
@@ -45,9 +43,8 @@ export const toggleLike: RequestHandler = async (req, res, next) => {
 
     const validatedData = toggleLikeSchema.parse(req.params);
 
-    const likeRepository = new LikeRepository();
-    const targetRepository = new PostRepository();
-    const toggleLikeUseCase = new ToggleLike(likeRepository, targetRepository);
+    const toggleLikeUseCase = container.get<ToggleLike>(TYPES.ToggleLike);
+
     const result = await toggleLikeUseCase.execute({
       ...validatedData,
       userId: req.user.id,

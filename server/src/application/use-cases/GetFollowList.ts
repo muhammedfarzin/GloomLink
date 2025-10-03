@@ -1,3 +1,4 @@
+import { injectable, inject } from "inversify";
 import {
   FollowListType,
   IFollowRepository,
@@ -5,6 +6,7 @@ import {
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { UserListResponseDto } from "../dtos/UserListResponseDto";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface GetFollowListInput {
   userId: string;
@@ -14,9 +16,12 @@ export interface GetFollowListInput {
   limit: number;
 }
 
+@injectable()
 export class GetFollowList {
   constructor(
+    @inject(TYPES.IFollowRepository)
     private followRepository: IFollowRepository,
+    @inject(TYPES.IUserRepository)
     private userRepository: IUserRepository
   ) {}
 

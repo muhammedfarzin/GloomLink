@@ -1,9 +1,11 @@
+import { injectable } from "inversify";
 import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
 import { Message } from "../../domain/entities/Message";
 import { MessageModel } from "../database/models/MessageModel";
 import { MessageMapper } from "../database/mappers/MessageMapper";
 import mongoose, { PipelineStage } from "mongoose";
 
+@injectable()
 export class MessageRepository implements IMessageRepository {
   async create(messageData: Partial<Message>): Promise<Message> {
     const messageToPersist = MessageMapper.toPersistence(messageData);

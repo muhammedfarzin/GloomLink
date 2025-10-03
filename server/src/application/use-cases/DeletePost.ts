@@ -1,5 +1,7 @@
+import { injectable, inject } from "inversify";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface DeletePostInput {
   postId: string;
@@ -7,8 +9,11 @@ export interface DeletePostInput {
   userRole: "user" | "admin";
 }
 
+@injectable()
 export class DeletePost {
-  constructor(private postRepository: IPostRepository) {}
+  constructor(
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+  ) {}
 
   async execute(input: DeletePostInput): Promise<void> {
     const { postId, userId, userRole } = input;
@@ -19,7 +24,7 @@ export class DeletePost {
     }
 
     // --- AUTHORIZATION LOGIC ---
-    if (userRole !== 'admin' && post.userId.toString() !== userId) {
+    if (userRole !== "admin" && post.userId.toString() !== userId) {
       throw new HttpError(403, "You are not authorized to delete this post");
     }
     await this.postRepository.deleteById(postId);

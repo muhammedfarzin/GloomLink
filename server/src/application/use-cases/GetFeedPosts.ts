@@ -1,3 +1,4 @@
+import { injectable, inject } from "inversify";
 import {
   EnrichedPost,
   IPostRepository,
@@ -5,6 +6,7 @@ import {
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
+import { TYPES } from "../../shared/types";
 
 export interface GetFeedPostsInput {
   userId: string;
@@ -12,11 +14,12 @@ export interface GetFeedPostsInput {
   limit: number;
 }
 
+@injectable()
 export class GetFeedPosts {
   constructor(
-    private postRepository: IPostRepository,
-    private userRepository: IUserRepository,
-    private followRepository: IFollowRepository
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.IFollowRepository) private followRepository: IFollowRepository
   ) {}
 
   async execute(input: GetFeedPostsInput): Promise<EnrichedPost[]> {

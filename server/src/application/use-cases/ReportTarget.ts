@@ -1,3 +1,4 @@
+import { injectable, inject } from "inversify";
 import {
   IReportRepository,
   ReportableType,
@@ -5,6 +6,7 @@ import {
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface ReportTargetInput {
   targetId: string;
@@ -14,16 +16,25 @@ export interface ReportTargetInput {
 
 const REPORT_THRESHOLD = 5;
 
+@injectable()
 export class ReportTarget {
   constructor(
+    @inject(TYPES.IReportRepository)
     private reportRepository: IReportRepository,
-    private targetRepository: IPostRepository | IUserRepository
+    @inject(TYPES.IUserRepository)
+    private userRepository: IUserRepository,
+    @inject(TYPES.IPostRepository)
+    private postRepository: IPostRepository
   ) {}
 
   async execute(input: ReportTargetInput): Promise<void> {
-    const { targetId, reportedBy, type } = input;
+    const { targetId, type } = input;
 
-    const target = await this.targetRepository.findById(targetId);
+    const targetRepository =
+      type === "post" ? this.postRepository : this.userRepository;
+
+    // ---Checking target exists---
+    const target = await targetRepository.findById(targetId);
     if (!target) {
       throw new HttpError(
         404,
@@ -45,7 +56,7 @@ export class ReportTarget {
     const reportCount = await this.reportRepository.countByTarget(targetId);
 
     if (reportCount >= REPORT_THRESHOLD) {
-      await this.targetRepository.update(targetId, { status: "blocked" });
+      await targetRepository.update(targetId, { status: "blocked" });
     }
   }
 }

@@ -1,17 +1,15 @@
 import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { PostRepository } from "../../infrastructure/repositories/PostRepository";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
-import { CloudinaryStorageService } from "../../infrastructure/services/CloudinaryStorageService";
 import { CreatePost } from "../../application/use-cases/CreatePost";
 import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
-import { FollowRepository } from "../../infrastructure/repositories/FollowRepository";
 import { GetPostById } from "../../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
 import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
 import { EditPost } from "../../application/use-cases/EditPost";
 import { DeletePost } from "../../application/use-cases/DeletePost";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
@@ -26,12 +24,8 @@ export const createPost: RequestHandler = async (req, res, next) => {
       throw new HttpError(400, "Post must have either a caption or an image.");
     }
 
-    const postRepository = new PostRepository();
-    const fileStorageService = new CloudinaryStorageService();
-    const createPostUseCase = new CreatePost(
-      postRepository,
-      fileStorageService
-    );
+    const createPostUseCase = container.get<CreatePost>(TYPES.CreatePost);
+
     const newPost = await createPostUseCase.execute({
       userId: req.user.id,
       caption: validatedBody.caption,
@@ -58,9 +52,8 @@ export const editPost: RequestHandler = async (req, res, next) => {
     const { removedImages, ...validatedBody } = editPostSchema.parse(req.body);
     const newFiles = (req.files as Express.Multer.File[]) || [];
 
-    const postRepository = new PostRepository();
-    const fileStorageService = new CloudinaryStorageService();
-    const editPostUseCase = new EditPost(postRepository, fileStorageService);
+    const editPostUseCase = container.get<EditPost>(TYPES.EditPost);
+
     const updatedPost = await editPostUseCase.execute({
       ...validatedBody,
       removedFiles: removedImages,
@@ -86,8 +79,10 @@ export const getSavedPosts: RequestHandler = async (req, res, next) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
 
-    const userRepository = new UserRepository();
-    const getSavedPostsUseCase = new GetSavedPosts(userRepository);
+    const getSavedPostsUseCase = container.get<GetSavedPosts>(
+      TYPES.GetSavedPosts
+    );
+
     const savedPosts = await getSavedPostsUseCase.execute(
       req.user.id,
       page,
@@ -112,12 +107,10 @@ export const toggleSavePost: RequestHandler = async (req, res, next) => {
 
     const { postId } = req.params;
 
-    const userRepository = new UserRepository();
-    const postRepository = new PostRepository();
-    const toggleSavePostUseCase = new ToggleSavePost(
-      userRepository,
-      postRepository
+    const toggleSavePostUseCase = container.get<ToggleSavePost>(
+      TYPES.ToggleSavePost
     );
+
     const result = await toggleSavePostUseCase.execute(req.user.id, postId);
 
     res.status(200).json({ message: `Post successfully ${result.status}` });
@@ -135,8 +128,8 @@ export const getPostById: RequestHandler = async (req, res, next) => {
     const currentUserId = req.user.id;
     const { postId } = req.params;
 
-    const postRepository = new PostRepository();
-    const getPostByIdUseCase = new GetPostById(postRepository);
+    const getPostByIdUseCase = container.get<GetPostById>(TYPES.GetPostById);
+
     const post = await getPostByIdUseCase.execute({
       postId: postId,
       userId: currentUserId,
@@ -160,15 +153,8 @@ export const getPosts: RequestHandler = async (req, res, next) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
 
-    const postRepository = new PostRepository();
-    const userRepository = new UserRepository();
-    const followRepository = new FollowRepository();
+    const getFeedPostsUseCase = container.get<GetFeedPosts>(TYPES.GetFeedPosts);
 
-    const getFeedPostsUseCase = new GetFeedPosts(
-      postRepository,
-      userRepository,
-      followRepository
-    );
     const postsData = await getFeedPostsUseCase.execute({
       userId: req.user.id,
       page,
@@ -191,8 +177,8 @@ export const deletePost: RequestHandler = async (req, res, next) => {
       throw new HttpError(401, "Unauthorized");
     }
 
-    const postRepository = new PostRepository();
-    const deletePostUseCase = new DeletePost(postRepository);
+    const deletePostUseCase = container.get<DeletePost>(TYPES.DeletePost);
+
     await deletePostUseCase.execute({
       postId: req.params.postId,
       userId: req.user.id,

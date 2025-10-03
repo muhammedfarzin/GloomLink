@@ -1,13 +1,13 @@
 import { RequestHandler } from "express";
 import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
-import { PostRepository } from "../../infrastructure/repositories/PostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TogglePostStatus } from "../../application/use-cases/TogglePostStatus";
 import { isValidObjectId } from "../validation/validations";
 import { GetAdminPosts } from "../../application/use-cases/GetAdminPosts";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
 import { GetAdminUsers } from "../../application/use-cases/GetAdminUsers";
 import { ToggleUserStatus } from "../../application/use-cases/ToggleUserStatus";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const getUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -17,8 +17,10 @@ export const getUsers: RequestHandler = async (req, res, next) => {
       ...validatedData
     } = getUsersSchema.parse(req.query);
 
-    const userRepository = new UserRepository();
-    const getAdminUsersUseCase = new GetAdminUsers(userRepository);
+    const getAdminUsersUseCase = container.get<GetAdminUsers>(
+      TYPES.GetAdminUsers
+    );
+
     const users = await getAdminUsersUseCase.execute({
       filter,
       searchQuery,
@@ -40,8 +42,10 @@ export const toggleUserStatus: RequestHandler = async (req, res, next) => {
 
     if (!isValidObjectId(userId)) throw new HttpError(400, "Invalid userId");
 
-    const userRepository = new UserRepository();
-    const toggleUserStatusUseCase = new ToggleUserStatus(userRepository);
+    const toggleUserStatusUseCase = container.get<ToggleUserStatus>(
+      TYPES.ToggleUserStatus
+    );
+
     const result = await toggleUserStatusUseCase.execute(userId);
 
     res.status(200).json({
@@ -60,8 +64,10 @@ export const getPosts: RequestHandler = async (req, res, next) => {
       ...validatedQuery
     } = getPostsSchema.parse(req.query);
 
-    const postRepository = new PostRepository();
-    const getAdminPostsUseCase = new GetAdminPosts(postRepository);
+    const getAdminPostsUseCase = container.get<GetAdminPosts>(
+      TYPES.GetAdminPosts
+    );
+
     const posts = await getAdminPostsUseCase.execute({
       ...validatedQuery,
       filter,
@@ -88,8 +94,10 @@ export const togglePostStatus: RequestHandler = async (req, res, next) => {
       throw new HttpError(400, "Invalid Post ID.");
     }
 
-    const postRepository = new PostRepository();
-    const togglePostStatusUseCase = new TogglePostStatus(postRepository);
+    const togglePostStatusUseCase = container.get<TogglePostStatus>(
+      TYPES.TogglePostStatus
+    );
+
     const result = await togglePostStatusUseCase.execute({ postId });
 
     res.status(200).json({

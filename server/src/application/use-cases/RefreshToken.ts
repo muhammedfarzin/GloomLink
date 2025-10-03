@@ -1,15 +1,18 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { ITokenService, Tokens } from "../services/ITokenService";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface RefreshTokenInput {
   token: string;
 }
 
+@injectable()
 export class RefreshToken {
   constructor(
-    private tokenService: ITokenService,
-    private userRepository: IUserRepository
+    @inject(TYPES.ITokenService) private tokenService: ITokenService,
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
   ) {}
 
   async execute(input: RefreshTokenInput): Promise<Tokens> {

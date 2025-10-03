@@ -1,3 +1,4 @@
+import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import {
   IPostRepository,
@@ -5,6 +6,7 @@ import {
 } from "../../domain/repositories/IPostRepository";
 import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
 import { UserListResponseDto } from "../dtos/UserListResponseDto";
+import { TYPES } from "../../shared/types";
 
 export type SearchResult = UserListResponseDto | EnrichedPost;
 
@@ -16,11 +18,12 @@ export interface SearchContentInput {
   currentUserId: string;
 }
 
+@injectable()
 export class SearchContent {
   constructor(
-    private userRepository: IUserRepository,
-    private postRepository: IPostRepository,
-    private followRepository: IFollowRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
+    @inject(TYPES.IFollowRepository) private followRepository: IFollowRepository
   ) {}
 
   async execute(input: SearchContentInput): Promise<SearchResult[]> {

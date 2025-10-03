@@ -1,6 +1,8 @@
+import { injectable } from "inversify";
 import nodemailer from "nodemailer";
 import { IMailService } from "../../application/services/IMailService";
 
+@injectable()
 export class MailService implements IMailService {
   private transporter: nodemailer.Transporter;
 

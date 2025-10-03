@@ -1,16 +1,20 @@
+import { injectable, inject } from "inversify";
 import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
 
 export interface ToggleFollowInput {
   currentUserId: string;
   targetUserId: string;
 }
 
+@injectable()
 export class ToggleFollow {
   constructor(
+    @inject(TYPES.IFollowRepository)
     private followRepository: IFollowRepository,
-    private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
   ) {}
 
   async execute(

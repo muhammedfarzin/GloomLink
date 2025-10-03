@@ -1,8 +1,10 @@
+import { injectable, inject } from "inversify";
 import {
   ICommentRepository,
   CommentableType,
 } from "../../domain/repositories/ICommentRepository";
 import { CommentResponseDto } from "../dtos/CommentResponseDto";
+import { TYPES } from "../../shared/types";
 
 export interface GetCommentsInput {
   targetId: string;
@@ -12,8 +14,12 @@ export interface GetCommentsInput {
   limit: number;
 }
 
+@injectable()
 export class GetComments {
-  constructor(private commentRepository: ICommentRepository) {}
+  constructor(
+    @inject(TYPES.ICommentRepository)
+    private commentRepository: ICommentRepository
+  ) {}
 
   async execute(input: GetCommentsInput): Promise<CommentResponseDto[]> {
     const { targetId, type, userId, page, limit } = input;

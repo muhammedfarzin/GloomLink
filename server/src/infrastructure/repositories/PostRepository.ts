@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import {
   EnrichedPost,
   IPostRepository,
@@ -7,6 +8,7 @@ import { PostMapper } from "../database/mappers/PostMapper";
 import { PostModel } from "../database/models/PostModel";
 import mongoose, { PipelineStage } from "mongoose";
 
+@injectable()
 export class PostRepository implements IPostRepository {
   private enrichedPipeline: PipelineStage[] = [
     {
