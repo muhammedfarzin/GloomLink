@@ -1,7 +1,7 @@
 import ProfileImage from "../../components/ProfileImage";
 import PostGridCard from "../../components/post/PostGridCard";
 import { useEffect, useState } from "react";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";

@@ -14,7 +14,7 @@ import {
 } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import ChatItem from "./ChatItem";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
 import type { MessageType } from "@/types/message-type";
 import { useParams } from "react-router-dom";

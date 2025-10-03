@@ -1,4 +1,4 @@
-import adminApiClient from "@/adminApiClient";
+import { adminApiClient } from "@/apiClient";
 import DropDownBox from "@/components/DropDownBox";
 import { Post } from "@/components/post/types/Post";
 import SearchBox from "@/components/SearchBox";

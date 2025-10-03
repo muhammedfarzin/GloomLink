@@ -10,7 +10,7 @@ import Button from "@/components/Button";
 import { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import CropperDialogBox from "@/components/CropperDialogBox";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch } from "react-redux";

@@ -1,4 +1,4 @@
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import type PostDataType from "@/components/post/types/PostDataType";
 import { useToast } from "@/hooks/use-toast";
 import { MessageType } from "@/types/message-type";

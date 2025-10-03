@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { ChatUserDataType } from "./types/user-data-types";
 import { useToast } from "@/hooks/use-toast";
 import UserListCard from "@/pages/user/components/UserListCard";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import CommentListCard from "./CommentListCard";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ReplyCommentType } from "./types/ReplyCommentType";
 import Comment from "./types/Comment";

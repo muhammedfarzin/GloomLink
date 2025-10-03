@@ -15,7 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import DateInput from "@/components/DateInput";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {

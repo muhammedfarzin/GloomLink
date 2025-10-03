@@ -13,7 +13,7 @@ import {
   TokensState,
 } from "../../redux/reducers/auth";
 import { LoginFormType, validateLoginForm } from "../user/formValidations";
-import adminApiClient from "@/adminApiClient";
+import { adminApiClient } from "@/apiClient";
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();

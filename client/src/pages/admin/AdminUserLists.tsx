@@ -5,7 +5,7 @@ import Table from "./components/Table/Table";
 import TableData from "./components/Table/TableData";
 import { useEffect, useState } from "react";
 import type { UserAuthState } from "../../redux/reducers/auth";
-import adminApiClient from "../../adminApiClient";
+import { adminApiClient } from "@/apiClient";
 import ConfirmButton from "@/components/ConfirmButton";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";

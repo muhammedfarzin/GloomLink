@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import throttle from "lodash/throttle";
 import { Post } from "./types/Post";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import EmptyIllustrationDark from "../../assets/images/Empty-Illustration-Dark.svg";
 import PostSkeletonList from "../skeleton/PostSkeletonList";
 

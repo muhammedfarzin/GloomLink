@@ -1,4 +1,4 @@
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";

@@ -5,7 +5,7 @@ import InputBox from "../InputBox";
 import { useState } from "react";
 import IconButton from "../IconButton";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import Comment from "./types/Comment";
 import { RootState } from "@/redux/store";

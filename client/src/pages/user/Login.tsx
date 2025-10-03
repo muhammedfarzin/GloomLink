@@ -18,7 +18,7 @@ import { RootState } from "../../redux/store";
 import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleAuthProvider } from "@/firebase";
 import { FirebaseError } from "firebase/app";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();

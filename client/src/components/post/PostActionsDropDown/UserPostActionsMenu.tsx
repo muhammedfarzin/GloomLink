@@ -1,4 +1,4 @@
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import ConfirmButton from "@/components/ConfirmButton";
 import {
   DropdownMenuContent,

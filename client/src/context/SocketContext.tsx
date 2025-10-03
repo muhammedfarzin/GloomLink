@@ -1,4 +1,4 @@
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import CallProvider from "./CallContext";

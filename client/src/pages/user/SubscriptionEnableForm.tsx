@@ -3,7 +3,7 @@ import InputBox from "@/components/InputBox";
 import { useEffect, useState } from "react";
 import { validateRequiredFields } from "./formValidations";
 import { useToast } from "@/hooks/use-toast";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useNavigate } from "react-router-dom";
 
 interface SubscriptionFormType {

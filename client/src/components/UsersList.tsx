@@ -1,4 +1,4 @@
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import UserListCard from "@/pages/user/components/UserListCard";
 import { useEffect, useState } from "react";

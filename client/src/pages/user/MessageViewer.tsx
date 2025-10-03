@@ -2,7 +2,7 @@ import ProfileImage from "@/components/ProfileImage";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MessageInput from "./components/message/MessageInput";
 import { useEffect, useRef, useState } from "react";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
 import MessageCard from "./components/message/MessageCard";
 import { RootState } from "@/redux/store";

@@ -1,4 +1,4 @@
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { Post } from "../types/Post";
 import PostActionsView from "./PostActionsView";
 import PostDataType from "../types/PostDataType";

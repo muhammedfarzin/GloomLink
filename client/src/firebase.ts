@@ -1,14 +1,16 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+const env = import.meta.env;
+
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB1nIao5b3cYY9Ah5VDuYtUT-sBdkYyRuc",
-  authDomain: "gloomlink-5.firebaseapp.com",
-  projectId: "gloomlink-5",
-  storageBucket: "gloomlink-5.firebasestorage.app",
-  messagingSenderId: "40917126178",
-  appId: "1:40917126178:web:f3fa4446385cddcc7e0e7b"
+  apiKey: env.VITE_FIREBASE_API_KEY,
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase

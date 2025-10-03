@@ -6,7 +6,7 @@ import DropDownBox from "../../components/DropDownBox";
 import Button from "../../components/Button";
 import TagsInput from "./components/TagsInput";
 import ImageInput from "./components/ImageInput";
-import apiClient from "@/apiClient";
+import { apiClient } from "@/apiClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 

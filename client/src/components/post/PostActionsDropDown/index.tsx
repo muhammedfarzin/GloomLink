@@ -4,10 +4,9 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import apiClient from "@/apiClient";
+import { apiClient, adminApiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Post } from "../types/Post";
-import adminApiClient from "@/adminApiClient";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import UserPostActionsMenu from "./UserPostActionsMenu";

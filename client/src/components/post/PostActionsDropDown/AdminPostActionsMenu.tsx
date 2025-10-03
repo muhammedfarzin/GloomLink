@@ -1,4 +1,4 @@
-import adminApiClient from "@/adminApiClient";
+import { adminApiClient } from "@/apiClient";
 import ConfirmButton from "@/components/ConfirmButton";
 import {
   DropdownMenuContent,
