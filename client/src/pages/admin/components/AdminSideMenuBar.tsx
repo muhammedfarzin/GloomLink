@@ -28,11 +28,6 @@ const AdminSideMenuBar: React.FC<AdminSideMenuBarProps> = ({ selected }) => {
         text="Posts"
         selected={selected === "posts"}
       />
-      <MenuButton
-        to="/admin/subscriptions"
-        text="Subscriptions"
-        selected={selected === "subscriptions"}
-      />
 
       <ConfirmButton
       description="Do you really want to logout from admin portal"
