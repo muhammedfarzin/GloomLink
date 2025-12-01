@@ -6,6 +6,8 @@ export interface CommentType {
   userId: Schema.Types.ObjectId;
   comment: string;
   type: "post" | "comment";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type CommentDocument = CommentType & Document;

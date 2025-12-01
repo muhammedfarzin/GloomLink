@@ -33,19 +33,21 @@ export class CommentMapper {
 
   public static toResponseDto(data: any): CommentResponseDto {
     return {
-      _id: data._id?.toString(),
+      id: data._id?.toString(),
       targetId: data.targetId?.toString(),
       userId: data.userId?.toString(),
       comment: data.comment,
       type: data.type,
       repliesCount: data.repliesCount || 0,
       uploadedBy: {
-        _id: data.uploadedBy?._id?.toString(),
+        id: data.uploadedBy?._id?.toString(),
         firstname: data.uploadedBy?.firstname,
         lastname: data.uploadedBy?.lastname,
         username: data.uploadedBy?.username,
         image: data.uploadedBy?.image,
       },
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     };
   }
 }

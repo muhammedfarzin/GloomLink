@@ -1,15 +1,17 @@
 export default interface Comment {
-  _id: string;
+  id: string;
   comment: string;
   targetId: string;
   userId: string;
   type: "post";
   repliesCount: number;
   uploadedBy: {
-    _id: string;
+    id: string;
     firstname: string;
     lastname: string;
     username: string;
     image?: string;
   };
+  createdAt: string;
+  updatedAt: string;
 }

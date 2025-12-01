@@ -56,16 +56,13 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
           {loading || !comments.length
             ? loading || "No comments yet!"
             : comments.map((comment) => (
-                <div key={comment._id}>
+                <div key={comment.id}>
                   <CommentListCard
-                    commentId={comment._id}
-                    comment={comment.comment}
-                    username={comment.uploadedBy.username}
-                    image={comment.uploadedBy.image}
+                    comment={comment}
                     showReplies={!!comment.repliesCount}
                     handleReplyOnClick={(handleReplyComment) =>
                       setReplyComment({
-                        commentId: comment._id,
+                        commentId: comment.id,
                         username: comment.uploadedBy.username,
                         handleReplyComment,
                       })

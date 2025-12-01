@@ -6,22 +6,17 @@ import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import type { HandleReplyCommentType } from "./types/ReplyCommentType";
 import type Comment from "./types/Comment";
+import { formatTimeAgo } from "@/lib/dateUtils";
 
 interface CommentListCardProps {
-  commentId: string;
-  comment: Comment["comment"];
-  username: Comment["uploadedBy"]["username"];
-  image?: Comment["uploadedBy"]["image"];
+  comment: Comment;
   showReplies?: boolean;
   isReply?: boolean;
   handleReplyOnClick?: (handleReplyComment: HandleReplyCommentType) => void;
 }
 
 const CommentListCard: React.FC<CommentListCardProps> = ({
-  commentId,
   comment,
-  image,
-  username,
   isReply = false,
   showReplies = false,
   handleReplyOnClick,
@@ -42,7 +37,7 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
       if (!showReply) {
         setLoading("Fetching replies...");
         const response = await apiClient.get(`/comments`, {
-          params: { targetId: commentId, type: "comment" },
+          params: { targetId: comment.id, type: "comment" },
         });
         setReplies(response.data.commentsData);
       }
@@ -61,19 +56,31 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
   return (
     <>
       <div className="flex p-2 rounded-lg items-start bg-primary">
-        <Link to={`/${username}`}>
-          <ProfileImage className="w-10" profileImage={image} />
+        <Link to={`/${comment.uploadedBy.username}`}>
+          <ProfileImage
+            className="w-10"
+            profileImage={comment.uploadedBy.image}
+          />
         </Link>
 
         <div className="w-full">
-          <Link to={`/${username}`} className="text-sm font-bold m-0">
-            {username}
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to={`/${comment.uploadedBy.username}`}
+              className="text-sm font-bold m-0"
+            >
+              {comment.uploadedBy.username}
+            </Link>
+            <span className="text-xs text-gray-500 -mx-1">•</span>
+            <p className="text-xs text-muted-foreground">
+              {formatTimeAgo(comment.createdAt)}
+            </p>
+          </div>
           <p
             tabIndex={0}
             className="line-clamp-3 focus:line-clamp-none max-h-[4.5rem] transition-all duration-1000 focus:max-h-[5000px]"
           >
-            {comment}
+            {comment.comment}
           </p>
 
           {!isReply && (
@@ -96,11 +103,8 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
             <div className="flex flex-col gap-1 mt-1 ml-10">
               {replies.map((replyData) => (
                 <CommentListCard
-                  key={replyData._id}
-                  commentId={replyData._id}
-                  comment={replyData.comment}
-                  username={replyData.uploadedBy.username}
-                  image={replyData.uploadedBy.image}
+                  key={replyData.id}
+                  comment={replyData}
                   isReply
                 />
               ))}

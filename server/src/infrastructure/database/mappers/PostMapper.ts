@@ -70,6 +70,8 @@ export class PostMapper {
         images: post.images,
         publishedFor: post.publishedFor,
         status: post.status,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
       })),
       followersCount: data.followersCount,
       followingCount: data.followingCount,
