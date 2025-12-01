@@ -12,6 +12,8 @@ type PostDataType = Pick<
   | "likesCount"
   | "commentsCount"
   | "reportCount"
+  | "createdAt"
+  | "updatedAt"
 >;
 
 export default PostDataType;

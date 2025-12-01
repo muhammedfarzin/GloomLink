@@ -9,6 +9,7 @@ import type PostDataType from "./types/PostDataType";
 import PostInteractionCount from "./PostInteractionCount";
 import PostView from "./PostView";
 import PostSkeleton from "../skeleton/PostSkeleton";
+import { formatTimeAgo } from "@/lib/dateUtils";
 
 export interface Props {
   postId: string;
@@ -80,7 +81,11 @@ const PostListCard: React.FC<Props> = ({
     >
       {/* Uploaded By */}
       <div className="flex justify-between">
-        <AccountViewCard userData={postDataState.uploadedBy} />
+        <AccountViewCard userData={postDataState.uploadedBy}>
+          <span className="text-xs text-gray-500 mt-0">
+            {formatTimeAgo(postDataState.createdAt)}
+          </span>
+        </AccountViewCard>
 
         <PostActionsDropDown
           postId={postDataState._id}

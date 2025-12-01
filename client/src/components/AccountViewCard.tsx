@@ -4,9 +4,10 @@ import { Post } from "./post/types/Post";
 
 interface Props {
   userData: Pick<Post["uploadedBy"], "username" | "image">;
+  children?: React.ReactNode;
 }
 
-const AccountViewCard: React.FC<Props> = ({ userData }) => {
+const AccountViewCard: React.FC<Props> = ({ userData, children }) => {
   return (
     <div className="flex flex-row items-center">
       <Link to={`/${userData.username}`}>
@@ -15,11 +16,15 @@ const AccountViewCard: React.FC<Props> = ({ userData }) => {
           profileImage={userData.image}
         />
       </Link>
-      <Link to={`/${userData.username}`}>
-        <span className="text-base font-bold cursor-pointer line-clamp-1">
-          {userData.username}
-        </span>
-      </Link>
+
+      <div className="flex flex-col">
+        <Link to={`/${userData.username}`}>
+          <span className="text-base font-bold cursor-pointer line-clamp-1">
+            {userData.username}
+          </span>
+        </Link>
+        {children}
+      </div>
     </div>
   );
 };

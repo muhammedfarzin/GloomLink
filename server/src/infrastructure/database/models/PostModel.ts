@@ -8,6 +8,8 @@ export interface Post {
   tags: string[];
   publishedFor: "public" | "subscriber";
   status: "active" | "blocked" | "deleted";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type PostDocument = Post & Document;

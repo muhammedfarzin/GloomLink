@@ -49,6 +49,8 @@ export class PostMapper {
         username: data.uploadedBy?.username,
         image: data.uploadedBy?.image,
       },
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
       type: "post",
     };
   }
