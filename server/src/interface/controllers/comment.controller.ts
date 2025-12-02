@@ -8,6 +8,7 @@ import { AddComment } from "../../application/use-cases/AddComment";
 import { GetComments } from "../../application/use-cases/GetComments";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
+import { RecordInteraction } from "../../application/use-cases/RecordInteraction";
 
 export const addComment: RequestHandler = async (req, res, next) => {
   try {
@@ -22,6 +23,18 @@ export const addComment: RequestHandler = async (req, res, next) => {
       ...validatedBody,
       userId: req.user.id,
     });
+
+    if (validatedBody.type === "post") {
+      const recordInteractionUseCase = container.get<RecordInteraction>(
+        TYPES.RecordInteraction
+      );
+
+      await recordInteractionUseCase.execute(
+        req.user.id,
+        validatedBody.targetId,
+        "comment"
+      );
+    }
 
     res.status(201).json({
       commentData: newComment,

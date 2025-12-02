@@ -8,6 +8,7 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { ToggleLike } from "../../application/use-cases/ToggleLike";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
+import { RecordInteraction } from "../../application/use-cases/RecordInteraction";
 
 export const getLikedUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -49,6 +50,18 @@ export const toggleLike: RequestHandler = async (req, res, next) => {
       ...validatedData,
       userId: req.user.id,
     });
+
+    if (result.status === "liked" && validatedData.type === "post") {
+      const recordInteractionUseCase = container.get<RecordInteraction>(
+        TYPES.RecordInteraction
+      );
+
+      await recordInteractionUseCase.execute(
+        req.user.id,
+        validatedData.targetId,
+        "like"
+      );
+    }
 
     res.status(200).json({
       message: `Post successfully ${result.status}`,

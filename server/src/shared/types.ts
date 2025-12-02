@@ -9,6 +9,7 @@ const TYPES = {
   ILikeRepository: Symbol.for("ILikeRepository"),
   IMessageRepository: Symbol.for("IMessageRepository"),
   IReportRepository: Symbol.for("IReportRepository"),
+  InteractionRepository: Symbol.for("InteractionRepository"),
 
   // Services
   IPasswordHasher: Symbol.for("IPasswordHasher"),
@@ -32,7 +33,7 @@ const TYPES = {
   GetComments: Symbol.for("GetComments"),
   GetConversationId: Symbol.for("GetConversationId"),
   GetConversations: Symbol.for("GetConversations"),
-  GetFeedPosts: Symbol.for("GetFeedPosts"),
+  GetRecommendedPosts: Symbol.for("GetRecommendedPosts"),
   GetFollowList: Symbol.for("GetFollowList"),
   GetLikedUsers: Symbol.for("GetLikedUsers"),
   GetMessages: Symbol.for("GetMessages"),
@@ -53,6 +54,7 @@ const TYPES = {
   ToggleUserStatus: Symbol.for("ToggleUserStatus"),
   UpdateProfile: Symbol.for("UpdateProfile"),
   VerifyOtp: Symbol.for("VerifyOtp"),
+  RecordInteraction: Symbol.for("RecordInteraction"),
 };
 
 export { TYPES };

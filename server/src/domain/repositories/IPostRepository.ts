@@ -19,6 +19,7 @@ export type EnrichedPost = Post & {
 export interface IPostRepository {
   create(postData: Partial<Post>): Promise<Post>;
   findById(id: string): Promise<Post | null>;
+  findByIds(ids: string[]): Promise<Post[]>;
   findEnrichedById(
     postId: string,
     userId: string

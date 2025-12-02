@@ -59,6 +59,11 @@ export class PostRepository implements IPostRepository {
     return postModel ? PostMapper.toDomain(postModel) : null;
   }
 
+  async findByIds(ids: string[]): Promise<Post[]> {
+    const postModels = await PostModel.find({ _id: { $in: ids } });
+    return postModels.map((post) => PostMapper.toDomain(post));
+  }
+
   async findEnrichedById(
     postId: string,
     userId: string

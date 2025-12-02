@@ -14,6 +14,13 @@ router.get(
 );
 
 router.post(
+  "/interaction",
+  authenticateToken,
+  authorizeRole("user"),
+  postController.recordInteraction
+);
+
+router.post(
   "/create",
   authenticateToken,
   authorizeRole("user"),

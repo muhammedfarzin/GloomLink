@@ -29,6 +29,8 @@ import { IPostRepository } from "../domain/repositories/IPostRepository";
 import { PostRepository } from "../infrastructure/repositories/PostRepository";
 import { IReportRepository } from "../domain/repositories/IReportRepository";
 import { ReportRepository } from "../infrastructure/repositories/ReportRepository";
+import { IInteractionRepository } from "../domain/repositories/IInteractionRepository";
+import { InteractionRepository } from "../infrastructure/repositories/InteractionRepository";
 import { AddComment } from "../application/use-cases/AddComment";
 import { AdminLogin } from "../application/use-cases/AdminLogin";
 import { CreateConversation } from "../application/use-cases/CreateConversation";
@@ -40,7 +42,6 @@ import { GetAdminUsers } from "../application/use-cases/GetAdminUsers";
 import { GetComments } from "../application/use-cases/GetComments";
 import { GetConversationId } from "../application/use-cases/GetConversationId";
 import { GetConversations } from "../application/use-cases/GetConversations";
-import { GetFeedPosts } from "../application/use-cases/GetFeedPosts";
 import { GetFollowList } from "../application/use-cases/GetFollowList";
 import { GetLikedUsers } from "../application/use-cases/GetLikedUsers";
 import { GetMessages } from "../application/use-cases/GetMessages";
@@ -63,6 +64,8 @@ import { ToggleSavePost } from "../application/use-cases/ToggleSavePost";
 import { ToggleUserStatus } from "../application/use-cases/ToggleUserStatus";
 import { UpdateProfile } from "../application/use-cases/UpdateProfile";
 import { VerifyOtp } from "../application/use-cases/VerifyOtp";
+import { RecordInteraction } from "../application/use-cases/RecordInteraction";
+import { GetRecommendedPosts } from "../application/use-cases/GetRecommendedPosts";
 
 // Create a new container
 const container = new Container();
@@ -92,6 +95,9 @@ container
 container
   .bind<IConversationRepository>(TYPES.IConversationRepository)
   .to(ConversationRepository);
+container
+  .bind<IInteractionRepository>(TYPES.InteractionRepository)
+  .to(InteractionRepository);
 
 // --- BIND USE CASES ---
 container.bind<AdminLogin>(TYPES.AdminLogin).to(AdminLogin);
@@ -110,11 +116,13 @@ container
   .bind<GetConversationId>(TYPES.GetConversationId)
   .to(GetConversationId);
 container.bind<GetConversations>(TYPES.GetConversations).to(GetConversations);
-container.bind<GetFeedPosts>(TYPES.GetFeedPosts).to(GetFeedPosts);
 container.bind<GetFollowList>(TYPES.GetFollowList).to(GetFollowList);
 container.bind<GetLikedUsers>(TYPES.GetLikedUsers).to(GetLikedUsers);
 container.bind<GetMessages>(TYPES.GetMessages).to(GetMessages);
 container.bind<GetPostById>(TYPES.GetPostById).to(GetPostById);
+container
+  .bind<GetRecommendedPosts>(TYPES.GetRecommendedPosts)
+  .to(GetRecommendedPosts);
 container.bind<GetSavedPosts>(TYPES.GetSavedPosts).to(GetSavedPosts);
 container
   .bind<GetUserDataForForm>(TYPES.GetUserDataForForm)
@@ -124,6 +132,9 @@ container.bind<LoginUser>(TYPES.LoginUser).to(LoginUser);
 container
   .bind<MarkMessageAsSeen>(TYPES.MarkMessageAsSeen)
   .to(MarkMessageAsSeen);
+container
+  .bind<RecordInteraction>(TYPES.RecordInteraction)
+  .to(RecordInteraction);
 container.bind<RefreshToken>(TYPES.RefreshToken).to(RefreshToken);
 container.bind<ReportTarget>(TYPES.ReportTarget).to(ReportTarget);
 container.bind<SearchContent>(TYPES.SearchContent).to(SearchContent);

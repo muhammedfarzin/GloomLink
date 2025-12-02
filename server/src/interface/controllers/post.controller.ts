@@ -2,12 +2,14 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
 import { CreatePost } from "../../application/use-cases/CreatePost";
-import { GetFeedPosts } from "../../application/use-cases/GetFeedPosts";
 import { GetPostById } from "../../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
 import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
 import { EditPost } from "../../application/use-cases/EditPost";
 import { DeletePost } from "../../application/use-cases/DeletePost";
+import { RecordInteraction } from "../../application/use-cases/RecordInteraction";
+import { GetRecommendedPosts } from "../../application/use-cases/GetRecommendedPosts";
+import { recordInteractionSchema } from "../validation/interactionSchemas";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
 
@@ -113,6 +115,14 @@ export const toggleSavePost: RequestHandler = async (req, res, next) => {
 
     const result = await toggleSavePostUseCase.execute(req.user.id, postId);
 
+    if (result.status === "saved") {
+      const recordInteractionUseCase = container.get<RecordInteraction>(
+        TYPES.RecordInteraction
+      );
+
+      await recordInteractionUseCase.execute(req.user.id, postId, "save");
+    }
+
     res.status(200).json({ message: `Post successfully ${result.status}` });
   } catch (error) {
     next(error);
@@ -153,13 +163,15 @@ export const getPosts: RequestHandler = async (req, res, next) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 5;
 
-    const getFeedPostsUseCase = container.get<GetFeedPosts>(TYPES.GetFeedPosts);
+    const getRecommendedPostsUseCase = container.get<GetRecommendedPosts>(
+      TYPES.GetRecommendedPosts
+    );
 
-    const postsData = await getFeedPostsUseCase.execute({
-      userId: req.user.id,
+    const postsData = await getRecommendedPostsUseCase.execute(
+      req.user.id,
       page,
-      limit,
-    });
+      limit
+    );
 
     res.status(200).json({
       postsData,
@@ -186,6 +198,30 @@ export const deletePost: RequestHandler = async (req, res, next) => {
     });
 
     res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const recordInteraction: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "user") {
+      throw new HttpError(401, "Unauthorized");
+    }
+
+    const validatedBody = recordInteractionSchema.parse(req.body);
+
+    const recordInteractionUseCase = container.get<RecordInteraction>(
+      TYPES.RecordInteraction
+    );
+
+    await recordInteractionUseCase.execute(
+      req.user.id,
+      validatedBody.postId,
+      validatedBody.type
+    );
+
+    res.status(200).json({ message: "Interaction recorded successfully" });
   } catch (error) {
     next(error);
   }
