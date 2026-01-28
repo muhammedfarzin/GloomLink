@@ -1,18 +1,20 @@
 import { RequestHandler } from "express";
 import firebaseAdmin from "firebase-admin";
-import { CreateUser } from "../../application/use-cases/CreateUser";
+import { inject } from "inversify";
 import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
-import { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { VerifyOtp } from "../../application/use-cases/VerifyOtp";
-import { LoginUser } from "../../application/use-cases/LoginUser";
-import { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
-import { RefreshToken } from "../../application/use-cases/RefreshToken";
-import { AdminLogin } from "../../application/use-cases/AdminLogin";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
-import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
 import { ITokenService } from "../../application/services/ITokenService";
+
+import type { VerifyOtp } from "../../application/use-cases/VerifyOtp";
+import type { LoginUser } from "../../application/use-cases/LoginUser";
+import type { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
+import type { RefreshToken } from "../../application/use-cases/RefreshToken";
+import type { AdminLogin } from "../../application/use-cases/AdminLogin";
+import type { CreateUser } from "../../application/use-cases/CreateUser";
+import type { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
+
 import {
   adminLoginInputSchema,
   googleAuthSchema,
@@ -24,197 +26,191 @@ import {
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
-    firebaseServiceAccount as firebaseAdmin.ServiceAccount
+    firebaseServiceAccount as firebaseAdmin.ServiceAccount,
   ),
 });
 
-export const login: RequestHandler = async (req, res, next) => {
-  try {
-    const validatedBody = loginInputSchema.parse(req.body);
+export class AuthController {
+  constructor(
+    @inject(TYPES.CreateUser) private createUserUseCase: CreateUser,
+    @inject(TYPES.LoginUser) private loginUserUseCase: LoginUser,
+    @inject(TYPES.SignInWithGoogle)
+    private signInWithGoogleUseCase: SignInWithGoogle,
+    @inject(TYPES.SendVerificationEmail)
+    private sendEmailUseCase: SendVerificationEmail,
+    @inject(TYPES.VerifyOtp) private verifyOtpUseCase: VerifyOtp,
+    @inject(TYPES.RefreshToken) private refreshTokenUseCase: RefreshToken,
+    @inject(TYPES.AdminLogin) private adminLoginUseCase: AdminLogin,
+    @inject(TYPES.ITokenService) private tokenService: ITokenService,
+  ) {}
 
-    const loginUserUseCase = container.get<LoginUser>(TYPES.LoginUser);
-    const user = await loginUserUseCase.execute(validatedBody);
+  login: RequestHandler = async (req, res, next) => {
+    try {
+      const validatedBody = loginInputSchema.parse(req.body);
 
-    if (user.status === "not-verified") {
-      const sendEmailUseCase = container.get<SendVerificationEmail>(
-        TYPES.SendVerificationEmail
+      const user = await this.loginUserUseCase.execute(validatedBody);
+
+      if (user.status === "not-verified") {
+        await this.sendEmailUseCase.execute({ email: user.email });
+      }
+
+      const userResponse = UserMapper.toResponse(user);
+      const tokens = this.tokenService.generate(
+        { role: "user", id: userResponse._id },
+        user.status !== "not-verified",
       );
-      await sendEmailUseCase.execute({ email: user.email });
+      const messageResponse =
+        user.status === "not-verified"
+          ? "Verify your email"
+          : "Login successful";
+
+      res.status(200).json({
+        userData: userResponse,
+        tokens,
+        message: messageResponse,
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const userResponse = UserMapper.toResponse(user);
-    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
-    const tokens = tokenService.generate(
-      { role: "user", id: userResponse._id },
-      user.status !== "not-verified"
-    );
-    const messageResponse =
-      user.status === "not-verified" ? "Verify your email" : "Login successful";
+  signup: RequestHandler = async (req, res, next) => {
+    try {
+      const validatedBody = signupInputSchema.parse(req.body);
 
-    res.status(200).json({
-      userData: userResponse,
-      tokens,
-      message: messageResponse,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      // --- Create User ---
+      const newUser = await this.createUserUseCase.execute({
+        ...validatedBody,
+        authType: "email",
+      });
 
-export const signup: RequestHandler = async (req, res, next) => {
-  try {
-    const validatedBody = signupInputSchema.parse(req.body);
+      // --- Send Verification Email ---
+      await this.sendEmailUseCase.execute({ email: newUser.email });
 
-    // --- Create User ---
-    const createUserUseCase = container.get<CreateUser>(TYPES.CreateUser);
-    const newUser = await createUserUseCase.execute({
-      ...validatedBody,
-      authType: "email",
-    });
+      // --- Generate Token & Respond ---
+      const userResponse = UserMapper.toResponse(newUser);
 
-    // --- Send Verification Email ---
-    const sendEmailUseCase = container.get<SendVerificationEmail>(
-      TYPES.SendVerificationEmail
-    );
-    await sendEmailUseCase.execute({ email: newUser.email });
+      const tokens = this.tokenService.generate(
+        { role: "user", id: userResponse._id },
+        false,
+      );
 
-    // --- Generate Token & Respond ---
-    const userResponse = UserMapper.toResponse(newUser);
-
-    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
-    const tokens = tokenService.generate(
-      { role: "user", id: userResponse._id },
-      false
-    );
-
-    res.status(201).json({
-      tokens,
-      userData: userResponse,
-      message: "User created successfully. Please check your email for OTP.",
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const resendOTP: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user")
-      throw new HttpError(401, "Unauthorized");
-
-    const sendEmailUseCase = container.get<SendVerificationEmail>(
-      TYPES.SendVerificationEmail
-    );
-
-    await sendEmailUseCase.execute({ email: req.user.email });
-
-    res.status(200).json({ message: "Otp has been send successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const verifyOTP: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user")
-      throw new HttpError(401, "Unauthorized");
-
-    const { otp } = otpInputSchema.parse(req.body);
-
-    const verifyOtpUseCase = container.get<VerifyOtp>(TYPES.VerifyOtp);
-    const updatedUser = await verifyOtpUseCase.execute({
-      email: req.user.email,
-      otp,
-    });
-
-    const userResponse = UserMapper.toResponse(updatedUser);
-
-    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
-    const tokens = tokenService.generate(
-      { role: "user", id: userResponse._id },
-      true
-    );
-
-    res.status(200).json({
-      userData: userResponse,
-      tokens,
-      message: "OTP verified successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const signInUsingGoogle: RequestHandler = async (req, res, next) => {
-  try {
-    const { token } = googleAuthSchema.parse(req.body);
-
-    const decodedData = await firebaseAdmin.auth().verifyIdToken(token);
-
-    const signInWithGoogleUseCase = container.get<SignInWithGoogle>(
-      TYPES.SignInWithGoogle
-    );
-
-    const user = await signInWithGoogleUseCase.execute({
-      email: decodedData.email,
-      name: decodedData.name,
-      uid: decodedData.uid,
-    });
-
-    const userResponse = UserMapper.toResponse(user);
-
-    const tokenService = container.get<ITokenService>(TYPES.ITokenService);
-    const tokens = tokenService.generate(
-      { role: "user", id: userResponse._id },
-      true
-    );
-
-    res.status(200).json({
-      userData: userResponse,
-      tokens,
-      message: "Google login successfully",
-    });
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      error.code === "auth/id-token-expired"
-    ) {
-      return next(new HttpError(401, "Google auth token has expired."));
+      res.status(201).json({
+        tokens,
+        userData: userResponse,
+        message: "User created successfully. Please check your email for OTP.",
+      });
+    } catch (err) {
+      next(err);
     }
-    next(error);
-  }
-};
+  };
 
-export const refreshToken: RequestHandler = async (req, res, next) => {
-  try {
-    const { token } = refreshTokenSchema.parse(req.body);
+  resendOTP: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user")
+        throw new HttpError(401, "Unauthorized");
 
-    const refreshTokenUseCase = container.get<RefreshToken>(TYPES.RefreshToken);
-    const newTokens = await refreshTokenUseCase.execute({ token });
+      await this.sendEmailUseCase.execute({ email: req.user.email });
 
-    res.status(200).json({
-      tokens: newTokens,
-      message: "Token refreshed successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      res.status(200).json({ message: "Otp has been send successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
 
-export const adminLogin: RequestHandler = async (req, res, next) => {
-  try {
-    const validatedBody = adminLoginInputSchema.parse(req.body);
+  verifyOTP: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user")
+        throw new HttpError(401, "Unauthorized");
 
-    const adminLoginUseCase = container.get<AdminLogin>(TYPES.AdminLogin);
-    const tokens = await adminLoginUseCase.execute(validatedBody);
+      const { otp } = otpInputSchema.parse(req.body);
 
-    res.status(200).json({
-      tokens,
-      userData: { username: validatedBody.username },
-      message: "Admin login successful",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const updatedUser = await this.verifyOtpUseCase.execute({
+        email: req.user.email,
+        otp,
+      });
+
+      const userResponse = UserMapper.toResponse(updatedUser);
+
+      const tokens = this.tokenService.generate(
+        { role: "user", id: userResponse._id },
+        true,
+      );
+
+      res.status(200).json({
+        userData: userResponse,
+        tokens,
+        message: "OTP verified successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  signInUsingGoogle: RequestHandler = async (req, res, next) => {
+    try {
+      const { token } = googleAuthSchema.parse(req.body);
+
+      const decodedData = await firebaseAdmin.auth().verifyIdToken(token);
+
+      const user = await this.signInWithGoogleUseCase.execute({
+        email: decodedData.email,
+        name: decodedData.name,
+        uid: decodedData.uid,
+      });
+
+      const userResponse = UserMapper.toResponse(user);
+
+      const tokens = this.tokenService.generate(
+        { role: "user", id: userResponse._id },
+        true,
+      );
+
+      res.status(200).json({
+        userData: userResponse,
+        tokens,
+        message: "Google login successfully",
+      });
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        error.code === "auth/id-token-expired"
+      ) {
+        return next(new HttpError(401, "Google auth token has expired."));
+      }
+      next(error);
+    }
+  };
+
+  refreshToken: RequestHandler = async (req, res, next) => {
+    try {
+      const { token } = refreshTokenSchema.parse(req.body);
+
+      const newTokens = await this.refreshTokenUseCase.execute({ token });
+
+      res.status(200).json({
+        tokens: newTokens,
+        message: "Token refreshed successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  adminLogin: RequestHandler = async (req, res, next) => {
+    try {
+      const validatedBody = adminLoginInputSchema.parse(req.body);
+
+      const tokens = await this.adminLoginUseCase.execute(validatedBody);
+
+      res.status(200).json({
+        tokens,
+        userData: { username: validatedBody.username },
+        message: "Admin login successful",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+}

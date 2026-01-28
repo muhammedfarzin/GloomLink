@@ -1,23 +1,27 @@
 import { Router } from "express";
 import { authenticateToken } from "../../middleware/authenticate-token.middleware";
 import { authorizeRole } from "../../middleware/authorize-role.middleware";
-import * as postController from "../../controllers/post.controller";
 import { uploadImage } from "../../middleware/file-upload.middleware";
+import container from "../../../shared/inversify.config";
+import { TYPES } from "../../../shared/types";
+
+import type { PostController } from "../../controllers/post.controller";
 
 const router = Router();
+const postController = container.get<PostController>(TYPES.PostController);
 
 router.get(
   "/",
   authenticateToken,
   authorizeRole("user"),
-  postController.getPosts
+  postController.getPosts,
 );
 
 router.post(
   "/interaction",
   authenticateToken,
   authorizeRole("user"),
-  postController.recordInteraction
+  postController.recordInteraction,
 );
 
 router.post(
@@ -25,7 +29,7 @@ router.post(
   authenticateToken,
   authorizeRole("user"),
   uploadImage.array("images"),
-  postController.createPost
+  postController.createPost,
 );
 
 router.put(
@@ -33,35 +37,35 @@ router.put(
   authenticateToken,
   authorizeRole("user"),
   uploadImage.array("images"),
-  postController.editPost
+  postController.editPost,
 );
 
 router.get(
   "/saved",
   authenticateToken,
   authorizeRole("user"),
-  postController.getSavedPosts
+  postController.getSavedPosts,
 );
 
 router.post(
   "/save/:postId",
   authenticateToken,
   authorizeRole("user"),
-  postController.toggleSavePost
+  postController.toggleSavePost,
 );
 
 router.get(
   "/:postId",
   authenticateToken,
   authorizeRole("user"),
-  postController.getPostById
+  postController.getPostById,
 );
 
 router.delete(
   "/:postId",
   authenticateToken,
   authorizeRole("user"),
-  postController.deletePost
+  postController.deletePost,
 );
 
 export { router as postsRouter };

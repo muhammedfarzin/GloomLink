@@ -1,228 +1,229 @@
 import type { RequestHandler } from "express";
+import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { createPostSchema, editPostSchema } from "../validation/postSchemas";
-import { CreatePost } from "../../application/use-cases/CreatePost";
-import { GetPostById } from "../../application/use-cases/GetPostById";
-import { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
-import { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
-import { EditPost } from "../../application/use-cases/EditPost";
-import { DeletePost } from "../../application/use-cases/DeletePost";
-import { RecordInteraction } from "../../application/use-cases/RecordInteraction";
-import { GetRecommendedPosts } from "../../application/use-cases/GetRecommendedPosts";
 import { recordInteractionSchema } from "../validation/interactionSchemas";
-import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
 
-export const createPost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+import type { CreatePost } from "../../application/use-cases/CreatePost";
+import type { GetPostById } from "../../application/use-cases/GetPostById";
+import type { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
+import type { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
+import type { EditPost } from "../../application/use-cases/EditPost";
+import type { DeletePost } from "../../application/use-cases/DeletePost";
+import type { RecordInteraction } from "../../application/use-cases/RecordInteraction";
+import type { GetRecommendedPosts } from "../../application/use-cases/GetRecommendedPosts";
+
+import { createPostSchema, editPostSchema } from "../validation/postSchemas";
+
+@injectable()
+export class PostController {
+  constructor(
+    @inject(TYPES.CreatePost) private createPostUseCase: CreatePost,
+    @inject(TYPES.EditPost) private editPostUseCase: EditPost,
+    @inject(TYPES.GetSavedPosts) private getSavedPostsUseCase: GetSavedPosts,
+    @inject(TYPES.ToggleSavePost) private toggleSavePostUseCase: ToggleSavePost,
+    @inject(TYPES.GetPostById) private getPostByIdUseCase: GetPostById,
+    @inject(TYPES.GetRecommendedPosts)
+    private getRecommendedPostsUseCase: GetRecommendedPosts,
+    @inject(TYPES.DeletePost) private deletePostUseCase: DeletePost,
+    @inject(TYPES.RecordInteraction)
+    private recordInteractionUseCase: RecordInteraction,
+  ) {}
+
+  createPost: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
+
+      const validatedBody = createPostSchema.parse(req.body);
+      const files = req.files as Express.Multer.File[];
+
+      if (!validatedBody.caption && (!files || files.length === 0)) {
+        throw new HttpError(
+          400,
+          "Post must have either a caption or an image.",
+        );
+      }
+
+      const newPost = await this.createPostUseCase.execute({
+        userId: req.user.id,
+        caption: validatedBody.caption,
+        tags: validatedBody.tags,
+        publishedFor: validatedBody.publishedFor,
+        files: files || [],
+      });
+
+      res.status(201).json({
+        postData: newPost,
+        message: "Post created successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const validatedBody = createPostSchema.parse(req.body);
-    const files = req.files as Express.Multer.File[];
+  editPost: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
+      const { postId } = req.params;
+      const { removedImages, ...validatedBody } = editPostSchema.parse(
+        req.body,
+      );
+      const newFiles = (req.files as Express.Multer.File[]) || [];
 
-    if (!validatedBody.caption && (!files || files.length === 0)) {
-      throw new HttpError(400, "Post must have either a caption or an image.");
+      const updatedPost = await this.editPostUseCase.execute({
+        ...validatedBody,
+        removedFiles: removedImages,
+        newFiles,
+        postId,
+        userId: req.user.id,
+      });
+
+      res
+        .status(200)
+        .json({ postData: updatedPost, message: "Post updated successfully" });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const createPostUseCase = container.get<CreatePost>(TYPES.CreatePost);
+  getSavedPosts: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const newPost = await createPostUseCase.execute({
-      userId: req.user.id,
-      caption: validatedBody.caption,
-      tags: validatedBody.tags,
-      publishedFor: validatedBody.publishedFor,
-      files: files || [],
-    });
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 5;
 
-    res.status(201).json({
-      postData: newPost,
-      message: "Post created successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const editPost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-    const { postId } = req.params;
-    const { removedImages, ...validatedBody } = editPostSchema.parse(req.body);
-    const newFiles = (req.files as Express.Multer.File[]) || [];
-
-    const editPostUseCase = container.get<EditPost>(TYPES.EditPost);
-
-    const updatedPost = await editPostUseCase.execute({
-      ...validatedBody,
-      removedFiles: removedImages,
-      newFiles,
-      postId,
-      userId: req.user.id,
-    });
-
-    res
-      .status(200)
-      .json({ postData: updatedPost, message: "Post updated successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getSavedPosts: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
-
-    const getSavedPostsUseCase = container.get<GetSavedPosts>(
-      TYPES.GetSavedPosts
-    );
-
-    const savedPosts = await getSavedPostsUseCase.execute(
-      req.user.id,
-      page,
-      limit
-    );
-
-    res.status(200).json({
-      postsData: savedPosts,
-      isEnd: savedPosts.length < limit,
-      message: "Saved posts fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const toggleSavePost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
-    }
-
-    const { postId } = req.params;
-
-    const toggleSavePostUseCase = container.get<ToggleSavePost>(
-      TYPES.ToggleSavePost
-    );
-
-    const result = await toggleSavePostUseCase.execute(req.user.id, postId);
-
-    if (result.status === "saved") {
-      const recordInteractionUseCase = container.get<RecordInteraction>(
-        TYPES.RecordInteraction
+      const savedPosts = await this.getSavedPostsUseCase.execute(
+        req.user.id,
+        page,
+        limit,
       );
 
-      await recordInteractionUseCase.execute(req.user.id, postId, "save");
+      res.status(200).json({
+        postsData: savedPosts,
+        isEnd: savedPosts.length < limit,
+        message: "Saved posts fetched successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    res.status(200).json({ message: `Post successfully ${result.status}` });
-  } catch (error) {
-    next(error);
-  }
-};
+  toggleSavePost: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-export const getPostById: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+      const { postId } = req.params;
+      const result = await this.toggleSavePostUseCase.execute(
+        req.user.id,
+        postId,
+      );
+
+      if (result.status === "saved") {
+        await this.recordInteractionUseCase.execute(
+          req.user.id,
+          postId,
+          "save",
+        );
+      }
+
+      res.status(200).json({ message: `Post successfully ${result.status}` });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const currentUserId = req.user.id;
-    const { postId } = req.params;
+  getPostById: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const getPostByIdUseCase = container.get<GetPostById>(TYPES.GetPostById);
+      const currentUserId = req.user.id;
+      const { postId } = req.params;
 
-    const post = await getPostByIdUseCase.execute({
-      postId: postId,
-      userId: currentUserId,
-    });
+      const post = await this.getPostByIdUseCase.execute({
+        postId: postId,
+        userId: currentUserId,
+      });
 
-    res.status(200).json({
-      postData: post,
-      message: "Post fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getPosts: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+      res.status(200).json({
+        postData: post,
+        message: "Post fetched successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 5;
+  getPosts: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const getRecommendedPostsUseCase = container.get<GetRecommendedPosts>(
-      TYPES.GetRecommendedPosts
-    );
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
 
-    const postsData = await getRecommendedPostsUseCase.execute(
-      req.user.id,
-      page,
-      limit
-    );
+      const postsData = await this.getRecommendedPostsUseCase.execute(
+        req.user.id,
+        page,
+        limit,
+      );
 
-    res.status(200).json({
-      postsData,
-      isEnd: postsData.length < limit,
-      message: "Posts fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deletePost: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      throw new HttpError(401, "Unauthorized");
+      res.status(200).json({
+        postsData,
+        isEnd: postsData.length < limit,
+        message: "Posts fetched successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const deletePostUseCase = container.get<DeletePost>(TYPES.DeletePost);
+  deletePost: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    await deletePostUseCase.execute({
-      postId: req.params.postId,
-      userId: req.user.id,
-      userRole: req.user.role,
-    });
+      await this.deletePostUseCase.execute({
+        postId: req.params.postId,
+        userId: req.user.id,
+        userRole: req.user.role,
+      });
 
-    res.status(200).json({ message: "Post deleted successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const recordInteraction: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+      res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const validatedBody = recordInteractionSchema.parse(req.body);
+  recordInteraction: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const recordInteractionUseCase = container.get<RecordInteraction>(
-      TYPES.RecordInteraction
-    );
+      const validatedBody = recordInteractionSchema.parse(req.body);
 
-    await recordInteractionUseCase.execute(
-      req.user.id,
-      validatedBody.postId,
-      validatedBody.type
-    );
+      await this.recordInteractionUseCase.execute(
+        req.user.id,
+        validatedBody.postId,
+        validatedBody.type,
+      );
 
-    res.status(200).json({ message: "Interaction recorded successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
+      res.status(200).json({ message: "Interaction recorded successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
+}

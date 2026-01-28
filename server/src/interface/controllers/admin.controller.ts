@@ -1,109 +1,107 @@
 import { RequestHandler } from "express";
-import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
+import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { TogglePostStatus } from "../../application/use-cases/TogglePostStatus";
 import { isValidObjectId } from "../validation/validations";
-import { GetAdminPosts } from "../../application/use-cases/GetAdminPosts";
-import { GetAdminUsers } from "../../application/use-cases/GetAdminUsers";
-import { ToggleUserStatus } from "../../application/use-cases/ToggleUserStatus";
-import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
 
-export const getUsers: RequestHandler = async (req, res, next) => {
-  try {
-    const {
-      filter,
-      q: searchQuery,
-      ...validatedData
-    } = getUsersSchema.parse(req.query);
+import type { TogglePostStatus } from "../../application/use-cases/TogglePostStatus";
+import type { GetAdminPosts } from "../../application/use-cases/GetAdminPosts";
+import type { GetAdminUsers } from "../../application/use-cases/GetAdminUsers";
+import type { ToggleUserStatus } from "../../application/use-cases/ToggleUserStatus";
 
-    const getAdminUsersUseCase = container.get<GetAdminUsers>(
-      TYPES.GetAdminUsers
-    );
+import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
 
-    const users = await getAdminUsersUseCase.execute({
-      filter,
-      searchQuery,
-      ...validatedData,
-    });
+@injectable()
+export class AdminController {
+  constructor(
+    @inject(TYPES.GetAdminUsers) private getAdminUsersUseCase: GetAdminUsers,
+    @inject(TYPES.ToggleUserStatus)
+    private toggleUserStatusUseCase: ToggleUserStatus,
+    @inject(TYPES.GetAdminPosts) private getAdminPostsUseCase: GetAdminPosts,
+    @inject(TYPES.TogglePostStatus)
+    private togglePostStatusUseCase: TogglePostStatus,
+  ) {}
 
-    res.status(200).json({
-      usersData: users,
-      message: "Users fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  getUsers: RequestHandler = async (req, res, next) => {
+    try {
+      const {
+        filter,
+        q: searchQuery,
+        ...validatedData
+      } = getUsersSchema.parse(req.query);
 
-export const toggleUserStatus: RequestHandler = async (req, res, next) => {
-  try {
-    const { userId } = req.params;
+      const users = await this.getAdminUsersUseCase.execute({
+        filter,
+        searchQuery,
+        ...validatedData,
+      });
 
-    if (!isValidObjectId(userId)) throw new HttpError(400, "Invalid userId");
-
-    const toggleUserStatusUseCase = container.get<ToggleUserStatus>(
-      TYPES.ToggleUserStatus
-    );
-
-    const result = await toggleUserStatusUseCase.execute(userId);
-
-    res.status(200).json({
-      message: `User is now ${result.updatedStatus}`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getPosts: RequestHandler = async (req, res, next) => {
-  try {
-    const {
-      filter,
-      q: searchQuery,
-      ...validatedQuery
-    } = getPostsSchema.parse(req.query);
-
-    const getAdminPostsUseCase = container.get<GetAdminPosts>(
-      TYPES.GetAdminPosts
-    );
-
-    const posts = await getAdminPostsUseCase.execute({
-      ...validatedQuery,
-      filter,
-      searchQuery,
-      withReports: true,
-    });
-
-    res.status(200).json({
-      postsData: posts,
-      isEnd: posts.length < validatedQuery.limit,
-      message: "Posts fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const togglePostStatus: RequestHandler = async (req, res, next) => {
-  try {
-    const { postId } = req.params;
-    if (!postId) {
-      throw new HttpError(400, "Post ID is required.");
-    } else if (!isValidObjectId(postId)) {
-      throw new HttpError(400, "Invalid Post ID.");
+      res.status(200).json({
+        usersData: users,
+        message: "Users fetched successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const togglePostStatusUseCase = container.get<TogglePostStatus>(
-      TYPES.TogglePostStatus
-    );
+  toggleUserStatus: RequestHandler = async (req, res, next) => {
+    try {
+      const { userId } = req.params;
 
-    const result = await togglePostStatusUseCase.execute({ postId });
+      if (!isValidObjectId(userId)) throw new HttpError(400, "Invalid userId");
 
-    res.status(200).json({
-      message: `Post is now ${result.updatedStatus}`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const result = await this.toggleUserStatusUseCase.execute(userId);
+
+      res.status(200).json({
+        message: `User is now ${result.updatedStatus}`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getPosts: RequestHandler = async (req, res, next) => {
+    try {
+      const {
+        filter,
+        q: searchQuery,
+        ...validatedQuery
+      } = getPostsSchema.parse(req.query);
+
+      const posts = await this.getAdminPostsUseCase.execute({
+        ...validatedQuery,
+        filter,
+        searchQuery,
+        withReports: true,
+      });
+
+      res.status(200).json({
+        postsData: posts,
+        isEnd: posts.length < validatedQuery.limit,
+        message: "Posts fetched successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  togglePostStatus: RequestHandler = async (req, res, next) => {
+    try {
+      const { postId } = req.params;
+      if (!postId) {
+        throw new HttpError(400, "Post ID is required.");
+      } else if (!isValidObjectId(postId)) {
+        throw new HttpError(400, "Invalid Post ID.");
+      }
+
+      const result = await this.togglePostStatusUseCase.execute({ postId });
+
+      res.status(200).json({
+        message: `Post is now ${result.updatedStatus}`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+}

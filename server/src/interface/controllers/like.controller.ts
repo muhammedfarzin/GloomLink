@@ -1,72 +1,74 @@
 import { RequestHandler } from "express";
+import { inject, injectable } from "inversify";
+import { HttpError } from "../../infrastructure/errors/HttpError";
+import { TYPES } from "../../shared/types";
+
+import type { GetLikedUsers } from "../../application/use-cases/GetLikedUsers";
+import type { ToggleLike } from "../../application/use-cases/ToggleLike";
+import type { RecordInteraction } from "../../application/use-cases/RecordInteraction";
+
 import {
   getLikedUsersSchema,
   toggleLikeSchema,
 } from "../validation/likeSchemas";
-import { GetLikedUsers } from "../../application/use-cases/GetLikedUsers";
-import { HttpError } from "../../infrastructure/errors/HttpError";
-import { ToggleLike } from "../../application/use-cases/ToggleLike";
-import container from "../../shared/inversify.config";
-import { TYPES } from "../../shared/types";
-import { RecordInteraction } from "../../application/use-cases/RecordInteraction";
 
-export const getLikedUsers: RequestHandler = async (req, res, next) => {
-  try {
-    const validatedData = getLikedUsersSchema.parse({
-      ...req.query,
-      type: req.params.type,
-      targetId: req.params.targetId,
-    });
+@injectable()
+export class LikeController {
+  constructor(
+    @inject(TYPES.GetLikedUsers) private getLikedUsersUseCase: GetLikedUsers,
+    @inject(TYPES.ToggleLike) private toggleLikeUseCase: ToggleLike,
+    @inject(TYPES.RecordInteraction)
+    private recordInteractionUseCase: RecordInteraction,
+  ) {}
 
-    const getLikedUsersUseCase = container.get<GetLikedUsers>(
-      TYPES.GetLikedUsers
-    );
+  getLikedUsers: RequestHandler = async (req, res, next) => {
+    try {
+      const validatedData = getLikedUsersSchema.parse({
+        ...req.query,
+        type: req.params.type,
+        targetId: req.params.targetId,
+      });
 
-    const users = await getLikedUsersUseCase.execute({
-      ...validatedData,
-      userId: req.user?.id,
-    });
+      const users = await this.getLikedUsersUseCase.execute({
+        ...validatedData,
+        userId: req.user?.id,
+      });
 
-    res.status(200).json({
-      usersData: users,
-      message: "Liked users fetched successfully.",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const toggleLike: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+      res.status(200).json({
+        usersData: users,
+        message: "Liked users fetched successfully.",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const validatedData = toggleLikeSchema.parse(req.params);
+  toggleLike: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const toggleLikeUseCase = container.get<ToggleLike>(TYPES.ToggleLike);
+      const validatedData = toggleLikeSchema.parse(req.params);
 
-    const result = await toggleLikeUseCase.execute({
-      ...validatedData,
-      userId: req.user.id,
-    });
+      const result = await this.toggleLikeUseCase.execute({
+        ...validatedData,
+        userId: req.user.id,
+      });
 
-    if (result.status === "liked" && validatedData.type === "post") {
-      const recordInteractionUseCase = container.get<RecordInteraction>(
-        TYPES.RecordInteraction
-      );
+      if (result.status === "liked" && validatedData.type === "post") {
+        await this.recordInteractionUseCase.execute(
+          req.user.id,
+          validatedData.targetId,
+          "like",
+        );
+      }
 
-      await recordInteractionUseCase.execute(
-        req.user.id,
-        validatedData.targetId,
-        "like"
-      );
+      res.status(200).json({
+        message: `Post successfully ${result.status}`,
+      });
+    } catch (error) {
+      next(error);
     }
-
-    res.status(200).json({
-      message: `Post successfully ${result.status}`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
+}

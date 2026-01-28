@@ -4,7 +4,6 @@ import { IUserRepository } from "../domain/repositories/IUserRepository";
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { IPasswordHasher } from "../application/services/IPasswordHasher";
 import { BcryptPasswordHasher } from "../infrastructure/services/BcryptPasswordHasher";
-import { CreateUser } from "../application/use-cases/CreateUser";
 import { IFileStorageService } from "../application/services/IFileStorageService";
 import { CloudinaryStorageService } from "../infrastructure/services/CloudinaryStorageService";
 import { ITokenService } from "../application/services/ITokenService";
@@ -31,6 +30,8 @@ import { IReportRepository } from "../domain/repositories/IReportRepository";
 import { ReportRepository } from "../infrastructure/repositories/ReportRepository";
 import { IInteractionRepository } from "../domain/repositories/IInteractionRepository";
 import { InteractionRepository } from "../infrastructure/repositories/InteractionRepository";
+
+import { CreateUser } from "../application/use-cases/CreateUser";
 import { AddComment } from "../application/use-cases/AddComment";
 import { AdminLogin } from "../application/use-cases/AdminLogin";
 import { CreateConversation } from "../application/use-cases/CreateConversation";
@@ -66,6 +67,17 @@ import { UpdateProfile } from "../application/use-cases/UpdateProfile";
 import { VerifyOtp } from "../application/use-cases/VerifyOtp";
 import { RecordInteraction } from "../application/use-cases/RecordInteraction";
 import { GetRecommendedPosts } from "../application/use-cases/GetRecommendedPosts";
+
+import { AuthController } from "../interface/controllers/auth.controller";
+import { CommentController } from "../interface/controllers/comment.controller";
+import { ConversationController } from "../interface/controllers/conversation.controller";
+import { FollowController } from "../interface/controllers/follow.controller";
+import { LikeController } from "../interface/controllers/like.controller";
+import { PostController } from "../interface/controllers/post.controller";
+import { ProfileController } from "../interface/controllers/profile.controller";
+import { ReportController } from "../interface/controllers/report.controller";
+import { SearchController } from "../interface/controllers/search.controller";
+import { AdminController } from "../interface/controllers/admin.controller";
 
 // Create a new container
 const container = new Container();
@@ -150,5 +162,23 @@ container.bind<ToggleSavePost>(TYPES.ToggleSavePost).to(ToggleSavePost);
 container.bind<ToggleUserStatus>(TYPES.ToggleUserStatus).to(ToggleUserStatus);
 container.bind<UpdateProfile>(TYPES.UpdateProfile).to(UpdateProfile);
 container.bind<VerifyOtp>(TYPES.VerifyOtp).to(VerifyOtp);
+
+// --- BIND CONTROLLER ---
+container.bind<AuthController>(TYPES.AuthController).to(AuthController);
+container.bind<PostController>(TYPES.PostController).to(PostController);
+container
+  .bind<CommentController>(TYPES.CommentController)
+  .to(CommentController);
+container
+  .bind<ConversationController>(TYPES.ConversationController)
+  .to(ConversationController);
+container.bind<FollowController>(TYPES.FollowController).to(FollowController);
+container.bind<LikeController>(TYPES.LikeController).to(LikeController);
+container
+  .bind<ProfileController>(TYPES.ProfileController)
+  .to(ProfileController);
+container.bind<ReportController>(TYPES.ReportController).to(ReportController);
+container.bind<SearchController>(TYPES.SearchController).to(SearchController);
+container.bind<AdminController>(TYPES.AdminController).to(AdminController);
 
 export default container;

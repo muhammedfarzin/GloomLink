@@ -55,6 +55,18 @@ const TYPES = {
   UpdateProfile: Symbol.for("UpdateProfile"),
   VerifyOtp: Symbol.for("VerifyOtp"),
   RecordInteraction: Symbol.for("RecordInteraction"),
+
+  // Controllers
+  AuthController: Symbol.for("AuthController"),
+  PostController: Symbol.for("PostController"),
+  CommentController: Symbol.for("CommentController"),
+  ConversationController: Symbol.for("ConversationController"),
+  FollowController: Symbol.for("FollowController"),
+  LikeController: Symbol.for("LikeController"),
+  ProfileController: Symbol.for("ProfileController"),
+  ReportController: Symbol.for("ReportController"),
+  SearchController: Symbol.for("SearchController"),
+  AdminController: Symbol.for("AdminController"),
 };
 
 export { TYPES };

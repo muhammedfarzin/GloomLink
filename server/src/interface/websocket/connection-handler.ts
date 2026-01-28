@@ -6,7 +6,9 @@ import { CallController } from "../controllers/call.controller";
 export const handleSocketConnection = async (socket: Socket) => {
   const controller = new SocketController(socket);
   const callController = new CallController(socket);
-
+  socket.onAny((...args) => {
+  console.log("Some transaction", ...args)
+})
   // Handle Messages
   socket.on("send-message", controller.handleSendMessage);
   socket.on("message-seen", controller.markAsSeen);

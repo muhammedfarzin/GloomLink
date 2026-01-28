@@ -1,84 +1,86 @@
 import type { RequestHandler } from "express";
+import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { GetUserProfile } from "../../application/use-cases/GetUserProfile";
-import { GetUserDataForForm } from "../../application/use-cases/GetUserDataForForm";
-import { updateProfileSchema } from "../validation/profileSchemas";
-import { UpdateProfile } from "../../application/use-cases/UpdateProfile";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
-import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
 
-export const getUserProfile: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+import type { GetUserProfile } from "../../application/use-cases/GetUserProfile";
+import type { GetUserDataForForm } from "../../application/use-cases/GetUserDataForForm";
+import type { UpdateProfile } from "../../application/use-cases/UpdateProfile";
+
+import { updateProfileSchema } from "../validation/profileSchemas";
+
+@injectable()
+export class ProfileController {
+  constructor(
+    @inject(TYPES.GetUserProfile) private getUserProfileUseCase: GetUserProfile,
+    @inject(TYPES.GetUserDataForForm)
+    private getUserDataForEditUseCase: GetUserDataForForm,
+    @inject(TYPES.UpdateProfile) private updateProfileUseCase: UpdateProfile,
+  ) {}
+
+  getUserProfile: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
+
+      const userProfile = await this.getUserProfileUseCase.execute({
+        username: req.params.username,
+        currentUserId: req.user.id,
+      });
+
+      res.status(200).json({
+        userData: userProfile,
+        message: "User profile fetched successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const getUserProfileUseCase = container.get<GetUserProfile>(
-      TYPES.GetUserProfile
-    );
+  fetchUserDataForForm: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const userProfile = await getUserProfileUseCase.execute({
-      username: req.params.username,
-      currentUserId: req.user.id,
-    });
+      const userData = await this.getUserDataForEditUseCase.execute(
+        req.user.id,
+      );
 
-    res.status(200).json({
-      userData: userProfile,
-      message: "User profile fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const fetchUserDataForForm: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+      res.status(200).json({
+        userData,
+        message: "User data for form fetched successfully",
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const getUserDataForEditUseCase = container.get<GetUserDataForForm>(
-      TYPES.GetUserDataForForm
-    );
+  updateProfile: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    const userData = await getUserDataForEditUseCase.execute(req.user.id);
+      const validatedBody = updateProfileSchema.parse(req.body);
+      const profileImageFile = req.file;
 
-    res.status(200).json({
-      userData,
-      message: "User data for form fetched successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const updatedUser = await this.updateProfileUseCase.execute({
+        ...validatedBody,
+        userId: req.user.id,
+        profileImageFile,
+      });
 
-export const updateProfile: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      throw new HttpError(401, "Unauthorized");
+      const userResponse = UserMapper.toResponse(updatedUser);
+
+      res.status(200).json({
+        userData: userResponse,
+        message: "Profile updated successfully",
+      });
+    } catch (error) {
+      next(error);
     }
-
-    const validatedBody = updateProfileSchema.parse(req.body);
-    const profileImageFile = req.file;
-
-    const updateProfileUseCase = container.get<UpdateProfile>(
-      TYPES.UpdateProfile
-    );
-
-    const updatedUser = await updateProfileUseCase.execute({
-      ...validatedBody,
-      userId: req.user.id,
-      profileImageFile,
-    });
-
-    const userResponse = UserMapper.toResponse(updatedUser);
-
-    res.status(200).json({
-      userData: userResponse,
-      message: "Profile updated successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
+}

@@ -4,23 +4,18 @@ import { authorizeRole } from "../../middleware/authorize-role.middleware";
 import container from "../../../shared/inversify.config";
 import { TYPES } from "../../../shared/types";
 
-import type { LikeController } from "../../controllers/like.controller";
+import type { ReportController } from "../../controllers/report.controller.js";
 
 const router = Router();
-const likeController = container.get<LikeController>(TYPES.LikeController);
-
-router.get(
-  "/:type/:targetId",
-  authenticateToken,
-  authorizeRole("user"),
-  likeController.getLikedUsers,
+const reportController = container.get<ReportController>(
+  TYPES.ReportController,
 );
 
 router.post(
-  "/:type/:targetId",
+  "/",
   authenticateToken,
   authorizeRole("user"),
-  likeController.toggleLike,
+  reportController.reportTarget,
 );
 
-export { router as likesRouter };
+export { router as reportRouter };

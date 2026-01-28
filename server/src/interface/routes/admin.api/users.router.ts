@@ -1,9 +1,13 @@
 import { Router } from "express";
 import { authenticateToken } from "../../middleware/authenticate-token.middleware";
 import { authorizeRole } from "../../middleware/authorize-role.middleware";
-import * as adminController from "../../controllers/admin.controller";
+import container from "../../../shared/inversify.config";
+import { TYPES } from "../../../shared/types";
+
+import type { AdminController } from "../../controllers/admin.controller";
 
 const router = Router();
+const adminController = container.get<AdminController>(TYPES.AdminController);
 
 router.get(
   "/",

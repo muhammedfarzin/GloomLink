@@ -1,62 +1,66 @@
 import { RequestHandler } from "express";
-import { getFollowListSchema } from "../validation/followSchemas";
-import { GetFollowList } from "../../application/use-cases/GetFollowList";
+import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
-import { ToggleFollow } from "../../application/use-cases/ToggleFollow";
-import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
 
-export const getFollowers: RequestHandler = async (req, res, next) => {
-  try {
-    const { listType, ...validatedData } = getFollowListSchema.parse({
-      ...req.query,
-      userId: req.params.userId,
-      listType: req.params.listType,
-    });
+import type { GetFollowList } from "../../application/use-cases/GetFollowList";
+import type { ToggleFollow } from "../../application/use-cases/ToggleFollow";
 
-    const getFollowListUseCase = container.get<GetFollowList>(
-      TYPES.GetFollowList
-    );
+import { getFollowListSchema } from "../validation/followSchemas";
 
-    const users = await getFollowListUseCase.execute({
-      ...validatedData,
-      currentUserId: req.user?.id,
-      type: listType,
-    });
+@injectable()
+export class FollowController {
+  constructor(
+    @inject(TYPES.GetFollowList) private getFollowListUseCase: GetFollowList,
+    @inject(TYPES.ToggleFollow) private toggleFollowUseCase: ToggleFollow,
+  ) {}
 
-    res.status(200).json({
-      usersData: users,
-      message: `${listType} list fetched successfully.`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  getFollowers: RequestHandler = async (req, res, next) => {
+    try {
+      const { listType, ...validatedData } = getFollowListSchema.parse({
+        ...req.query,
+        userId: req.params.userId,
+        listType: req.params.listType,
+      });
 
-export const toggleFollow: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.user || req.user.role !== "user") {
-      throw new HttpError(401, "Unauthorized");
+      const users = await this.getFollowListUseCase.execute({
+        ...validatedData,
+        currentUserId: req.user?.id,
+        type: listType,
+      });
+
+      res.status(200).json({
+        usersData: users,
+        message: `${listType} list fetched successfully.`,
+      });
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const { userId: targetUserId } = req.params;
+  toggleFollow: RequestHandler = async (req, res, next) => {
+    try {
+      if (!req.user || req.user.role !== "user") {
+        throw new HttpError(401, "Unauthorized");
+      }
 
-    if (!isValidObjectId(targetUserId)) {
-      throw new HttpError(400, "Invalid userId");
+      const { userId: targetUserId } = req.params;
+
+      if (!isValidObjectId(targetUserId)) {
+        throw new HttpError(400, "Invalid userId");
+      }
+
+      const result = await this.toggleFollowUseCase.execute({
+        currentUserId: req.user.id,
+        targetUserId,
+      });
+
+      res.status(200).json({
+        message: `Successfully ${result.status} the user.`,
+      });
+    } catch (error) {
+      next(error);
     }
-
-    const toggleFollowUseCase = container.get<ToggleFollow>(TYPES.ToggleFollow);
-
-    const result = await toggleFollowUseCase.execute({
-      currentUserId: req.user.id,
-      targetUserId,
-    });
-
-    res.status(200).json({
-      message: `Successfully ${result.status} the user.`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  };
+}
