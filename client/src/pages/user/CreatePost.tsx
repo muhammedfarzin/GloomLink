@@ -50,7 +50,7 @@ const CreatePost: React.FC = () => {
       setCaption("");
       setImages([]);
       setTags([]);
-      setpublishedFor("pubilc");
+      setpublishedFor("public");
     }
   }, [postId]);
 
