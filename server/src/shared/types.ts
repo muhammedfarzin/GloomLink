@@ -17,6 +17,7 @@ const TYPES = {
   IFileStorageService: Symbol.for("IFileStorageService"),
   IMailService: Symbol.for("IMailService"),
   IOtpService: Symbol.for("IOtpService"),
+  IExternalAuthService: Symbol.for("IExternalAuthService"),
 
   // Use Cases
   CreateUser: Symbol.for("CreateUser"),
