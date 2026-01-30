@@ -31,7 +31,7 @@ export class AuthController {
     @inject(TYPES.SignInWithGoogle)
     private signInWithGoogleUseCase: SignInWithGoogle,
     @inject(TYPES.SendVerificationEmail)
-    private sendEmailUseCase: SendVerificationEmail,
+    private sendVerificationEmailUseCase: SendVerificationEmail,
     @inject(TYPES.VerifyOtp) private verifyOtpUseCase: VerifyOtp,
     @inject(TYPES.RefreshToken) private refreshTokenUseCase: RefreshToken,
     @inject(TYPES.AdminLogin) private adminLoginUseCase: AdminLogin,
@@ -47,7 +47,7 @@ export class AuthController {
       const user = await this.loginUserUseCase.execute(validatedBody);
 
       if (user.status === "not-verified") {
-        await this.sendEmailUseCase.execute({ email: user.email });
+        await this.sendVerificationEmailUseCase.execute({ email: user.email });
       }
 
       const userResponse = UserMapper.toResponse(user);
@@ -81,7 +81,7 @@ export class AuthController {
       });
 
       // --- Send Verification Email ---
-      await this.sendEmailUseCase.execute({ email: newUser.email });
+      await this.sendVerificationEmailUseCase.execute({ email: newUser.email });
 
       // --- Generate Token & Respond ---
       const userResponse = UserMapper.toResponse(newUser);
@@ -106,7 +106,9 @@ export class AuthController {
       if (!req.user || req.user.role !== "user")
         throw new HttpError(401, "Unauthorized");
 
-      await this.sendEmailUseCase.execute({ email: req.user.email });
+      await this.sendVerificationEmailUseCase.execute({
+        email: req.user.email,
+      });
 
       res.status(200).json({ message: "Otp has been send successfully" });
     } catch (error) {
