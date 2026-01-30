@@ -1,35 +1,40 @@
 import { Container } from "inversify";
 import { TYPES } from "./types";
-import { IUserRepository } from "../domain/repositories/IUserRepository";
-import { UserRepository } from "../infrastructure/repositories/UserRepository";
-import { IPasswordHasher } from "../application/services/IPasswordHasher";
 import { BcryptPasswordHasher } from "../infrastructure/services/BcryptPasswordHasher";
-import { IFileStorageService } from "../application/services/IFileStorageService";
 import { CloudinaryStorageService } from "../infrastructure/services/CloudinaryStorageService";
-import { ITokenService } from "../application/services/ITokenService";
 import { JwtTokenService } from "../infrastructure/services/JwtTokenService";
-import { IMailService } from "../application/services/IMailService";
 import { MailService } from "../infrastructure/services/MailService";
-import { IOtpService } from "../application/services/IOtpService";
 import { OtpService } from "../infrastructure/services/OtpService";
-import { ICommentRepository } from "../domain/repositories/ICommentRepository";
+import { FirebaseAuthService } from "../infrastructure/services/FirebaseAuthService";
+
+import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { CommentRepository } from "../infrastructure/repositories/CommentRepository";
-import { IConversationRepository } from "../domain/repositories/IConversationRepository";
 import { ConversationRepository } from "../infrastructure/repositories/ConversationRepository";
-import { IFollowRepository } from "../domain/repositories/IFollowRepository";
 import { FollowRepository } from "../infrastructure/repositories/FollowRepository";
-import { ILikeRepository } from "../domain/repositories/ILikeRepository";
 import { LikeRepository } from "../infrastructure/repositories/LikeRepository";
-import { IMessageRepository } from "../domain/repositories/IMessageRepository";
 import { MessageRepository } from "../infrastructure/repositories/MessageRepository";
-import { IOtpRepository } from "../domain/repositories/IOtpRepository";
 import { OtpRepository } from "../infrastructure/repositories/OtpRepository";
-import { IPostRepository } from "../domain/repositories/IPostRepository";
 import { PostRepository } from "../infrastructure/repositories/PostRepository";
-import { IReportRepository } from "../domain/repositories/IReportRepository";
 import { ReportRepository } from "../infrastructure/repositories/ReportRepository";
-import { IInteractionRepository } from "../domain/repositories/IInteractionRepository";
 import { InteractionRepository } from "../infrastructure/repositories/InteractionRepository";
+
+import type { IPasswordHasher } from "../application/services/IPasswordHasher";
+import type { IFileStorageService } from "../application/services/IFileStorageService";
+import type { IExternalAuthService } from "../application/services/IExternalAuthService";
+import type { ITokenService } from "../application/services/ITokenService";
+import type { IMailService } from "../application/services/IMailService";
+import type { IOtpService } from "../application/services/IOtpService";
+
+import type { IUserRepository } from "../domain/repositories/IUserRepository";
+import type { ICommentRepository } from "../domain/repositories/ICommentRepository";
+import type { IConversationRepository } from "../domain/repositories/IConversationRepository";
+import type { IFollowRepository } from "../domain/repositories/IFollowRepository";
+import type { ILikeRepository } from "../domain/repositories/ILikeRepository";
+import type { IMessageRepository } from "../domain/repositories/IMessageRepository";
+import type { IOtpRepository } from "../domain/repositories/IOtpRepository";
+import type { IPostRepository } from "../domain/repositories/IPostRepository";
+import type { IReportRepository } from "../domain/repositories/IReportRepository";
+import type { IInteractionRepository } from "../domain/repositories/IInteractionRepository";
 
 import { CreateUser } from "../application/use-cases/CreateUser";
 import { AddComment } from "../application/use-cases/AddComment";
@@ -87,6 +92,9 @@ container.bind<IPasswordHasher>(TYPES.IPasswordHasher).to(BcryptPasswordHasher);
 container.bind<ITokenService>(TYPES.ITokenService).to(JwtTokenService);
 container.bind<IMailService>(TYPES.IMailService).to(MailService);
 container.bind<IOtpService>(TYPES.IOtpService).to(OtpService);
+container
+  .bind<IExternalAuthService>(TYPES.IExternalAuthService)
+  .to(FirebaseAuthService);
 container
   .bind<IFileStorageService>(TYPES.IFileStorageService)
   .to(CloudinaryStorageService);

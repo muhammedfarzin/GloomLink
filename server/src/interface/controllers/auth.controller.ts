@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
-import firebaseAdmin from "firebase-admin";
 import { inject } from "inversify";
-import firebaseServiceAccount from "../../infrastructure/configuration/firebase-service-account-file.json";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 import { TYPES } from "../../shared/types";
-import { ITokenService } from "../../application/services/ITokenService";
+
+import type { ITokenService } from "../../application/services/ITokenService";
+import type { IExternalAuthService } from "../../application/services/IExternalAuthService";
 
 import type { VerifyOtp } from "../../application/use-cases/VerifyOtp";
 import type { LoginUser } from "../../application/use-cases/LoginUser";
@@ -24,12 +24,6 @@ import {
   signupInputSchema,
 } from "../validation/authSchemas";
 
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(
-    firebaseServiceAccount as firebaseAdmin.ServiceAccount,
-  ),
-});
-
 export class AuthController {
   constructor(
     @inject(TYPES.CreateUser) private createUserUseCase: CreateUser,
@@ -42,6 +36,8 @@ export class AuthController {
     @inject(TYPES.RefreshToken) private refreshTokenUseCase: RefreshToken,
     @inject(TYPES.AdminLogin) private adminLoginUseCase: AdminLogin,
     @inject(TYPES.ITokenService) private tokenService: ITokenService,
+    @inject(TYPES.IExternalAuthService)
+    private externalAuthService: IExternalAuthService,
   ) {}
 
   login: RequestHandler = async (req, res, next) => {
@@ -151,16 +147,9 @@ export class AuthController {
     try {
       const { token } = googleAuthSchema.parse(req.body);
 
-      const decodedData = await firebaseAdmin.auth().verifyIdToken(token);
-
-      const user = await this.signInWithGoogleUseCase.execute({
-        email: decodedData.email,
-        name: decodedData.name,
-        uid: decodedData.uid,
-      });
-
+      const authData = await this.externalAuthService.verifyToken(token);
+      const user = await this.signInWithGoogleUseCase.execute(authData);
       const userResponse = UserMapper.toResponse(user);
-
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse._id },
         true,
