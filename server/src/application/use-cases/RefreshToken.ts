@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { ITokenService, Tokens } from "../services/ITokenService";
+import { ITokenService, Tokens } from "../../domain/services/ITokenService";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 

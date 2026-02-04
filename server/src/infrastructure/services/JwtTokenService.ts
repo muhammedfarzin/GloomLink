@@ -4,7 +4,7 @@ import {
   ITokenService,
   TokenPayload,
   Tokens,
-} from "../../application/services/ITokenService";
+} from "../../domain/services/ITokenService";
 import { HttpError } from "../errors/HttpError";
 
 @injectable()

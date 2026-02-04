@@ -18,12 +18,12 @@ import { PostRepository } from "../infrastructure/repositories/PostRepository";
 import { ReportRepository } from "../infrastructure/repositories/ReportRepository";
 import { InteractionRepository } from "../infrastructure/repositories/InteractionRepository";
 
-import type { IPasswordHasher } from "../application/services/IPasswordHasher";
-import type { IFileStorageService } from "../application/services/IFileStorageService";
-import type { IExternalAuthService } from "../application/services/IExternalAuthService";
-import type { ITokenService } from "../application/services/ITokenService";
-import type { IMailService } from "../application/services/IMailService";
-import type { IOtpService } from "../application/services/IOtpService";
+import type { IPasswordHasher } from "../domain/services/IPasswordHasher";
+import type { IFileStorageService } from "../domain/services/IFileStorageService";
+import type { IExternalAuthService } from "../domain/services/IExternalAuthService";
+import type { ITokenService } from "../domain/services/ITokenService";
+import type { IMailService } from "../domain/services/IMailService";
+import type { IOtpService } from "../domain/services/IOtpService";
 
 import type { IUserRepository } from "../domain/repositories/IUserRepository";
 import type { ICommentRepository } from "../domain/repositories/ICommentRepository";
@@ -73,16 +73,16 @@ import { VerifyOtp } from "../application/use-cases/VerifyOtp";
 import { RecordInteraction } from "../application/use-cases/RecordInteraction";
 import { GetRecommendedPosts } from "../application/use-cases/GetRecommendedPosts";
 
-import { AuthController } from "../interface/controllers/auth.controller";
-import { CommentController } from "../interface/controllers/comment.controller";
-import { ConversationController } from "../interface/controllers/conversation.controller";
-import { FollowController } from "../interface/controllers/follow.controller";
-import { LikeController } from "../interface/controllers/like.controller";
-import { PostController } from "../interface/controllers/post.controller";
-import { ProfileController } from "../interface/controllers/profile.controller";
-import { ReportController } from "../interface/controllers/report.controller";
-import { SearchController } from "../interface/controllers/search.controller";
-import { AdminController } from "../interface/controllers/admin.controller";
+import { AuthController } from "../interface-adapters/controllers/auth.controller";
+import { CommentController } from "../interface-adapters/controllers/comment.controller";
+import { ConversationController } from "../interface-adapters/controllers/conversation.controller";
+import { FollowController } from "../interface-adapters/controllers/follow.controller";
+import { LikeController } from "../interface-adapters/controllers/like.controller";
+import { PostController } from "../interface-adapters/controllers/post.controller";
+import { ProfileController } from "../interface-adapters/controllers/profile.controller";
+import { ReportController } from "../interface-adapters/controllers/report.controller";
+import { SearchController } from "../interface-adapters/controllers/search.controller";
+import { AdminController } from "../interface-adapters/controllers/admin.controller";
 
 // Create a new container
 const container = new Container();

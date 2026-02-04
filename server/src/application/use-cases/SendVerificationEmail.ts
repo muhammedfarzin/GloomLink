@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
-import { IOtpService } from "../services/IOtpService";
-import { IMailService } from "../services/IMailService";
+import { IOtpService } from "../../domain/services/IOtpService";
+import { IMailService } from "../../domain/services/IMailService";
 import { TYPES } from "../../shared/types";
 
 export interface SendVerificationEmailInput {

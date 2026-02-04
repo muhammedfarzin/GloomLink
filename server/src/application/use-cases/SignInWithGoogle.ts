@@ -3,20 +3,15 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface SignInWithGoogleInput {
-  name?: string;
-  email?: string;
-  uid: string;
-}
+import { ExternalAuthUser } from "../../domain/services/IExternalAuthService";
 
 @injectable()
 export class SignInWithGoogle {
   constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
-  async execute(input: SignInWithGoogleInput): Promise<User> {
+  async execute(input: ExternalAuthUser): Promise<User> {
     if (!input.email) {
       throw new HttpError(400, "Email not provided by Google authentication");
     }
@@ -27,7 +22,7 @@ export class SignInWithGoogle {
       if (existingUser.authType !== "google") {
         throw new HttpError(
           400,
-          "This email is registered with a different sign-in method."
+          "This email is registered with a different sign-in method.",
         );
       }
       return existingUser;
@@ -49,7 +44,7 @@ export class SignInWithGoogle {
       lastname,
       username,
       email: input.email,
-      password: input.uid,
+      password: input.externalId,
       status: "active",
       authType: "google",
     };

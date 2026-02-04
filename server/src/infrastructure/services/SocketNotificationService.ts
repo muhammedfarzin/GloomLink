@@ -1,10 +1,10 @@
 import { Server } from "socket.io";
 import appEmitter from "../../application/events/appEmitter";
-import { INotificationService } from "../../application/services/INotificationService";
+import { INotificationService } from "../../domain/services/INotificationService";
 import { Conversation } from "../../domain/entities/Conversation";
 import { User } from "../../domain/entities/User";
 import { ConversationMapper } from "../database/mappers/ConversationMapper";
-import { activeUsers } from "../../interface/websocket";
+import { activeUsers } from "../../interface-adapters/websocket";
 
 export class SocketNotificationService implements INotificationService {
   private io: Server;

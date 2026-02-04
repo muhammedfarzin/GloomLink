@@ -4,8 +4,8 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
 import { TYPES } from "../../shared/types";
 
-import type { ITokenService } from "../../application/services/ITokenService";
-import type { IExternalAuthService } from "../../application/services/IExternalAuthService";
+import type { ITokenService } from "../../domain/services/ITokenService";
+import type { IExternalAuthService } from "../../domain/services/IExternalAuthService";
 
 import type { VerifyOtp } from "../../application/use-cases/VerifyOtp";
 import type { LoginUser } from "../../application/use-cases/LoginUser";

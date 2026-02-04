@@ -3,7 +3,7 @@ import firebaseAdmin from "firebase-admin";
 import {
   IExternalAuthService,
   ExternalAuthUser,
-} from "../../application/services/IExternalAuthService";
+} from "../../domain/services/IExternalAuthService";
 import firebaseServiceAccount from "../configuration/firebase-service-account-file.json";
 
 @injectable()
@@ -23,7 +23,7 @@ export class FirebaseAuthService implements IExternalAuthService {
     return {
       email: decodedData.email!,
       name: decodedData.name!,
-      uid: decodedData.uid,
+      externalId: decodedData.uid,
     };
   }
 }

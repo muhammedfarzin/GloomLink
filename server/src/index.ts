@@ -4,8 +4,8 @@ import http from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import { connectDatabase } from "./infrastructure/database";
-import router from "./interface/routes";
-import { setupSocket } from "./interface/websocket";
+import router from "./interface-adapters/routes";
+import { setupSocket } from "./interface-adapters/websocket";
 
 dotenv.config();
 

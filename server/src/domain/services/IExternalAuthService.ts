@@ -1,7 +1,7 @@
 export interface ExternalAuthUser {
   email: string;
   name: string;
-  uid: string;
+  externalId: string;
 }
 
 export interface IExternalAuthService {

@@ -1,10 +1,10 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IFileStorageService } from "../services/IFileStorageService";
+import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UpdateProfileInputDto } from "../../interface/validation/profileSchemas";
-import { IPasswordHasher } from "../services/IPasswordHasher";
+import { UpdateProfileInputDto } from "../../interface-adapters/validation/profileSchemas";
+import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { TYPES } from "../../shared/types";
 
 export interface UpdateProfileInput extends UpdateProfileInputDto {

@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Post } from "../../domain/entities/Post";
-import { IFileStorageService } from "../services/IFileStorageService";
+import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import { TYPES } from "../../shared/types";
 
 export interface EditPostInput {

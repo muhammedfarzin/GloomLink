@@ -1,13 +1,17 @@
 import { injectable, inject } from "inversify";
-import { ITokenService, TokenPayload, Tokens } from "../services/ITokenService";
+import {
+  ITokenService,
+  TokenPayload,
+  Tokens,
+} from "../../domain/services/ITokenService";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { AdminLoginInput } from "../../interface/validation/authSchemas";
+import { AdminLoginInput } from "../../interface-adapters/validation/authSchemas";
 import { TYPES } from "../../shared/types";
 
 @injectable()
 export class AdminLogin {
   constructor(
-    @inject(TYPES.ITokenService) private tokenService: ITokenService
+    @inject(TYPES.ITokenService) private tokenService: ITokenService,
   ) {}
 
   async execute(input: AdminLoginInput): Promise<Tokens> {

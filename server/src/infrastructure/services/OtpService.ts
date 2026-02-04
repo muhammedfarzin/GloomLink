@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import otpGenerator from "otp-generator";
-import { IOtpService } from "../../application/services/IOtpService";
+import { IOtpService } from "../../domain/services/IOtpService";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { BcryptPasswordHasher } from "./BcryptPasswordHasher";
 import { TYPES } from "../../shared/types";

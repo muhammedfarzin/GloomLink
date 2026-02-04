@@ -1,9 +1,9 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IPasswordHasher } from "../services/IPasswordHasher";
+import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { LoginInput } from "../../interface/validation/authSchemas";
+import { LoginInput } from "../../interface-adapters/validation/authSchemas";
 import { TYPES } from "../../shared/types";
 
 @injectable()

@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import {
   IFileStorageService,
   UploadedFile,
-} from "../../application/services/IFileStorageService";
+} from "../../domain/services/IFileStorageService";
 import { HttpError } from "../errors/HttpError";
 
 @injectable()
