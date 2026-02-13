@@ -1,5 +1,5 @@
-import { InteractionDocument } from "../models/InteractionModel";
-import { Interaction } from "../../../domain/entities/Interaction";
+import { InteractionDocument } from "../database/models/InteractionModel";
+import { Interaction } from "../../domain/entities/Interaction";
 import { Types } from "mongoose";
 
 export class InteractionMapper {

@@ -1,18 +1,17 @@
 import { type Document, model, Schema } from "mongoose";
-import bcrypt from "bcryptjs";
 
 export interface User {
   _id: Schema.Types.ObjectId;
   username: string;
-  password: string;
+  passwordHash: string;
   firstname: string;
   lastname: string;
   email: string;
-  mobile: string;
+  mobile?: string;
   authType: "email" | "google";
   status: "active" | "inactive" | "blocked" | "not-verified";
   image?: string;
-  gender?: string;
+  gender?: "m" | "f";
   dob?: Date;
   blockedUsers: Schema.Types.ObjectId[];
   savedPosts: Schema.Types.ObjectId[];
@@ -27,7 +26,7 @@ const INTEREST_KEYWORDS_LIMIT = 100;
 const userSchema = new Schema<User>(
   {
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    passwordHash: { type: String, required: true },
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -53,7 +52,7 @@ const userSchema = new Schema<User>(
       default: [],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {

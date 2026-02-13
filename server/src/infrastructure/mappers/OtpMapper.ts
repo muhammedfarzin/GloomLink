@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Otp } from "../../../domain/entities/Otp";
-import { OtpDocument } from "../models/OtpModel";
+import { Otp } from "../../domain/entities/Otp";
+import { OtpDocument } from "../database/models/OtpModel";
 
 export class OtpMapper {
   public static toDomain(otpModel: OtpDocument): Otp {

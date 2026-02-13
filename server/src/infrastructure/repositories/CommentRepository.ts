@@ -5,7 +5,7 @@ import {
 } from "../../domain/repositories/ICommentRepository";
 import { Comment } from "../../domain/entities/Comment";
 import { CommentModel } from "../database/models/CommentModel";
-import { CommentMapper } from "../database/mappers/CommentMapper";
+import { CommentMapper } from "../mappers/CommentMapper";
 import mongoose, { PipelineStage } from "mongoose";
 import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
 

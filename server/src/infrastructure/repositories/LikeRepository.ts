@@ -2,20 +2,22 @@ import { injectable } from "inversify";
 import {
   ILikeRepository,
   LikeableType,
+  LikeOptions,
 } from "../../domain/repositories/ILikeRepository";
 import { Like } from "../../domain/entities/Like";
 import { LikeModel } from "../database/models/LikeModel";
-import { LikeMapper } from "../database/mappers/LikeMapper";
-import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
+import { LikeMapper } from "../mappers/LikeMapper";
+import { UserListViewDto } from "../../application/dtos/UserDto";
 import mongoose, { PipelineStage } from "mongoose";
-import { UserMapper } from "../database/mappers/UserMapper";
+import { UserMapper } from "../mappers/UserMapper";
+import { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 @injectable()
 export class LikeRepository implements ILikeRepository {
   async findByTargetAndUser(
     targetId: string,
     userId: string,
-    type: LikeableType
+    type: LikeableType,
   ): Promise<Like | null> {
     const likeModel = await LikeModel.findOne({ targetId, userId, type });
     return likeModel ? LikeMapper.toDomain(likeModel) : null;
@@ -38,13 +40,8 @@ export class LikeRepository implements ILikeRepository {
 
   async findLikersByTarget(
     targetId: string,
-    options: {
-      userId?: string;
-      type: LikeableType;
-      page: number;
-      limit: number;
-    }
-  ): Promise<UserListResponseDto[]> {
+    options: LikeOptions,
+  ): Promise<UserCompactProfile[]> {
     const { userId, type, page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -91,18 +88,21 @@ export class LikeRepository implements ILikeRepository {
       { $unwind: "$likerInfo" },
       {
         $project: {
-          _id: "$likerInfo._id",
+          _id: 0,
+          userId: "$likerInfo._id",
           username: "$likerInfo.username",
+          fullname: {
+            $concat: [`$likerInfo.firstname`, " ", `$likerInfo.lastname`],
+          },
           firstname: "$likerInfo.firstname",
           lastname: "$likerInfo.lastname",
-          image: "$likerInfo.image",
+          imageUrl: "$likerInfo.image",
           isFollowing: "$likerInfo.isFollowing",
         },
       },
     ];
 
-    const results = await LikeModel.aggregate(aggregationPipeline);
-
-    return results.map(UserMapper.toListView);
+    const result = await LikeModel.aggregate(aggregationPipeline);
+    return result;
   }
 }

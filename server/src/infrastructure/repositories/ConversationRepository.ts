@@ -3,7 +3,7 @@ import mongoose, { PipelineStage } from "mongoose";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { ConversationListDto } from "../../application/dtos/ConversationListDto";
 import { ConversationModel } from "../database/models/ConversationModel";
-import { ConversationMapper } from "../database/mappers/ConversationMapper";
+import { ConversationMapper } from "../mappers/ConversationMapper";
 import { Conversation } from "../../domain/entities/Conversation";
 
 @injectable()

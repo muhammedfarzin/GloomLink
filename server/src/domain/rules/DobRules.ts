@@ -1,0 +1,1 @@
+export const MAX_HUMAN_LIFESPAN_YEARS = 120;

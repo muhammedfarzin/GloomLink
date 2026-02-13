@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Report } from "../../../domain/entities/Report";
-import { ReportDocument } from "../models/ReportModel";
+import { Report } from "../../domain/entities/Report";
+import { ReportDocument } from "../database/models/ReportModel";
 
 export class ReportMapper {
   public static toDomain(reportModel: ReportDocument): Report {

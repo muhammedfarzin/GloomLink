@@ -1,5 +1,5 @@
 export interface ConversationListDto {
-  _id: string;
+  participantId: string;
   conversationId: string;
   username: string;
   firstname: string;

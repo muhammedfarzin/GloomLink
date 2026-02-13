@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Message } from "../../../domain/entities/Message";
-import { MessageDocument } from "../models/MessageModel";
+import { Message } from "../../domain/entities/Message";
+import { MessageDocument } from "../database/models/MessageModel";
 
 export class MessageMapper {
   public static toDomain(messageModel: MessageDocument): Message {

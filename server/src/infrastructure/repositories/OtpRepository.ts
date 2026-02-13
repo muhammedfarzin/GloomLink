@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
 import { OtpModel } from "../database/models/OtpModel";
 import { Otp } from "../../domain/entities/Otp";
-import { OtpMapper } from "../database/mappers/OtpMapper";
+import { OtpMapper } from "../mappers/OtpMapper";
 
 @injectable()
 export class OtpRepository implements IOtpRepository {

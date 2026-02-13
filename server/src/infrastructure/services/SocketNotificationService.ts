@@ -3,7 +3,7 @@ import appEmitter from "../../application/events/appEmitter";
 import { INotificationService } from "../../domain/services/INotificationService";
 import { Conversation } from "../../domain/entities/Conversation";
 import { User } from "../../domain/entities/User";
-import { ConversationMapper } from "../database/mappers/ConversationMapper";
+import { ConversationMapper } from "../mappers/ConversationMapper";
 import { activeUsers } from "../../interface-adapters/websocket";
 
 export class SocketNotificationService implements INotificationService {
@@ -24,23 +24,20 @@ export class SocketNotificationService implements INotificationService {
     otherParticipants: User[];
   }) => {
     const { conversation, creator, otherParticipants } = data;
-    const otherPartyUsername = otherParticipants
-      .map((u) => u.username)
-      .join(", ");
 
     const viewForCreator = ConversationMapper.toListView({
-      username: otherParticipants.map((u) => u.username).join(", "),
+      username: otherParticipants.map((u) => u.getUsername()).join(", "),
       conversationId: conversation._id,
       lastMessageTime: new Date(),
     });
     const viewForOthers = ConversationMapper.toListView({
-      username: creator.username,
+      username: creator.getUsername(),
       conversationId: conversation._id,
       lastMessageTime: new Date(),
     });
 
     // Emit to the creator
-    const creatorSockets = activeUsers[creator.username];
+    const creatorSockets = activeUsers[creator.getUsername()];
     if (creatorSockets) {
       creatorSockets.forEach((socketId) => {
         this.io.sockets.sockets.get(socketId)?.join(conversation._id);
@@ -50,7 +47,7 @@ export class SocketNotificationService implements INotificationService {
 
     // Emit to other participants
     otherParticipants.forEach((participant) => {
-      const participantSockets = activeUsers[participant.username];
+      const participantSockets = activeUsers[participant.getUsername()];
       if (participantSockets) {
         participantSockets.forEach((socketId) => {
           this.io.sockets.sockets.get(socketId)?.join(conversation._id);

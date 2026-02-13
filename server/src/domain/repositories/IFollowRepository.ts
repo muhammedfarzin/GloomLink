@@ -1,7 +1,12 @@
-import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
 import { Follow } from "../entities/Follow";
+import { UserCompactProfile } from "../models/UserCompactProfile";
 
 export type FollowListType = "followers" | "following";
+export interface FollowListOptions {
+  currentUserId?: string;
+  page: number;
+  limit: number;
+}
 
 export interface IFollowRepository {
   create(followerId: string, followingId: string): Promise<Follow>;
@@ -10,7 +15,7 @@ export interface IFollowRepository {
   findFollowList(
     userId: string,
     type: FollowListType,
-    options: { currentUserId?: string; page: number; limit: number }
-  ): Promise<UserListResponseDto[]>;
+    options: FollowListOptions,
+  ): Promise<UserCompactProfile[]>;
   deleteById(id: string): Promise<void>;
 }

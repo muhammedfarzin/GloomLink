@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Follow } from "../../../domain/entities/Follow";
-import { FollowDocument } from "../models/FollowModel";
+import { Follow } from "../../domain/entities/Follow";
+import { FollowDocument } from "../database/models/FollowModel";
 
 export class FollowMapper {
   public static toDomain(followModel: FollowDocument): Follow {

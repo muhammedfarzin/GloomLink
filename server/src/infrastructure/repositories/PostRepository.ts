@@ -4,7 +4,7 @@ import {
   IPostRepository,
 } from "../../domain/repositories/IPostRepository";
 import { Post } from "../../domain/entities/Post";
-import { PostMapper } from "../database/mappers/PostMapper";
+import { PostMapper } from "../mappers/PostMapper";
 import { PostModel } from "../database/models/PostModel";
 import mongoose, { PipelineStage } from "mongoose";
 

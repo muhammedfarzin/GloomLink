@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
+import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { TYPES } from "../../shared/types";
 
 import type { GetUserProfile } from "../../application/use-cases/GetUserProfile";

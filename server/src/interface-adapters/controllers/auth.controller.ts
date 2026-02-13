@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { inject } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
+import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { TYPES } from "../../shared/types";
 
 import type { ITokenService } from "../../domain/services/ITokenService";

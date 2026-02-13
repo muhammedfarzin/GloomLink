@@ -40,7 +40,7 @@ export class VerifyOtp {
       throw new HttpError(404, "User not found.");
     }
 
-    const updatedUser = await this.userRepository.update(user._id, {
+    const updatedUser = await this.userRepository.update(user.getId(), {
       status: "active",
     });
     if (!updatedUser) {

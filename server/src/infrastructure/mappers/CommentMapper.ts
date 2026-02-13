@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
-import { Comment } from "../../../domain/entities/Comment";
-import { CommentDocument } from "../models/CommentModel";
-import { CommentResponseDto } from "../../../application/dtos/CommentResponseDto";
+import { Comment } from "../../domain/entities/Comment";
+import { CommentDocument } from "../database/models/CommentModel";
+import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
 
 export class CommentMapper {
   public static toDomain(commentModel: CommentDocument): Comment {

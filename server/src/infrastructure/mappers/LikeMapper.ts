@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Like } from "../../../domain/entities/Like";
-import { LikeDocument } from "../models/LikeModel";
+import { Like } from "../../domain/entities/Like";
+import { LikeDocument } from "../database/models/LikeModel";
 
 export class LikeMapper {
   public static toDomain(likeModel: LikeDocument): Like {

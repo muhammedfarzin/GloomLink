@@ -1,14 +1,14 @@
 import { injectable } from "inversify";
-import {
+import type {
+  FollowListOptions,
   FollowListType,
   IFollowRepository,
 } from "../../domain/repositories/IFollowRepository";
-import { Follow } from "../../domain/entities/Follow";
+import type { Follow } from "../../domain/entities/Follow";
 import { FollowModel } from "../database/models/FollowModel";
-import { FollowMapper } from "../database/mappers/FollowMapper";
-import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
-import mongoose, { PipelineStage } from "mongoose";
-import { UserMapper } from "../database/mappers/UserMapper";
+import { FollowMapper } from "../mappers/FollowMapper";
+import mongoose, { type PipelineStage } from "mongoose";
+import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 @injectable()
 export class FollowRepository implements IFollowRepository {
@@ -23,7 +23,7 @@ export class FollowRepository implements IFollowRepository {
 
   async findByUsers(
     followerId: string,
-    followingId: string
+    followingId: string,
   ): Promise<Follow | null> {
     const followDoc = await FollowModel.findOne({
       followedBy: followerId,
@@ -40,8 +40,8 @@ export class FollowRepository implements IFollowRepository {
   async findFollowList(
     userId: string,
     type: FollowListType,
-    options: { currentUserId?: string; page: number; limit: number }
-  ): Promise<UserListResponseDto[]> {
+    options: FollowListOptions,
+  ): Promise<UserCompactProfile[]> {
     const { currentUserId, page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -89,18 +89,22 @@ export class FollowRepository implements IFollowRepository {
       { $unwind: `$${lookupAs}` },
       {
         $project: {
-          _id: `$${lookupAs}._id`,
+          _id: 0,
+          userId: `$${lookupAs}._id`,
           username: `$${lookupAs}.username`,
+          fullname: {
+            $concat: [`$${lookupAs}.firstname`, " ", `$${lookupAs}.lastname`],
+          },
           firstname: `$${lookupAs}.firstname`,
           lastname: `$${lookupAs}.lastname`,
-          image: `$${lookupAs}.image`,
+          imageUrl: `$${lookupAs}.image`,
           isFollowing: `$${lookupAs}.isFollowing`,
         },
       },
     ];
 
-    const results = await FollowModel.aggregate(aggregationPipeline);
-    return results.map(UserMapper.toListView);
+    const result = await FollowModel.aggregate(aggregationPipeline);
+    return result;
   }
 
   async deleteById(id: string): Promise<void> {

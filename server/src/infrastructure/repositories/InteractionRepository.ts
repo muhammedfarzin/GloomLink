@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { IInteractionRepository } from "../../domain/repositories/IInteractionRepository";
 import { Interaction } from "../../domain/entities/Interaction";
 import { InteractionModel } from "../database/models/InteractionModel";
-import { InteractionMapper } from "../database/mappers/InteractionMapper";
+import { InteractionMapper } from "../mappers/InteractionMapper";
 import mongoose from "mongoose";
 
 @injectable()

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
-import { Conversation } from "../../../domain/entities/Conversation";
-import { ConversationDocument } from "../models/ConversationModel";
-import { ConversationListDto } from "../../../application/dtos/ConversationListDto";
+import { Conversation } from "../../domain/entities/Conversation";
+import { ConversationDocument } from "../database/models/ConversationModel";
+import { ConversationListDto } from "../../application/dtos/ConversationListDto";
 
 export class ConversationMapper {
   public static toDomain(

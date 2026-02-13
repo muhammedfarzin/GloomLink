@@ -1,12 +1,10 @@
-import { Comment } from "../../domain/entities/Comment";
+import type { Comment } from "../../domain/entities/Comment";
+import type { UserBasicDto } from "./UserDto";
 
-interface CommentAuthorDto {
-  id: string;
-  firstname: string;
-  lastname: string;
-  username: string;
-  image?: string;
-}
+type CommentAuthorDto = Pick<
+  UserBasicDto,
+  "userId" | "fullname" | "firstname" | "lastname" | "username" | "imageUrl"
+>;
 
 export interface CommentResponseDto extends Omit<Comment, "_id"> {
   id: string;

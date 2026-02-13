@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { UserFormViewDto } from "../dtos/UserFormViewDto";
-import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
+import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 

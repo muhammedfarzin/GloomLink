@@ -1,90 +1,112 @@
 import { injectable } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import mongoose, { type PipelineStage } from "mongoose";
+import { PostMapper } from "../mappers/PostMapper";
+import { UserDocument, UserModel } from "../database/models/UserModel";
+import { UserMapper } from "../mappers/UserMapper";
+
+import type {
+  IUserRepository,
+  UserIdentifier,
+  UserOptions,
+  UserStatus,
+} from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
-import { UserModel } from "../database/models/UserModel";
-import { UserMapper } from "../database/mappers/UserMapper";
-import { EnrichedPost } from "../../domain/repositories/IPostRepository";
-import mongoose, { PipelineStage } from "mongoose";
-import { PostMapper } from "../database/mappers/PostMapper";
-import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
-import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
+import type { EnrichedPost } from "../../domain/repositories/IPostRepository";
+import type {
+  UserDto,
+  UserProfileResponseDto,
+} from "../../application/dtos/UserDto";
+import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 @injectable()
 export class UserRepository implements IUserRepository {
-  async create(userData: Partial<User>): Promise<User> {
+  async create(userData: User): Promise<User> {
     const userToPersist = UserMapper.toPersistence(userData);
     const newUserModel = new UserModel(userToPersist);
-    const savedUser = await newUserModel.save();
-    return UserMapper.toDomain(savedUser);
+    const userDoc = await newUserModel.save();
+    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const userModel = await UserModel.findOne({ email });
-    return userModel ? UserMapper.toDomain(userModel) : null;
+    const userDoc = await UserModel.findOne({ email });
+    if (!userDoc) return null;
+
+    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const userModel = await UserModel.findOne({ username });
-    return userModel ? UserMapper.toDomain(userModel) : null;
+    const userDoc = await UserModel.findOne({ username });
+    if (!userDoc) return null;
+
+    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
   }
 
   async findById(id: string): Promise<User | null> {
-    const userModel = await UserModel.findById(id);
-    return userModel ? UserMapper.toDomain(userModel) : null;
+    const userDoc = await UserModel.findById(id);
+    if (!userDoc) return null;
+
+    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
   }
 
   async findByIdentifier(identifier: string): Promise<User | null> {
-    const userModel = await UserModel.findOne({
+    const userDoc = await UserModel.findOne({
       $or: [
         { username: identifier },
         { email: identifier },
         { mobile: identifier },
       ],
     });
-    return userModel ? UserMapper.toDomain(userModel) : null;
+
+    if (!userDoc) return null;
+
+    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
   }
 
   async checkUserExist(
-    query: Pick<User, "username" | "email" | "mobile">
-  ): Promise<{ exist: false } | { exist: true; data: User; field: string }> {
-    const { username, email, mobile } = query;
+    query: UserIdentifier,
+  ): Promise<
+    { isExists: false } | { isExists: true; data: User; field: string }
+  > {
+    for (const [field, value] of Object.entries(query)) {
+      if (!value) continue;
 
-    let user = await UserModel.findOne({ username });
-    if (user) {
-      return {
-        exist: true,
-        field: "username",
-        data: UserMapper.toDomain(user),
-      };
+      const userDoc = await UserModel.findOne({ [field]: value });
+
+      if (userDoc) {
+        return {
+          isExists: true,
+          field,
+          data: UserMapper.toDomain(this.safeParseUserDoc(userDoc)),
+        };
+      }
     }
 
-    user = await UserModel.findOne({ email });
-    if (user) {
-      return { exist: true, field: "email", data: UserMapper.toDomain(user) };
-    }
-
-    user = await UserModel.findOne({ mobile });
-    if (user) {
-      return { exist: true, field: "mobile", data: UserMapper.toDomain(user) };
-    }
-
-    return { exist: false };
+    return { isExists: false };
   }
 
-  async update(id: string, userData: Partial<User>): Promise<User | null> {
-    const userToPersist = UserMapper.toPersistence(userData);
-    const updatedUser = await UserModel.findByIdAndUpdate(
+  async update(id: string, userData: User): Promise<User | null> {
+    const {
+      blockedUsers: _blockedUser,
+      savedPosts: _savedPost,
+      interestKeywords,
+      ...userToPersist
+    } = UserMapper.toPersistence(userData);
+
+    const updatedUserDoc = await UserModel.findByIdAndUpdate(
       id,
       { $set: userToPersist },
-      { new: true }
+      { new: true },
     );
-    return updatedUser ? UserMapper.toDomain(updatedUser) : null;
+
+    if (!updatedUserDoc) return null;
+
+    return UserMapper.toDomain(this.safeParseUserDoc(updatedUserDoc));
   }
 
   async findSavedPosts(
     userId: string,
     page: number,
-    limit: number
+    limit: number,
   ): Promise<EnrichedPost[]> {
     const skip = (page - 1) * limit;
     const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -154,28 +176,28 @@ export class UserRepository implements IUserRepository {
     const results = await UserModel.aggregate(aggregationPipeline);
 
     return results[0].savedPostsData.map((post: any) =>
-      PostMapper.toResponse(post)
+      PostMapper.toResponse(post),
     );
   }
 
   async savePost(userId: string, postId: string): Promise<void> {
     await UserModel.updateOne(
       { _id: userId },
-      { $addToSet: { savedPosts: postId } }
+      { $addToSet: { savedPosts: postId } },
     );
   }
 
   async unsavePost(userId: string, postId: string): Promise<void> {
     await UserModel.updateOne(
       { _id: userId },
-      { $pull: { savedPosts: postId } }
+      { $pull: { savedPosts: postId } },
     );
   }
 
   async findProfileByUsername(
     username: string,
     currentUserId: string,
-    limit = 15
+    limit = 15,
   ): Promise<UserProfileResponseDto | null> {
     const viewerId = currentUserId
       ? new mongoose.Types.ObjectId(currentUserId)
@@ -254,14 +276,9 @@ export class UserRepository implements IUserRepository {
   }
 
   async findByStatus(
-    status: "active" | "blocked" | "inactive",
-    options: {
-      userId?: string;
-      searchQuery?: string;
-      page: number;
-      limit: number;
-    }
-  ): Promise<UserListResponseDto[]> {
+    status: UserStatus,
+    options: UserOptions,
+  ): Promise<UserCompactProfile[]> {
     const { userId, searchQuery = "", page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -296,21 +313,26 @@ export class UserRepository implements IUserRepository {
                 ],
               }
             : undefined,
+          fullname: {
+            $concat: [`$firstname`, " ", `$lastname`],
+          },
         },
       },
       {
         $project: {
+          _id: 0,
+          userId: "$_id",
           username: 1,
           firstname: 1,
           lastname: 1,
-          image: 1,
+          imageUrl: "$image",
           isFollowing: 1,
         },
       },
     ];
 
     const users = await UserModel.aggregate(aggregationPipeline);
-    return users.map(UserMapper.toListView);
+    return users;
   }
 
   async findAll(options: {
@@ -347,11 +369,11 @@ export class UserRepository implements IUserRepository {
   async findSuggestions(
     userId: string,
     excludeIds: string[],
-    limit: number
-  ): Promise<UserListResponseDto[]> {
+    limit: number,
+  ): Promise<UserCompactProfile[]> {
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const excludeObjectIds = excludeIds.map(
-      (id) => new mongoose.Types.ObjectId(id)
+      (id) => new mongoose.Types.ObjectId(id),
     );
 
     const aggregationPipeline: PipelineStage[] = [
@@ -408,8 +430,11 @@ export class UserRepository implements IUserRepository {
       { $replaceRoot: { newRoot: "$doc" } },
       {
         $project: {
-          _id: 1,
+          userId: 1,
           username: 1,
+          fullname: {
+            $concat: ["$firstname", " ", "$lastname"],
+          },
           firstname: 1,
           lastname: 1,
           image: 1,
@@ -418,6 +443,22 @@ export class UserRepository implements IUserRepository {
     ];
 
     const users = await UserModel.aggregate(aggregationPipeline);
-    return users.map(UserMapper.toListView);
+    return users;
+  }
+
+  private safeParseUserDoc(userDoc: UserDocument): Omit<UserDto, "fullname"> {
+    const {
+      _id: userId,
+      savedPosts,
+      blockedUsers,
+      ...userObj
+    } = userDoc.toObject();
+
+    return {
+      ...userObj,
+      userId: userId.toString(),
+      savedPosts: savedPosts.map((ids: any) => ids.toString()),
+      blockedUsers: blockedUsers.map((ids: any) => ids.toString()),
+    };
   }
 }

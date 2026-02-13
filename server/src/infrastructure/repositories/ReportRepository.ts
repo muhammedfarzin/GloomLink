@@ -5,7 +5,7 @@ import {
 } from "../../domain/repositories/IReportRepository";
 import { Report } from "../../domain/entities/Report";
 import { ReportModel } from "../database/models/ReportModel";
-import { ReportMapper } from "../database/mappers/ReportMapper";
+import { ReportMapper } from "../mappers/ReportMapper";
 
 @injectable()
 export class ReportRepository implements IReportRepository {

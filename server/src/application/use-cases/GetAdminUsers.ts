@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { UserMapper } from "../../infrastructure/database/mappers/UserMapper";
+import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { UserResponseDto } from "../dtos/UserResponseDto";
 import { TYPES } from "../../shared/types";
 

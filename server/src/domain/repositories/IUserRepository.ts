@@ -1,39 +1,36 @@
-import { UserListResponseDto } from "../../application/dtos/UserListResponseDto";
-import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
-import { User } from "../entities/User";
-import { EnrichedPost } from "./IPostRepository";
+import type { User } from "../entities/User";
+import type { EnrichedPost } from "./IPostRepository";
+import type { UserProfileResponseDto } from "../../application/dtos/UserDto";
+import type { UserCompactProfile } from "../models/UserCompactProfile";
 
 export interface IUserRepository {
-  create: (data: Partial<User>) => Promise<User>;
+  create: (user: User) => Promise<User>;
   findByEmail(email: string): Promise<User | null>;
   findByUsername(username: string): Promise<User | null>;
-  findById(id: string): Promise<User | null>;
+  findById(userId: string): Promise<User | null>;
   findByIdentifier(identifier: string): Promise<User | null>;
   checkUserExist: (
-    query: Pick<User, "username" | "email" | "mobile">
-  ) => Promise<{ exist: false } | { exist: true; data: User; field: string }>;
-  update(id: string, userData: Partial<User>): Promise<User | null>;
+    query: UserIdentifier,
+  ) => Promise<
+    { isExists: false } | { isExists: true; data: User; field: string }
+  >;
+  update(id: string, userData: User): Promise<User | null>;
   findSavedPosts(
     userId: string,
     page: number,
-    limit: number
+    limit: number,
   ): Promise<EnrichedPost[]>;
   savePost(userId: string, postId: string): Promise<void>;
   unsavePost(userId: string, postId: string): Promise<void>;
   findProfileByUsername(
     username: string,
     currentUserId: string,
-    limit?: number
+    limit?: number,
   ): Promise<UserProfileResponseDto | null>;
   findByStatus(
-    status: "active" | "blocked" | "inactive",
-    options: {
-      userId?: string;
-      searchQuery?: string;
-      page: number;
-      limit: number;
-    }
-  ): Promise<UserListResponseDto[]>;
+    status: UserStatus,
+    options: UserOptions,
+  ): Promise<UserCompactProfile[]>;
   findAll(options: {
     filter: "all" | "active" | "blocked";
     searchQuery?: string;
@@ -43,6 +40,20 @@ export interface IUserRepository {
   findSuggestions(
     userId: string,
     excludeIds: string[],
-    limit: number
-  ): Promise<UserListResponseDto[]>;
+    limit: number,
+  ): Promise<UserCompactProfile[]>;
+}
+
+export type UserStatus = "active" | "blocked" | "inactive";
+export interface UserIdentifier {
+  username: string;
+  email: string;
+  mobile: string;
+}
+
+export interface UserOptions {
+  userId?: string;
+  searchQuery?: string;
+  page: number;
+  limit: number;
 }

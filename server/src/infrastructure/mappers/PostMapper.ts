@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import { Post } from "../../../domain/entities/Post";
-import { PostDocument } from "../models/PostModel";
-import { EnrichedPost } from "../../../domain/repositories/IPostRepository";
-import { UserProfileResponseDto } from "../../../application/dtos/UserProfileResponseDto";
+import { Post } from "../../domain/entities/Post";
+import { PostDocument } from "../database/models/PostModel";
+import { EnrichedPost } from "../../domain/repositories/IPostRepository";
+import { UserProfileResponseDto } from "../../application/dtos/UserProfileResponseDto";
 
 export class PostMapper {
   public static toDomain(postModel: PostDocument): Post {
