@@ -2,16 +2,16 @@ import { injectable, inject } from "inversify";
 import { IOtpService } from "../../domain/services/IOtpService";
 import { IMailService } from "../../domain/services/IMailService";
 import { TYPES } from "../../shared/types";
-
-export interface SendVerificationEmailInput {
-  email: string;
-}
+import {
+  ISendVerificationEmail,
+  type SendVerificationEmailInput,
+} from "../../domain/use-cases/ISendVerificationEmail";
 
 @injectable()
-export class SendVerificationEmail {
+export class SendVerificationEmail implements ISendVerificationEmail {
   constructor(
     @inject(TYPES.IOtpService) private otpService: IOtpService,
-    @inject(TYPES.IMailService) private mailService: IMailService
+    @inject(TYPES.IMailService) private mailService: IMailService,
   ) {}
 
   async execute(input: SendVerificationEmailInput): Promise<void> {

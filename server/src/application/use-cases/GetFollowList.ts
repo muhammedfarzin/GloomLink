@@ -1,31 +1,24 @@
 import { injectable, inject } from "inversify";
-import {
-  FollowListType,
-  IFollowRepository,
-} from "../../domain/repositories/IFollowRepository";
+import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { UserListResponseDto } from "../dtos/UserListResponseDto";
+import { UserListViewDto } from "../dtos/UserDto";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface GetFollowListInput {
-  userId: string;
-  currentUserId?: string;
-  type: FollowListType;
-  page: number;
-  limit: number;
-}
+import {
+  IGetFollowList,
+  type GetFollowListInput,
+} from "../../domain/use-cases/IGetFollowList";
 
 @injectable()
-export class GetFollowList {
+export class GetFollowList implements IGetFollowList {
   constructor(
     @inject(TYPES.IFollowRepository)
     private followRepository: IFollowRepository,
     @inject(TYPES.IUserRepository)
-    private userRepository: IUserRepository
+    private userRepository: IUserRepository,
   ) {}
 
-  async execute(input: GetFollowListInput): Promise<UserListResponseDto[]> {
+  async execute(input: GetFollowListInput): Promise<UserListViewDto[]> {
     const { userId, type, ...restInput } = input;
 
     const user = await this.userRepository.findById(userId);

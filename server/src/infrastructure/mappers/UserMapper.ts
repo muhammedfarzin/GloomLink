@@ -1,17 +1,18 @@
 import { User } from "../../domain/entities/User";
-import type { UserBasicDto, UserDto } from "../../application/dtos/UserDto";
+import type { UserDto } from "../../application/dtos/UserDto";
 import type {
   UserWithStatusDto,
   UserWithAuthDto,
   UserListViewDto,
 } from "../../application/dtos/UserDto";
+import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 export class UserMapper {
   public static toDomain(data: Omit<UserDto, "fullname">): User {
     return new User(data);
   }
 
-  private static toBasicPersistence(user: User): UserBasicDto {
+  private static toBasicPersistence(user: User): UserCompactProfile {
     return {
       userId: user.getId(),
       username: user.getUsername(),
@@ -29,6 +30,7 @@ export class UserMapper {
   public static toPersistence(user: User): UserDto {
     return {
       ...this.toBasicPersistence(user),
+      email: user.getEmail(),
       passwordHash: user.getPasswordHash(),
       authType: user.getAuthType(),
       status: user.getStatus(),

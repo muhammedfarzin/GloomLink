@@ -1,45 +1,34 @@
 import type { Post } from "../../domain/entities/Post";
+import { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 type AuthType = "email" | "google";
 type UserStatus = "active" | "inactive" | "blocked" | "not-verified";
 
-export interface UserBasicDto {
-  userId: string;
-  username: string;
-  fullname: string;
-  firstname: string;
-  lastname?: string;
-  email: string;
-  mobile?: string;
-  imageUrl?: string;
-  dob?: Date;
-  gender?: "f" | "m";
-}
-
-export interface UserWithStatusDto extends UserBasicDto {
+export interface UserWithStatusDto extends UserCompactProfile {
   status: UserStatus;
 }
 
-export interface UserWithAuthDto extends UserBasicDto {
+export interface UserWithAuthDto extends UserCompactProfile {
   authType: AuthType;
 }
 
-export interface UserProfileResponseDto extends UserBasicDto {
+export interface UserProfileResponseDto extends UserCompactProfile {
   posts: Omit<Post, "tags">[];
   followersCount: number;
   followingCount: number;
   isFollowing?: boolean;
 }
 
-export interface UserListViewDto extends UserBasicDto {
+export interface UserListViewDto extends UserCompactProfile {
   isFollowing?: boolean;
-  type: "user";
+  type?: "user";
 }
 
 export interface UserDto extends UserWithAuthDto {
+  email: string;
   passwordHash: string;
   status: UserStatus;
-  blockedUsers?: string[] | undefined;
-  savedPosts?: string[] | undefined;
-  interestKeywords?: string[] | undefined;
+  blockedUsers: string[] | undefined;
+  savedPosts: string[] | undefined;
+  interestKeywords: string[] | undefined;
 }

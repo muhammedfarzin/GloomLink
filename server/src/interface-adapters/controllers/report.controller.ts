@@ -10,7 +10,7 @@ import { reportTargetSchema } from "../validation/reportSchemas";
 @injectable()
 export class ReportController {
   constructor(
-    @inject(TYPES.ReportTarget) private reportTargetUseCase: ReportTarget,
+    @inject(TYPES.IReportTarget) private reportTargetUseCase: ReportTarget,
   ) {}
 
   reportTarget: RequestHandler = async (req, res, next) => {

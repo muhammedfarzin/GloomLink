@@ -3,87 +3,92 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UpdateProfileInputDto } from "../../interface-adapters/validation/profileSchemas";
 import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { TYPES } from "../../shared/types";
-
-export interface UpdateProfileInput extends UpdateProfileInputDto {
-  userId: string;
-  profileImageFile?: Express.Multer.File;
-}
+import {
+  IUpdateProfile,
+  type UpdateProfileInput,
+} from "../../domain/use-cases/IUpdateProfile";
 
 @injectable()
-export class UpdateProfile {
+export class UpdateProfile implements IUpdateProfile {
   constructor(
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
     @inject(TYPES.IFileStorageService)
     private fileStorageService: IFileStorageService,
-    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher,
   ) {}
 
   async execute(input: UpdateProfileInput): Promise<User> {
-    const { userId, profileImageFile, ...updates } = input;
-    const currentUser = await this.userRepository.findById(userId);
+    const { userId, profileImageFile } = input;
+    const user = await this.userRepository.findById(userId);
 
-    if (!currentUser) {
+    if (!user) {
       throw new HttpError(404, "User not found or has been removed");
     }
 
     // ---Validating User---
-    if (currentUser.authType === "email") {
-      if (!updates.password) throw new HttpError(400, "Password is required");
+    if (user.getAuthType() === "email") {
+      if (!input.password) throw new HttpError(400, "Password is required");
 
       const isPasswordMatch = await this.passwordHasher.compare(
-        updates.password,
-        currentUser.password
+        input.password,
+        user.getPasswordHash(),
       );
 
       if (!isPasswordMatch) {
         throw new HttpError(401, "Password does not matching with our records");
       }
 
-      delete updates.password;
+      delete input.password;
 
-      if (updates.newPassword) {
-        updates.password = await this.passwordHasher.hash(updates.newPassword);
-        delete updates.newPassword;
+      if (input.newPassword) {
+        const passwordHash = await this.passwordHasher.hash(input.newPassword);
+        user.updatePasswordHash(passwordHash);
       }
     }
 
     // ---Checking username already taken---
-    if (currentUser.username !== updates.username) {
+    if (user.getUsername() !== input.username) {
       const existingUser = await this.userRepository.findByUsername(
-        updates.username
+        input.username,
       );
-      if (existingUser && existingUser._id !== userId) {
+      if (existingUser && existingUser.getId() !== userId) {
         throw new HttpError(409, "This username is already taken.");
       }
+
+      user.changeUsername(input.username);
     }
 
     // ---Uploading new profile image URL---
-    let imageUrl: string | undefined = undefined;
+    let newImageUrl: string | null = null;
+    const currentImgUrl = user.getImageUrl();
+
     if (profileImageFile) {
       const uploadedMedia = await this.fileStorageService.upload(
         [profileImageFile],
-        "profile"
+        "profile",
       );
-      imageUrl = uploadedMedia[0]?.url;
+      newImageUrl = uploadedMedia[0]?.url;
     }
 
-    const finalUpdates: UpdateProfileInputDto & { image?: string } = {
-      ...updates,
-    };
-
-    if (imageUrl) {
-      finalUpdates.image = imageUrl;
+    if (newImageUrl) {
+      user.updateImage(newImageUrl);
     }
 
-    const updatedUser = await this.userRepository.update(userId, finalUpdates);
+    input;
+    user.changeName(input.firstname, input.lastname);
+    user.updateMobile(input.mobile);
+    user.updateGender(input.gender);
+    user.updateDateOfBirth(input.dob);
+
+    const updatedUser = await this.userRepository.update(userId, user);
     if (!updatedUser) {
       throw new HttpError(500, "Failed to update profile.");
     }
-    if (imageUrl && currentUser.image) {
-      await this.fileStorageService.delete([currentUser.image], "image");
+
+    if (newImageUrl && currentImgUrl) {
+      await this.fileStorageService.delete([currentImgUrl], "image");
     }
 
     return updatedUser;

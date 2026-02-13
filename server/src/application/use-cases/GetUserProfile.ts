@@ -1,26 +1,24 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { UserProfileResponseDto } from "../dtos/UserProfileResponseDto";
+import { UserProfileResponseDto } from "../dtos/UserDto";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface GetUserProfileInput {
-  username: string;
-  currentUserId: string;
-  limit?: number;
-}
+import {
+  IGetUserProfile,
+  type GetUserProfileInput,
+} from "../../domain/use-cases/IGetUserProfile";
 
 @injectable()
-export class GetUserProfile {
+export class GetUserProfile implements IGetUserProfile {
   constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
   async execute(input: GetUserProfileInput): Promise<UserProfileResponseDto> {
     const userProfile = await this.userRepository.findProfileByUsername(
       input.username,
       input.currentUserId,
-      input.limit
+      input.limit,
     );
 
     if (!userProfile) {

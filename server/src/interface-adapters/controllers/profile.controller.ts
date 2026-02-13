@@ -5,7 +5,7 @@ import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { TYPES } from "../../shared/types";
 
 import type { GetUserProfile } from "../../application/use-cases/GetUserProfile";
-import type { GetUserDataForForm } from "../../application/use-cases/GetUserDataForForm";
+import type { FetchUser } from "../../application/use-cases/FetchUser";
 import type { UpdateProfile } from "../../application/use-cases/UpdateProfile";
 
 import { updateProfileSchema } from "../validation/profileSchemas";
@@ -13,10 +13,11 @@ import { updateProfileSchema } from "../validation/profileSchemas";
 @injectable()
 export class ProfileController {
   constructor(
-    @inject(TYPES.GetUserProfile) private getUserProfileUseCase: GetUserProfile,
-    @inject(TYPES.GetUserDataForForm)
-    private getUserDataForEditUseCase: GetUserDataForForm,
-    @inject(TYPES.UpdateProfile) private updateProfileUseCase: UpdateProfile,
+    @inject(TYPES.IGetUserProfile)
+    private getUserProfileUseCase: GetUserProfile,
+    @inject(TYPES.IFetchUser)
+    private fetchUserUseCase: FetchUser,
+    @inject(TYPES.IUpdateProfile) private updateProfileUseCase: UpdateProfile,
   ) {}
 
   getUserProfile: RequestHandler = async (req, res, next) => {
@@ -45,12 +46,11 @@ export class ProfileController {
         throw new HttpError(401, "Unauthorized");
       }
 
-      const userData = await this.getUserDataForEditUseCase.execute(
-        req.user.id,
-      );
+      const user = await this.fetchUserUseCase.execute(req.user.id);
+      const userResponseDto = UserMapper.toResponseWithAuthType(user);
 
       res.status(200).json({
-        userData,
+        userData: userResponseDto,
         message: "User data for form fetched successfully",
       });
     } catch (error) {
@@ -73,7 +73,7 @@ export class ProfileController {
         profileImageFile,
       });
 
-      const userResponse = UserMapper.toResponse(updatedUser);
+      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
 
       res.status(200).json({
         userData: userResponse,

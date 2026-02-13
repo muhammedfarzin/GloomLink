@@ -4,22 +4,18 @@ import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import { Post } from "../../domain/entities/Post";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface CreatePostInput {
-  userId: string;
-  caption?: string;
-  files: Express.Multer.File[];
-  tags: string[];
-  publishedFor?: "public" | "subscriber";
-}
+import {
+  ICreatePost,
+  type CreatePostInput,
+} from "../../domain/use-cases/ICreatePost";
 
 @injectable()
-export class CreatePost {
+export class CreatePost implements ICreatePost {
   constructor(
     @inject(TYPES.IPostRepository)
     private postRepository: IPostRepository,
     @inject(TYPES.IFileStorageService)
-    private fileStorageService: IFileStorageService
+    private fileStorageService: IFileStorageService,
   ) {}
 
   async execute(input: CreatePostInput): Promise<Post> {
@@ -30,7 +26,7 @@ export class CreatePost {
     // ---Upload media files---
     const uploadedMedia = await this.fileStorageService.upload(
       input.files,
-      "posts"
+      "posts",
     );
     const imagesPath = uploadedMedia
       .filter((file) => file.mediaType === "image")

@@ -1,15 +1,18 @@
 import { injectable, inject } from "inversify";
-import {
-  ITokenService,
-  TokenPayload,
-  Tokens,
-} from "../../domain/services/ITokenService";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { AdminLoginInput } from "../../interface-adapters/validation/authSchemas";
 import { TYPES } from "../../shared/types";
+import {
+  IAdminLogin,
+  type AdminLoginInput,
+} from "../../domain/use-cases/IAdminLogin";
+import {
+  type ITokenService,
+  type TokenPayload,
+  type Tokens,
+} from "../../domain/services/ITokenService";
 
 @injectable()
-export class AdminLogin {
+export class AdminLogin implements IAdminLogin {
   constructor(
     @inject(TYPES.ITokenService) private tokenService: ITokenService,
   ) {}

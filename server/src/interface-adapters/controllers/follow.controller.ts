@@ -12,8 +12,8 @@ import { getFollowListSchema } from "../validation/followSchemas";
 @injectable()
 export class FollowController {
   constructor(
-    @inject(TYPES.GetFollowList) private getFollowListUseCase: GetFollowList,
-    @inject(TYPES.ToggleFollow) private toggleFollowUseCase: ToggleFollow,
+    @inject(TYPES.IGetFollowList) private getFollowListUseCase: GetFollowList,
+    @inject(TYPES.IToggleFollow) private toggleFollowUseCase: ToggleFollow,
   ) {}
 
   getFollowers: RequestHandler = async (req, res, next) => {

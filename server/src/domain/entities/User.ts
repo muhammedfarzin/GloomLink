@@ -79,6 +79,14 @@ export class User {
     this.mobile = new MobileNumber(mobile);
   }
 
+  updateDateOfBirth(dob: UserType["dob"]) {
+    this.dob = dob && new DateOfBirth(dob);
+  }
+
+  updateGender(gender: UserType["gender"]) {
+    this.gender = gender && new UserGender(gender);
+  }
+
   updateStatus(status: UserType["status"]) {
     this.status = status;
   }

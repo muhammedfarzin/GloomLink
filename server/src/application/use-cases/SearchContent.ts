@@ -5,30 +5,26 @@ import {
   EnrichedPost,
 } from "../../domain/repositories/IPostRepository";
 import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import { UserListResponseDto } from "../dtos/UserListResponseDto";
+import { UserListViewDto } from "../dtos/UserDto";
 import { TYPES } from "../../shared/types";
-
-export type SearchResult = UserListResponseDto | EnrichedPost;
-
-export interface SearchContentInput {
-  searchQuery: string;
-  filter: "all" | "users" | "posts";
-  page: number;
-  limit: number;
-  currentUserId: string;
-}
+import {
+  ISearchContent,
+  type SearchContentInput,
+  type SearchResult,
+} from "../../domain/use-cases/ISearchContent";
 
 @injectable()
-export class SearchContent {
+export class SearchContent implements ISearchContent {
   constructor(
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
     @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
-    @inject(TYPES.IFollowRepository) private followRepository: IFollowRepository
+    @inject(TYPES.IFollowRepository)
+    private followRepository: IFollowRepository,
   ) {}
 
   async execute(input: SearchContentInput): Promise<SearchResult[]> {
     const { searchQuery, filter, page, limit, currentUserId } = input;
-    let users: UserListResponseDto[] = [];
+    let users: UserListViewDto[] = [];
     let posts: EnrichedPost[] = [];
 
     const currentUser = await this.userRepository.findById(currentUserId);
@@ -46,15 +42,14 @@ export class SearchContent {
     }
 
     if (filter === "all" || filter === "posts") {
-      const following = await this.followRepository.findFollowing(
-        currentUserId
-      );
+      const following =
+        await this.followRepository.findFollowing(currentUserId);
       const followingUserIds = following.map((f) => f.followingTo);
 
       posts = await this.postRepository.findAndSortFeed({
         searchQuery,
         userId: currentUserId,
-        interestKeywords: currentUser.interestKeywords,
+        interestKeywords: currentUser.getInterestKeywords(),
         followingUserIds,
         page,
         limit,

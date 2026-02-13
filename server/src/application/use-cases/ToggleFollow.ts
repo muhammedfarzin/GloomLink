@@ -3,23 +3,21 @@ import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface ToggleFollowInput {
-  currentUserId: string;
-  targetUserId: string;
-}
+import {
+  IToggleFollow,
+  type ToggleFollowInput,
+  type ToggleFollowResponse,
+} from "../../domain/use-cases/IToggleFollow";
 
 @injectable()
-export class ToggleFollow {
+export class ToggleFollow implements IToggleFollow {
   constructor(
     @inject(TYPES.IFollowRepository)
     private followRepository: IFollowRepository,
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
-  async execute(
-    input: ToggleFollowInput
-  ): Promise<{ status: "followed" | "unfollowed" }> {
+  async execute(input: ToggleFollowInput): Promise<ToggleFollowResponse> {
     const { currentUserId, targetUserId } = input;
 
     if (currentUserId === targetUserId) {
@@ -35,7 +33,7 @@ export class ToggleFollow {
     // ---Check if the follow relationship already exists---
     const existingFollow = await this.followRepository.findByUsers(
       currentUserId,
-      targetUserId
+      targetUserId,
     );
 
     // ---Performing Action---

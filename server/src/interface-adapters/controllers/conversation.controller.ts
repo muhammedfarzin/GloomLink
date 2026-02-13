@@ -14,13 +14,13 @@ import { createConversationSchema } from "../validation/conversationSchemas";
 @injectable()
 export class ConversationController {
   constructor(
-    @inject(TYPES.CreateConversation)
+    @inject(TYPES.ICreateConversation)
     private createConversationUseCase: CreateConversation,
-    @inject(TYPES.GetConversations)
+    @inject(TYPES.IGetConversations)
     private getConversationsUseCase: GetConversations,
-    @inject(TYPES.GetConversationId)
+    @inject(TYPES.IGetConversationId)
     private getConversationIdUseCase: GetConversationId,
-    @inject(TYPES.GetMessages) private getMessagesUseCase: GetMessages,
+    @inject(TYPES.IGetMessages) private getMessagesUseCase: GetMessages,
   ) {}
 
   createConversation: RequestHandler = async (req, res, next) => {

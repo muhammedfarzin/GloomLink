@@ -2,17 +2,15 @@ import { injectable, inject } from "inversify";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface DeletePostInput {
-  postId: string;
-  userId: string;
-  userRole: "user" | "admin";
-}
+import {
+  IDeletePost,
+  type DeletePostInput,
+} from "../../domain/use-cases/IDeletePost";
 
 @injectable()
-export class DeletePost {
+export class DeletePost implements IDeletePost {
   constructor(
-    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
 
   async execute(input: DeletePostInput): Promise<void> {

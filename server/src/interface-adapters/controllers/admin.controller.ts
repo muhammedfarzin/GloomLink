@@ -14,11 +14,11 @@ import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
 @injectable()
 export class AdminController {
   constructor(
-    @inject(TYPES.GetAdminUsers) private getAdminUsersUseCase: GetAdminUsers,
-    @inject(TYPES.ToggleUserStatus)
+    @inject(TYPES.IGetAdminUsers) private getAdminUsersUseCase: GetAdminUsers,
+    @inject(TYPES.IToggleUserStatus)
     private toggleUserStatusUseCase: ToggleUserStatus,
-    @inject(TYPES.GetAdminPosts) private getAdminPostsUseCase: GetAdminPosts,
-    @inject(TYPES.TogglePostStatus)
+    @inject(TYPES.IGetAdminPosts) private getAdminPostsUseCase: GetAdminPosts,
+    @inject(TYPES.ITogglePostStatus)
     private togglePostStatusUseCase: TogglePostStatus,
   ) {}
 

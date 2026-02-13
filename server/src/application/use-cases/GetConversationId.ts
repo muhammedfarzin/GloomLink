@@ -4,17 +4,17 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { Conversation } from "../../domain/entities/Conversation";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface GetConversationIdInput {
-  participantsUsername: string[];
-}
+import {
+  IGetConversationId,
+  type GetConversationIdInput,
+} from "../../domain/use-cases/IGetConversationId";
 
 @injectable()
-export class GetConversationId {
+export class GetConversationId implements IGetConversationId {
   constructor(
     @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
   async execute(input: GetConversationIdInput): Promise<Conversation> {
@@ -26,21 +26,20 @@ export class GetConversationId {
 
     const participantsData = await Promise.all(
       participantsUsername.map((username) =>
-        this.userRepository.findByUsername(username)
-      )
+        this.userRepository.findByUsername(username),
+      ),
     );
 
     const participantsId = participantsData
       .filter((user) => !!user)
-      .map((user) => user._id);
+      .map((user) => user.getId());
 
     if (participantsId.length !== participantsUsername.length) {
       throw new HttpError(404, "Conversation not found");
     }
 
-    const conversation = await this.conversationRepository.findByParticipants(
-      participantsId
-    );
+    const conversation =
+      await this.conversationRepository.findByParticipants(participantsId);
 
     if (!conversation) {
       throw new HttpError(404, "Conversation not found");

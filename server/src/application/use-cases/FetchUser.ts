@@ -1,21 +1,20 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { UserFormViewDto } from "../dtos/UserFormViewDto";
-import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
+import { IFetchUser } from "../../domain/use-cases/IFetchUser";
 
 @injectable()
-export class GetUserDataForForm {
+export class FetchUser implements IFetchUser {
   constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
-  async execute(userId: string): Promise<UserFormViewDto> {
+  async execute(userId: string) {
     const user = await this.userRepository.findById(userId);
-    if (!user || user.status === "not-verified") {
+    if (!user || user.getStatus() === "not-verified") {
       throw new HttpError(404, "User not found or has been removed");
     }
-    return UserMapper.toFormView(user);
+    return user;
   }
 }

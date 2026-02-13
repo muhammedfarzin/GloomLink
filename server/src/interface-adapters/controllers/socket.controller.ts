@@ -21,7 +21,7 @@ export class SocketController {
 
   handleSendMessage = async (
     conversationId: string,
-    data: Partial<Pick<Message, "message" | "image" | "type">>
+    data: Partial<Pick<Message, "message" | "image" | "type">>,
   ) => {
     try {
       const { message, image, type } = sendMessageSchema.parse({
@@ -29,7 +29,7 @@ export class SocketController {
         conversationId,
       });
 
-      const sendMessageUseCase = container.get<SendMessage>(TYPES.SendMessage);
+      const sendMessageUseCase = container.get<SendMessage>(TYPES.ISendMessage);
 
       const newMessage = await sendMessageUseCase.execute({
         message,
@@ -51,7 +51,7 @@ export class SocketController {
       const validatedMessages = markAsSeenSchema.parse(messages);
 
       const markAsSeenUseCase = container.get<MarkMessageAsSeen>(
-        TYPES.MarkMessageAsSeen
+        TYPES.IMarkMessageAsSeen,
       );
 
       for (const message of validatedMessages) {
@@ -72,7 +72,7 @@ export class SocketController {
         {
           message: error.message || "Something went wrong",
         },
-        ...messages
+        ...messages,
       );
     }
   };

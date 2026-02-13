@@ -5,18 +5,17 @@ import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface VerifyOtpInput {
-  email: string;
-  otp: string;
-}
+import {
+  IVerifyOtp,
+  type VerifyOtpInput,
+} from "../../domain/use-cases/IVerifyOtp";
 
 @injectable()
-export class VerifyOtp {
+export class VerifyOtp implements IVerifyOtp {
   constructor(
     @inject(TYPES.IOtpRepository) private otpRepository: IOtpRepository,
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
-    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher,
   ) {}
 
   async execute(input: VerifyOtpInput): Promise<User> {
@@ -25,7 +24,7 @@ export class VerifyOtp {
     if (!storedOtp) {
       throw new HttpError(
         404,
-        "OTP has expired or is invalid. Please request a new one."
+        "OTP has expired or is invalid. Please request a new one.",
       );
     }
 
@@ -40,9 +39,8 @@ export class VerifyOtp {
       throw new HttpError(404, "User not found.");
     }
 
-    const updatedUser = await this.userRepository.update(user.getId(), {
-      status: "active",
-    });
+    user.updateStatus("active");
+    const updatedUser = await this.userRepository.update(user.getId(), user);
     if (!updatedUser) {
       throw new HttpError(500, "Failed to activate user account.");
     }

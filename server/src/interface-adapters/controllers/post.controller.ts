@@ -18,15 +18,16 @@ import { createPostSchema, editPostSchema } from "../validation/postSchemas";
 @injectable()
 export class PostController {
   constructor(
-    @inject(TYPES.CreatePost) private createPostUseCase: CreatePost,
-    @inject(TYPES.EditPost) private editPostUseCase: EditPost,
-    @inject(TYPES.GetSavedPosts) private getSavedPostsUseCase: GetSavedPosts,
-    @inject(TYPES.ToggleSavePost) private toggleSavePostUseCase: ToggleSavePost,
-    @inject(TYPES.GetPostById) private getPostByIdUseCase: GetPostById,
-    @inject(TYPES.GetRecommendedPosts)
+    @inject(TYPES.ICreatePost) private createPostUseCase: CreatePost,
+    @inject(TYPES.IEditPost) private editPostUseCase: EditPost,
+    @inject(TYPES.IGetSavedPosts) private getSavedPostsUseCase: GetSavedPosts,
+    @inject(TYPES.IToggleSavePost)
+    private toggleSavePostUseCase: ToggleSavePost,
+    @inject(TYPES.IGetPostById) private getPostByIdUseCase: GetPostById,
+    @inject(TYPES.IGetRecommendedPosts)
     private getRecommendedPostsUseCase: GetRecommendedPosts,
-    @inject(TYPES.DeletePost) private deletePostUseCase: DeletePost,
-    @inject(TYPES.RecordInteraction)
+    @inject(TYPES.IDeletePost) private deletePostUseCase: DeletePost,
+    @inject(TYPES.IRecordInteraction)
     private recordInteractionUseCase: RecordInteraction,
   ) {}
 
@@ -99,11 +100,11 @@ export class PostController {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 5;
 
-      const savedPosts = await this.getSavedPostsUseCase.execute(
-        req.user.id,
+      const savedPosts = await this.getSavedPostsUseCase.execute({
+        userId: req.user.id,
         page,
         limit,
-      );
+      });
 
       res.status(200).json({
         postsData: savedPosts,
@@ -122,17 +123,17 @@ export class PostController {
       }
 
       const { postId } = req.params;
-      const result = await this.toggleSavePostUseCase.execute(
-        req.user.id,
+      const result = await this.toggleSavePostUseCase.execute({
+        userId: req.user.id,
         postId,
-      );
+      });
 
       if (result.status === "saved") {
-        await this.recordInteractionUseCase.execute(
-          req.user.id,
+        await this.recordInteractionUseCase.execute({
+          userId: req.user.id,
           postId,
-          "save",
-        );
+          type: "save",
+        });
       }
 
       res.status(200).json({ message: `Post successfully ${result.status}` });
@@ -173,11 +174,11 @@ export class PostController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 5;
 
-      const postsData = await this.getRecommendedPostsUseCase.execute(
-        req.user.id,
+      const postsData = await this.getRecommendedPostsUseCase.execute({
+        userId: req.user.id,
         page,
         limit,
-      );
+      });
 
       res.status(200).json({
         postsData,
@@ -215,11 +216,10 @@ export class PostController {
 
       const validatedBody = recordInteractionSchema.parse(req.body);
 
-      await this.recordInteractionUseCase.execute(
-        req.user.id,
-        validatedBody.postId,
-        validatedBody.type,
-      );
+      await this.recordInteractionUseCase.execute({
+        ...validatedBody,
+        userId: req.user.id,
+      });
 
       res.status(200).json({ message: "Interaction recorded successfully" });
     } catch (error) {

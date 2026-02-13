@@ -3,18 +3,21 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
+import {
+  IToggleSavePost,
+  type ToggleSavePostInput,
+  type ToggleSavePostOutput,
+} from "../../domain/use-cases/IToggleSavePost";
 
 @injectable()
-export class ToggleSavePost {
+export class ToggleSavePost implements IToggleSavePost {
   constructor(
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
-    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    postId: string
-  ): Promise<{ status: "saved" | "unsaved" }> {
+  async execute(input: ToggleSavePostInput): Promise<ToggleSavePostOutput> {
+    const { userId, postId } = input;
     const user = await this.userRepository.findById(userId);
     const post = await this.postRepository.findById(postId);
     if (!user) {
@@ -24,7 +27,7 @@ export class ToggleSavePost {
       throw new HttpError(404, "Post not found or has been deleted");
     }
 
-    const isAlreadySaved = user.savedPosts.includes(postId);
+    const isAlreadySaved = user.getSavedPosts().includes(postId);
 
     if (isAlreadySaved) {
       await this.userRepository.unsavePost(userId, postId);

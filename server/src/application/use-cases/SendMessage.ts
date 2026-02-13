@@ -5,23 +5,19 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Message } from "../../domain/entities/Message";
 import { TYPES } from "../../shared/types";
-
-export interface SendMessageInput {
-  conversationId: string;
-  senderId: string;
-  message?: string;
-  type: "text" | "image" | "post";
-  image?: string;
-}
+import {
+  ISendMessage,
+  type SendMessageInput,
+} from "../../domain/use-cases/ISendMessage";
 
 @injectable()
-export class SendMessage {
+export class SendMessage implements ISendMessage {
   constructor(
     @inject(TYPES.IMessageRepository)
     private messageRepository: IMessageRepository,
     @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
   async execute(input: SendMessageInput): Promise<Message> {
@@ -39,13 +35,12 @@ export class SendMessage {
       throw new HttpError(404, "Sender not found");
     }
 
-    const conversation = await this.conversationRepository.findById(
-      conversationId
-    );
+    const conversation =
+      await this.conversationRepository.findById(conversationId);
     if (!conversation || !conversation.participants.includes(senderId)) {
       throw new HttpError(
         403,
-        "You are not a participant of this conversation."
+        "You are not a participant of this conversation.",
       );
     }
 
@@ -58,6 +53,6 @@ export class SendMessage {
       status: "sent",
     });
 
-    return { ...newMessage, from: sender.username };
+    return { ...newMessage, from: sender.getUsername() };
   }
 }

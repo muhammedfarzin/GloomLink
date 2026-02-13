@@ -53,7 +53,7 @@ import { GetLikedUsers } from "../application/use-cases/GetLikedUsers";
 import { GetMessages } from "../application/use-cases/GetMessages";
 import { GetPostById } from "../application/use-cases/GetPostById";
 import { GetSavedPosts } from "../application/use-cases/GetSavedPosts";
-import { GetUserDataForForm } from "../application/use-cases/GetUserDataForForm";
+import { FetchUser } from "../application/use-cases/FetchUser";
 import { GetUserProfile } from "../application/use-cases/GetUserProfile";
 import { LoginUser } from "../application/use-cases/LoginUser";
 import { MarkMessageAsSeen } from "../application/use-cases/MarkMessageAsSeen";
@@ -120,56 +120,56 @@ container
   .to(InteractionRepository);
 
 // --- BIND USE CASES ---
-container.bind<AdminLogin>(TYPES.AdminLogin).to(AdminLogin);
-container.bind<AddComment>(TYPES.AddComment).to(AddComment);
+container.bind<AdminLogin>(TYPES.IAdminLogin).to(AdminLogin);
+container.bind<AddComment>(TYPES.IAddComment).to(AddComment);
 container
-  .bind<CreateConversation>(TYPES.CreateConversation)
+  .bind<CreateConversation>(TYPES.ICreateConversation)
   .to(CreateConversation);
-container.bind<CreatePost>(TYPES.CreatePost).to(CreatePost);
-container.bind<CreateUser>(TYPES.CreateUser).to(CreateUser);
-container.bind<DeletePost>(TYPES.DeletePost).to(DeletePost);
-container.bind<EditPost>(TYPES.EditPost).to(EditPost);
-container.bind<GetAdminPosts>(TYPES.GetAdminPosts).to(GetAdminPosts);
-container.bind<GetAdminUsers>(TYPES.GetAdminUsers).to(GetAdminUsers);
-container.bind<GetComments>(TYPES.GetComments).to(GetComments);
+container.bind<CreatePost>(TYPES.ICreatePost).to(CreatePost);
+container.bind<CreateUser>(TYPES.ICreateUser).to(CreateUser);
+container.bind<DeletePost>(TYPES.IDeletePost).to(DeletePost);
+container.bind<EditPost>(TYPES.IEditPost).to(EditPost);
+container.bind<GetAdminPosts>(TYPES.IGetAdminPosts).to(GetAdminPosts);
+container.bind<GetAdminUsers>(TYPES.IGetAdminUsers).to(GetAdminUsers);
+container.bind<GetComments>(TYPES.IGetComments).to(GetComments);
 container
-  .bind<GetConversationId>(TYPES.GetConversationId)
+  .bind<GetConversationId>(TYPES.IGetConversationId)
   .to(GetConversationId);
-container.bind<GetConversations>(TYPES.GetConversations).to(GetConversations);
-container.bind<GetFollowList>(TYPES.GetFollowList).to(GetFollowList);
-container.bind<GetLikedUsers>(TYPES.GetLikedUsers).to(GetLikedUsers);
-container.bind<GetMessages>(TYPES.GetMessages).to(GetMessages);
-container.bind<GetPostById>(TYPES.GetPostById).to(GetPostById);
+container.bind<GetConversations>(TYPES.IGetConversations).to(GetConversations);
+container.bind<GetFollowList>(TYPES.IGetFollowList).to(GetFollowList);
+container.bind<GetLikedUsers>(TYPES.IGetLikedUsers).to(GetLikedUsers);
+container.bind<GetMessages>(TYPES.IGetMessages).to(GetMessages);
+container.bind<GetPostById>(TYPES.IGetPostById).to(GetPostById);
 container
-  .bind<GetRecommendedPosts>(TYPES.GetRecommendedPosts)
+  .bind<GetRecommendedPosts>(TYPES.IGetRecommendedPosts)
   .to(GetRecommendedPosts);
-container.bind<GetSavedPosts>(TYPES.GetSavedPosts).to(GetSavedPosts);
+container.bind<GetSavedPosts>(TYPES.IGetSavedPosts).to(GetSavedPosts);
 container
-  .bind<GetUserDataForForm>(TYPES.GetUserDataForForm)
-  .to(GetUserDataForForm);
-container.bind<GetUserProfile>(TYPES.GetUserProfile).to(GetUserProfile);
-container.bind<LoginUser>(TYPES.LoginUser).to(LoginUser);
+  .bind<FetchUser>(TYPES.IFetchUser)
+  .to(FetchUser);
+container.bind<GetUserProfile>(TYPES.IGetUserProfile).to(GetUserProfile);
+container.bind<LoginUser>(TYPES.ILoginUser).to(LoginUser);
 container
-  .bind<MarkMessageAsSeen>(TYPES.MarkMessageAsSeen)
+  .bind<MarkMessageAsSeen>(TYPES.IMarkMessageAsSeen)
   .to(MarkMessageAsSeen);
 container
-  .bind<RecordInteraction>(TYPES.RecordInteraction)
+  .bind<RecordInteraction>(TYPES.IRecordInteraction)
   .to(RecordInteraction);
-container.bind<RefreshToken>(TYPES.RefreshToken).to(RefreshToken);
-container.bind<ReportTarget>(TYPES.ReportTarget).to(ReportTarget);
-container.bind<SearchContent>(TYPES.SearchContent).to(SearchContent);
-container.bind<SendMessage>(TYPES.SendMessage).to(SendMessage);
+container.bind<RefreshToken>(TYPES.IRefreshToken).to(RefreshToken);
+container.bind<ReportTarget>(TYPES.IReportTarget).to(ReportTarget);
+container.bind<SearchContent>(TYPES.ISearchContent).to(SearchContent);
+container.bind<SendMessage>(TYPES.ISendMessage).to(SendMessage);
 container
-  .bind<SendVerificationEmail>(TYPES.SendVerificationEmail)
+  .bind<SendVerificationEmail>(TYPES.ISendVerificationEmail)
   .to(SendVerificationEmail);
-container.bind<SignInWithGoogle>(TYPES.SignInWithGoogle).to(SignInWithGoogle);
-container.bind<ToggleFollow>(TYPES.ToggleFollow).to(ToggleFollow);
-container.bind<ToggleLike>(TYPES.ToggleLike).to(ToggleLike);
-container.bind<TogglePostStatus>(TYPES.TogglePostStatus).to(TogglePostStatus);
-container.bind<ToggleSavePost>(TYPES.ToggleSavePost).to(ToggleSavePost);
-container.bind<ToggleUserStatus>(TYPES.ToggleUserStatus).to(ToggleUserStatus);
-container.bind<UpdateProfile>(TYPES.UpdateProfile).to(UpdateProfile);
-container.bind<VerifyOtp>(TYPES.VerifyOtp).to(VerifyOtp);
+container.bind<SignInWithGoogle>(TYPES.ISignInWithGoogle).to(SignInWithGoogle);
+container.bind<ToggleFollow>(TYPES.IToggleFollow).to(ToggleFollow);
+container.bind<ToggleLike>(TYPES.IToggleLike).to(ToggleLike);
+container.bind<TogglePostStatus>(TYPES.ITogglePostStatus).to(TogglePostStatus);
+container.bind<ToggleSavePost>(TYPES.IToggleSavePost).to(ToggleSavePost);
+container.bind<ToggleUserStatus>(TYPES.IToggleUserStatus).to(ToggleUserStatus);
+container.bind<UpdateProfile>(TYPES.IUpdateProfile).to(UpdateProfile);
+container.bind<VerifyOtp>(TYPES.IVerifyOtp).to(VerifyOtp);
 
 // --- BIND CONTROLLER ---
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);

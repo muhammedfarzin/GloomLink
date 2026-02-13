@@ -15,9 +15,9 @@ import {
 @injectable()
 export class CommentController {
   constructor(
-    @inject(TYPES.AddComment) private addCommentUseCase: AddComment,
-    @inject(TYPES.GetComments) private getCommentsUseCase: GetComments,
-    @inject(TYPES.RecordInteraction)
+    @inject(TYPES.IAddComment) private addCommentUseCase: AddComment,
+    @inject(TYPES.IGetComments) private getCommentsUseCase: GetComments,
+    @inject(TYPES.IRecordInteraction)
     private recordInteractionUseCase: RecordInteraction,
   ) {}
 
@@ -34,11 +34,11 @@ export class CommentController {
       });
 
       if (validatedBody.type === "post") {
-        await this.recordInteractionUseCase.execute(
-          req.user.id,
-          validatedBody.targetId,
-          "comment",
-        );
+        await this.recordInteractionUseCase.execute({
+          userId: req.user.id,
+          postId: validatedBody.targetId,
+          type: "comment",
+        });
       }
 
       res.status(201).json({

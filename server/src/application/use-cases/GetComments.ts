@@ -1,24 +1,17 @@
 import { injectable, inject } from "inversify";
-import {
-  ICommentRepository,
-  CommentableType,
-} from "../../domain/repositories/ICommentRepository";
+import { ICommentRepository } from "../../domain/repositories/ICommentRepository";
 import { CommentResponseDto } from "../dtos/CommentResponseDto";
 import { TYPES } from "../../shared/types";
-
-export interface GetCommentsInput {
-  targetId: string;
-  type: CommentableType;
-  userId: string;
-  page: number;
-  limit: number;
-}
+import {
+  IGetComments,
+  type GetCommentsInput,
+} from "../../domain/use-cases/IGetComments";
 
 @injectable()
-export class GetComments {
+export class GetComments implements IGetComments {
   constructor(
     @inject(TYPES.ICommentRepository)
-    private commentRepository: ICommentRepository
+    private commentRepository: ICommentRepository,
   ) {}
 
   async execute(input: GetCommentsInput): Promise<CommentResponseDto[]> {
@@ -29,7 +22,7 @@ export class GetComments {
         ? await this.commentRepository.findUserCommentsByTarget(
             targetId,
             userId,
-            type
+            type,
           )
         : [];
 
@@ -39,7 +32,7 @@ export class GetComments {
           userId,
           type,
           page,
-          limit
+          limit,
         )
       : this.commentRepository.findByTargetId(targetId, type, page, limit));
 

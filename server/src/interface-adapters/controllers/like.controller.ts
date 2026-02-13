@@ -15,9 +15,9 @@ import {
 @injectable()
 export class LikeController {
   constructor(
-    @inject(TYPES.GetLikedUsers) private getLikedUsersUseCase: GetLikedUsers,
-    @inject(TYPES.ToggleLike) private toggleLikeUseCase: ToggleLike,
-    @inject(TYPES.RecordInteraction)
+    @inject(TYPES.IGetLikedUsers) private getLikedUsersUseCase: GetLikedUsers,
+    @inject(TYPES.IToggleLike) private toggleLikeUseCase: ToggleLike,
+    @inject(TYPES.IRecordInteraction)
     private recordInteractionUseCase: RecordInteraction,
   ) {}
 
@@ -57,11 +57,11 @@ export class LikeController {
       });
 
       if (result.status === "liked" && validatedData.type === "post") {
-        await this.recordInteractionUseCase.execute(
-          req.user.id,
-          validatedData.targetId,
-          "like",
-        );
+        await this.recordInteractionUseCase.execute({
+          userId: req.user.id,
+          postId: validatedData.targetId,
+          type: "like",
+        });
       }
 
       res.status(200).json({

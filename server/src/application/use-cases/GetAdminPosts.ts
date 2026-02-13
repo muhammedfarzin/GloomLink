@@ -1,22 +1,18 @@
 import { injectable, inject } from "inversify";
 import {
   IPostRepository,
-  EnrichedPost,
+  type EnrichedPost,
 } from "../../domain/repositories/IPostRepository";
 import { TYPES } from "../../shared/types";
-
-export interface GetAdminPostsInput {
-  filter: "all" | "active" | "blocked" | "reported";
-  page: number;
-  limit: number;
-  searchQuery?: string;
-  withReports?: boolean;
-}
+import {
+  IGetAdminPosts,
+  type GetAdminPostsInput,
+} from "../../domain/use-cases/IGetAdminPosts";
 
 @injectable()
-export class GetAdminPosts {
+export class GetAdminPosts implements IGetAdminPosts {
   constructor(
-    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
 
   async execute(input: GetAdminPostsInput): Promise<EnrichedPost[]> {

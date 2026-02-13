@@ -3,24 +3,18 @@ import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Post } from "../../domain/entities/Post";
 import { IFileStorageService } from "../../domain/services/IFileStorageService";
+import {
+  IEditPost,
+  type EditPostInput,
+} from "../../domain/use-cases/IEditPost";
 import { TYPES } from "../../shared/types";
 
-export interface EditPostInput {
-  postId: string;
-  userId: string;
-  newFiles: Express.Multer.File[];
-  removedFiles: string[];
-  tags: string[];
-  publishedFor: "public" | "subscriber";
-  caption?: string | undefined;
-}
-
 @injectable()
-export class EditPost {
+export class EditPost implements IEditPost {
   constructor(
     @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
     @inject(TYPES.IFileStorageService)
-    private fileStorageService: IFileStorageService
+    private fileStorageService: IFileStorageService,
   ) {}
 
   async execute(input: EditPostInput): Promise<Post> {
@@ -37,13 +31,13 @@ export class EditPost {
 
     const uploadedMedia = await this.fileStorageService.upload(
       newFiles,
-      "posts"
+      "posts",
     );
     const newImageUrls = uploadedMedia
       .filter((file) => file.mediaType === "image")
       .map((file) => file.url);
     const remainingImages = post.images.filter(
-      (img) => !removedFiles?.includes(img)
+      (img) => !removedFiles?.includes(img),
     );
 
     const finalImages = [...remainingImages, ...newImageUrls];

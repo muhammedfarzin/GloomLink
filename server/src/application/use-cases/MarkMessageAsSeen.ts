@@ -4,19 +4,18 @@ import { IConversationRepository } from "../../domain/repositories/IConversation
 import { Message } from "../../domain/entities/Message";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface MarkMessageAsSeenInput {
-  messageId: string;
-  viewerId: string;
-}
+import {
+  IMarkMessageAsSeen,
+  type MarkMessageAsSeenInput,
+} from "../../domain/use-cases/IMarkMessageAsSeen";
 
 @injectable()
-export class MarkMessageAsSeen {
+export class MarkMessageAsSeen implements IMarkMessageAsSeen {
   constructor(
     @inject(TYPES.IMessageRepository)
     private messageRepository: IMessageRepository,
     @inject(TYPES.IConversationRepository)
-    private conversationRepository: IConversationRepository
+    private conversationRepository: IConversationRepository,
   ) {}
 
   async execute(input: MarkMessageAsSeenInput): Promise<Message> {
@@ -28,12 +27,12 @@ export class MarkMessageAsSeen {
     }
 
     const conversation = await this.conversationRepository.findById(
-      message.conversation
+      message.conversation,
     );
     if (!conversation || !conversation.participants.includes(viewerId)) {
       throw new HttpError(
         403,
-        "You are not a participant of this conversation."
+        "You are not a participant of this conversation.",
       );
     }
 

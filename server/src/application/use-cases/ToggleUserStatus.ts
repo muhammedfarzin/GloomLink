@@ -2,21 +2,23 @@ import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
+import { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
 
 @injectable()
-export class ToggleUserStatus {
+export class ToggleUserStatus implements IToggleUserStatus {
   constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
-  async execute(userId: string): Promise<{ updatedStatus: string }> {
+  async execute(userId: string) {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new HttpError(404, "User not found or has been removed");
     }
 
-    const newStatus = user.status === "active" ? "blocked" : "active";
-    await this.userRepository.update(userId, { status: newStatus });
+    const newStatus = user.getStatus() === "active" ? "blocked" : "active";
+    user.updateStatus(newStatus);
+    await this.userRepository.update(userId, user);
 
     return { updatedStatus: newStatus };
   }

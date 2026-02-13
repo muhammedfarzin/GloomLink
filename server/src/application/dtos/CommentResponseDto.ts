@@ -1,8 +1,8 @@
 import type { Comment } from "../../domain/entities/Comment";
-import type { UserBasicDto } from "./UserDto";
+import { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 type CommentAuthorDto = Pick<
-  UserBasicDto,
+  UserCompactProfile,
   "userId" | "fullname" | "firstname" | "lastname" | "username" | "imageUrl"
 >;
 

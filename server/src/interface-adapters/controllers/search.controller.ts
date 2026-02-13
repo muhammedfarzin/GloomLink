@@ -10,7 +10,7 @@ import { searchSchema } from "../validation/searchSchemas";
 @injectable()
 export class SearchController {
   constructor(
-    @inject(TYPES.SearchContent) private searchContentUseCase: SearchContent,
+    @inject(TYPES.ISearchContent) private searchContentUseCase: SearchContent,
   ) {}
 
   search: RequestHandler = async (req, res, next) => {

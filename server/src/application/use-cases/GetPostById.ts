@@ -5,22 +5,21 @@ import {
 } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface GetPostByIdInput {
-  postId: string;
-  userId: string;
-}
+import {
+  IGetPostById,
+  type GetPostByIdInput,
+} from "../../domain/use-cases/IGetPostById";
 
 @injectable()
-export class GetPostById {
+export class GetPostById implements IGetPostById {
   constructor(
-    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
 
   async execute(input: GetPostByIdInput): Promise<EnrichedPost> {
     const post = await this.postRepository.findEnrichedById(
       input.postId,
-      input.userId
+      input.userId,
     );
 
     if (!post) {

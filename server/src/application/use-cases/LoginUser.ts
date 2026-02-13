@@ -3,14 +3,14 @@ import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { LoginInput } from "../../interface-adapters/validation/authSchemas";
 import { TYPES } from "../../shared/types";
+import { ILoginUser, type LoginInput } from "../../domain/use-cases/ILoginUser";
 
 @injectable()
-export class LoginUser {
+export class LoginUser implements ILoginUser {
   constructor(
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
-    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher,
   ) {}
 
   async execute(input: LoginInput): Promise<User> {
@@ -22,14 +22,14 @@ export class LoginUser {
 
     const isPasswordMatch = await this.passwordHasher.compare(
       input.password,
-      user.password
+      user.getPasswordHash(),
     );
 
     if (!isPasswordMatch) {
       throw new HttpError(401, "Invalid credentials");
     }
 
-    if (user.status === "blocked") {
+    if (user.getStatus() === "blocked") {
       throw new HttpError(403, "Your account has been blocked");
     }
 

@@ -26,15 +26,15 @@ import {
 
 export class AuthController {
   constructor(
-    @inject(TYPES.CreateUser) private createUserUseCase: CreateUser,
-    @inject(TYPES.LoginUser) private loginUserUseCase: LoginUser,
-    @inject(TYPES.SignInWithGoogle)
+    @inject(TYPES.ICreateUser) private createUserUseCase: CreateUser,
+    @inject(TYPES.ILoginUser) private loginUserUseCase: LoginUser,
+    @inject(TYPES.ISignInWithGoogle)
     private signInWithGoogleUseCase: SignInWithGoogle,
-    @inject(TYPES.SendVerificationEmail)
+    @inject(TYPES.ISendVerificationEmail)
     private sendVerificationEmailUseCase: SendVerificationEmail,
-    @inject(TYPES.VerifyOtp) private verifyOtpUseCase: VerifyOtp,
-    @inject(TYPES.RefreshToken) private refreshTokenUseCase: RefreshToken,
-    @inject(TYPES.AdminLogin) private adminLoginUseCase: AdminLogin,
+    @inject(TYPES.IVerifyOtp) private verifyOtpUseCase: VerifyOtp,
+    @inject(TYPES.IRefreshToken) private refreshTokenUseCase: RefreshToken,
+    @inject(TYPES.IAdminLogin) private adminLoginUseCase: AdminLogin,
     @inject(TYPES.ITokenService) private tokenService: ITokenService,
     @inject(TYPES.IExternalAuthService)
     private externalAuthService: IExternalAuthService,
@@ -46,17 +46,19 @@ export class AuthController {
 
       const user = await this.loginUserUseCase.execute(validatedBody);
 
-      if (user.status === "not-verified") {
-        await this.sendVerificationEmailUseCase.execute({ email: user.email });
+      if (user.getStatus() === "not-verified") {
+        await this.sendVerificationEmailUseCase.execute({
+          email: user.getEmail(),
+        });
       }
 
-      const userResponse = UserMapper.toResponse(user);
+      const userResponse = UserMapper.toResponseWithStatus(user);
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse._id },
-        user.status !== "not-verified",
+        { role: "user", id: userResponse.userId },
+        userResponse.status !== "not-verified",
       );
       const messageResponse =
-        user.status === "not-verified"
+        userResponse.status === "not-verified"
           ? "Verify your email"
           : "Login successful";
 
@@ -81,13 +83,15 @@ export class AuthController {
       });
 
       // --- Send Verification Email ---
-      await this.sendVerificationEmailUseCase.execute({ email: newUser.email });
+      await this.sendVerificationEmailUseCase.execute({
+        email: newUser.getEmail(),
+      });
 
       // --- Generate Token & Respond ---
-      const userResponse = UserMapper.toResponse(newUser);
+      const userResponse = UserMapper.toResponseWithStatus(newUser);
 
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse._id },
+        { role: "user", id: userResponse.userId },
         false,
       );
 
@@ -128,10 +132,10 @@ export class AuthController {
         otp,
       });
 
-      const userResponse = UserMapper.toResponse(updatedUser);
+      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
 
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse._id },
+        { role: "user", id: userResponse.userId },
         true,
       );
 
@@ -152,9 +156,9 @@ export class AuthController {
       const authData =
         await this.externalAuthService.verifyGoogleAuthToken(token);
       const user = await this.signInWithGoogleUseCase.execute(authData);
-      const userResponse = UserMapper.toResponse(user);
+      const userResponse = UserMapper.toResponseWithStatus(user);
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse._id },
+        { role: "user", id: userResponse.userId },
         true,
       );
 

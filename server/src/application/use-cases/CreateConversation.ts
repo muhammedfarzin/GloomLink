@@ -5,14 +5,13 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Conversation } from "../../domain/entities/Conversation";
 import appEmitter from "../events/appEmitter";
 import { TYPES } from "../../shared/types";
-
-export interface CreateConversationInput {
-  currentUsername: string;
-  participantsUsername: string[];
-}
+import {
+  ICreateConversation,
+  type CreateConversationInput,
+} from "../../domain/use-cases/ICreateConversation";
 
 @injectable()
-export class CreateConversation {
+export class CreateConversation implements ICreateConversation {
   constructor(
     @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,

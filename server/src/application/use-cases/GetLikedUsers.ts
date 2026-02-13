@@ -1,29 +1,22 @@
 import { injectable, inject } from "inversify";
-import {
-  ILikeRepository,
-  LikeableType,
-} from "../../domain/repositories/ILikeRepository";
+import { ILikeRepository } from "../../domain/repositories/ILikeRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { UserListResponseDto } from "../dtos/UserListResponseDto";
+import { UserListViewDto } from "../dtos/UserDto";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface GetLikedUsersInput {
-  targetId: string;
-  userId?: string;
-  type: LikeableType;
-  page: number;
-  limit: number;
-}
+import {
+  IGetLikedUsers,
+  type GetLikedUsersInput,
+} from "../../domain/use-cases/IGetLikedUsers";
 
 @injectable()
-export class GetLikedUsers {
+export class GetLikedUsers implements IGetLikedUsers {
   constructor(
     @inject(TYPES.ILikeRepository) private likeRepository: ILikeRepository,
-    @inject(TYPES.IPostRepository) private postRepository: IPostRepository
+    @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
 
-  async execute(input: GetLikedUsersInput): Promise<UserListResponseDto[]> {
+  async execute(input: GetLikedUsersInput): Promise<UserListViewDto[]> {
     const { targetId, ...restInput } = input;
 
     const post = await this.postRepository.findById(targetId);

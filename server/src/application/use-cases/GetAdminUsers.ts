@@ -1,24 +1,21 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { UserMapper } from "../../infrastructure/mappers/UserMapper";
-import { UserResponseDto } from "../dtos/UserResponseDto";
+import { UserWithStatusDto } from "../dtos/UserDto";
+import {
+  IGetAdminUsers,
+  type GetAdminUsersInput,
+} from "../../domain/use-cases/IGetAdminUsers";
 import { TYPES } from "../../shared/types";
 
-export interface GetAdminUsersInput {
-  filter: "all" | "active" | "blocked";
-  page: number;
-  limit: number;
-  searchQuery?: string;
-}
-
 @injectable()
-export class GetAdminUsers {
+export class GetAdminUsers implements IGetAdminUsers {
   constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository
+    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
-  async execute(input: GetAdminUsersInput): Promise<UserResponseDto[]> {
+  async execute(input: GetAdminUsersInput): Promise<UserWithStatusDto[]> {
     const user = await this.userRepository.findAll(input);
-    return user.map(UserMapper.toResponse);
+    return user.map(UserMapper.toResponseWithStatus);
   }
 }

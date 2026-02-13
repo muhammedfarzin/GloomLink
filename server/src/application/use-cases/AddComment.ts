@@ -1,27 +1,21 @@
 import { injectable, inject } from "inversify";
-import {
-  ICommentRepository,
-  CommentableType,
-} from "../../domain/repositories/ICommentRepository";
+import { ICommentRepository } from "../../domain/repositories/ICommentRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { Comment } from "../../domain/entities/Comment";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-
-export interface AddCommentInput {
-  targetId: string;
-  userId: string;
-  comment: string;
-  type: CommentableType;
-}
+import {
+  IAddComment,
+  type AddCommentInput,
+} from "../../domain/use-cases/IAddComment";
 
 @injectable()
-export class AddComment {
+export class AddComment implements IAddComment {
   constructor(
     @inject(TYPES.ICommentRepository)
     private commentRepository: ICommentRepository,
     @inject(TYPES.IPostRepository)
-    private postRepository: IPostRepository
+    private postRepository: IPostRepository,
   ) {}
 
   async execute(input: AddCommentInput): Promise<Comment> {
