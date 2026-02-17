@@ -1,18 +1,21 @@
 import { User } from "../../domain/entities/User";
-import type { UserDto } from "../../application/dtos/UserDto";
+import type { UserBasicDto, UserDto } from "../../application/dtos/UserDto";
 import type {
   UserWithStatusDto,
   UserWithAuthDto,
   UserListViewDto,
 } from "../../application/dtos/UserDto";
-import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 export class UserMapper {
   public static toDomain(data: Omit<UserDto, "fullname">): User {
-    return new User(data);
+    return new User({
+      ...data,
+      savedPosts: data.savedPosts?.map((postId) => postId.toString()),
+      blockedUsers: data.blockedUsers?.map((postId) => postId.toString()),
+    });
   }
 
-  private static toBasicPersistence(user: User): UserCompactProfile {
+  private static toBasicPersistence(user: User): UserBasicDto {
     return {
       userId: user.getId(),
       username: user.getUsername(),
@@ -29,7 +32,7 @@ export class UserMapper {
 
   public static toPersistence(user: User): UserDto {
     return {
-      ...this.toBasicPersistence(user),
+      ...UserMapper.toBasicPersistence(user),
       email: user.getEmail(),
       passwordHash: user.getPasswordHash(),
       authType: user.getAuthType(),
@@ -42,21 +45,21 @@ export class UserMapper {
 
   public static toResponseWithStatus(user: User): UserWithStatusDto {
     return {
-      ...this.toBasicPersistence(user),
+      ...UserMapper.toBasicPersistence(user),
       status: user.getStatus(),
     };
   }
 
   public static toResponseWithAuthType(user: User): UserWithAuthDto {
     return {
-      ...this.toBasicPersistence(user),
+      ...UserMapper.toBasicPersistence(user),
       authType: user.getAuthType(),
     };
   }
 
   public static toListView(user: any): UserListViewDto {
     return {
-      ...this.toBasicPersistence(user),
+      ...UserMapper.toBasicPersistence(user),
       type: "user",
     };
   }

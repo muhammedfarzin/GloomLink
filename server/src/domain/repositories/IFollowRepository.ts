@@ -1,5 +1,5 @@
-import { Follow } from "../entities/Follow";
-import { UserCompactProfile } from "../models/UserCompactProfile";
+import type { UserListViewDto } from "../../application/dtos/UserDto";
+import type { Follow } from "../entities/Follow";
 
 export type FollowListType = "followers" | "following";
 export interface FollowListOptions {
@@ -16,6 +16,6 @@ export interface IFollowRepository {
     userId: string,
     type: FollowListType,
     options: FollowListOptions,
-  ): Promise<UserCompactProfile[]>;
+  ): Promise<UserListViewDto[]>;
   deleteById(id: string): Promise<void>;
 }

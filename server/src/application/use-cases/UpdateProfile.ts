@@ -76,7 +76,6 @@ export class UpdateProfile implements IUpdateProfile {
       user.updateImage(newImageUrl);
     }
 
-    input;
     user.changeName(input.firstname, input.lastname);
     user.updateMobile(input.mobile);
     user.updateGender(input.gender);

@@ -14,24 +14,26 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
 
     const data = jwt.verify(
       token,
-      process.env.JWT_ACCESS_SECRET || "secret"
+      process.env.JWT_ACCESS_SECRET || "secret",
     ) as TokenPayloadType;
 
     const userRepository = new UserRepository();
 
     if (data.role === "user") {
-      const userData = await userRepository.findById(data.id);
-      if (!userData) throw new HttpError(401, "Unauthorized: User not found");
-      if (userData.status === "blocked")
+      const user = await userRepository.findById(data.id);
+      if (!user) throw new HttpError(401, "Unauthorized: User not found");
+      if (user.getStatus() === "blocked")
         throw new HttpError(401, "Unauthorized: User has been blocked");
-
-      const { authType = "email", _id: userId } = userData;
 
       req.user = {
         role: "user",
-        ...userData,
-        id: userId.toString(),
-        authType,
+        id: user.getId(),
+        username: user.getUsername(),
+        firstname: user.getFirstName(),
+        lastname: user.getLastName(),
+        email: user.getEmail(),
+        status: user.getStatus(),
+        authType: user.getAuthType(),
       };
     } else req.user = { role: "admin", id: data.id };
 

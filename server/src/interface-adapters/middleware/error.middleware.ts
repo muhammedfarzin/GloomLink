@@ -17,7 +17,7 @@ const errorMiddleware = (
     status = err.statusCode || 500;
     message = err.message || "Something went wrong";
   }
-
+console.log(err)
   res.status(status).json({
     status,
     message,

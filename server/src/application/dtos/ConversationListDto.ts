@@ -4,7 +4,7 @@ export interface ConversationListDto {
   username: string;
   firstname: string;
   lastname: string;
-  image?: string;
+  imageUrl?: string;
   unread: number;
   lastMessageTime?: Date;
   type: "conversation";

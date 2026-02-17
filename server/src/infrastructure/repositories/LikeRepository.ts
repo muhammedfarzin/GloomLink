@@ -9,8 +9,6 @@ import { LikeModel } from "../database/models/LikeModel";
 import { LikeMapper } from "../mappers/LikeMapper";
 import { UserListViewDto } from "../../application/dtos/UserDto";
 import mongoose, { PipelineStage } from "mongoose";
-import { UserMapper } from "../mappers/UserMapper";
-import { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 @injectable()
 export class LikeRepository implements ILikeRepository {
@@ -41,7 +39,7 @@ export class LikeRepository implements ILikeRepository {
   async findLikersByTarget(
     targetId: string,
     options: LikeOptions,
-  ): Promise<UserCompactProfile[]> {
+  ): Promise<UserListViewDto[]> {
     const { userId, type, page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -89,6 +87,7 @@ export class LikeRepository implements ILikeRepository {
       {
         $project: {
           _id: 0,
+          type: "user",
           userId: "$likerInfo._id",
           username: "$likerInfo.username",
           fullname: {
@@ -96,7 +95,7 @@ export class LikeRepository implements ILikeRepository {
           },
           firstname: "$likerInfo.firstname",
           lastname: "$likerInfo.lastname",
-          imageUrl: "$likerInfo.image",
+          imageUrl: "$likerInfo.imageUrl",
           isFollowing: "$likerInfo.isFollowing",
         },
       },

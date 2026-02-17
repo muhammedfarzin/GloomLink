@@ -8,7 +8,7 @@ import type { Follow } from "../../domain/entities/Follow";
 import { FollowModel } from "../database/models/FollowModel";
 import { FollowMapper } from "../mappers/FollowMapper";
 import mongoose, { type PipelineStage } from "mongoose";
-import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
+import type { UserListViewDto } from "../../application/dtos/UserDto";
 
 @injectable()
 export class FollowRepository implements IFollowRepository {
@@ -41,7 +41,7 @@ export class FollowRepository implements IFollowRepository {
     userId: string,
     type: FollowListType,
     options: FollowListOptions,
-  ): Promise<UserCompactProfile[]> {
+  ): Promise<UserListViewDto[]> {
     const { currentUserId, page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -90,6 +90,7 @@ export class FollowRepository implements IFollowRepository {
       {
         $project: {
           _id: 0,
+          type: "user",
           userId: `$${lookupAs}._id`,
           username: `$${lookupAs}.username`,
           fullname: {
@@ -97,7 +98,7 @@ export class FollowRepository implements IFollowRepository {
           },
           firstname: `$${lookupAs}.firstname`,
           lastname: `$${lookupAs}.lastname`,
-          imageUrl: `$${lookupAs}.image`,
+          imageUrl: `$${lookupAs}.imageUrl`,
           isFollowing: `$${lookupAs}.isFollowing`,
         },
       },

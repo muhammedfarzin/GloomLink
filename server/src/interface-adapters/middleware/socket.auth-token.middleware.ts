@@ -8,7 +8,7 @@ import { ConversationRepository } from "../../infrastructure/repositories/Conver
 
 export const authenticateTokenForSocket = async (
   socket: Socket,
-  next: (err?: ExtendedError) => void
+  next: (err?: ExtendedError) => void,
 ) => {
   const token = socket.handshake.auth.token;
 
@@ -19,37 +19,41 @@ export const authenticateTokenForSocket = async (
 
     const data = jwt.verify(
       token,
-      process.env.JWT_ACCESS_SECRET || "secret"
+      process.env.JWT_ACCESS_SECRET || "secret",
     ) as TokenPayloadType;
 
     if (data.role === "user") {
       const userRepository = new UserRepository();
       const conversationRepository = new ConversationRepository();
 
-      var userData = await userRepository.findById(data.id);
-      if (!userData) throw new Error("Unauthorized: Invalid user");
-      if (userData.status === "blocked")
+      var user = await userRepository.findById(data.id);
+      if (!user) throw new Error("Unauthorized: Invalid user");
+      if (user.getStatus() === "blocked")
         throw new Error("Unauthorized: User has been blocked");
 
       const conversations =
-        await conversationRepository.findConversationsByUserId(userData._id);
+        await conversationRepository.findConversationsByUserId(user.getId());
       socket.join(
-        conversations.map((conversation) => conversation.conversationId)
+        conversations.map((conversation) => conversation.conversationId),
       );
 
-      const { authType = "email", _id: userId } = userData;
-
+      const username = user.getUsername();
       socket.user = {
         role: "user",
-        ...userData,
-        id: userId.toString(),
-        authType,
+        id: user.getId(),
+        username,
+        firstname: user.getFirstName(),
+        lastname: user.getLastName(),
+        email: user.getEmail(),
+        status: user.getStatus(),
+        authType: user.getAuthType(),
       };
 
-      if (!activeUsers[userData.username])
-        activeUsers[userData.username] = new Set();
+      if (!activeUsers[username]) {
+        activeUsers[username] = new Set();
+      }
 
-      activeUsers[userData.username].add(socket.id);
+      activeUsers[username].add(socket.id);
     } else socket.user = { role: "admin", id: data.id, username: data.id };
 
     next();

@@ -17,7 +17,7 @@ export class User {
   private mobile: MobileNumber | undefined;
   private readonly authType: "email" | "google";
   private status: "active" | "inactive" | "blocked" | "not-verified";
-  private imageUrl: Url | undefined;
+  private imageUrl: Url | null;
   private gender: UserGender | undefined;
   private dob: DateOfBirth | undefined;
   private readonly blockedUsers: Set<string>;
@@ -40,9 +40,7 @@ export class User {
     this.mobile = userParams.mobile
       ? new MobileNumber(userParams.mobile)
       : undefined;
-    this.imageUrl = userParams.imageUrl
-      ? new Url(userParams.imageUrl)
-      : undefined;
+    this.imageUrl = userParams.imageUrl ? new Url(userParams.imageUrl) : null;
     this.gender = userParams.gender
       ? new UserGender(userParams.gender)
       : undefined;
@@ -67,8 +65,8 @@ export class User {
     this.lastname = lastname ?? "";
   }
 
-  updateImage(imageUrl?: string) {
-    this.imageUrl = imageUrl ? new Url(imageUrl) : undefined;
+  updateImage(imageUrl: string | null) {
+    this.imageUrl = imageUrl ? new Url(imageUrl) : null;
   }
 
   updateEmail(email: string) {

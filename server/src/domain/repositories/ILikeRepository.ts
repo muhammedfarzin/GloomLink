@@ -1,5 +1,5 @@
+import { UserListViewDto } from "../../application/dtos/UserDto";
 import type { Like } from "../entities/Like";
-import { UserCompactProfile } from "../models/UserCompactProfile";
 
 export type LikeableType = "post";
 export interface LikeOptions {
@@ -24,5 +24,5 @@ export interface ILikeRepository {
   findLikersByTarget(
     targetId: string,
     options: LikeOptions,
-  ): Promise<UserCompactProfile[]>;
+  ): Promise<UserListViewDto[]>;
 }

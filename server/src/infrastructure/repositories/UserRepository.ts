@@ -14,6 +14,7 @@ import { User } from "../../domain/entities/User";
 import type { EnrichedPost } from "../../domain/repositories/IPostRepository";
 import type {
   UserDto,
+  UserListViewDto,
   UserProfileResponseDto,
 } from "../../application/dtos/UserDto";
 import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
@@ -86,6 +87,8 @@ export class UserRepository implements IUserRepository {
 
   async update(id: string, userData: User): Promise<User | null> {
     const {
+      userId: _userId,
+      email: _email,
       blockedUsers: _blockedUser,
       savedPosts: _savedPost,
       interestKeywords,
@@ -151,7 +154,7 @@ export class UserRepository implements IUserRepository {
                       username: 1,
                       firstname: 1,
                       lastname: 1,
-                      image: 1,
+                      imageUrl: 1,
                     },
                   },
                 ],
@@ -251,7 +254,7 @@ export class UserRepository implements IUserRepository {
           firstname: 1,
           lastname: 1,
           fullname: 1,
-          image: 1,
+          imageUrl: 1,
           posts: 1,
           followersCount: 1,
           followingCount: 1,
@@ -278,7 +281,7 @@ export class UserRepository implements IUserRepository {
   async findByStatus(
     status: UserStatus,
     options: UserOptions,
-  ): Promise<UserCompactProfile[]> {
+  ): Promise<UserListViewDto[]> {
     const { userId, searchQuery = "", page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -327,6 +330,7 @@ export class UserRepository implements IUserRepository {
           lastname: 1,
           imageUrl: "$image",
           isFollowing: 1,
+          type: "user",
         },
       },
     ];
@@ -363,14 +367,18 @@ export class UserRepository implements IUserRepository {
       { $limit: limit },
     ];
 
-    return await UserModel.aggregate(aggregationPipeline);
+    const userList = await UserModel.aggregate(aggregationPipeline);
+
+    return userList.map((user) => {
+      return UserMapper.toDomain({ ...user, userId: user._id.toString() });
+    });
   }
 
   async findSuggestions(
     userId: string,
     excludeIds: string[],
     limit: number,
-  ): Promise<UserCompactProfile[]> {
+  ): Promise<UserListViewDto[]> {
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const excludeObjectIds = excludeIds.map(
       (id) => new mongoose.Types.ObjectId(id),
@@ -430,14 +438,22 @@ export class UserRepository implements IUserRepository {
       { $replaceRoot: { newRoot: "$doc" } },
       {
         $project: {
-          userId: 1,
+          _id: 0,
+          type: "user",
+          userId: { $toString: "$_id" },
           username: 1,
           fullname: {
             $concat: ["$firstname", " ", "$lastname"],
           },
           firstname: 1,
           lastname: 1,
-          image: 1,
+          imageUrl: 1,
+          isFollowing: {
+            $eq: [
+              { $toString: { $arrayElemAt: ["$followDoc.followedBy", 0] } },
+              userId,
+            ],
+          },
         },
       },
     ];

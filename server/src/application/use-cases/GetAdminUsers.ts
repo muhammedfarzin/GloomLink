@@ -15,7 +15,7 @@ export class GetAdminUsers implements IGetAdminUsers {
   ) {}
 
   async execute(input: GetAdminUsersInput): Promise<UserWithStatusDto[]> {
-    const user = await this.userRepository.findAll(input);
-    return user.map(UserMapper.toResponseWithStatus);
+    const users = await this.userRepository.findAll(input);
+    return users.map(UserMapper.toResponseWithStatus);
   }
 }

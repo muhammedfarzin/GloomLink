@@ -113,7 +113,7 @@ export class ConversationRepository implements IConversationRepository {
           username: "$otherParticipant.username",
           firstname: "$otherParticipant.firstname",
           lastname: "$otherParticipant.lastname",
-          image: "$otherParticipant.image",
+          imageUrl: "$otherParticipant.imageUrl",
           unread: { $ifNull: ["$messageInfo.unread", 0] },
           lastMessageTime: "$messageInfo.lastMessageTime",
         },

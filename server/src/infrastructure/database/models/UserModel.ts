@@ -10,7 +10,7 @@ export interface User {
   mobile?: string;
   authType: "email" | "google";
   status: "active" | "inactive" | "blocked" | "not-verified";
-  image?: string;
+  imageUrl?: string;
   gender?: "m" | "f";
   dob?: Date;
   blockedUsers: Schema.Types.ObjectId[];
@@ -31,7 +31,7 @@ const userSchema = new Schema<User>(
     lastname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     mobile: { type: String },
-    image: { type: String, default: null },
+    imageUrl: { type: String, default: null },
     authType: {
       type: String,
       default: "email",

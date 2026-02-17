@@ -5,7 +5,7 @@ import { ConversationListDto } from "../../application/dtos/ConversationListDto"
 
 export class ConversationMapper {
   public static toDomain(
-    conversationModel: ConversationDocument
+    conversationModel: ConversationDocument,
   ): Conversation {
     return {
       _id: conversationModel._id.toString(),
@@ -17,7 +17,7 @@ export class ConversationMapper {
     const persistenceConversation: any = {
       ...conversation,
       participants: conversation.participants?.map(
-        (id) => new Types.ObjectId(id)
+        (id) => new Types.ObjectId(id),
       ),
     };
 
@@ -30,12 +30,12 @@ export class ConversationMapper {
 
   public static toListView(conversation: any): ConversationListDto {
     return {
-      _id: conversation._id?.toString(),
+      participantId: conversation._id?.toString(),
       conversationId: conversation.conversationId?.toString(),
       username: conversation.username,
       firstname: conversation.firstname,
       lastname: conversation.lastname,
-      image: conversation.image,
+      imageUrl: conversation.imageUrl,
       unread: conversation.unread || 0,
       lastMessageTime: conversation.lastMessageTime,
       type: "conversation",

@@ -5,9 +5,5 @@ export interface UserCompactProfile {
   firstname: string;
   lastname?: string;
   imageUrl?: string;
-  email?: string;
-  mobile?: string;
-  dob?: Date;
-  gender?: "f" | "m";
   isFollowing?: boolean;
 }
