@@ -15,7 +15,7 @@ const ChatList = () => {
   const handleIncomeMessage = useCallback(
     async (newMessage: MessageType) => {
       let chat: ChatUserDataType | undefined = chats.find(
-        (chat) => chat.username === newMessage.from
+        (chat) => chat.username === newMessage.from,
       );
 
       if (chat) {
@@ -29,25 +29,25 @@ const ChatList = () => {
         } else newChat.unread = (newChat.unread || 0) + 1;
 
         const remaining = chats.filter(
-          (chat) => chat.username !== newMessage.from
+          (chat) => chat.username !== newMessage.from,
         );
         return setChats([newChat, ...remaining]);
       }
     },
-    [chats, setChats]
+    [chats, setChats],
   );
 
   const handleNewConversation = useCallback(
     (conversation: ChatUserDataType) => {
-      const isExist = chats.find((chat) => chat._id === conversation._id);
+      const isExist = chats.find((chat) => chat.userId === conversation.userId);
       if (isExist) return;
 
       setChats((prevState) => [conversation, ...prevState]);
       setSuggested((prevState) =>
-        prevState.filter((chat) => chat._id !== conversation._id)
+        prevState.filter((chat) => chat.userId !== conversation.userId),
       );
     },
-    [chats, setChats, setSuggested]
+    [chats, setChats, setSuggested],
   );
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const ChatList = () => {
             chat.unread = 0;
           }
           return chat;
-        })
+        }),
       );
     }
   }, [location.pathname]);
@@ -92,18 +92,18 @@ const ChatList = () => {
             {chats.length ? (
               chats.map((chat) => (
                 <ChatItem
-                  key={chat._id}
+                  key={chat.userId}
                   username={chat.username}
-                  image={chat.image}
+                  image={chat.imageUrl}
                   unread={chat.unread}
                   onClick={() => {
                     setChats((prevState) =>
                       prevState.map((chatState) => {
-                        if (chatState._id === chat._id) {
+                        if (chatState.userId === chat.userId) {
                           chatState.unread = 0;
                         }
                         return chatState;
-                      })
+                      }),
                     );
                   }}
                 />
@@ -123,9 +123,9 @@ const ChatList = () => {
           <div className="flex flex-col gap-2 mt-2" id="suggested-chats">
             {suggested.map((chat) => (
               <ChatItem
-                key={chat._id}
+                key={chat.userId}
                 username={chat.username}
-                image={chat.image}
+                image={chat.imageUrl}
               />
             ))}
           </div>

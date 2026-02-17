@@ -27,7 +27,9 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   isAdmin = false,
   handleChange,
 }) => {
-  const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
+  const myUserId = useSelector(
+    (state: RootState) => state.auth.userData?.userId,
+  );
   const { toast } = useToast();
 
   const handleDeletePost = async (userType: "user" | "admin" = "user") => {
@@ -75,7 +77,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
               state.map((post) => {
                 if (post._id === postId) post.status = newStatus;
                 return post;
-              })
+              }),
             );
           }}
         />

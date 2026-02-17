@@ -23,11 +23,13 @@ const UserListCard: React.FC<UserListCardProps> = ({
   actions,
   handleChange,
 }) => {
-  const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
+  const myUserId = useSelector(
+    (state: RootState) => state.auth.userData?.userId,
+  );
   const { toast } = useToast();
 
   const handleFollowUser = async () => {
-    const userId = userData._id;
+    const userId = userData.userId;
     function toggleFollowStatus() {
       handleChange?.((prevState: any[]) =>
         prevState.map((user) => {
@@ -35,7 +37,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
             user.isFollowing = !user.isFollowing;
           }
           return user;
-        })
+        }),
       );
     }
 
@@ -56,12 +58,12 @@ const UserListCard: React.FC<UserListCardProps> = ({
 
   return (
     <div
-      key={userData._id}
+      key={userData.userId}
       className={`flex items-center justify-between bg-[#6b728033] p-2 rounded-lg ${className}`}
     >
       <div className="flex items-center gap-1">
         <Link to={`/${userData.username}`}>
-          <ProfileImage className="w-10" profileImage={userData.image} />
+          <ProfileImage className="w-10" profileImage={userData.imageUrl} />
         </Link>
         <Link to={`/${userData.username}`}>
           <span className="text-sm font-bold line-clamp-1">
@@ -71,7 +73,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
       </div>
 
       {actions ??
-        (myUserId !== userData._id && (
+        (myUserId !== userData.userId && (
           <Button className="h-7" onClick={handleFollowUser}>
             {isFollowing ? "Unfollow" : "Follow"}
           </Button>

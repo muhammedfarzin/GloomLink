@@ -29,7 +29,7 @@ const ShareList: React.FC<Props> = ({ data }) => {
       setSentList({ ...sentList, [username]: "sharing" });
       socket?.emit("send-message", username, data);
     },
-    [socket, data]
+    [socket, data],
   );
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const ShareList: React.FC<Props> = ({ data }) => {
       {chatList.length && !loading ? (
         chatList.map((chat) => (
           <UserListCard
-            key={chat._id}
+            key={chat.userId}
             userData={chat}
             className="my-2"
             actions={

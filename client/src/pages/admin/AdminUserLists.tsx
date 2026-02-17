@@ -14,11 +14,11 @@ const AdminUserLists: React.FC = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState<string>(
-    searchParams.get("q") || ""
+    searchParams.get("q") || "",
   );
   const [loading, setLoading] = useState<string | null>(null);
   const [users, setUsers] = useState<(UserAuthState & { mobile?: string })[]>(
-    []
+    [],
   );
 
   useEffect(() => {
@@ -46,11 +46,11 @@ const AdminUserLists: React.FC = () => {
       });
       setUsers(
         users.map((user) => {
-          if (user._id === userId) {
+          if (user.userId === userId) {
             user.status = user.status === "active" ? "blocked" : "active";
           }
           return user;
-        })
+        }),
       );
     } catch (error: any) {
       toast({
@@ -112,7 +112,7 @@ const AdminUserLists: React.FC = () => {
               ]}
             >
               {users.map((user) => (
-                <tr key={user._id}>
+                <tr key={user.userId}>
                   <TableData>{user.username}</TableData>
                   <TableData>
                     {user.firstname} {user.lastname}
@@ -128,24 +128,24 @@ const AdminUserLists: React.FC = () => {
                           user.status === "active"
                             ? "block"
                             : user.status === "not-verified"
-                            ? "activate"
-                            : "unblock"
+                              ? "activate"
+                              : "unblock"
                         } ${user.username}`}
                         confirmButtonText={
                           user.status === "active"
                             ? "Block"
                             : user.status === "not-verified"
-                            ? "Activate"
-                            : "Unblock"
+                              ? "Activate"
+                              : "Unblock"
                         }
-                        onSuccess={() => blockUser(user._id)}
+                        onSuccess={() => blockUser(user.userId)}
                       >
                         <Button className="text-xs w-full">
                           {user.status === "active"
                             ? "Block"
                             : user.status === "not-verified"
-                            ? "Activate"
-                            : "Unblock"}
+                              ? "Activate"
+                              : "Unblock"}
                         </Button>
                       </ConfirmButton>
                     </div>

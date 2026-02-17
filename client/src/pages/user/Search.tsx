@@ -72,7 +72,7 @@ const Search: React.FC = () => {
             {searchResult.map((data) =>
               data.type === "user" ? (
                 <UserListCard
-                  key={data.type + data._id}
+                  key={data.type + data.userId}
                   className="w-full"
                   userData={data}
                   handleChange={setSearchResult}

@@ -14,7 +14,7 @@ const CreatePost: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { postId } = useParams();
-  const myUserId = useSelector((state: RootState) => state.auth.userData?._id);
+  const myUserId = useSelector((state: RootState) => state.auth.userData?.userId);
 
   const [caption, setCaption] = useState<string>("");
   const [images, setImages] = useState<(File | string)[]>([]);

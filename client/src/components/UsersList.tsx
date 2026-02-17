@@ -36,7 +36,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
       {users.length && !loading ? (
         users.map((user) => (
           <UserListCard
-            key={user._id}
+            key={user.userId}
             userData={user}
             className="my-2"
             handleChange={setUsers}

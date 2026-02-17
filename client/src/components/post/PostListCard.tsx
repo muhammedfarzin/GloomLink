@@ -36,11 +36,11 @@ const PostListCard: React.FC<Props> = ({
   captionLine,
   handleChange,
 }) => {
-  const authId = useSelector((state: RootState) => state.auth.userData?._id);
+  const authId = useSelector((state: RootState) => state.auth.userData?.userId);
   const { toast } = useToast();
   const { recordInteraction } = useInteraction();
   const [postDataState, setPostDataState] = useState<PostDataType | undefined>(
-    postData
+    postData,
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ const PostListCard: React.FC<Props> = ({
   const onSavePost = useCallback(
     (isSaved: boolean) =>
       postDataState && setPostDataState({ ...postDataState, isSaved }),
-    [postDataState, setPostDataState]
+    [postDataState, setPostDataState],
   );
 
   const onLikePost = useCallback(
@@ -73,7 +73,7 @@ const PostListCard: React.FC<Props> = ({
         isLiked,
         likesCount: count,
       }),
-    [postDataState, setPostDataState]
+    [postDataState, setPostDataState],
   );
 
   const handleView = useCallback(() => {
@@ -99,7 +99,6 @@ const PostListCard: React.FC<Props> = ({
               {formatTimeAgo(postDataState.createdAt)}
             </span>
           </AccountViewCard>
-
           <PostActionsDropDown
             postId={postDataState._id}
             userId={postDataState.uploadedBy._id}

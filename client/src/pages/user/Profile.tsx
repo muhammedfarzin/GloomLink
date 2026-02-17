@@ -15,11 +15,11 @@ interface ProfileProps {
 }
 
 interface UserDataType {
-  _id: string;
+  userId: string;
   username: string;
   firstname: string;
   lastname: string;
-  image?: string;
+  imageUrl?: string;
   fullname: string;
   followersCount: number;
   followingCount: number;
@@ -39,7 +39,7 @@ interface PostsType {
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const { toast } = useToast();
   const myUsername = useSelector(
-    (state: RootState) => state.auth.userData?.username
+    (state: RootState) => state.auth.userData?.username,
   );
   const { username } = useParams();
   const [userData, setUserData] = useState<UserDataType>();
@@ -68,7 +68,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const handleFollow = async () => {
     try {
       setIsFollowing(!isFollowing);
-      if (userData) await apiClient.post(`/profile/follow/${userData._id}`);
+      if (userData) await apiClient.post(`/profile/follow/${userData.userId}`);
     } catch (error: any) {
       setIsFollowing(isFollowing);
       toast({
@@ -92,7 +92,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
           <div className="border border-border bg-secondary rounded-lg md:rounded-2xl mt-8 p-4 md:p-8">
             <div className="flex gap-4 md:gap-8 max-h-16 items-center">
               <ProfileImage
-                profileImage={userData.image}
+                profileImage={userData.imageUrl}
                 className="min-w-12"
               />
               <div className="flex justify-between w-full">
@@ -109,12 +109,12 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
                 </div>
                 <div className="flex justify-around w-2/3">
                   <FollowDialogButton
-                    userId={userData._id}
+                    userId={userData.userId}
                     followCount={userData?.followersCount}
                     type="followers"
                   />
                   <FollowDialogButton
-                    userId={userData._id}
+                    userId={userData.userId}
                     followCount={userData?.followingCount}
                     type="following"
                   />

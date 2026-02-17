@@ -26,7 +26,7 @@ const EditProfile: React.FC = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
-  const [image, setImage] = useState<File | string>();
+  const [imageUrl, setImageUrl] = useState<File | string>();
   const [cropimage, setCropImage] = useState<string | ArrayBuffer | null>(null);
   const [authType, setAuthType] = useState<string>("email");
   const [formData, setFormData] = useState<EditProfileFormType>({
@@ -47,11 +47,11 @@ const EditProfile: React.FC = () => {
     apiClient
       .get("/profile/form")
       .then((response) => {
-        const { dob, gender, image, authType, ...userData } =
+        const { dob, gender, imageUrl, authType, ...userData } =
           response.data.userData;
         setDob(dob);
-        setGender(gender);
-        setImage(image);
+        setGender(gender);console.log(imageUrl)
+        setImageUrl(imageUrl);
         setFormData({ ...formData, ...userData });
         setAuthType(authType);
       })
@@ -98,7 +98,7 @@ const EditProfile: React.FC = () => {
           const file = new File([blob], "profile.jpg", {
             type: "image/jpg",
           });
-          setImage(file);
+          setImageUrl(file);
         }
       });
     }
@@ -117,7 +117,7 @@ const EditProfile: React.FC = () => {
 
       const formDatas = new FormData();
 
-      if (image instanceof File) formDatas.append("image", image);
+      if (imageUrl instanceof File) formDatas.append("image", imageUrl);
       if (dob) formDatas.append("dob", dob.toString());
       if (gender) formDatas.append("gender", gender);
 
@@ -151,7 +151,9 @@ const EditProfile: React.FC = () => {
           <ProfileImage
             className="cursor-pointer w-3/4 !max-w-36"
             profileImage={
-              image instanceof File ? URL.createObjectURL(image) : image
+              imageUrl instanceof File
+                ? URL.createObjectURL(imageUrl)
+                : imageUrl
             }
             onClick={() => imageInputRef.current?.click()}
           />

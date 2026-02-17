@@ -1,9 +1,9 @@
 export interface UserDataType {
-  _id: string;
+  userId: string;
   username: string;
   firstname: string;
   lastname: string;
-  image?: string;
+  imageUrl?: string;
   isFollowing?: boolean;
 }
 
