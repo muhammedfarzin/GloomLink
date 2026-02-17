@@ -6,6 +6,7 @@ import { PasswordHash } from "../value-objects/PasswordHash";
 import { Url } from "../value-objects/Url";
 import { UserGender } from "../value-objects/UserGender";
 import { Username } from "../value-objects/Username";
+import { UserStatus, type UserStatusType } from "../value-objects/UserStatus";
 
 export class User {
   private readonly userId: string;
@@ -16,7 +17,7 @@ export class User {
   private email: Email;
   private mobile: MobileNumber | undefined;
   private readonly authType: "email" | "google";
-  private status: "active" | "inactive" | "blocked" | "not-verified";
+  private status: UserStatus;
   private imageUrl: Url | null;
   private gender: UserGender | undefined;
   private dob: DateOfBirth | undefined;
@@ -31,7 +32,7 @@ export class User {
     this.lastname = userParams.lastname ?? "";
     this.email = new Email(userParams.email);
     this.authType = userParams.authType;
-    this.status = userParams.status;
+    this.status = new UserStatus(userParams.status);
     this.passwordHash = new PasswordHash(userParams.passwordHash);
     this.blockedUsers = new Set(userParams.blockedUsers ?? []);
     this.savedPosts = new Set(userParams.savedPosts ?? []);
@@ -86,7 +87,7 @@ export class User {
   }
 
   updateStatus(status: UserType["status"]) {
-    this.status = status;
+    this.status = new UserStatus(status);
   }
 
   // ---------- Collection Setters -----------
@@ -149,7 +150,7 @@ export class User {
   }
 
   getStatus(): UserType["status"] {
-    return this.status;
+    return this.status.getValue();
   }
 
   getGender(): UserType["gender"] {
@@ -181,15 +182,15 @@ export class User {
   // --------- Boolean helpers ---------
 
   isActive(): boolean {
-    return this.status === "active";
+    return this.status.getValue() === "active";
   }
 
   isBlocked(): boolean {
-    return this.status === "blocked";
+    return this.status.getValue() === "blocked";
   }
 
   isVerified(): boolean {
-    return this.status !== "not-verified";
+    return this.status.getValue() !== "not-verified";
   }
 
   hasBlocked(userId: string): boolean {
@@ -210,7 +211,7 @@ interface UserType {
   email: string;
   mobile?: string;
   authType: "email" | "google";
-  status: "active" | "inactive" | "blocked" | "not-verified";
+  status: UserStatusType;
   imageUrl?: string;
   gender?: "m" | "f";
   dob?: Date;

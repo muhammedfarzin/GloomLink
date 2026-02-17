@@ -4,7 +4,6 @@ import type {
   UserListViewDto,
   UserProfileResponseDto,
 } from "../../application/dtos/UserDto";
-import type { UserCompactProfile } from "../models/UserCompactProfile";
 
 export interface IUserRepository {
   create: (user: User) => Promise<User>;
