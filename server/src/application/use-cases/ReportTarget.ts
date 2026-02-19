@@ -1,6 +1,5 @@
 import { injectable, inject } from "inversify";
 import { User } from "../../domain/entities/User";
-import { Post } from "../../domain/entities/Post";
 import { IReportRepository } from "../../domain/repositories/IReportRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
@@ -10,6 +9,7 @@ import {
   IReportTarget,
   type ReportTargetInput,
 } from "../../domain/use-cases/IReportTarget";
+import { Report } from "../../domain/entities/Report";
 
 const REPORT_THRESHOLD = 5;
 
@@ -40,7 +40,12 @@ export class ReportTarget implements IReportTarget {
     }
 
     // ---Creating report---
-    await this.reportRepository.create(input);
+    const reportToCreate = new Report({
+      ...input,
+      reportId: crypto.randomUUID(),
+    });
+
+    await this.reportRepository.create(reportToCreate);
 
     // ---Check Report Count and Block if Necessary---
     const reportCount = await this.reportRepository.countByTarget(targetId);
