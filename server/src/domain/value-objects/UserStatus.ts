@@ -6,6 +6,7 @@ export class UserStatus {
       case "blocked":
       case "not-verified":
         this.value = value;
+        break;
       default:
         throw new Error("Invalid user status");
     }
