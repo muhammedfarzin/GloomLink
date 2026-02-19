@@ -40,8 +40,8 @@ export class EditPost implements IEditPost {
     post.updateCaption(input.caption);
     post.updateTags(input.tags);
     post.updatePublishedFor(input.publishedFor);
-    removedFiles.forEach(post.removeImage);
-    newImageUrls.forEach(post.addImage);
+    removedFiles.forEach((imgUrl) => post.removeImage(imgUrl));
+    newImageUrls.forEach((imgUrl) => post.addImage(imgUrl));
 
     const updatedPost = await this.postRepository.update(postId, post);
 

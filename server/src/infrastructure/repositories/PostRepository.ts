@@ -111,7 +111,6 @@ export class PostRepository implements IPostRepository {
           likes: 0,
           comments: 0,
           currentUserInfo: 0,
-          publishedFor: 0,
           status: 0,
         },
       },

@@ -4,12 +4,12 @@ export interface PostCompact {
   caption?: string | null;
   images?: string[];
   tags?: string[];
+  publishedFor: "public" | "subscriber";
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface PostType extends PostCompact {
-  publishedFor: "public" | "subscriber";
   status: "active" | "blocked" | "deleted";
 }
 
