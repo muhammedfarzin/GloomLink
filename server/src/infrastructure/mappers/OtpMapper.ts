@@ -1,24 +1,17 @@
-import { Types } from "mongoose";
 import { Otp } from "../../domain/entities/Otp";
-import { OtpDocument } from "../database/models/OtpModel";
+import { OtpType } from "../../domain/models/Otp";
 
 export class OtpMapper {
-  public static toDomain(otpModel: OtpDocument): Otp {
-    const otpObject = otpModel.toObject<OtpDocument>();
-
-    return {
-      ...otpObject,
-      _id: otpObject._id.toString(),
-    };
+  public static toDomain(otp: OtpType): Otp {
+    return new Otp(otp);
   }
 
-  public static toPersistence(otp: Partial<Otp>): any {
-    const persistenceOtp: any = { ...otp };
-
-    if (otp._id) {
-      persistenceOtp._id = new Types.ObjectId(otp._id);
-    }
-
-    return persistenceOtp;
+  public static toPersistence(otp: Otp): OtpType {
+    return {
+      otpId: otp.getId(),
+      email: otp.getEmail(),
+      hashedOtp: otp.getHashedOtp(),
+      createdAt: otp.getCreatedAt(),
+    };
   }
 }

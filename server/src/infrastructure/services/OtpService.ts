@@ -1,14 +1,17 @@
 import { inject, injectable } from "inversify";
 import otpGenerator from "otp-generator";
-import { IOtpService } from "../../domain/services/IOtpService";
-import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
-import { BcryptPasswordHasher } from "./BcryptPasswordHasher";
 import { TYPES } from "../../shared/types";
+import { Otp } from "../../domain/entities/Otp";
+
+import type { IOtpRepository } from "../../domain/repositories/IOtpRepository";
+import type { IOtpService } from "../../domain/services/IOtpService";
+import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 
 @injectable()
 export class OtpService implements IOtpService {
   constructor(
-    @inject(TYPES.IOtpRepository) private otpRepository: IOtpRepository
+    @inject(TYPES.IOtpRepository) private otpRepository: IOtpRepository,
+    @inject(TYPES.IPasswordHasher) private passwordHasher: IPasswordHasher,
   ) {}
 
   async generate(email: string): Promise<string> {
@@ -18,13 +21,14 @@ export class OtpService implements IOtpService {
       specialChars: false,
     });
 
-    const passwordHasher = new BcryptPasswordHasher();
-    const hashedOtp = await passwordHasher.hash(otp);
-
-    await this.otpRepository.save({
+    const hashedOtp = await this.passwordHasher.hash(otp);
+    const otpToCreate = new Otp({
+      otpId: crypto.randomUUID(),
       email,
-      otp: hashedOtp,
+      hashedOtp,
     });
+
+    await this.otpRepository.create(otpToCreate);
 
     return otp;
   }

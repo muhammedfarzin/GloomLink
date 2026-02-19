@@ -1,28 +1,36 @@
 import { injectable } from "inversify";
 import { IOtpRepository } from "../../domain/repositories/IOtpRepository";
-import { OtpModel } from "../database/models/OtpModel";
+import { OtpDocument, OtpModel } from "../database/models/OtpModel";
 import { Otp } from "../../domain/entities/Otp";
 import { OtpMapper } from "../mappers/OtpMapper";
+import { OtpType } from "../../domain/models/Otp";
 
 @injectable()
 export class OtpRepository implements IOtpRepository {
-  async save(
-    otpData: Pick<Otp, "email" | "otp"> & Partial<Omit<Otp, "email" | "otp">>
-  ): Promise<Otp> {
-    await OtpModel.findOneAndDelete({ email: otpData.email });
+  async create(otp: Otp): Promise<Otp> {
+    const { createdAt, otpId, ...otpToPersist } = OtpMapper.toPersistence(otp);
+    await OtpModel.findOneAndDelete({ email: otpToPersist.email });
 
-    const otpToPersist = OtpMapper.toPersistence(otpData);
     const newOtpModel = new OtpModel(otpToPersist);
     const savedOtp = await newOtpModel.save();
-    return OtpMapper.toDomain(savedOtp);
+    return OtpMapper.toDomain(this.safeParseOtpDoc(savedOtp));
   }
 
   async findByEmail(email: string): Promise<Otp | null> {
     const otpModel = await OtpModel.findOne({ email });
-    return otpModel ? OtpMapper.toDomain(otpModel) : null;
+    return otpModel ? OtpMapper.toDomain(this.safeParseOtpDoc(otpModel)) : null;
   }
 
-  async delete(email: string): Promise<void> {
-    await OtpModel.deleteOne({ email });
+  async delete(email: string): Promise<boolean> {
+    const deletedOtp = await OtpModel.deleteOne({ email });
+    return deletedOtp.acknowledged;
+  }
+
+  private safeParseOtpDoc(otpDoc: OtpDocument): OtpType {
+    const { _id: otpId, ...otpObj } = otpDoc.toObject();
+    return {
+      ...otpObj,
+      otpId: otpId.toString(),
+    };
   }
 }

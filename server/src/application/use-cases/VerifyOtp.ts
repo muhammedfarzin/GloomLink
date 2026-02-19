@@ -28,7 +28,10 @@ export class VerifyOtp implements IVerifyOtp {
       );
     }
 
-    const isMatch = await this.passwordHasher.compare(input.otp, storedOtp.otp);
+    const isMatch = await this.passwordHasher.compare(
+      input.otp,
+      storedOtp.getHashedOtp(),
+    );
 
     if (!isMatch) {
       throw new HttpError(400, "Invalid OTP provided.");
