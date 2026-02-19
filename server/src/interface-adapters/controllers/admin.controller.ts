@@ -4,22 +4,22 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
 import { TYPES } from "../../shared/types";
 
-import type { TogglePostStatus } from "../../application/use-cases/TogglePostStatus";
-import type { GetAdminPosts } from "../../application/use-cases/GetAdminPosts";
-import type { GetAdminUsers } from "../../application/use-cases/GetAdminUsers";
-import type { ToggleUserStatus } from "../../application/use-cases/ToggleUserStatus";
+import type { IGetAdminUsers } from "../../domain/use-cases/IGetAdminUsers";
+import type { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
+import type { IGetAdminPosts } from "../../domain/use-cases/IGetAdminPosts";
+import type { ITogglePostStatus } from "../../domain/use-cases/ITogglePostStatus";
 
 import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
 
 @injectable()
 export class AdminController {
   constructor(
-    @inject(TYPES.IGetAdminUsers) private getAdminUsersUseCase: GetAdminUsers,
+    @inject(TYPES.IGetAdminUsers) private getAdminUsersUseCase: IGetAdminUsers,
     @inject(TYPES.IToggleUserStatus)
-    private toggleUserStatusUseCase: ToggleUserStatus,
-    @inject(TYPES.IGetAdminPosts) private getAdminPostsUseCase: GetAdminPosts,
+    private toggleUserStatusUseCase: IToggleUserStatus,
+    @inject(TYPES.IGetAdminPosts) private getAdminPostsUseCase: IGetAdminPosts,
     @inject(TYPES.ITogglePostStatus)
-    private togglePostStatusUseCase: TogglePostStatus,
+    private togglePostStatusUseCase: ITogglePostStatus,
   ) {}
 
   getUsers: RequestHandler = async (req, res, next) => {

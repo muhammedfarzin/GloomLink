@@ -3,14 +3,14 @@ import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 
-import type { ReportTarget } from "../../application/use-cases/ReportTarget";
+import type { IReportTarget } from "../../domain/use-cases/IReportTarget";
 
 import { reportTargetSchema } from "../validation/reportSchemas";
 
 @injectable()
 export class ReportController {
   constructor(
-    @inject(TYPES.IReportTarget) private reportTargetUseCase: ReportTarget,
+    @inject(TYPES.IReportTarget) private reportTargetUseCase: IReportTarget,
   ) {}
 
   reportTarget: RequestHandler = async (req, res, next) => {

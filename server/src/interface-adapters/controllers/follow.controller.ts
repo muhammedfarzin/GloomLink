@@ -4,16 +4,16 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
 import { TYPES } from "../../shared/types";
 
-import type { GetFollowList } from "../../application/use-cases/GetFollowList";
-import type { ToggleFollow } from "../../application/use-cases/ToggleFollow";
+import type { IGetFollowList } from "../../domain/use-cases/IGetFollowList";
+import type { IToggleFollow } from "../../domain/use-cases/IToggleFollow";
 
 import { getFollowListSchema } from "../validation/followSchemas";
 
 @injectable()
 export class FollowController {
   constructor(
-    @inject(TYPES.IGetFollowList) private getFollowListUseCase: GetFollowList,
-    @inject(TYPES.IToggleFollow) private toggleFollowUseCase: ToggleFollow,
+    @inject(TYPES.IGetFollowList) private getFollowListUseCase: IGetFollowList,
+    @inject(TYPES.IToggleFollow) private toggleFollowUseCase: IToggleFollow,
   ) {}
 
   getFollowers: RequestHandler = async (req, res, next) => {

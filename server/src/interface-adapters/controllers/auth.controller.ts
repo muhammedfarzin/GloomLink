@@ -7,13 +7,13 @@ import { TYPES } from "../../shared/types";
 import type { ITokenService } from "../../domain/services/ITokenService";
 import type { IExternalAuthService } from "../../domain/services/IExternalAuthService";
 
-import type { VerifyOtp } from "../../application/use-cases/VerifyOtp";
-import type { LoginUser } from "../../application/use-cases/LoginUser";
-import type { SignInWithGoogle } from "../../application/use-cases/SignInWithGoogle";
-import type { RefreshToken } from "../../application/use-cases/RefreshToken";
-import type { AdminLogin } from "../../application/use-cases/AdminLogin";
-import type { CreateUser } from "../../application/use-cases/CreateUser";
-import type { SendVerificationEmail } from "../../application/use-cases/SendVerificationEmail";
+import type { ICreateUser } from "../../domain/use-cases/ICreateUser";
+import type { ILoginUser } from "../../domain/use-cases/ILoginUser";
+import type { ISignInWithGoogle } from "../../domain/use-cases/ISignInWithGoogle";
+import type { ISendVerificationEmail } from "../../domain/use-cases/ISendVerificationEmail";
+import type { IVerifyOtp } from "../../domain/use-cases/IVerifyOtp";
+import type { IRefreshToken } from "../../domain/use-cases/IRefreshToken";
+import type { IAdminLogin } from "../../domain/use-cases/IAdminLogin";
 
 import {
   adminLoginInputSchema,
@@ -26,15 +26,15 @@ import {
 
 export class AuthController {
   constructor(
-    @inject(TYPES.ICreateUser) private createUserUseCase: CreateUser,
-    @inject(TYPES.ILoginUser) private loginUserUseCase: LoginUser,
+    @inject(TYPES.ICreateUser) private createUserUseCase: ICreateUser,
+    @inject(TYPES.ILoginUser) private loginUserUseCase: ILoginUser,
     @inject(TYPES.ISignInWithGoogle)
-    private signInWithGoogleUseCase: SignInWithGoogle,
+    private signInWithGoogleUseCase: ISignInWithGoogle,
     @inject(TYPES.ISendVerificationEmail)
-    private sendVerificationEmailUseCase: SendVerificationEmail,
-    @inject(TYPES.IVerifyOtp) private verifyOtpUseCase: VerifyOtp,
-    @inject(TYPES.IRefreshToken) private refreshTokenUseCase: RefreshToken,
-    @inject(TYPES.IAdminLogin) private adminLoginUseCase: AdminLogin,
+    private sendVerificationEmailUseCase: ISendVerificationEmail,
+    @inject(TYPES.IVerifyOtp) private verifyOtpUseCase: IVerifyOtp,
+    @inject(TYPES.IRefreshToken) private refreshTokenUseCase: IRefreshToken,
+    @inject(TYPES.IAdminLogin) private adminLoginUseCase: IAdminLogin,
     @inject(TYPES.ITokenService) private tokenService: ITokenService,
     @inject(TYPES.IExternalAuthService)
     private externalAuthService: IExternalAuthService,

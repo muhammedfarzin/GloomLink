@@ -3,14 +3,14 @@ import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 
-import { SearchContent } from "../../application/use-cases/SearchContent";
+import { ISearchContent } from "../../domain/use-cases/ISearchContent";
 
 import { searchSchema } from "../validation/searchSchemas";
 
 @injectable()
 export class SearchController {
   constructor(
-    @inject(TYPES.ISearchContent) private searchContentUseCase: SearchContent,
+    @inject(TYPES.ISearchContent) private searchContentUseCase: ISearchContent,
   ) {}
 
   search: RequestHandler = async (req, res, next) => {

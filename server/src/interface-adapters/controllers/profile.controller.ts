@@ -4,9 +4,9 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 import { TYPES } from "../../shared/types";
 
-import type { GetUserProfile } from "../../application/use-cases/GetUserProfile";
-import type { FetchUser } from "../../application/use-cases/FetchUser";
-import type { UpdateProfile } from "../../application/use-cases/UpdateProfile";
+import type { IGetUserProfile } from "../../domain/use-cases/IGetUserProfile";
+import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
+import type { IUpdateProfile } from "../../domain/use-cases/IUpdateProfile";
 
 import { updateProfileSchema } from "../validation/profileSchemas";
 
@@ -14,10 +14,10 @@ import { updateProfileSchema } from "../validation/profileSchemas";
 export class ProfileController {
   constructor(
     @inject(TYPES.IGetUserProfile)
-    private getUserProfileUseCase: GetUserProfile,
+    private getUserProfileUseCase: IGetUserProfile,
     @inject(TYPES.IFetchUser)
-    private fetchUserUseCase: FetchUser,
-    @inject(TYPES.IUpdateProfile) private updateProfileUseCase: UpdateProfile,
+    private fetchUserUseCase: IFetchUser,
+    @inject(TYPES.IUpdateProfile) private updateProfileUseCase: IUpdateProfile,
   ) {}
 
   getUserProfile: RequestHandler = async (req, res, next) => {

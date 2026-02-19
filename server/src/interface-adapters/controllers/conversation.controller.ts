@@ -4,10 +4,10 @@ import { getMessagesSchema } from "../validation/followSchemas";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 
-import type { GetConversations } from "../../application/use-cases/GetConversations";
-import type { CreateConversation } from "../../application/use-cases/CreateConversation";
-import type { GetConversationId } from "../../application/use-cases/GetConversationId";
-import type { GetMessages } from "../../application/use-cases/GetMessages";
+import type { ICreateConversation } from "../../domain/use-cases/ICreateConversation";
+import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
+import type { IGetConversationId } from "../../domain/use-cases/IGetConversationId";
+import type { IGetMessages } from "../../domain/use-cases/IGetMessages";
 
 import { createConversationSchema } from "../validation/conversationSchemas";
 
@@ -15,12 +15,12 @@ import { createConversationSchema } from "../validation/conversationSchemas";
 export class ConversationController {
   constructor(
     @inject(TYPES.ICreateConversation)
-    private createConversationUseCase: CreateConversation,
+    private createConversationUseCase: ICreateConversation,
     @inject(TYPES.IGetConversations)
-    private getConversationsUseCase: GetConversations,
+    private getConversationsUseCase: IGetConversations,
     @inject(TYPES.IGetConversationId)
-    private getConversationIdUseCase: GetConversationId,
-    @inject(TYPES.IGetMessages) private getMessagesUseCase: GetMessages,
+    private getConversationIdUseCase: IGetConversationId,
+    @inject(TYPES.IGetMessages) private getMessagesUseCase: IGetMessages,
   ) {}
 
   createConversation: RequestHandler = async (req, res, next) => {

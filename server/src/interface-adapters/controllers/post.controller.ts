@@ -4,31 +4,31 @@ import { HttpError } from "../../infrastructure/errors/HttpError";
 import { recordInteractionSchema } from "../validation/interactionSchemas";
 import { TYPES } from "../../shared/types";
 
-import type { CreatePost } from "../../application/use-cases/CreatePost";
-import type { GetPostById } from "../../application/use-cases/GetPostById";
-import type { GetSavedPosts } from "../../application/use-cases/GetSavedPosts";
-import type { ToggleSavePost } from "../../application/use-cases/ToggleSavePost";
-import type { EditPost } from "../../application/use-cases/EditPost";
-import type { DeletePost } from "../../application/use-cases/DeletePost";
-import type { RecordInteraction } from "../../application/use-cases/RecordInteraction";
-import type { GetRecommendedPosts } from "../../application/use-cases/GetRecommendedPosts";
+import type { ICreatePost } from "../../domain/use-cases/ICreatePost";
+import type { IGetPostById } from "../../domain/use-cases/IGetPostById";
+import type { IGetSavedPosts } from "../../domain/use-cases/IGetSavedPosts";
+import type { IToggleSavePost } from "../../domain/use-cases/IToggleSavePost";
+import type { IEditPost } from "../../domain/use-cases/IEditPost";
+import type { IDeletePost } from "../../domain/use-cases/IDeletePost";
+import type { IRecordInteraction } from "../../domain/use-cases/IRecordInteraction";
+import type { IGetRecommendedPosts } from "../../domain/use-cases/IGetRecommendedPosts";
 
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
 
 @injectable()
 export class PostController {
   constructor(
-    @inject(TYPES.ICreatePost) private createPostUseCase: CreatePost,
-    @inject(TYPES.IEditPost) private editPostUseCase: EditPost,
-    @inject(TYPES.IGetSavedPosts) private getSavedPostsUseCase: GetSavedPosts,
+    @inject(TYPES.ICreatePost) private createPostUseCase: ICreatePost,
+    @inject(TYPES.IEditPost) private editPostUseCase: IEditPost,
+    @inject(TYPES.IGetSavedPosts) private getSavedPostsUseCase: IGetSavedPosts,
     @inject(TYPES.IToggleSavePost)
-    private toggleSavePostUseCase: ToggleSavePost,
-    @inject(TYPES.IGetPostById) private getPostByIdUseCase: GetPostById,
+    private toggleSavePostUseCase: IToggleSavePost,
+    @inject(TYPES.IGetPostById) private getPostByIdUseCase: IGetPostById,
     @inject(TYPES.IGetRecommendedPosts)
-    private getRecommendedPostsUseCase: GetRecommendedPosts,
-    @inject(TYPES.IDeletePost) private deletePostUseCase: DeletePost,
+    private getRecommendedPostsUseCase: IGetRecommendedPosts,
+    @inject(TYPES.IDeletePost) private deletePostUseCase: IDeletePost,
     @inject(TYPES.IRecordInteraction)
-    private recordInteractionUseCase: RecordInteraction,
+    private recordInteractionUseCase: IRecordInteraction,
   ) {}
 
   createPost: RequestHandler = async (req, res, next) => {

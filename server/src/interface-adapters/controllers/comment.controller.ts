@@ -3,9 +3,9 @@ import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 
-import type { AddComment } from "../../application/use-cases/AddComment";
-import type { GetComments } from "../../application/use-cases/GetComments";
-import type { RecordInteraction } from "../../application/use-cases/RecordInteraction";
+import type { IAddComment } from "../../domain/use-cases/IAddComment";
+import type { IGetComments } from "../../domain/use-cases/IGetComments";
+import type { IRecordInteraction } from "../../domain/use-cases/IRecordInteraction";
 
 import {
   addCommentSchema,
@@ -15,10 +15,10 @@ import {
 @injectable()
 export class CommentController {
   constructor(
-    @inject(TYPES.IAddComment) private addCommentUseCase: AddComment,
-    @inject(TYPES.IGetComments) private getCommentsUseCase: GetComments,
+    @inject(TYPES.IAddComment) private addCommentUseCase: IAddComment,
+    @inject(TYPES.IGetComments) private getCommentsUseCase: IGetComments,
     @inject(TYPES.IRecordInteraction)
-    private recordInteractionUseCase: RecordInteraction,
+    private recordInteractionUseCase: IRecordInteraction,
   ) {}
 
   addComment: RequestHandler = async (req, res, next) => {

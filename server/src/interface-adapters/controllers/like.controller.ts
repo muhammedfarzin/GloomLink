@@ -3,9 +3,9 @@ import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 
-import type { GetLikedUsers } from "../../application/use-cases/GetLikedUsers";
-import type { ToggleLike } from "../../application/use-cases/ToggleLike";
-import type { RecordInteraction } from "../../application/use-cases/RecordInteraction";
+import type { IGetLikedUsers } from "../../domain/use-cases/IGetLikedUsers";
+import type { IToggleLike } from "../../domain/use-cases/IToggleLike";
+import type { IRecordInteraction } from "../../domain/use-cases/IRecordInteraction";
 
 import {
   getLikedUsersSchema,
@@ -15,10 +15,10 @@ import {
 @injectable()
 export class LikeController {
   constructor(
-    @inject(TYPES.IGetLikedUsers) private getLikedUsersUseCase: GetLikedUsers,
-    @inject(TYPES.IToggleLike) private toggleLikeUseCase: ToggleLike,
+    @inject(TYPES.IGetLikedUsers) private getLikedUsersUseCase: IGetLikedUsers,
+    @inject(TYPES.IToggleLike) private toggleLikeUseCase: IToggleLike,
     @inject(TYPES.IRecordInteraction)
-    private recordInteractionUseCase: RecordInteraction,
+    private recordInteractionUseCase: IRecordInteraction,
   ) {}
 
   getLikedUsers: RequestHandler = async (req, res, next) => {
