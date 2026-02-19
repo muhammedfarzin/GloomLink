@@ -11,7 +11,7 @@ import type {
   UserStatus,
 } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
-import type { EnrichedPost } from "../../domain/repositories/IPostRepository";
+import type { EnrichedPost } from "../../domain/models/Post";
 import type {
   UserDto,
   UserListViewDto,
@@ -151,6 +151,8 @@ export class UserRepository implements IUserRepository {
                 pipeline: [
                   {
                     $project: {
+                      userId: "$_id",
+                      _id: 0,
                       username: 1,
                       firstname: 1,
                       lastname: 1,
@@ -163,13 +165,14 @@ export class UserRepository implements IUserRepository {
             { $unwind: "$uploadedBy" },
             {
               $addFields: {
-                likeCount: { $size: "$likes" },
-                commentCount: { $size: "$comments" },
+                postId: "$_id",
+                likesCount: { $size: "$likes" },
+                commentsCount: { $size: "$comments" },
                 isLiked: { $in: [userObjectId, "$likes.userId"] },
                 isSaved: true,
               },
             },
-            { $project: { likes: 0, comments: 0 } },
+            { $project: { _id: 0, likes: 0, comments: 0 } },
           ],
         },
       },
@@ -177,10 +180,7 @@ export class UserRepository implements IUserRepository {
     ];
 
     const results = await UserModel.aggregate(aggregationPipeline);
-
-    return results[0].savedPostsData.map((post: any) =>
-      PostMapper.toResponse(post),
-    );
+    return results[0].savedPostsData.map(PostMapper.toResponse);
   }
 
   async savePost(userId: string, postId: string): Promise<void> {

@@ -1,5 +1,5 @@
 import type { User } from "../entities/User";
-import type { EnrichedPost } from "./IPostRepository";
+import type { EnrichedPost } from "../models/Post";
 import type {
   UserListViewDto,
   UserProfileResponseDto,

@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { EnrichedPost } from "../../domain/repositories/IPostRepository";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { EnrichedPost } from "../../domain/models/Post";
 import { TYPES } from "../../shared/types";
 import {
   IGetSavedPosts,

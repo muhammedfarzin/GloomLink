@@ -1,5 +1,5 @@
-import type { Post } from "../../domain/entities/Post";
-import { UserCompactProfile } from "../../domain/models/UserCompactProfile";
+import type { PostCompact } from "../../domain/models/Post";
+import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
 
 type AuthType = "email" | "google";
 type UserStatus = "active" | "inactive" | "blocked" | "not-verified";
@@ -20,7 +20,7 @@ export interface UserWithAuthDto extends UserBasicDto {
 }
 
 export interface UserProfileResponseDto extends UserCompactProfile {
-  posts: Omit<Post, "tags">[];
+  posts: Omit<PostCompact, "tags">[];
   followersCount: number;
   followingCount: number;
   isFollowing?: boolean;

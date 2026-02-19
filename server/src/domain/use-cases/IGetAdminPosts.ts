@@ -1,4 +1,4 @@
-import { EnrichedPost } from "../repositories/IPostRepository";
+import type { EnrichedPost } from "../models/Post";
 
 export interface IGetAdminPosts {
   execute(input: GetAdminPostsInput): Promise<EnrichedPost[]>;

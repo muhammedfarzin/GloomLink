@@ -1,28 +1,13 @@
 import { Post } from "../entities/Post";
-
-export type EnrichedPost = Post & {
-  likesCount: number;
-  commentsCount: number;
-  isLiked: boolean;
-  isSaved: boolean;
-  reportCount?: number;
-  uploadedBy: {
-    _id: string;
-    username: string;
-    firstname: string;
-    lastname: string;
-    image?: string;
-  };
-  type: "post";
-};
+import type { EnrichedPost } from "../models/Post";
 
 export interface IPostRepository {
-  create(postData: Partial<Post>): Promise<Post>;
+  create(post: Post): Promise<Post>;
   findById(id: string): Promise<Post | null>;
   findByIds(ids: string[]): Promise<Post[]>;
   findEnrichedById(
     postId: string,
-    userId: string
+    userId: string,
   ): Promise<EnrichedPost | null>;
   findAndSortFeed(options: {
     userId: string;
@@ -45,13 +30,13 @@ export interface IPostRepository {
       limit: number;
       searchQuery?: string;
       withReports?: boolean;
-    }
+    },
   ): Promise<EnrichedPost[]>;
   findReported(options: {
     page: number;
     limit: number;
     searchQuery?: string;
   }): Promise<EnrichedPost[]>;
-  update(postId: string, postData: Partial<Post>): Promise<Post | null>;
+  update(postId: string, post: Post): Promise<Post | null>;
   deleteById(postId: string): Promise<void>;
 }

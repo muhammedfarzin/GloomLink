@@ -1,12 +1,10 @@
 import { injectable } from "inversify";
-import {
-  EnrichedPost,
-  IPostRepository,
-} from "../../domain/repositories/IPostRepository";
 import { Post } from "../../domain/entities/Post";
 import { PostMapper } from "../mappers/PostMapper";
-import { PostModel } from "../database/models/PostModel";
-import mongoose, { PipelineStage } from "mongoose";
+import mongoose, { type PipelineStage } from "mongoose";
+import { type PostDocument, PostModel } from "../database/models/PostModel";
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type { EnrichedPost, PostType } from "../../domain/models/Post";
 
 @injectable()
 export class PostRepository implements IPostRepository {
@@ -34,7 +32,16 @@ export class PostRepository implements IPostRepository {
         foreignField: "_id",
         as: "uploadedBy",
         pipeline: [
-          { $project: { username: 1, firstname: 1, lastname: 1, image: 1 } },
+          {
+            $project: {
+              _id: 0,
+              userId: "$_id",
+              username: 1,
+              firstname: 1,
+              lastname: 1,
+              imageUrl: 1,
+            },
+          },
         ],
       },
     },
@@ -47,26 +54,31 @@ export class PostRepository implements IPostRepository {
     },
   ];
 
-  async create(postData: Partial<Post>): Promise<Post> {
-    const postToPersist = PostMapper.toPersistence(postData);
+  async create(post: Post): Promise<Post> {
+    const { createdAt, updatedAt, ...postToPersist } =
+      PostMapper.toPersistence(post);
     const newPostModel = new PostModel(postToPersist);
     const savedPost = await newPostModel.save();
-    return PostMapper.toDomain(savedPost);
+    return PostMapper.toDomain(this.safeParsePostDoc(savedPost));
   }
 
   async findById(id: string): Promise<Post | null> {
     const postModel = await PostModel.findById(id);
-    return postModel ? PostMapper.toDomain(postModel) : null;
+    return postModel
+      ? PostMapper.toDomain(this.safeParsePostDoc(postModel))
+      : null;
   }
 
   async findByIds(ids: string[]): Promise<Post[]> {
     const postModels = await PostModel.find({ _id: { $in: ids } });
-    return postModels.map((post) => PostMapper.toDomain(post));
+    return postModels.map((post) =>
+      PostMapper.toDomain(this.safeParsePostDoc(post)),
+    );
   }
 
   async findEnrichedById(
     postId: string,
-    userId: string
+    userId: string,
   ): Promise<EnrichedPost | null> {
     const currentUserId = new mongoose.Types.ObjectId(userId);
     const postObjectId = new mongoose.Types.ObjectId(postId);
@@ -88,11 +100,21 @@ export class PostRepository implements IPostRepository {
       { $unwind: "$currentUserInfo" },
       {
         $addFields: {
+          postId: "$_id",
           isLiked: { $in: [currentUserId, "$likes.userId"] },
           isSaved: { $in: [postObjectId, "$currentUserInfo.savedPosts"] },
         },
       },
-      { $project: { likes: 0, comments: 0 } },
+      {
+        $project: {
+          _id: 0,
+          likes: 0,
+          comments: 0,
+          currentUserInfo: 0,
+          publishedFor: 0,
+          status: 0,
+        },
+      },
     ];
 
     const results = await PostModel.aggregate(aggregationPipeline);
@@ -117,7 +139,7 @@ export class PostRepository implements IPostRepository {
     const currentUserId = new mongoose.Types.ObjectId(options.userId);
 
     const interestKeywordsRegex = interestKeywords.map(
-      (keyword) => new RegExp(keyword, "i")
+      (keyword) => new RegExp(keyword, "i"),
     );
 
     const aggregationPipeline: PipelineStage[] = [
@@ -167,7 +189,7 @@ export class PostRepository implements IPostRepository {
                     $in: [
                       "$userId",
                       options.followingUserIds.map(
-                        (id) => new mongoose.Types.ObjectId(id)
+                        (id) => new mongoose.Types.ObjectId(id),
                       ),
                     ],
                   },
@@ -196,10 +218,12 @@ export class PostRepository implements IPostRepository {
           pipeline: [
             {
               $project: {
+                _id: 0,
+                userId: "$_id",
                 username: 1,
-                image: 1,
                 firstname: 1,
                 lastname: 1,
+                imageUrl: 1,
               },
             },
           ],
@@ -236,6 +260,7 @@ export class PostRepository implements IPostRepository {
       { $unwind: "$currentUserInfo" },
       {
         $addFields: {
+          postId: "$_id",
           isLiked: { $in: [currentUserId, "$likes.userId"] },
           isSaved: { $in: ["$_id", "$currentUserInfo.savedPosts"] },
           commentsCount: { $size: "$comments" },
@@ -244,6 +269,7 @@ export class PostRepository implements IPostRepository {
       },
       {
         $project: {
+          _id: 0,
           likes: 0,
           comments: 0,
           relevanceScore: 0,
@@ -296,10 +322,11 @@ export class PostRepository implements IPostRepository {
         },
         {
           $addFields: {
+            postId: "$_id",
             reportCount: { $size: "$reports" },
           },
         },
-        { $project: { reports: 0 } }
+        { $project: { _id: 0, reports: 0 } },
       );
     }
 
@@ -314,7 +341,7 @@ export class PostRepository implements IPostRepository {
       limit: number;
       searchQuery: string;
       withReports?: boolean;
-    }
+    },
   ): Promise<EnrichedPost[]> {
     const { page, limit, searchQuery = "" } = options;
     const skip = (page - 1) * limit;
@@ -333,7 +360,8 @@ export class PostRepository implements IPostRepository {
       { $skip: skip },
       { $limit: limit },
       ...this.enrichedPipeline,
-      { $project: { likes: 0, comments: 0 } },
+      { $addFields: { postId: "$_id" } },
+      { $project: { _id: 0, likes: 0, comments: 0 } },
     ];
 
     if (options.withReports) {
@@ -351,7 +379,7 @@ export class PostRepository implements IPostRepository {
             reportCount: { $size: "$reports" },
           },
         },
-        { $project: { reports: 0 } }
+        { $project: { reports: 0 } },
       );
     }
 
@@ -378,6 +406,7 @@ export class PostRepository implements IPostRepository {
       },
       {
         $addFields: {
+          postId: "$_id",
           reportCount: { $size: "$reports" },
         },
       },
@@ -395,24 +424,37 @@ export class PostRepository implements IPostRepository {
       { $skip: skip },
       { $limit: limit },
       ...this.enrichedPipeline,
-      { $project: { reports: 0, likes: 0, comments: 0 } },
+      { $project: { _id: 0, reports: 0, likes: 0, comments: 0 } },
     ];
 
     const results = await PostModel.aggregate(aggregationPipeline);
     return results.map(PostMapper.toResponse);
   }
 
-  async update(postId: string, postData: Partial<Post>): Promise<Post | null> {
-    const postToPersist = PostMapper.toPersistence(postData);
+  async update(postId: string, post: Post): Promise<Post | null> {
+    const { createdAt, updatedAt, ...postToPersist } =
+      PostMapper.toPersistence(post);
     const updatedPost = await PostModel.findByIdAndUpdate(
       postId,
       postToPersist,
-      { new: true }
+      { new: true },
     );
-    return updatedPost ? PostMapper.toDomain(updatedPost) : null;
+    return updatedPost
+      ? PostMapper.toDomain(this.safeParsePostDoc(updatedPost))
+      : null;
   }
 
   async deleteById(postId: string): Promise<void> {
     await PostModel.findByIdAndUpdate(postId, { status: "deleted" });
+  }
+
+  private safeParsePostDoc(postDoc: PostDocument): PostType {
+    const { _id: postId, userId, ...postObj } = postDoc.toObject();
+
+    return {
+      ...postObj,
+      postId: postId.toString(),
+      userId: userId.toString(),
+    };
   }
 }

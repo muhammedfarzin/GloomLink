@@ -17,12 +17,12 @@ export class DeletePost implements IDeletePost {
     const { postId, userId, userRole } = input;
 
     const post = await this.postRepository.findById(postId);
-    if (!post || post.status === "deleted") {
+    if (!post || post.getStatus() === "deleted") {
       return;
     }
 
     // --- AUTHORIZATION LOGIC ---
-    if (userRole !== "admin" && post.userId.toString() !== userId) {
+    if (userRole !== "admin" && post.getUserId() !== userId) {
       throw new HttpError(403, "You are not authorized to delete this post");
     }
     await this.postRepository.deleteById(postId);

@@ -33,13 +33,15 @@ export class CreatePost implements ICreatePost {
       .map((file) => file.url);
 
     // ---Creating Post---
-    const postToCreate: Partial<Post> = {
+    const postToCreate = new Post({
+      postId: crypto.randomUUID(),
       userId: input.userId,
       caption: input.caption,
       images: imagesPath,
       tags: input.tags,
-      publishedFor: input.publishedFor,
-    };
+      publishedFor: input.publishedFor ?? "public",
+      status: input.status ?? "active",
+    });
 
     const createdPost = await this.postRepository.create(postToCreate);
 

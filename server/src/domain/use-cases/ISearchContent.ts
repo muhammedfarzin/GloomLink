@@ -1,4 +1,4 @@
-import { EnrichedPost } from "../repositories/IPostRepository";
+import type { EnrichedPost } from "../models/Post";
 import { UserListViewDto } from "../../application/dtos/UserDto";
 
 export type SearchResult = UserListViewDto | EnrichedPost;
