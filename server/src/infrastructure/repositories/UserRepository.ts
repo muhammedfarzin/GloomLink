@@ -250,7 +250,8 @@ export class UserRepository implements IUserRepository {
       },
       {
         $project: {
-          _id: 1,
+          _id: 0,
+          userId: "$_id",
           username: 1,
           firstname: 1,
           lastname: 1,
@@ -272,7 +273,7 @@ export class UserRepository implements IUserRepository {
 
     const profileData = results[0];
 
-    if (viewerId && viewerId.toString() === profileData._id.toString()) {
+    if (viewerId && viewerId.toString() === profileData.userId.toString()) {
       delete profileData.isFollowing;
     }
 

@@ -19,7 +19,7 @@ const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>(
-    searchParams.get("q") || ""
+    searchParams.get("q") || "",
   );
   const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
 
@@ -78,14 +78,13 @@ const Search: React.FC = () => {
                   handleChange={setSearchResult}
                 />
               ) : (
-                <Suspense fallback={<PostSkeleton />}>
-                  <PostListCard
-                    key={data.type + data._id}
-                    postId={data._id}
-                    postData={data}
-                  />
+                <Suspense
+                  key={data.type + data.postId}
+                  fallback={<PostSkeleton />}
+                >
+                  <PostListCard postId={data.postId} postData={data} />
                 </Suspense>
-              )
+              ),
             )}
           </div>
         )}

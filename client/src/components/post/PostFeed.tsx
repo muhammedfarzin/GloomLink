@@ -72,8 +72,8 @@ const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
         <Suspense fallback={<PostSkeletonList />}>
           {posts.map((post) => (
             <PostListCard
-              key={post._id}
-              postId={post._id}
+              key={post.postId}
+              postId={post.postId}
               postData={post}
               handleChange={setPosts}
             />

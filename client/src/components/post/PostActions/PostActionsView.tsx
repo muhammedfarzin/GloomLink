@@ -44,9 +44,9 @@ const PostActionsView: React.FC<Props> = ({
         {(hideComment && !showCommentsForSm) || (
           <CommentButton
             className={hideComment && showCommentsForSm ? "md:hidden" : ""}
-            postId={postData._id}
+            postId={postData.postId}
             postCardData={{
-              postId: postData._id,
+              postId: postData.postId,
               postData: postData,
               handleChange,
             }}
@@ -55,7 +55,7 @@ const PostActionsView: React.FC<Props> = ({
 
         <DialogBox
           dialogElement={
-            <ShareList data={{ message: postData._id, type: "post" }} />
+            <ShareList data={{ message: postData.postId, type: "post" }} />
           }
           title="Share post"
         >
@@ -66,7 +66,7 @@ const PostActionsView: React.FC<Props> = ({
         <IconButton
           icon={postData?.isSaved ? SavedIcon : SaveIcon}
           alt="save"
-          onClick={() => postData && handleSavePost?.(postData._id)}
+          onClick={() => postData && handleSavePost?.(postData.postId)}
         />
       </div>
     </div>

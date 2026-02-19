@@ -1,5 +1,5 @@
 export interface Post {
-  _id: string;
+  postId: string;
   userId: string;
   caption: string;
   images: string[];
@@ -13,11 +13,11 @@ export interface Post {
   likesCount?: number;
   commentsCount?: number;
   uploadedBy: {
-    _id: string;
+    userId: string;
     firstname: string;
     lastname: string;
     username: string;
-    image?: string;
+    imageUrl?: string;
   };
   reportCount?: number;
 }

@@ -6,7 +6,7 @@ const errorMiddleware = (
   err: HttpError,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   let status: number, message: string;
 
@@ -17,7 +17,7 @@ const errorMiddleware = (
     status = err.statusCode || 500;
     message = err.message || "Something went wrong";
   }
-console.log(err)
+  console.log(err);
   res.status(status).json({
     status,
     message,

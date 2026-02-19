@@ -40,7 +40,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
         var response = await adminApiClient.delete(`/posts/${postId}`);
       }
 
-      handleChange?.((state) => state.filter((post) => post._id !== postId));
+      handleChange?.((state) => state.filter((post) => post.postId !== postId));
       toast({
         description: response.data.message || "Post deleted successfully",
       });
@@ -75,7 +75,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
           onBlockStatusChange={(newStatus) => {
             handleChange?.((state) =>
               state.map((post) => {
-                if (post._id === postId) post.status = newStatus;
+                if (post.postId === postId) post.status = newStatus;
                 return post;
               }),
             );

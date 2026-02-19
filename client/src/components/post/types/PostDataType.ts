@@ -2,7 +2,7 @@ import { Post } from "./Post";
 
 type PostDataType = Pick<
   Post,
-  | "_id"
+  | "postId"
   | "caption"
   | "images"
   | "isSaved"

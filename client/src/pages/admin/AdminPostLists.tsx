@@ -13,7 +13,7 @@ const AdminPostLists: React.FC = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState<string>(
-    searchParams.get("q") || ""
+    searchParams.get("q") || "",
   );
   const [loading, setLoading] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -82,10 +82,10 @@ const AdminPostLists: React.FC = () => {
           <div className="flex flex-wrap mt-3" id="posts-list">
             {posts.length ? (
               posts.map((post) => (
-                <div key={post._id} className="w-full md:w-1/2 p-1">
+                <div key={post.postId} className="w-full md:w-1/2 p-1">
                   <Suspense fallback={<PostSkeleton />}>
                     <PostListCard
-                      postId={post._id}
+                      postId={post.postId}
                       isAdmin
                       postData={post}
                       handleChange={setPosts}

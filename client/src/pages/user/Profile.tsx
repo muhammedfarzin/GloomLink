@@ -27,7 +27,7 @@ interface UserDataType {
 }
 
 interface PostsType {
-  _id: string;
+  postId: string;
   userId: string;
   caption: string;
   images: string[];
@@ -139,8 +139,8 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
               <div className="flex flex-wrap gap-2 p-2">
                 {posts?.map((post) => (
                   <PostGridCard
-                    key={post._id}
-                    postId={post._id}
+                    key={post.postId}
+                    postId={post.postId}
                     image={post.images[0]}
                     caption={post.caption}
                   />

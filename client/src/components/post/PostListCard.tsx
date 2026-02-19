@@ -77,8 +77,8 @@ const PostListCard: React.FC<Props> = ({
   );
 
   const handleView = useCallback(() => {
-    if (postDataState && postDataState.uploadedBy._id !== authId) {
-      recordInteraction(postDataState._id, "view");
+    if (postDataState && postDataState.uploadedBy.userId !== authId) {
+      recordInteraction(postDataState.postId, "view");
     }
   }, [postDataState, recordInteraction, authId]);
 
@@ -100,8 +100,8 @@ const PostListCard: React.FC<Props> = ({
             </span>
           </AccountViewCard>
           <PostActionsDropDown
-            postId={postDataState._id}
-            userId={postDataState.uploadedBy._id}
+            postId={postDataState.postId}
+            userId={postDataState.uploadedBy.userId}
             isAdmin={isAdmin}
             handleChange={handleChange}
             status={postDataState.status}
@@ -115,7 +115,7 @@ const PostListCard: React.FC<Props> = ({
         />
 
         <PostInteractionCount
-          postId={postDataState._id}
+          postId={postDataState.postId}
           likesCount={postDataState.likesCount}
           commentsCount={postDataState.commentsCount}
         />

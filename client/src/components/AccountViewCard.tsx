@@ -3,7 +3,7 @@ import ProfileImage from "./ProfileImage";
 import { Post } from "./post/types/Post";
 
 interface Props {
-  userData: Pick<Post["uploadedBy"], "username" | "image">;
+  userData: Pick<Post["uploadedBy"], "username" | "imageUrl">;
   children?: React.ReactNode;
 }
 
@@ -13,7 +13,7 @@ const AccountViewCard: React.FC<Props> = ({ userData, children }) => {
       <Link to={`/${userData.username}`}>
         <ProfileImage
           className="w-10 cursor-pointer"
-          profileImage={userData.image}
+          profileImage={userData.imageUrl}
         />
       </Link>
 
