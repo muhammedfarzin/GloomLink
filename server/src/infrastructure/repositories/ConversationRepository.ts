@@ -13,18 +13,24 @@ export class ConversationRepository implements IConversationRepository {
       participants: participantIds,
     });
     const savedDoc = await newConversation.save();
-    return ConversationMapper.toDomain(savedDoc);
+    return ConversationMapper.toDomain({
+      conversationId: savedDoc._id.toString(),
+      participants: savedDoc.participants.map((id) => id.toString()),
+    });
   }
 
   async findById(id: string): Promise<Conversation | null> {
-    const conversationModel = await ConversationModel.findById(id);
-    return conversationModel
-      ? ConversationMapper.toDomain(conversationModel)
+    const conversationDoc = await ConversationModel.findById(id);
+    return conversationDoc
+      ? ConversationMapper.toDomain({
+          conversationId: conversationDoc._id.toString(),
+          participants: conversationDoc.participants.map((id) => id.toString()),
+        })
       : null;
   }
 
   async findByParticipants(
-    participantIds: string[]
+    participantIds: string[],
   ): Promise<Conversation | null> {
     const conversationDoc = await ConversationModel.findOne({
       participants: {
@@ -33,12 +39,15 @@ export class ConversationRepository implements IConversationRepository {
       },
     });
     return conversationDoc
-      ? ConversationMapper.toDomain(conversationDoc)
+      ? ConversationMapper.toDomain({
+          conversationId: conversationDoc._id.toString(),
+          participants: conversationDoc.participants.map((id) => id.toString()),
+        })
       : null;
   }
 
   async findConversationsByUserId(
-    userId: string
+    userId: string,
   ): Promise<ConversationListDto[]> {
     const currentUserId = new mongoose.Types.ObjectId(userId);
 
@@ -61,7 +70,9 @@ export class ConversationRepository implements IConversationRepository {
                 },
               },
             },
-            { $project: { username: 1, firstname: 1, lastname: 1, image: 1 } },
+            {
+              $project: { username: 1, firstname: 1, lastname: 1, imageUrl: 1 },
+            },
           ],
           as: "otherParticipant",
         },
@@ -108,7 +119,8 @@ export class ConversationRepository implements IConversationRepository {
       // ---Project to the final shape---
       {
         $project: {
-          _id: "$otherParticipant._id",
+          _id: 0,
+          participantId: "$otherParticipant._id",
           conversationId: "$_id",
           username: "$otherParticipant.username",
           firstname: "$otherParticipant.firstname",

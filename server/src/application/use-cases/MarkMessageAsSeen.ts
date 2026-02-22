@@ -29,7 +29,7 @@ export class MarkMessageAsSeen implements IMarkMessageAsSeen {
     const conversation = await this.conversationRepository.findById(
       message.conversation,
     );
-    if (!conversation || !conversation.participants.includes(viewerId)) {
+    if (!conversation || !conversation.isParticipant(viewerId)) {
       throw new HttpError(
         403,
         "You are not a participant of this conversation.",

@@ -26,7 +26,7 @@ export class GetMessages implements IGetMessages {
     if (!conversation) {
       throw new HttpError(404, "Conversation not found.");
     }
-    if (!conversation.participants.includes(currentUserId)) {
+    if (!conversation.isParticipant(currentUserId)) {
       throw new HttpError(
         403,
         "You are not authorized to view these messages.",

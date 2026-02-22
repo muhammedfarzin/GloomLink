@@ -27,12 +27,12 @@ export class SocketNotificationService implements INotificationService {
 
     const viewForCreator = ConversationMapper.toListView({
       username: otherParticipants.map((u) => u.getUsername()).join(", "),
-      conversationId: conversation._id,
+      conversationId: conversation.getConversationId(),
       lastMessageTime: new Date(),
     });
     const viewForOthers = ConversationMapper.toListView({
       username: creator.getUsername(),
-      conversationId: conversation._id,
+      conversationId: conversation.getConversationId(),
       lastMessageTime: new Date(),
     });
 
@@ -40,7 +40,9 @@ export class SocketNotificationService implements INotificationService {
     const creatorSockets = activeUsers[creator.getUsername()];
     if (creatorSockets) {
       creatorSockets.forEach((socketId) => {
-        this.io.sockets.sockets.get(socketId)?.join(conversation._id);
+        this.io.sockets.sockets
+          .get(socketId)
+          ?.join(conversation.getConversationId());
         this.io.to(socketId).emit("new-conversation", viewForCreator);
       });
     }
@@ -50,7 +52,9 @@ export class SocketNotificationService implements INotificationService {
       const participantSockets = activeUsers[participant.getUsername()];
       if (participantSockets) {
         participantSockets.forEach((socketId) => {
-          this.io.sockets.sockets.get(socketId)?.join(conversation._id);
+          this.io.sockets.sockets
+            .get(socketId)
+            ?.join(conversation.getConversationId());
           this.io.to(socketId).emit("new-conversation", viewForOthers);
         });
       }

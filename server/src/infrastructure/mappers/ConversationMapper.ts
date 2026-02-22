@@ -1,36 +1,25 @@
-import { Types } from "mongoose";
 import { Conversation } from "../../domain/entities/Conversation";
-import { ConversationDocument } from "../database/models/ConversationModel";
-import { ConversationListDto } from "../../application/dtos/ConversationListDto";
+import type { ConversationType } from "../../domain/models/Conversation";
+import type { ConversationListDto } from "../../application/dtos/ConversationListDto";
 
 export class ConversationMapper {
-  public static toDomain(
-    conversationModel: ConversationDocument,
-  ): Conversation {
-    return {
-      _id: conversationModel._id.toString(),
-      participants: conversationModel.participants.map((id) => id.toString()),
-    };
+  public static toDomain(conversation: ConversationType): Conversation {
+    return new Conversation({
+      conversationId: conversation.conversationId,
+      participants: conversation.participants,
+    });
   }
 
-  public static toPersistence(conversation: Partial<Conversation>): any {
-    const persistenceConversation: any = {
-      ...conversation,
-      participants: conversation.participants?.map(
-        (id) => new Types.ObjectId(id),
-      ),
+  public static toPersistence(conversation: Conversation): ConversationType {
+    return {
+      conversationId: conversation.getConversationId(),
+      participants: conversation.getParticipants(),
     };
-
-    if (conversation._id) {
-      persistenceConversation._id = new Types.ObjectId(conversation._id);
-    }
-
-    return persistenceConversation;
   }
 
   public static toListView(conversation: any): ConversationListDto {
     return {
-      participantId: conversation._id?.toString(),
+      participantId: conversation.participantId?.toString(),
       conversationId: conversation.conversationId?.toString(),
       username: conversation.username,
       firstname: conversation.firstname,

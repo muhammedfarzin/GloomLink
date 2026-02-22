@@ -37,7 +37,7 @@ export class SendMessage implements ISendMessage {
 
     const conversation =
       await this.conversationRepository.findById(conversationId);
-    if (!conversation || !conversation.participants.includes(senderId)) {
+    if (!conversation || !conversation.isParticipant(senderId)) {
       throw new HttpError(
         403,
         "You are not a participant of this conversation.",
