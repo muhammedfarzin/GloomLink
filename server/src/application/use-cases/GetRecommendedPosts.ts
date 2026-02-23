@@ -28,7 +28,7 @@ export class GetRecommendedPosts implements IGetRecommendedPosts {
 
     // 2. Get following users (to boost their content)
     const following = await this.followRepository.findFollowing(userId);
-    const followingUserIds = following.map((f) => f.followingTo);
+    const followingUserIds = following.map((f) => f.getFollowingId());
 
     // 3. Fetch recommended posts
     return this.postRepository.findAndSortFeed({

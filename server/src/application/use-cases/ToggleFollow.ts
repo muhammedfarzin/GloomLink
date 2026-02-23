@@ -3,6 +3,7 @@ import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
+import { Follow } from "../../domain/entities/Follow";
 import {
   IToggleFollow,
   type ToggleFollowInput,
@@ -31,17 +32,23 @@ export class ToggleFollow implements IToggleFollow {
     }
 
     // ---Check if the follow relationship already exists---
-    const existingFollow = await this.followRepository.findByUsers(
+    const existingFollow = await this.followRepository.find(
       currentUserId,
       targetUserId,
     );
 
     // ---Performing Action---
     if (existingFollow) {
-      await this.followRepository.deleteById(existingFollow._id);
+      await this.followRepository.deleteById(existingFollow.getId());
       return { status: "unfollowed" };
     } else {
-      await this.followRepository.create(currentUserId, targetUserId);
+      const followToCreate = new Follow({
+        id: crypto.randomUUID(),
+        followedBy: currentUserId,
+        followingTo: targetUserId,
+      });
+
+      await this.followRepository.create(followToCreate);
       return { status: "followed" };
     }
   }

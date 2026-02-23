@@ -9,8 +9,8 @@ export interface FollowListOptions {
 }
 
 export interface IFollowRepository {
-  create(followerId: string, followingId: string): Promise<Follow>;
-  findByUsers(followerId: string, followingId: string): Promise<Follow | null>;
+  create(follow: Follow): Promise<Follow>;
+  find(followerId: string, followingId: string): Promise<Follow | null>;
   findFollowing(userId: string): Promise<Follow[]>;
   findFollowList(
     userId: string,

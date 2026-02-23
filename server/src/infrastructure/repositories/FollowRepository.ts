@@ -12,19 +12,14 @@ import type { UserListViewDto } from "../../application/dtos/UserDto";
 
 @injectable()
 export class FollowRepository implements IFollowRepository {
-  async create(followerId: string, followingId: string): Promise<Follow> {
-    const newFollow = new FollowModel({
-      followedBy: followerId,
-      followingTo: followingId,
-    });
+  async create(follow: Follow): Promise<Follow> {
+    const { id, ...followToPersist } = FollowMapper.toPersistence(follow);
+    const newFollow = new FollowModel(followToPersist);
     const savedDoc = await newFollow.save();
     return FollowMapper.toDomain(savedDoc);
   }
 
-  async findByUsers(
-    followerId: string,
-    followingId: string,
-  ): Promise<Follow | null> {
+  async find(followerId: string, followingId: string): Promise<Follow | null> {
     const followDoc = await FollowModel.findOne({
       followedBy: followerId,
       followingTo: followingId,

@@ -42,7 +42,7 @@ export class SearchContent implements ISearchContent {
     if (filter === "all" || filter === "posts") {
       const following =
         await this.followRepository.findFollowing(currentUserId);
-      const followingUserIds = following.map((f) => f.followingTo);
+      const followingUserIds = following.map((f) => f.getFollowingId());
 
       posts = await this.postRepository.findAndSortFeed({
         searchQuery,
