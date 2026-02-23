@@ -12,24 +12,17 @@ import mongoose, { PipelineStage } from "mongoose";
 
 @injectable()
 export class LikeRepository implements ILikeRepository {
-  async findByTargetAndUser(
-    targetId: string,
-    userId: string,
-    type: LikeableType,
-  ): Promise<Like | null> {
-    const likeModel = await LikeModel.findOne({ targetId, userId, type });
-    return likeModel ? LikeMapper.toDomain(likeModel) : null;
-  }
-
-  async create(likeData: {
-    targetId: string;
-    userId: string;
-    type: LikeableType;
-  }): Promise<Like> {
-    const likeToPersist = LikeMapper.toPersistence(likeData);
+  async create(like: Like): Promise<Like> {
+    const { id, ...likeToPersist } = LikeMapper.toPersistence(like);
     const newLikeModel = new LikeModel(likeToPersist);
     const savedLike = await newLikeModel.save();
     return LikeMapper.toDomain(savedLike);
+  }
+
+  async find(like: Like): Promise<Like | null> {
+    const { id, ...likeToFind } = LikeMapper.toPersistence(like);
+    const likeModel = await LikeModel.findOne(likeToFind);
+    return likeModel ? LikeMapper.toDomain(likeModel) : null;
   }
 
   async delete(id: string): Promise<void> {

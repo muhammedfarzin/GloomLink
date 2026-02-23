@@ -1,4 +1,4 @@
-import { UserListViewDto } from "../../application/dtos/UserDto";
+import type { UserListViewDto } from "../../application/dtos/UserDto";
 import type { Like } from "../entities/Like";
 
 export type LikeableType = "post";
@@ -10,16 +10,8 @@ export interface LikeOptions {
 }
 
 export interface ILikeRepository {
-  findByTargetAndUser(
-    targetId: string,
-    userId: string,
-    type: LikeableType,
-  ): Promise<Like | null>;
-  create(likeData: {
-    targetId: string;
-    userId: string;
-    type: LikeableType;
-  }): Promise<Like>;
+  create(like: Like): Promise<Like>;
+  find(like: Like): Promise<Like | null>;
   delete(id: string): Promise<void>;
   findLikersByTarget(
     targetId: string,

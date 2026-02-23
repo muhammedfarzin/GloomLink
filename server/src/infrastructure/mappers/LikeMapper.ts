@@ -1,32 +1,23 @@
-import { Types } from "mongoose";
 import { Like } from "../../domain/entities/Like";
-import { LikeDocument } from "../database/models/LikeModel";
+import type { LikeType } from "../../domain/models/Like";
+import type { LikeDocument } from "../database/models/LikeModel";
 
 export class LikeMapper {
-  public static toDomain(likeModel: LikeDocument): Like {
-    const likeObject = likeModel.toObject<LikeDocument>();
-
-    return {
-      ...likeObject,
-      _id: likeObject._id.toString(),
-      targetId: likeObject.targetId.toString(),
-      userId: likeObject.userId.toString(),
-    };
+  public static toDomain(like: LikeType | LikeDocument): Like {
+    return new Like({
+      id: like.id.toString(),
+      targetId: like.targetId.toString(),
+      userId: like.userId.toString(),
+      type: like.type,
+    });
   }
 
-  public static toPersistence(like: Partial<Like>): any {
-    const persistenceLike: any = { ...like };
-
-    if (like._id) {
-      persistenceLike._id = new Types.ObjectId(like._id);
-    }
-    if (like.targetId) {
-      persistenceLike.targetId = new Types.ObjectId(like.targetId);
-    }
-    if (like.userId) {
-      persistenceLike.userId = new Types.ObjectId(like.userId);
-    }
-
-    return persistenceLike;
+  public static toPersistence(like: Like): LikeType {
+    return {
+      id: like.getId(),
+      targetId: like.getTargetId(),
+      userId: like.getUserId(),
+      type: like.getTargetType(),
+    };
   }
 }

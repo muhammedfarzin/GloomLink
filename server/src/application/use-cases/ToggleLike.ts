@@ -1,8 +1,9 @@
 import { injectable, inject } from "inversify";
-import { ILikeRepository } from "../../domain/repositories/ILikeRepository";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
+import { Like } from "../../domain/entities/Like";
+import type { ILikeRepository } from "../../domain/repositories/ILikeRepository";
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
 import {
   IToggleLike,
   type ToggleLikeInput,
@@ -25,17 +26,14 @@ export class ToggleLike implements IToggleLike {
       );
     }
 
-    const existingLike = await this.likeRepository.findByTargetAndUser(
-      input.targetId,
-      input.userId,
-      input.type,
-    );
+    const likeToCreate = new Like({ ...input, id: crypto.randomUUID() });
+    const existingLike = await this.likeRepository.find(likeToCreate);
 
     if (existingLike) {
-      await this.likeRepository.delete(existingLike._id);
+      await this.likeRepository.delete(existingLike.getId());
       return { status: "unliked" };
     } else {
-      await this.likeRepository.create(input);
+      await this.likeRepository.create(likeToCreate);
       return { status: "liked" };
     }
   }
