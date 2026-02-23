@@ -22,7 +22,7 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
     if (data.role === "user") {
       const user = await userRepository.findById(data.id);
       if (!user) throw new HttpError(401, "Unauthorized: User not found");
-      if (user.getStatus() === "blocked")
+      if (user.isBlocked())
         throw new HttpError(401, "Unauthorized: User has been blocked");
 
       req.user = {

@@ -16,7 +16,7 @@ export class ToggleUserStatus implements IToggleUserStatus {
       throw new HttpError(404, "User not found or has been removed");
     }
 
-    const newStatus = user.getStatus() === "active" ? "blocked" : "active";
+    const newStatus = user.isActive() ? "blocked" : "active";
     user.updateStatus(newStatus);
     await this.userRepository.update(userId, user);
 

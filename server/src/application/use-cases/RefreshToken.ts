@@ -23,7 +23,7 @@ export class RefreshToken implements IRefreshToken {
       if (!user) {
         throw new HttpError(404, "User associated with this token not found.");
       }
-      if (user.getStatus() === "blocked") {
+      if (user.isBlocked()) {
         throw new HttpError(403, "Your account is blocked.");
       }
 

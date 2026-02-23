@@ -28,7 +28,7 @@ export const authenticateTokenForSocket = async (
 
       var user = await userRepository.findById(data.id);
       if (!user) throw new Error("Unauthorized: Invalid user");
-      if (user.getStatus() === "blocked")
+      if (user.isBlocked())
         throw new Error("Unauthorized: User has been blocked");
 
       const conversations =

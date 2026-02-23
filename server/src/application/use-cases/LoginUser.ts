@@ -29,7 +29,7 @@ export class LoginUser implements ILoginUser {
       throw new HttpError(401, "Invalid credentials");
     }
 
-    if (user.getStatus() === "blocked") {
+    if (user.isBlocked()) {
       throw new HttpError(403, "Your account has been blocked");
     }
 

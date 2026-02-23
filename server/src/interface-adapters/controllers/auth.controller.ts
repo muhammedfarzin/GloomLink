@@ -46,7 +46,7 @@ export class AuthController {
 
       const user = await this.loginUserUseCase.execute(validatedBody);
 
-      if (user.getStatus() === "not-verified") {
+      if (!user.isVerified()) {
         await this.sendVerificationEmailUseCase.execute({
           email: user.getEmail(),
         });

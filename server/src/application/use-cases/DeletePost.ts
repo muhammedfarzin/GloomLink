@@ -17,7 +17,7 @@ export class DeletePost implements IDeletePost {
     const { postId, userId, userRole } = input;
 
     const post = await this.postRepository.findById(postId);
-    if (!post || post.getStatus() === "deleted") {
+    if (!post || post.isDeleted()) {
       return;
     }
 

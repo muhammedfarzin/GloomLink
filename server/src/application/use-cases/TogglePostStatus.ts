@@ -18,11 +18,11 @@ export class TogglePostStatus implements ITogglePostStatus {
     const { postId } = input;
 
     const post = await this.postRepository.findById(postId);
-    if (!post || post.getStatus() === "deleted") {
+    if (!post || post.isDeleted()) {
       throw new HttpError(404, "Post not found or has been deleted");
     }
 
-    const newStatus = post.getStatus() === "active" ? "blocked" : "active";
+    const newStatus = post.isActive() ? "blocked" : "active";
     post.updateStatus(newStatus);
 
     await this.postRepository.update(postId, post);

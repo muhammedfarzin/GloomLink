@@ -12,7 +12,7 @@ export class FetchUser implements IFetchUser {
 
   async execute(userId: string) {
     const user = await this.userRepository.findById(userId);
-    if (!user || user.getStatus() === "not-verified") {
+    if (!user || !user.isVerified()) {
       throw new HttpError(404, "User not found or has been removed");
     }
     return user;
