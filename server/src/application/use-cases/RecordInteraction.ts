@@ -23,11 +23,14 @@ export class RecordInteraction implements IRecordInteraction {
       save: 7,
     };
 
-    return this.interactionRepository.create({
+    const interactionToCreate = new Interaction({
+      id: crypto.randomUUID(),
       userId,
       postId,
       type,
       weight: weightMap[type],
     });
+
+    return this.interactionRepository.create(interactionToCreate);
   }
 }

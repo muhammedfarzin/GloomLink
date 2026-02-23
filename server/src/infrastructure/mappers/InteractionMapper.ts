@@ -1,30 +1,29 @@
-import { InteractionDocument } from "../database/models/InteractionModel";
 import { Interaction } from "../../domain/entities/Interaction";
-import { Types } from "mongoose";
+import type { InteractionType } from "../../domain/models/Interaction";
+import type { InteractionDocument } from "../database/models/InteractionModel";
 
 export class InteractionMapper {
-  public static toDomain(interactionModel: InteractionDocument): Interaction {
-    return {
-      ...interactionModel,
-      _id: interactionModel._id.toString(),
-      userId: interactionModel.userId.toString(),
-      postId: interactionModel.postId.toString(),
-    };
+  public static toDomain(
+    interaction: InteractionType | InteractionDocument,
+  ): Interaction {
+    return new Interaction({
+      id: interaction.id.toString(),
+      userId: interaction.userId.toString(),
+      postId: interaction.postId.toString(),
+      weight: interaction.weight,
+      type: interaction.type,
+      createdAt: interaction.createdAt,
+    });
   }
 
-  public static toPersistence(interaction: Partial<Interaction>): any {
-    const persistenceInteraction: any = { ...interaction };
-
-    if (interaction._id) {
-      persistenceInteraction._id = new Types.ObjectId(interaction._id);
-    }
-    if (interaction.userId) {
-      persistenceInteraction.userId = new Types.ObjectId(interaction.userId);
-    }
-    if (interaction.postId) {
-      persistenceInteraction.postId = new Types.ObjectId(interaction.postId);
-    }
-
-    return persistenceInteraction;
+  public static toPersistence(interaction: Interaction): InteractionType {
+    return {
+      id: interaction.getId(),
+      userId: interaction.getUserId(),
+      postId: interaction.getPostId(),
+      weight: interaction.getWeight(),
+      type: interaction.getType(),
+      createdAt: interaction.getCreatedAt(),
+    };
   }
 }
