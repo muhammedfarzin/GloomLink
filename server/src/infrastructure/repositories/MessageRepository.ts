@@ -7,8 +7,9 @@ import mongoose, { PipelineStage } from "mongoose";
 
 @injectable()
 export class MessageRepository implements IMessageRepository {
-  async create(messageData: Partial<Message>): Promise<Message> {
-    const messageToPersist = MessageMapper.toPersistence(messageData);
+  async create(message: Message): Promise<Message> {
+    const { id, createdAt, updatedAt, ...messageToPersist } =
+      MessageMapper.toPersistence(message);
     const newMessageModel = new MessageModel(messageToPersist);
     const savedDoc = await newMessageModel.save();
     return MessageMapper.toDomain(savedDoc);
@@ -19,52 +20,48 @@ export class MessageRepository implements IMessageRepository {
     return messageDoc ? MessageMapper.toDomain(messageDoc) : null;
   }
 
-  async update(
-    messageId: string,
-    data: Partial<Message>
-  ): Promise<Message | null> {
-    const messageToPersist = MessageMapper.toPersistence(data);
+  async update(message: Message): Promise<Message | null> {
+    const { id, createdAt, updatedAt, ...messageToPersist } =
+      MessageMapper.toPersistence(message);
     const updatedDoc = await MessageModel.findByIdAndUpdate(
-      messageId,
+      id,
       { $set: messageToPersist },
-      { new: true }
+      { new: true },
     );
     return updatedDoc ? MessageMapper.toDomain(updatedDoc) : null;
   }
 
   async findByConversationId(
     conversationId: string,
-    options: { page: number; limit: number }
+    options: { page: number; limit: number },
   ): Promise<Message[]> {
     const { page, limit } = options;
     const skip = (page - 1) * limit;
 
     const aggregationPipeline: PipelineStage[] = [
-      { $match: { conversation: new mongoose.Types.ObjectId(conversationId) } },
+      {
+        $match: { conversationId: new mongoose.Types.ObjectId(conversationId) },
+      },
       { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
       {
         $lookup: {
           from: "users",
-          localField: "from",
+          localField: "senderId",
           foreignField: "_id",
-          as: "fromUser",
+          as: "sender",
+          pipeline: [{ $project: { _id: 1, username: 1 } }],
         },
       },
-      { $unwind: "$fromUser" },
-      {
-        $project: {
-          _id: 1,
-          message: 1,
-          image: 1,
-          from: "$fromUser.username",
-          status: 1,
-          type: 1,
-          createdAt: 1,
-        },
-      },
+      { $unwind: "$sender" },
       { $sort: { createdAt: 1 } },
+      {
+        $addFields: {
+          id: "$_id",
+          senderUsername: "$sender.username",
+        },
+      },
     ];
 
     const messages = await MessageModel.aggregate(aggregationPipeline);

@@ -1,8 +1,8 @@
 import type { Socket } from "socket.io";
-import { Message } from "../../domain/entities/Message";
+import type { CompactMessage } from "../../domain/models/Message";
+import type { ISendMessage } from "../../domain/use-cases/ISendMessage";
+import type { IMarkMessageAsSeen } from "../../domain/use-cases/IMarkMessageAsSeen";
 import { activeUsers } from "../websocket";
-import { SendMessage } from "../../application/use-cases/SendMessage";
-import { MarkMessageAsSeen } from "../../application/use-cases/MarkMessageAsSeen";
 import {
   markAsSeenSchema,
   sendMessageSchema,
@@ -21,7 +21,7 @@ export class SocketController {
 
   handleSendMessage = async (
     conversationId: string,
-    data: Partial<Pick<Message, "message" | "image" | "type">>,
+    data: Partial<Pick<CompactMessage, "message" | "image" | "type">>,
   ) => {
     try {
       const { message, image, type } = sendMessageSchema.parse({
@@ -29,7 +29,9 @@ export class SocketController {
         conversationId,
       });
 
-      const sendMessageUseCase = container.get<SendMessage>(TYPES.ISendMessage);
+      const sendMessageUseCase = container.get<ISendMessage>(
+        TYPES.ISendMessage,
+      );
 
       const newMessage = await sendMessageUseCase.execute({
         message,
@@ -50,7 +52,7 @@ export class SocketController {
     try {
       const validatedMessages = markAsSeenSchema.parse(messages);
 
-      const markAsSeenUseCase = container.get<MarkMessageAsSeen>(
+      const markAsSeenUseCase = container.get<IMarkMessageAsSeen>(
         TYPES.IMarkMessageAsSeen,
       );
 

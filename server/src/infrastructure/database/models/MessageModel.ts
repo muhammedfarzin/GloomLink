@@ -2,25 +2,27 @@ import { type Document, model, Schema } from "mongoose";
 
 export interface Message {
   _id: Schema.Types.ObjectId;
-  conversation: Schema.Types.ObjectId;
+  conversationId: Schema.Types.ObjectId;
   message: string;
   image: string;
-  from: Schema.Types.ObjectId;
+  senderId: Schema.Types.ObjectId;
   status: "sent" | "delivered" | "seen";
   type: "text" | "image" | "post";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type MessageDocument = Message & Document;
 
 const messageSchema = new Schema<Message>(
   {
-    conversation: {
+    conversationId: {
       type: Schema.Types.ObjectId,
       required: true,
     },
     message: String,
     image: String,
-    from: {
+    senderId: {
       type: Schema.Types.ObjectId,
       required: true,
     },
@@ -35,7 +37,7 @@ const messageSchema = new Schema<Message>(
       enum: ["text", "image", "post"],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const MessageModel = model("Message", messageSchema, "messages");

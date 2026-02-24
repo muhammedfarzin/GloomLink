@@ -44,15 +44,15 @@ export class SendMessage implements ISendMessage {
       );
     }
 
-    const newMessage = await this.messageRepository.create({
-      conversation: conversationId,
-      from: senderId,
-      message,
-      type,
-      image,
+    const messageToCreate = new Message({
+      ...input,
+      id: crypto.randomUUID(),
+      senderUsername: sender.getUsername(),
       status: "sent",
     });
+    const newMessage = await this.messageRepository.create(messageToCreate);
+    newMessage.addSenderUsername(sender.getUsername());
 
-    return { ...newMessage, from: sender.getUsername() };
+    return newMessage;
   }
 }

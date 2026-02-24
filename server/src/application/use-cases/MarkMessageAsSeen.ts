@@ -27,7 +27,7 @@ export class MarkMessageAsSeen implements IMarkMessageAsSeen {
     }
 
     const conversation = await this.conversationRepository.findById(
-      message.conversation,
+      message.getConversationId(),
     );
     if (!conversation || !conversation.isParticipant(viewerId)) {
       throw new HttpError(
@@ -36,13 +36,12 @@ export class MarkMessageAsSeen implements IMarkMessageAsSeen {
       );
     }
 
-    if (message.from === viewerId) {
+    if (message.isSentBy(viewerId)) {
       return message;
     }
 
-    const updatedMessage = await this.messageRepository.update(messageId, {
-      status: "seen",
-    });
+    message.updateStatus("seen");
+    const updatedMessage = await this.messageRepository.update(message);
     if (!updatedMessage) {
       throw new HttpError(500, "Failed mark message as seen.");
     }

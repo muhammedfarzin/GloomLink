@@ -1,35 +1,37 @@
-import { Types } from "mongoose";
 import { Message } from "../../domain/entities/Message";
-import { MessageDocument } from "../database/models/MessageModel";
+import type { MessageDocument } from "../database/models/MessageModel";
+import type { CompactMessage } from "../../domain/models/Message";
 
 export class MessageMapper {
-  public static toDomain(messageModel: MessageDocument): Message {
-    const messageObject =
-      messageModel.toObject<MessageDocument>?.() || messageModel;
-
-    return {
-      ...messageObject,
-      _id: messageObject._id?.toString(),
-      conversation: messageObject.conversation?.toString(),
-      from: messageObject.from?.toString(),
-    };
+  public static toDomain(
+    message: CompactMessage | (MessageDocument & { senderUsername?: string }),
+  ): Message {
+    return new Message({
+      id: message.id.toString(),
+      conversationId: message.conversationId.toString(),
+      message: message.message,
+      image: message.image,
+      senderId: message.senderId.toString(),
+      senderUsername: message.senderUsername,
+      status: message.status,
+      type: message.type,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    });
   }
 
-  public static toPersistence(message: Partial<Message>): any {
-    const persistenceMessage: any = { ...message };
-
-    if (message._id) {
-      persistenceMessage._id = new Types.ObjectId(message._id);
-    }
-    if (message.conversation) {
-      persistenceMessage.conversation = new Types.ObjectId(
-        message.conversation
-      );
-    }
-    if (message.from) {
-      persistenceMessage.from = new Types.ObjectId(message.from);
-    }
-
-    return persistenceMessage;
+  public static toPersistence(message: Message): CompactMessage {
+    return {
+      id: message.getId(),
+      conversationId: message.getConversationId(),
+      message: message.getMessage(),
+      image: message.getImage(),
+      senderId: message.getSenderId(),
+      senderUsername: message.getSenderUsername(),
+      status: message.getStatus(),
+      type: message.getType(),
+      createdAt: message.getCreatedAt(),
+      updatedAt: message.getUpdatedAt(),
+    };
   }
 }
