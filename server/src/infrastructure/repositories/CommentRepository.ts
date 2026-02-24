@@ -1,23 +1,20 @@
 import { injectable } from "inversify";
-import {
-  ICommentRepository,
-  CommentableType,
-} from "../../domain/repositories/ICommentRepository";
 import { Comment } from "../../domain/entities/Comment";
 import { CommentModel } from "../database/models/CommentModel";
 import { CommentMapper } from "../mappers/CommentMapper";
 import mongoose, { PipelineStage } from "mongoose";
-import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
+import type { CommentResponse } from "../../domain/models/Comment";
+import type {
+  ICommentRepository,
+  CommentableType,
+} from "../../domain/repositories/ICommentRepository";
 
 @injectable()
 export class CommentRepository implements ICommentRepository {
-  async create(commentData: {
-    targetId: string;
-    userId: string;
-    comment: string;
-    type: CommentableType;
-  }): Promise<Comment> {
-    const commentToPersist = CommentMapper.toPersistence(commentData);
+  async create(comment: Comment): Promise<Comment> {
+    const { id, createdAt, updatedAt, ...commentToPersist } =
+      CommentMapper.toPersistence(comment);
+
     const newCommentModel = new CommentModel(commentToPersist);
     const savedComment = await newCommentModel.save();
     return CommentMapper.toDomain(savedComment);
@@ -32,8 +29,8 @@ export class CommentRepository implements ICommentRepository {
     targetId: string,
     type: CommentableType,
     page: number,
-    limit: number
-  ): Promise<CommentResponseDto[]> {
+    limit: number,
+  ): Promise<CommentResponse[]> {
     const skip = (page - 1) * limit;
 
     const aggregationPipeline: PipelineStage[] =
@@ -52,11 +49,11 @@ export class CommentRepository implements ICommentRepository {
     return results.map(CommentMapper.toResponseDto);
   }
 
-  async findUserCommentsByTarget(
+  async findByUserAndTarget(
     targetId: string,
     userId: string,
-    type: CommentableType
-  ): Promise<CommentResponseDto[]> {
+    type: CommentableType,
+  ): Promise<CommentResponse[]> {
     const aggregationPipeline: PipelineStage[] =
       this.createCommentAggregationPipeline([
         {
@@ -76,8 +73,8 @@ export class CommentRepository implements ICommentRepository {
     userId: string,
     type: CommentableType,
     page: number,
-    limit: number
-  ): Promise<CommentResponseDto[]> {
+    limit: number,
+  ): Promise<CommentResponse[]> {
     const skip = (page - 1) * limit;
     const aggregationPipeline = this.createCommentAggregationPipeline([
       {
@@ -95,7 +92,7 @@ export class CommentRepository implements ICommentRepository {
   }
 
   private createCommentAggregationPipeline(
-    initialMatchStage: PipelineStage[]
+    initialMatchStage: PipelineStage[],
   ): PipelineStage[] {
     return [
       ...initialMatchStage,
@@ -108,11 +105,12 @@ export class CommentRepository implements ICommentRepository {
           pipeline: [
             {
               $project: {
-                _id: 1,
+                _id: 0,
+                userId: "$_id",
                 firstname: 1,
                 lastname: 1,
                 username: 1,
-                image: 1,
+                imageUrl: 1,
               },
             },
           ],
@@ -128,8 +126,8 @@ export class CommentRepository implements ICommentRepository {
           pipeline: [{ $match: { type: "comment" } }],
         },
       },
-      { $addFields: { repliesCount: { $size: "$replies" } } },
-      { $project: { replies: 0 } },
+      { $addFields: { id: "$_id", repliesCount: { $size: "$replies" } } },
+      { $project: { _id: 0, replies: 0 } },
     ];
   }
 }

@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
-import { ICommentRepository } from "../../domain/repositories/ICommentRepository";
-import { CommentResponseDto } from "../dtos/CommentResponseDto";
 import { TYPES } from "../../shared/types";
+import type { ICommentRepository } from "../../domain/repositories/ICommentRepository";
+import type { CommentResponse } from "../../domain/models/Comment";
 import {
   IGetComments,
   type GetCommentsInput,
@@ -14,12 +14,12 @@ export class GetComments implements IGetComments {
     private commentRepository: ICommentRepository,
   ) {}
 
-  async execute(input: GetCommentsInput): Promise<CommentResponseDto[]> {
+  async execute(input: GetCommentsInput): Promise<CommentResponse[]> {
     const { targetId, type, userId, page, limit } = input;
 
     const userComments =
       page === 1 && type !== "comment"
-        ? await this.commentRepository.findUserCommentsByTarget(
+        ? await this.commentRepository.findByUserAndTarget(
             targetId,
             userId,
             type,

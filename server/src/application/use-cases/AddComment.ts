@@ -33,12 +33,15 @@ export class AddComment implements IAddComment {
       }
     }
 
-    const newComment = await this.commentRepository.create({
+    const commentToCreate = new Comment({
+      id: crypto.randomUUID(),
       targetId,
       userId,
       comment,
       type,
     });
+
+    const newComment = await this.commentRepository.create(commentToCreate);
 
     return newComment;
   }

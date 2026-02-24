@@ -1,46 +1,43 @@
-import { Types } from "mongoose";
 import { Comment } from "../../domain/entities/Comment";
-import { CommentDocument } from "../database/models/CommentModel";
-import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
+import type { CommentDocument } from "../database/models/CommentModel";
+import type { CommentResponse } from "../../domain/models/Comment";
+import type { CommentType } from "../../domain/models/Comment";
 
 export class CommentMapper {
-  public static toDomain(commentModel: CommentDocument): Comment {
-    const commentObject = commentModel.toObject<CommentDocument>();
+  public static toDomain(comment: CommentType | CommentDocument): Comment {
+    return new Comment({
+      id: comment.id.toString(),
+      userId: comment.userId.toString(),
+      targetId: comment.targetId.toString(),
+      comment: comment.comment,
+      type: comment.type,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+    });
+  }
 
+  public static toPersistence(comment: Comment): CommentType {
     return {
-      ...commentObject,
-      _id: commentObject._id.toString(),
-      targetId: commentObject.targetId.toString(),
-      userId: commentObject.userId.toString(),
+      id: comment.getId(),
+      userId: comment.getUserId(),
+      targetId: comment.getTargetId(),
+      comment: comment.getComment(),
+      type: comment.getType(),
+      createdAt: comment.getCreatedAt(),
+      updatedAt: comment.getUpdatedAt(),
     };
   }
 
-  public static toPersistence(comment: Partial<Comment>): any {
-    const persistenceComment: any = { ...comment };
-
-    if (comment._id) {
-      persistenceComment._id = new Types.ObjectId(comment._id);
-    }
-    if (comment.targetId) {
-      persistenceComment.targetId = new Types.ObjectId(comment.targetId);
-    }
-    if (comment.userId) {
-      persistenceComment.userId = new Types.ObjectId(comment.userId);
-    }
-
-    return persistenceComment;
-  }
-
-  public static toResponseDto(data: any): CommentResponseDto {
+  public static toResponseDto(data: any): CommentResponse {
     return {
-      id: data._id?.toString(),
-      targetId: data.targetId?.toString(),
-      userId: data.userId?.toString(),
+      id: data.id?.toString(),
+      userId: data.userId.toString(),
+      targetId: data.targetId.toString(),
       comment: data.comment,
       type: data.type,
       repliesCount: data.repliesCount || 0,
       uploadedBy: {
-        userId: data.uploadedBy?._id?.toString(),
+        userId: data.uploadedBy?.userId?.toString(),
         firstname: data.uploadedBy?.firstname,
         lastname: data.uploadedBy?.lastname,
         fullname: `${data.uploadedBy?.firstname} ${data.uploadedBy?.lastname}`,

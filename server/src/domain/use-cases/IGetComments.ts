@@ -1,8 +1,8 @@
-import { CommentableType } from "../repositories/ICommentRepository";
-import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
+import type { CommentableType } from "../repositories/ICommentRepository";
+import type { CommentResponse } from "../models/Comment";
 
 export interface IGetComments {
-  execute(input: GetCommentsInput): Promise<CommentResponseDto[]>;
+  execute(input: GetCommentsInput): Promise<CommentResponse[]>;
 }
 
 export interface GetCommentsInput {

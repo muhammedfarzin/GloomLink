@@ -1,15 +1,10 @@
-import { CommentResponseDto } from "../../application/dtos/CommentResponseDto";
-import { Comment } from "../entities/Comment";
+import type { Comment } from "../entities/Comment";
+import type { CommentResponse } from "../models/Comment";
 
 export type CommentableType = "post" | "comment";
 
 export interface ICommentRepository {
-  create(commentData: {
-    targetId: string;
-    userId: string;
-    comment: string;
-    type: CommentableType;
-  }): Promise<Comment>;
+  create(comment: Comment): Promise<Comment>;
 
   findById(id: string): Promise<Comment | null>;
 
@@ -17,20 +12,20 @@ export interface ICommentRepository {
     targetId: string,
     type: CommentableType,
     page: number,
-    limit: number
-  ): Promise<CommentResponseDto[]>;
+    limit: number,
+  ): Promise<CommentResponse[]>;
 
-  findUserCommentsByTarget(
+  findByUserAndTarget(
     targetId: string,
     userId: string,
-    type: CommentableType
-  ): Promise<CommentResponseDto[]>;
+    type: CommentableType,
+  ): Promise<CommentResponse[]>;
 
   findOtherCommentsByTarget(
     targetId: string,
     userId: string,
     type: CommentableType,
     page: number,
-    limit: number
-  ): Promise<CommentResponseDto[]>;
+    limit: number,
+  ): Promise<CommentResponse[]>;
 }
