@@ -1,8 +1,8 @@
-import { LikeableType } from "../repositories/ILikeRepository";
-import { UserListViewDto } from "../../application/dtos/UserDto";
+import type { LikeableType } from "../repositories/ILikeRepository";
+import type { UserListView } from "../models/User";
 
 export interface IGetLikedUsers {
-  execute(input: GetLikedUsersInput): Promise<UserListViewDto[]>;
+  execute(input: GetLikedUsersInput): Promise<UserListView[]>;
 }
 
 export interface GetLikedUsersInput {

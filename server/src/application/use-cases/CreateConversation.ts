@@ -3,8 +3,8 @@ import { IConversationRepository } from "../../domain/repositories/IConversation
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { Conversation } from "../../domain/entities/Conversation";
-import appEmitter from "../events/appEmitter";
 import { TYPES } from "../../shared/types";
+import type { INotificationService } from "../../domain/services/INotificationService";
 import {
   ICreateConversation,
   type CreateConversationInput,
@@ -16,6 +16,8 @@ export class CreateConversation implements ICreateConversation {
     @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.INotificationService)
+    private notificationService: INotificationService,
   ) {}
 
   async execute(input: CreateConversationInput): Promise<Conversation> {
@@ -69,7 +71,7 @@ export class CreateConversation implements ICreateConversation {
       await this.conversationRepository.create(participantsIds);
 
     // Inform to all participants
-    appEmitter.emit("conversationCreated", {
+    this.notificationService.notifyConversationCreated({
       conversation: newConversation,
       creator: currentUser,
       otherParticipants: users.filter(

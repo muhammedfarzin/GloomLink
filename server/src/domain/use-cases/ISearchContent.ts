@@ -1,7 +1,7 @@
 import type { EnrichedPost } from "../models/Post";
-import { UserListViewDto } from "../../application/dtos/UserDto";
+import type { UserListView } from "../models/User";
 
-export type SearchResult = UserListViewDto | EnrichedPost;
+export type SearchResult = UserListView | EnrichedPost;
 
 export interface ISearchContent {
   execute(input: SearchContentInput): Promise<SearchResult[]>;

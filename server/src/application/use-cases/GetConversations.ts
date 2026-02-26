@@ -1,9 +1,9 @@
 import { injectable, inject } from "inversify";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { UserListViewDto } from "../dtos/UserDto";
 import { TYPES } from "../../shared/types";
-import { IGetConversations } from "../../domain/use-cases/IGetConversations";
+import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
+import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { UserListView } from "../../domain/models/User";
 
 const CONVERSATION_SUGGESTION_THRESHOLD = 10;
 
@@ -19,7 +19,7 @@ export class GetConversations implements IGetConversations {
     const conversations =
       await this.conversationRepository.findConversationsByUserId(userId);
 
-    let suggested: UserListViewDto[] = [];
+    let suggested: UserListView[] = [];
     if (conversations.length < CONVERSATION_SUGGESTION_THRESHOLD) {
       const existingParticipantIds = conversations.map((c) => c.participantId);
       suggested = await this.userRepository.findSuggestions(

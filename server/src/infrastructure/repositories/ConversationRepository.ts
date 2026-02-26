@@ -1,10 +1,10 @@
 import { injectable } from "inversify";
 import mongoose, { PipelineStage } from "mongoose";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { ConversationListDto } from "../../application/dtos/ConversationListDto";
+import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import type { ConversationList } from "../../domain/models/Conversation";
+import { Conversation } from "../../domain/entities/Conversation";
 import { ConversationModel } from "../database/models/ConversationModel";
 import { ConversationMapper } from "../mappers/ConversationMapper";
-import { Conversation } from "../../domain/entities/Conversation";
 
 @injectable()
 export class ConversationRepository implements IConversationRepository {
@@ -46,9 +46,7 @@ export class ConversationRepository implements IConversationRepository {
       : null;
   }
 
-  async findConversationsByUserId(
-    userId: string,
-  ): Promise<ConversationListDto[]> {
+  async findConversationsByUserId(userId: string): Promise<ConversationList[]> {
     const currentUserId = new mongoose.Types.ObjectId(userId);
 
     const aggregationPipeline: PipelineStage[] = [

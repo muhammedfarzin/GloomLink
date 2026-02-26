@@ -1,9 +1,10 @@
 import { User } from "../../domain/entities/User";
-import type { UserBasicDto, UserDto } from "../../application/dtos/UserDto";
+import type { UserListView } from "../../domain/models/User";
+import type { UserDto } from "../../application/dtos/UserDto";
 import type {
-  UserWithStatusDto,
+  UserBasicDto,
   UserWithAuthDto,
-  UserListViewDto,
+  UserWithStatusDto,
 } from "../../application/dtos/UserDto";
 
 export class UserMapper {
@@ -57,7 +58,7 @@ export class UserMapper {
     };
   }
 
-  public static toListView(user: any): UserListViewDto {
+  public static toListView(user: any): UserListView {
     return {
       ...UserMapper.toBasicPersistence(user),
       type: "user",

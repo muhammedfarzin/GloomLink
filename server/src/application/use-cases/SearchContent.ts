@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import { UserListViewDto } from "../dtos/UserDto";
 import { TYPES } from "../../shared/types";
-import {
-  ISearchContent,
-  type SearchContentInput,
-  type SearchResult,
-} from "../../domain/use-cases/ISearchContent";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type { IFollowRepository } from "../../domain/repositories/IFollowRepository";
+import type { UserListView } from "../../domain/models/User";
 import type { EnrichedPost } from "../../domain/models/Post";
+import type {
+  ISearchContent,
+  SearchContentInput,
+  SearchResult,
+} from "../../domain/use-cases/ISearchContent";
 
 @injectable()
 export class SearchContent implements ISearchContent {
@@ -22,7 +22,7 @@ export class SearchContent implements ISearchContent {
 
   async execute(input: SearchContentInput): Promise<SearchResult[]> {
     const { searchQuery, filter, page, limit, currentUserId } = input;
-    let users: UserListViewDto[] = [];
+    let users: UserListView[] = [];
     let posts: EnrichedPost[] = [];
 
     const currentUser = await this.userRepository.findById(currentUserId);

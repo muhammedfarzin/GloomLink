@@ -1,6 +1,8 @@
 import { Conversation } from "../../domain/entities/Conversation";
-import type { ConversationType } from "../../domain/models/Conversation";
-import type { ConversationListDto } from "../../application/dtos/ConversationListDto";
+import type {
+  ConversationType,
+  ConversationList,
+} from "../../domain/models/Conversation";
 
 export class ConversationMapper {
   public static toDomain(conversation: ConversationType): Conversation {
@@ -17,7 +19,7 @@ export class ConversationMapper {
     };
   }
 
-  public static toListView(conversation: any): ConversationListDto {
+  public static toListView(conversation: any): ConversationList {
     return {
       participantId: conversation.participantId?.toString(),
       conversationId: conversation.conversationId?.toString(),

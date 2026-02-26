@@ -1,24 +1,19 @@
 import { Server } from "socket.io";
-import appEmitter from "../../application/events/appEmitter";
-import { INotificationService } from "../../domain/services/INotificationService";
-import { Conversation } from "../../domain/entities/Conversation";
-import { User } from "../../domain/entities/User";
+import type { INotificationService } from "../../domain/services/INotificationService";
+import type { Conversation } from "../../domain/entities/Conversation";
+import type { User } from "../../domain/entities/User";
 import { ConversationMapper } from "../mappers/ConversationMapper";
-import { activeUsers } from "../../interface-adapters/websocket";
+import { inject } from "inversify";
+import { TYPES } from "../../shared/types";
 
 export class SocketNotificationService implements INotificationService {
-  private io: Server;
+  constructor(
+    @inject(TYPES.SocketServer) private readonly io: Server,
+    @inject(TYPES.SocketActiveUsers)
+    private readonly activeUsers: Record<string, Set<string>>,
+  ) {}
 
-  constructor(io: Server) {
-    this.io = io;
-    this.listenForEvents();
-  }
-
-  private listenForEvents() {
-    appEmitter.on("conversationCreated", this.handleConversationCreated);
-  }
-
-  public handleConversationCreated = (data: {
+  public notifyConversationCreated = (data: {
     conversation: Conversation;
     creator: User;
     otherParticipants: User[];
@@ -37,7 +32,7 @@ export class SocketNotificationService implements INotificationService {
     });
 
     // Emit to the creator
-    const creatorSockets = activeUsers[creator.getUsername()];
+    const creatorSockets = this.activeUsers[creator.getUsername()];
     if (creatorSockets) {
       creatorSockets.forEach((socketId) => {
         this.io.sockets.sockets
@@ -49,7 +44,7 @@ export class SocketNotificationService implements INotificationService {
 
     // Emit to other participants
     otherParticipants.forEach((participant) => {
-      const participantSockets = activeUsers[participant.getUsername()];
+      const participantSockets = this.activeUsers[participant.getUsername()];
       if (participantSockets) {
         participantSockets.forEach((socketId) => {
           this.io.sockets.sockets

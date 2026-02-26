@@ -1,9 +1,7 @@
 import type { User } from "../entities/User";
+import type { UserListView } from "../models/User";
 import type { EnrichedPost } from "../models/Post";
-import type {
-  UserListViewDto,
-  UserProfileResponseDto,
-} from "../../application/dtos/UserDto";
+import type { UserProfile } from "../models/User";
 
 export interface IUserRepository {
   create: (user: User) => Promise<User>;
@@ -28,11 +26,11 @@ export interface IUserRepository {
     username: string,
     currentUserId: string,
     limit?: number,
-  ): Promise<UserProfileResponseDto | null>;
+  ): Promise<UserProfile | null>;
   findByStatus(
     status: UserStatus,
     options: UserOptions,
-  ): Promise<UserListViewDto[]>;
+  ): Promise<UserListView[]>;
   findAll(options: {
     filter: "all" | "active" | "blocked";
     searchQuery?: string;
@@ -43,7 +41,7 @@ export interface IUserRepository {
     userId: string,
     excludeIds: string[],
     limit: number,
-  ): Promise<UserListViewDto[]>;
+  ): Promise<UserListView[]>;
 }
 
 export type UserStatus = "active" | "blocked" | "inactive";

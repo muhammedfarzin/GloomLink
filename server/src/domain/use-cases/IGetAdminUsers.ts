@@ -1,7 +1,7 @@
-import { UserWithStatusDto } from "../../application/dtos/UserDto";
+import type { User } from "../entities/User";
 
 export interface IGetAdminUsers {
-  execute(input: GetAdminUsersInput): Promise<UserWithStatusDto[]>;
+  execute(input: GetAdminUsersInput): Promise<User[]>;
 }
 
 export interface GetAdminUsersInput {

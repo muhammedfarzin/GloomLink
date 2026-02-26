@@ -1,14 +1,14 @@
 import { injectable } from "inversify";
+import mongoose, { type PipelineStage } from "mongoose";
+import type { Follow } from "../../domain/entities/Follow";
+import type { UserListView } from "../../domain/models/User";
 import type {
   FollowListOptions,
   FollowListType,
   IFollowRepository,
 } from "../../domain/repositories/IFollowRepository";
-import type { Follow } from "../../domain/entities/Follow";
 import { FollowModel } from "../database/models/FollowModel";
 import { FollowMapper } from "../mappers/FollowMapper";
-import mongoose, { type PipelineStage } from "mongoose";
-import type { UserListViewDto } from "../../application/dtos/UserDto";
 
 @injectable()
 export class FollowRepository implements IFollowRepository {
@@ -36,7 +36,7 @@ export class FollowRepository implements IFollowRepository {
     userId: string,
     type: FollowListType,
     options: FollowListOptions,
-  ): Promise<UserListViewDto[]> {
+  ): Promise<UserListView[]> {
     const { currentUserId, page, limit } = options;
     const skip = (page - 1) * limit;
 

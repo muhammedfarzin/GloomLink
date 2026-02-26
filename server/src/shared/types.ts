@@ -18,6 +18,7 @@ const TYPES = {
   IMailService: Symbol.for("IMailService"),
   IOtpService: Symbol.for("IOtpService"),
   IExternalAuthService: Symbol.for("IExternalAuthService"),
+  INotificationService: Symbol.for("INotificationService"),
 
   // Use Cases
   ICreateUser: Symbol.for("ICreateUser"),
@@ -68,6 +69,10 @@ const TYPES = {
   ReportController: Symbol.for("ReportController"),
   SearchController: Symbol.for("SearchController"),
   AdminController: Symbol.for("AdminController"),
+
+  // Constants
+  SocketServer: Symbol.for("SocketServer"),
+  SocketActiveUsers: Symbol.for("SocketActiveUsers"),
 };
 
 export { TYPES };

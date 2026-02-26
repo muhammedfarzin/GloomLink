@@ -1,4 +1,4 @@
-import type { UserListViewDto } from "../../application/dtos/UserDto";
+import type { UserListView } from "../models/User";
 import type { Follow } from "../entities/Follow";
 
 export type FollowListType = "followers" | "following";
@@ -16,6 +16,6 @@ export interface IFollowRepository {
     userId: string,
     type: FollowListType,
     options: FollowListOptions,
-  ): Promise<UserListViewDto[]>;
+  ): Promise<UserListView[]>;
   deleteById(id: string): Promise<void>;
 }

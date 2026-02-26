@@ -1,9 +1,9 @@
-import { ConversationListDto } from "../../application/dtos/ConversationListDto";
-import { UserListViewDto } from "../../application/dtos/UserDto";
+import type { ConversationList } from "../models/Conversation";
+import type { UserListView } from "../models/User";
 
 interface ConversationResponse {
-  conversations: ConversationListDto[];
-  suggested: UserListViewDto[];
+  conversations: ConversationList[];
+  suggested: UserListView[];
 }
 
 export interface IGetConversations {

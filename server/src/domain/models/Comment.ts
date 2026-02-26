@@ -1,4 +1,4 @@
-import type { UserCompactProfile } from "./UserCompactProfile";
+import type { UserCompactProfile } from "./User";
 
 export interface CommentType {
   id: string;

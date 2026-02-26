@@ -2,7 +2,8 @@ import http from "http";
 import { Server } from "socket.io";
 import { handleSocketConnection } from "./connection-handler";
 import { authenticateTokenForSocket } from "../middleware/socket.auth-token.middleware";
-import { SocketNotificationService } from "../../infrastructure/services/SocketNotificationService";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
 
 export const activeUsers: Record<string, Set<string>> = {};
 
@@ -13,5 +14,8 @@ export const setupSocket = (server: http.Server) => {
 
   io.on("connection", handleSocketConnection);
 
-  new SocketNotificationService(io);
+  container.bind(TYPES.SocketActiveUsers).toConstantValue(activeUsers);
+  container.bind(TYPES.SocketServer).toConstantValue(io);
+
+  return io;
 };

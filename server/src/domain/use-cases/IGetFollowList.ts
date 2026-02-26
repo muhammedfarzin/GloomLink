@@ -1,8 +1,8 @@
-import { FollowListType } from "../repositories/IFollowRepository";
-import { UserListViewDto } from "../../application/dtos/UserDto";
+import type { FollowListType } from "../repositories/IFollowRepository";
+import type { UserListView } from "../models/User";
 
 export interface IGetFollowList {
-  execute(input: GetFollowListInput): Promise<UserListViewDto[]>;
+  execute(input: GetFollowListInput): Promise<UserListView[]>;
 }
 
 export interface GetFollowListInput {

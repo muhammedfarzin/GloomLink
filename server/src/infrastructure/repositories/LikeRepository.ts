@@ -1,14 +1,13 @@
 import { injectable } from "inversify";
-import {
+import mongoose, { PipelineStage } from "mongoose";
+import type { UserListView } from "../../domain/models/User";
+import type {
   ILikeRepository,
-  LikeableType,
   LikeOptions,
 } from "../../domain/repositories/ILikeRepository";
 import { Like } from "../../domain/entities/Like";
 import { LikeModel } from "../database/models/LikeModel";
 import { LikeMapper } from "../mappers/LikeMapper";
-import { UserListViewDto } from "../../application/dtos/UserDto";
-import mongoose, { PipelineStage } from "mongoose";
 
 @injectable()
 export class LikeRepository implements ILikeRepository {
@@ -32,7 +31,7 @@ export class LikeRepository implements ILikeRepository {
   async findLikersByTarget(
     targetId: string,
     options: LikeOptions,
-  ): Promise<UserListViewDto[]> {
+  ): Promise<UserListView[]> {
     const { userId, type, page, limit } = options;
     const skip = (page - 1) * limit;
 

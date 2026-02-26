@@ -10,6 +10,7 @@ import type { IGetAdminPosts } from "../../domain/use-cases/IGetAdminPosts";
 import type { ITogglePostStatus } from "../../domain/use-cases/ITogglePostStatus";
 
 import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
+import { UserMapper } from "../../infrastructure/mappers/UserMapper";
 
 @injectable()
 export class AdminController {
@@ -36,8 +37,10 @@ export class AdminController {
         ...validatedData,
       });
 
+      const usersData = users.map(UserMapper.toResponseWithStatus);
+
       res.status(200).json({
-        usersData: users,
+        usersData,
         message: "Users fetched successfully",
       });
     } catch (error) {

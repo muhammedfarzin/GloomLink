@@ -6,6 +6,7 @@ import { JwtTokenService } from "../infrastructure/services/JwtTokenService";
 import { MailService } from "../infrastructure/services/MailService";
 import { OtpService } from "../infrastructure/services/OtpService";
 import { FirebaseAuthService } from "../infrastructure/services/FirebaseAuthService";
+import { SocketNotificationService } from "../infrastructure/services/SocketNotificationService";
 
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { CommentRepository } from "../infrastructure/repositories/CommentRepository";
@@ -24,6 +25,7 @@ import type { IExternalAuthService } from "../domain/services/IExternalAuthServi
 import type { ITokenService } from "../domain/services/ITokenService";
 import type { IMailService } from "../domain/services/IMailService";
 import type { IOtpService } from "../domain/services/IOtpService";
+import type { INotificationService } from "../domain/services/INotificationService";
 
 import type { IUserRepository } from "../domain/repositories/IUserRepository";
 import type { ICommentRepository } from "../domain/repositories/ICommentRepository";
@@ -98,6 +100,10 @@ container
 container
   .bind<IFileStorageService>(TYPES.IFileStorageService)
   .to(CloudinaryStorageService);
+container
+  .bind<INotificationService>(TYPES.INotificationService)
+  .to(SocketNotificationService)
+  .inSingletonScope();
 
 // --- BIND REPOSITORIES ---
 container.bind<IFollowRepository>(TYPES.IFollowRepository).to(FollowRepository);
@@ -144,9 +150,7 @@ container
   .bind<GetRecommendedPosts>(TYPES.IGetRecommendedPosts)
   .to(GetRecommendedPosts);
 container.bind<GetSavedPosts>(TYPES.IGetSavedPosts).to(GetSavedPosts);
-container
-  .bind<FetchUser>(TYPES.IFetchUser)
-  .to(FetchUser);
+container.bind<FetchUser>(TYPES.IFetchUser).to(FetchUser);
 container.bind<GetUserProfile>(TYPES.IGetUserProfile).to(GetUserProfile);
 container.bind<LoginUser>(TYPES.ILoginUser).to(LoginUser);
 container

@@ -1,7 +1,7 @@
-import { UserProfileResponseDto } from "../../application/dtos/UserDto";
+import type { UserProfile } from "../models/User";
 
 export interface IGetUserProfile {
-  execute(input: GetUserProfileInput): Promise<UserProfileResponseDto>;
+  execute(input: GetUserProfileInput): Promise<UserProfile>;
 }
 
 export interface GetUserProfileInput {

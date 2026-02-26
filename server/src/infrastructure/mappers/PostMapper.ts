@@ -1,5 +1,5 @@
 import { Post } from "../../domain/entities/Post";
-import type { UserProfileResponseDto } from "../../application/dtos/UserDto";
+import type { UserProfile } from "../../domain/models/User";
 import type {
   EnrichedPost,
   PostCompact,
@@ -51,7 +51,7 @@ export class PostMapper {
     };
   }
 
-  public static toProfileResponse(data: any): UserProfileResponseDto {
+  public static toProfileResponse(data: any): UserProfile {
     return {
       userId: data.userId.toString(),
       username: data.username,

@@ -4,20 +4,16 @@ import { PostMapper } from "../mappers/PostMapper";
 import { UserDocument, UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../mappers/UserMapper";
 
+import { User } from "../../domain/entities/User";
+import type { EnrichedPost } from "../../domain/models/Post";
+import type { UserListView, UserProfile } from "../../domain/models/User";
 import type {
   IUserRepository,
   UserIdentifier,
   UserOptions,
   UserStatus,
 } from "../../domain/repositories/IUserRepository";
-import { User } from "../../domain/entities/User";
-import type { EnrichedPost } from "../../domain/models/Post";
-import type {
-  UserDto,
-  UserListViewDto,
-  UserProfileResponseDto,
-} from "../../application/dtos/UserDto";
-import type { UserCompactProfile } from "../../domain/models/UserCompactProfile";
+import type { UserDto } from "../../application/dtos/UserDto";
 
 @injectable()
 export class UserRepository implements IUserRepository {
@@ -201,7 +197,7 @@ export class UserRepository implements IUserRepository {
     username: string,
     currentUserId: string,
     limit = 15,
-  ): Promise<UserProfileResponseDto | null> {
+  ): Promise<UserProfile | null> {
     const viewerId = currentUserId
       ? new mongoose.Types.ObjectId(currentUserId)
       : null;
@@ -283,7 +279,7 @@ export class UserRepository implements IUserRepository {
   async findByStatus(
     status: UserStatus,
     options: UserOptions,
-  ): Promise<UserListViewDto[]> {
+  ): Promise<UserListView[]> {
     const { userId, searchQuery = "", page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -380,7 +376,7 @@ export class UserRepository implements IUserRepository {
     userId: string,
     excludeIds: string[],
     limit: number,
-  ): Promise<UserListViewDto[]> {
+  ): Promise<UserListView[]> {
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const excludeObjectIds = excludeIds.map(
       (id) => new mongoose.Types.ObjectId(id),
