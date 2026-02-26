@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { inject } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UserMapper } from "../../infrastructure/mappers/UserMapper";
+import { UserPresenter } from "../presenters/UserPresenter";
 import { TYPES } from "../../shared/types";
 
 import type { ITokenService } from "../../domain/services/ITokenService";
@@ -52,7 +52,7 @@ export class AuthController {
         });
       }
 
-      const userResponse = UserMapper.toResponseWithStatus(user);
+      const userResponse = UserPresenter.toResponseWithStatus(user);
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
         userResponse.status !== "not-verified",
@@ -88,7 +88,7 @@ export class AuthController {
       });
 
       // --- Generate Token & Respond ---
-      const userResponse = UserMapper.toResponseWithStatus(newUser);
+      const userResponse = UserPresenter.toResponseWithStatus(newUser);
 
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
@@ -132,7 +132,7 @@ export class AuthController {
         otp,
       });
 
-      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
+      const userResponse = UserPresenter.toResponseWithStatus(updatedUser);
 
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
@@ -156,7 +156,7 @@ export class AuthController {
       const authData =
         await this.externalAuthService.verifyGoogleAuthToken(token);
       const user = await this.signInWithGoogleUseCase.execute(authData);
-      const userResponse = UserMapper.toResponseWithStatus(user);
+      const userResponse = UserPresenter.toResponseWithStatus(user);
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
         true,

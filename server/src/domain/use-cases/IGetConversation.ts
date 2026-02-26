@@ -1,6 +1,6 @@
 import { Conversation } from "../entities/Conversation";
 
-export interface IGetConversationId {
+export interface IGetConversation {
   execute(input: GetConversationIdInput): Promise<Conversation>;
 }
 

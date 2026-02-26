@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { HttpError } from "../../infrastructure/errors/HttpError";
-import { UserMapper } from "../../infrastructure/mappers/UserMapper";
+import { UserPresenter } from "../presenters/UserPresenter";
 import { TYPES } from "../../shared/types";
 
 import type { IGetUserProfile } from "../../domain/use-cases/IGetUserProfile";
@@ -47,7 +47,7 @@ export class ProfileController {
       }
 
       const user = await this.fetchUserUseCase.execute(req.user.id);
-      const userResponseDto = UserMapper.toResponseWithAuthType(user);
+      const userResponseDto = UserPresenter.toResponseWithAuthType(user);
 
       res.status(200).json({
         userData: userResponseDto,
@@ -73,7 +73,7 @@ export class ProfileController {
         profileImageFile,
       });
 
-      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
+      const userResponse = UserPresenter.toResponseWithStatus(updatedUser);
 
       res.status(200).json({
         userData: userResponse,

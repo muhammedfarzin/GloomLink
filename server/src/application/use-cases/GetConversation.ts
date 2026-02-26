@@ -1,16 +1,16 @@
 import { injectable, inject } from "inversify";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { Conversation } from "../../domain/entities/Conversation";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
-import {
-  IGetConversationId,
-  type GetConversationIdInput,
-} from "../../domain/use-cases/IGetConversationId";
+import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type {
+  IGetConversation,
+  GetConversationIdInput,
+} from "../../domain/use-cases/IGetConversation";
 
 @injectable()
-export class GetConversationId implements IGetConversationId {
+export class GetConversation implements IGetConversation {
   constructor(
     @inject(TYPES.IConversationRepository)
     private conversationRepository: IConversationRepository,

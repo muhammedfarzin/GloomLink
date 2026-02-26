@@ -6,10 +6,11 @@ import { TYPES } from "../../shared/types";
 
 import type { ICreateConversation } from "../../domain/use-cases/ICreateConversation";
 import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
-import type { IGetConversationId } from "../../domain/use-cases/IGetConversationId";
+import type { IGetConversation } from "../../domain/use-cases/IGetConversation";
 import type { IGetMessages } from "../../domain/use-cases/IGetMessages";
 
 import { createConversationSchema } from "../validation/conversationSchemas";
+import { MessagePresenter } from "../presenters/MessagePresenter";
 
 @injectable()
 export class ConversationController {
@@ -18,8 +19,8 @@ export class ConversationController {
     private createConversationUseCase: ICreateConversation,
     @inject(TYPES.IGetConversations)
     private getConversationsUseCase: IGetConversations,
-    @inject(TYPES.IGetConversationId)
-    private getConversationIdUseCase: IGetConversationId,
+    @inject(TYPES.IGetConversation)
+    private getConversationUseCase: IGetConversation,
     @inject(TYPES.IGetMessages) private getMessagesUseCase: IGetMessages,
   ) {}
 
@@ -67,7 +68,7 @@ export class ConversationController {
       }
 
       const { username: targetUsername } = req.params;
-      const conversation = await this.getConversationIdUseCase.execute({
+      const conversation = await this.getConversationUseCase.execute({
         participantsUsername: [req.user.username, targetUsername],
       });
 
@@ -99,7 +100,7 @@ export class ConversationController {
       });
 
       res.status(200).json({
-        messagesData: messages,
+        messagesData: messages.map(MessagePresenter.toResponse),
         message: "Messages fetched successfully.",
       });
     } catch (error) {

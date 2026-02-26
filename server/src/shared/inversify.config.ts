@@ -48,7 +48,7 @@ import { EditPost } from "../application/use-cases/EditPost";
 import { GetAdminPosts } from "../application/use-cases/GetAdminPosts";
 import { GetAdminUsers } from "../application/use-cases/GetAdminUsers";
 import { GetComments } from "../application/use-cases/GetComments";
-import { GetConversationId } from "../application/use-cases/GetConversationId";
+import { GetConversation } from "../application/use-cases/GetConversation";
 import { GetConversations } from "../application/use-cases/GetConversations";
 import { GetFollowList } from "../application/use-cases/GetFollowList";
 import { GetLikedUsers } from "../application/use-cases/GetLikedUsers";
@@ -138,9 +138,7 @@ container.bind<EditPost>(TYPES.IEditPost).to(EditPost);
 container.bind<GetAdminPosts>(TYPES.IGetAdminPosts).to(GetAdminPosts);
 container.bind<GetAdminUsers>(TYPES.IGetAdminUsers).to(GetAdminUsers);
 container.bind<GetComments>(TYPES.IGetComments).to(GetComments);
-container
-  .bind<GetConversationId>(TYPES.IGetConversationId)
-  .to(GetConversationId);
+container.bind<GetConversation>(TYPES.IGetConversation).to(GetConversation);
 container.bind<GetConversations>(TYPES.IGetConversations).to(GetConversations);
 container.bind<GetFollowList>(TYPES.IGetFollowList).to(GetFollowList);
 container.bind<GetLikedUsers>(TYPES.IGetLikedUsers).to(GetLikedUsers);

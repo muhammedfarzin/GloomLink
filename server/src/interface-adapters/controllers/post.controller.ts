@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
+import { PostPresenter } from "../presenters/PostPresenter";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { recordInteractionSchema } from "../validation/interactionSchemas";
 import { TYPES } from "../../shared/types";
@@ -56,7 +57,7 @@ export class PostController {
       });
 
       res.status(201).json({
-        postData: newPost,
+        postData: PostPresenter.toResponse(newPost),
         message: "Post created successfully",
       });
     } catch (error) {
@@ -85,7 +86,10 @@ export class PostController {
 
       res
         .status(200)
-        .json({ postData: updatedPost, message: "Post updated successfully" });
+        .json({
+          postData: PostPresenter.toResponse(updatedPost),
+          message: "Post updated successfully",
+        });
     } catch (error) {
       next(error);
     }

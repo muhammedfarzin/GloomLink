@@ -9,6 +9,7 @@ import {
 } from "../validation/socketSchemas";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
+import { MessagePresenter } from "../presenters/MessagePresenter";
 
 export class SocketController {
   socket: Socket;
@@ -41,8 +42,13 @@ export class SocketController {
         conversationId,
       });
 
-      this.socket.to(conversationId).emit("send-message", newMessage);
-      this.socket.emit("send-message-success", newMessage);
+      this.socket
+        .to(conversationId)
+        .emit("send-message", MessagePresenter.toResponse(newMessage));
+      this.socket.emit(
+        "send-message-success",
+        MessagePresenter.toResponse(newMessage),
+      );
     } catch (error: any) {
       this.socket.emit("error-send-message", error.message, data);
     }
@@ -65,7 +71,7 @@ export class SocketController {
         if (senderSocketIds && senderSocketIds.size) {
           this.socket
             .to([...senderSocketIds])
-            .emit("message-seen", updatedMessage);
+            .emit("message-seen", MessagePresenter.toResponse(updatedMessage));
         }
       }
     } catch (error: any) {

@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
+import { CommentPresenter } from "../presenters/CommentPresenter";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TYPES } from "../../shared/types";
 
@@ -42,7 +43,7 @@ export class CommentController {
       }
 
       res.status(201).json({
-        commentData: newComment,
+        commentData: CommentPresenter.toResponse(newComment),
         message: "Comment added successfully",
       });
     } catch (error) {
