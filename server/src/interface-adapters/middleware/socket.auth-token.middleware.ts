@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
 import { activeUsers } from "../websocket";
 import container from "../../shared/inversify.config";
@@ -34,9 +34,9 @@ export const authenticateTokenForSocket = async (
         allowNotVerified: true,
       });
 
-      if (!user) throw new Error("Unauthorized: Invalid user");
+      if (!user) throw new HttpError(401, "Unauthorized: Invalid user");
       if (user.isBlocked())
-        throw new Error("Unauthorized: User has been blocked");
+        throw new HttpError(401, "Unauthorized: User has been blocked");
 
       const conversations = await getConversationsUseCase.execute(user.getId());
       socket.join(

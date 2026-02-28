@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import { ILoginUser, type LoginInput } from "../../domain/use-cases/ILoginUser";
 

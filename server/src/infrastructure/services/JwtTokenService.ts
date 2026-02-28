@@ -5,7 +5,7 @@ import {
   TokenPayload,
   Tokens,
 } from "../../domain/services/ITokenService";
-import { HttpError } from "../errors/HttpError";
+import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
 
 @injectable()
 export class JwtTokenService implements ITokenService {
@@ -37,8 +37,7 @@ export class JwtTokenService implements ITokenService {
       }
       return { id, role };
     } catch (error) {
-        
-      throw new HttpError(403, `Invalid or expired ${type} token.`);
+      throw new UnauthorizedError(`Invalid or expired ${type} token.`);
     }
   }
 }

@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { PostPresenter } from "../presenters/PostPresenter";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { recordInteractionSchema } from "../validation/interactionSchemas";
 import { TYPES } from "../../shared/types";
 

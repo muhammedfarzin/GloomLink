@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { Conversation } from "../../domain/entities/Conversation";
 import { TYPES } from "../../shared/types";
 import type { INotificationService } from "../../domain/services/INotificationService";

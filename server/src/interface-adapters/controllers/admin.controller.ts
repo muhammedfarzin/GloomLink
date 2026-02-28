@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { UserPresenter } from "../presenters/UserPresenter";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
 import { TYPES } from "../../shared/types";
 

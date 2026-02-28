@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { Message } from "../../domain/entities/Message";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import {
   IGetMessages,

@@ -1,10 +1,10 @@
 import { injectable } from "inversify";
 import { v2 as cloudinary } from "cloudinary";
-import {
+import { StorageServiceError } from "../../domain/errors/StorageServiceError";
+import type {
   IFileStorageService,
   UploadedFile,
 } from "../../domain/services/IFileStorageService";
-import { HttpError } from "../errors/HttpError";
 
 @injectable()
 export class CloudinaryStorageService implements IFileStorageService {
@@ -18,7 +18,7 @@ export class CloudinaryStorageService implements IFileStorageService {
 
   async upload(
     files: Express.Multer.File[],
-    folder?: string
+    folder?: string,
   ): Promise<UploadedFile[]> {
     const uploadPromises = files.map((file) => {
       const resource_type = file.mimetype.startsWith("video")
@@ -39,7 +39,7 @@ export class CloudinaryStorageService implements IFileStorageService {
       }));
     } catch (error) {
       console.error("Cloudinary upload failed:", error);
-      throw new HttpError(500, "Failed to upload files to cloud storage.");
+      throw new StorageServiceError("Failed to upload files to cloud storage.");
     }
   }
 
@@ -48,7 +48,7 @@ export class CloudinaryStorageService implements IFileStorageService {
       const afterUploadIndex = url.indexOf("/upload/") + 8;
       const pathWithVersion = url.substring(afterUploadIndex);
       const pathWithoutVersion = pathWithVersion.substring(
-        pathWithVersion.indexOf("/") + 1
+        pathWithVersion.indexOf("/") + 1,
       );
       return pathWithoutVersion.split(".")[0];
     };
@@ -57,7 +57,7 @@ export class CloudinaryStorageService implements IFileStorageService {
       const publicId = getPublicId(url);
       return cloudinary.uploader.destroy(
         publicId,
-        type && { resource_type: type }
+        type && { resource_type: type },
       );
     });
 

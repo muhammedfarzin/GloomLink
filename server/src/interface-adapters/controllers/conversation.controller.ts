@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { getMessagesSchema } from "../validation/followSchemas";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { TYPES } from "../../shared/types";
 
 import type { ICreateConversation } from "../../domain/use-cases/ICreateConversation";

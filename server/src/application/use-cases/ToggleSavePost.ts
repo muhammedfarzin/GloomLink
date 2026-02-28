@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import {
   IToggleSavePost,

@@ -3,7 +3,7 @@ import { User } from "../../domain/entities/User";
 import { IReportRepository } from "../../domain/repositories/IReportRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import {
   IReportTarget,

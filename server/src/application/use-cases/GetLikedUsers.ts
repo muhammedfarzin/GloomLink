@@ -1,5 +1,5 @@
 import { injectable, inject } from "inversify";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import type { ILikeRepository } from "../../domain/repositories/ILikeRepository";
 import type { IPostRepository } from "../../domain/repositories/IPostRepository";

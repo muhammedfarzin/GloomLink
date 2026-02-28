@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";

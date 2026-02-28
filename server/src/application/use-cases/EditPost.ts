@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { Post } from "../../domain/entities/Post";
 import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import {

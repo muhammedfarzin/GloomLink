@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { UserPresenter } from "../presenters/UserPresenter";
 import { TYPES } from "../../shared/types";
 

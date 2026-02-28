@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import { Follow } from "../../domain/entities/Follow";
 import {

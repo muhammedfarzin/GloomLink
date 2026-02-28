@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { CommentPresenter } from "../presenters/CommentPresenter";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../errors/HttpError";
 import { TYPES } from "../../shared/types";
 
 import type { IAddComment } from "../../domain/use-cases/IAddComment";

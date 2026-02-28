@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { Conversation } from "../../domain/entities/Conversation";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import type { IUserRepository } from "../../domain/repositories/IUserRepository";

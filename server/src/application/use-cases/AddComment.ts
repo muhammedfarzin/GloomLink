@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { ICommentRepository } from "../../domain/repositories/ICommentRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { Comment } from "../../domain/entities/Comment";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import {
   IAddComment,

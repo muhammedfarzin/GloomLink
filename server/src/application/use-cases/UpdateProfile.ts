@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import { User } from "../../domain/entities/User";
-import { HttpError } from "../../infrastructure/errors/HttpError";
+import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { TYPES } from "../../shared/types";
 import {
