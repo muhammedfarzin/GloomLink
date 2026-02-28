@@ -9,6 +9,7 @@ import type { EnrichedPost } from "../../domain/models/Post";
 import type { UserListView, UserProfile } from "../../domain/models/User";
 import type {
   IUserRepository,
+  SuggestionInput,
   UserIdentifier,
   UserOptions,
   UserStatus,
@@ -372,13 +373,9 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  async findSuggestions(
-    userId: string,
-    excludeIds: string[],
-    limit: number,
-  ): Promise<UserListView[]> {
-    const userObjectId = new mongoose.Types.ObjectId(userId);
-    const excludeObjectIds = excludeIds.map(
+  async findSuggestions(input: SuggestionInput): Promise<UserListView[]> {
+    const userObjectId = new mongoose.Types.ObjectId(input.userId);
+    const excludeObjectIds = input.excludeIds.map(
       (id) => new mongoose.Types.ObjectId(id),
     );
 
@@ -415,7 +412,7 @@ export class UserRepository implements IUserRepository {
           ],
           random: [
             {
-              $sample: { size: limit * 2 },
+              $sample: { size: input.limit * 2 },
             },
           ],
         },
@@ -432,7 +429,7 @@ export class UserRepository implements IUserRepository {
           doc: { $first: "$suggestions" },
         },
       },
-      { $limit: limit },
+      { $limit: input.limit },
       { $replaceRoot: { newRoot: "$doc" } },
       {
         $project: {
@@ -449,7 +446,7 @@ export class UserRepository implements IUserRepository {
           isFollowing: {
             $eq: [
               { $toString: { $arrayElemAt: ["$followDoc.followedBy", 0] } },
-              userId,
+              input.userId,
             ],
           },
         },

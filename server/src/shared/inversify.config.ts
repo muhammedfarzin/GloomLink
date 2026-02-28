@@ -65,6 +65,7 @@ import { SearchContent } from "../application/use-cases/SearchContent";
 import { SendMessage } from "../application/use-cases/SendMessage";
 import { SendVerificationEmail } from "../application/use-cases/SendVerificationEmail";
 import { SignInWithGoogle } from "../application/use-cases/SignInWithGoogle";
+import { SuggestUser } from "../application/use-cases/SuggestUser";
 import { ToggleFollow } from "../application/use-cases/ToggleFollow";
 import { ToggleLike } from "../application/use-cases/ToggleLike";
 import { TogglePostStatus } from "../application/use-cases/TogglePostStatus";
@@ -165,6 +166,7 @@ container
   .bind<SendVerificationEmail>(TYPES.ISendVerificationEmail)
   .to(SendVerificationEmail);
 container.bind<SignInWithGoogle>(TYPES.ISignInWithGoogle).to(SignInWithGoogle);
+container.bind<SuggestUser>(TYPES.ISuggestUser).to(SuggestUser);
 container.bind<ToggleFollow>(TYPES.IToggleFollow).to(ToggleFollow);
 container.bind<ToggleLike>(TYPES.IToggleLike).to(ToggleLike);
 container.bind<TogglePostStatus>(TYPES.ITogglePostStatus).to(TogglePostStatus);

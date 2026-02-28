@@ -49,6 +49,7 @@ const TYPES = {
   ISearchContent: Symbol.for("ISearchContent"),
   ISendMessage: Symbol.for("ISendMessage"),
   ISendVerificationEmail: Symbol.for("ISendVerificationEmail"),
+  ISuggestUser: Symbol.for("ISuggestUser"),
   IToggleFollow: Symbol.for("IToggleFollow"),
   IToggleLike: Symbol.for("IToggleLike"),
   ITogglePostStatus: Symbol.for("ITogglePostStatus"),

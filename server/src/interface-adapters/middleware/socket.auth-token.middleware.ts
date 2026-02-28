@@ -1,10 +1,12 @@
 import jwt from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
-import type { ExtendedError, Socket } from "socket.io";
 import { activeUsers } from "../websocket";
-import { ConversationRepository } from "../../infrastructure/repositories/ConversationRepository";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
+import type { ExtendedError, Socket } from "socket.io";
+import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
+import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
 
 export const authenticateTokenForSocket = async (
   socket: Socket,
@@ -23,16 +25,20 @@ export const authenticateTokenForSocket = async (
     ) as TokenPayloadType;
 
     if (data.role === "user") {
-      const userRepository = new UserRepository();
-      const conversationRepository = new ConversationRepository();
+      const fetchUserUseCase = container.get<IFetchUser>(TYPES.IFetchUser);
+      const getConversationsUseCase = container.get<IGetConversations>(
+        TYPES.IGetConversations,
+      );
 
-      var user = await userRepository.findById(data.id);
+      var user = await fetchUserUseCase.execute(data.id, {
+        allowNotVerified: true,
+      });
+
       if (!user) throw new Error("Unauthorized: Invalid user");
       if (user.isBlocked())
         throw new Error("Unauthorized: User has been blocked");
 
-      const conversations =
-        await conversationRepository.findConversationsByUserId(user.getId());
+      const conversations = await getConversationsUseCase.execute(user.getId());
       socket.join(
         conversations.map((conversation) => conversation.conversationId),
       );

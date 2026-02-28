@@ -8,6 +8,7 @@ import type { ICreateConversation } from "../../domain/use-cases/ICreateConversa
 import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
 import type { IGetConversation } from "../../domain/use-cases/IGetConversation";
 import type { IGetMessages } from "../../domain/use-cases/IGetMessages";
+import type { ISuggestUser } from "../../domain/use-cases/ISuggestUser";
 
 import { createConversationSchema } from "../validation/conversationSchemas";
 import { MessagePresenter } from "../presenters/MessagePresenter";
@@ -22,6 +23,7 @@ export class ConversationController {
     @inject(TYPES.IGetConversation)
     private getConversationUseCase: IGetConversation,
     @inject(TYPES.IGetMessages) private getMessagesUseCase: IGetMessages,
+    @inject(TYPES.ISuggestUser) private suggestUserUseCase: ISuggestUser,
   ) {}
 
   createConversation: RequestHandler = async (req, res, next) => {
@@ -51,11 +53,23 @@ export class ConversationController {
         throw new HttpError(401, "Unauthorized");
       }
 
-      const result = await this.getConversationsUseCase.execute(req.user.id);
+      const CONVERSATION_SUGGESTION_THRESHOLD = 10;
+      const userId = req.user.id;
+      const conversations = await this.getConversationsUseCase.execute(userId);
+      const suggestedUsers =
+        conversations.length < CONVERSATION_SUGGESTION_THRESHOLD
+          ? await this.suggestUserUseCase.execute({
+              userId,
+              excludeIds: conversations.map((c) => c.participantId),
+              limit: 5,
+            })
+          : [];
 
-      res
-        .status(200)
-        .json({ ...result, message: "Conversations fetched successfully" });
+      res.status(200).json({
+        conversations,
+        suggestedUsers,
+        message: "Conversations fetched successfully",
+      });
     } catch (error) {
       next(error);
     }

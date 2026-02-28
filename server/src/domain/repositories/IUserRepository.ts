@@ -37,11 +37,7 @@ export interface IUserRepository {
     page: number;
     limit: number;
   }): Promise<User[]>;
-  findSuggestions(
-    userId: string,
-    excludeIds: string[],
-    limit: number,
-  ): Promise<UserListView[]>;
+  findSuggestions(input: SuggestionInput): Promise<UserListView[]>;
 }
 
 export type UserStatus = "active" | "blocked" | "inactive";
@@ -55,5 +51,11 @@ export interface UserOptions {
   userId?: string;
   searchQuery?: string;
   page: number;
+  limit: number;
+}
+
+export interface SuggestionInput {
+  userId: string;
+  excludeIds: string[];
   limit: number;
 }

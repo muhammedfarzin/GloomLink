@@ -2,7 +2,9 @@ import { RequestHandler } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../../infrastructure/errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
-import { UserRepository } from "../../infrastructure/repositories/UserRepository";
+import container from "../../shared/inversify.config";
+import { TYPES } from "../../shared/types";
+import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
 
 export const authenticateToken: RequestHandler = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -17,13 +19,22 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
       process.env.JWT_ACCESS_SECRET || "secret",
     ) as TokenPayloadType;
 
-    const userRepository = new UserRepository();
+    const fetchUserUseCase = container.get<IFetchUser>(TYPES.IFetchUser);
 
     if (data.role === "user") {
-      const user = await userRepository.findById(data.id);
+      const user = await fetchUserUseCase.execute(data.id, {
+        allowNotVerified: true,
+      });
+
       if (!user) throw new HttpError(401, "Unauthorized: User not found");
       if (user.isBlocked())
         throw new HttpError(401, "Unauthorized: User has been blocked");
+      if (
+        !user.isVerified() &&
+        req.originalUrl.startsWith("/api/user/signup/verify-otp")
+      ) {
+        throw new HttpError(403, "Forbidden: User not verified");
+      }
 
       req.user = {
         role: "user",
