@@ -1,12 +1,13 @@
 import { injectable, inject } from "inversify";
-import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { Message } from "../../domain/entities/Message";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { ConversationNotFoundError } from "../../domain/errors/NotFoundErrors";
+import { ForbiddenError } from "../../domain/errors/AuthErrors";
 import { TYPES } from "../../shared/types";
-import {
+import type { IMessageRepository } from "../../domain/repositories/IMessageRepository";
+import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import type {
   IGetMessages,
-  type GetMessagesInput,
+  GetMessagesInput,
 } from "../../domain/use-cases/IGetMessages";
 
 @injectable()
@@ -24,13 +25,10 @@ export class GetMessages implements IGetMessages {
     const conversation =
       await this.conversationRepository.findById(conversationId);
     if (!conversation) {
-      throw new HttpError(404, "Conversation not found.");
+      throw new ConversationNotFoundError();
     }
     if (!conversation.isParticipant(currentUserId)) {
-      throw new HttpError(
-        403,
-        "You are not authorized to view these messages.",
-      );
+      throw new ForbiddenError("You are not authorized to view these messages");
     }
 
     return this.messageRepository.findByConversationId(conversationId, {

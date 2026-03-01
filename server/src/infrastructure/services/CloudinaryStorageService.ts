@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { v2 as cloudinary } from "cloudinary";
-import { StorageServiceError } from "../../domain/errors/StorageServiceError";
+import { StorageServiceError } from "../../domain/errors/InternalError";
 import type {
   IFileStorageService,
   UploadedFile,

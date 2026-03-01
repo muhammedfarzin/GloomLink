@@ -1,7 +1,8 @@
 import { injectable, inject } from "inversify";
 import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { ValidationError } from "../../domain/errors/ValidationError";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { Conversation } from "../../domain/entities/Conversation";
 import { TYPES } from "../../shared/types";
 import type { INotificationService } from "../../domain/services/INotificationService";
@@ -28,8 +29,7 @@ export class CreateConversation implements ICreateConversation {
     const { currentUsername, participantsUsername } = input;
 
     if (participantsUsername.length === 0) {
-      throw new HttpError(
-        400,
+      throw new ValidationError(
         "You cannot create a conversation without other users",
       );
     }
@@ -46,9 +46,8 @@ export class CreateConversation implements ICreateConversation {
     const participantsIds = users.map((user) => user.getId());
 
     if (participantsIds.length !== pUsernames.length) {
-      throw new HttpError(
-        404,
-        "the user you are tryinng to message not found or has been removed",
+      throw new UserNotFoundError(
+        "The user you are trying to message not found or has been removed",
       );
     }
 
@@ -56,7 +55,7 @@ export class CreateConversation implements ICreateConversation {
       (user) => user.getUsername() === currentUsername,
     );
     if (!currentUser) {
-      throw new HttpError(400, "You cannot create a conversation without you");
+      throw new ValidationError("You cannot create a conversation without you");
     }
 
     // ---Check if a conversation already exists---

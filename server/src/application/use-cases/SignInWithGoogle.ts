@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { User } from "../../domain/entities/User";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { ValidationError } from "../../domain/errors/ValidationError";
 import { TYPES } from "../../shared/types";
 import { ExternalAuthUser } from "../../domain/services/IExternalAuthService";
 import { ISignInWithGoogle } from "../../domain/use-cases/ISignInWithGoogle";
@@ -14,15 +14,14 @@ export class SignInWithGoogle implements ISignInWithGoogle {
 
   async execute(input: ExternalAuthUser): Promise<User> {
     if (!input.email) {
-      throw new HttpError(400, "Email not provided by Google authentication");
+      throw new ValidationError("Email not provided by Google authentication");
     }
 
     const existingUser = await this.userRepository.findByEmail(input.email);
 
     if (existingUser) {
       if (existingUser.getAuthType() !== "google") {
-        throw new HttpError(
-          400,
+        throw new ValidationError(
           "This email is registered with a different sign-in method.",
         );
       }

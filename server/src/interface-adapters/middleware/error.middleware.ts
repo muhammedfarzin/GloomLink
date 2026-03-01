@@ -1,8 +1,17 @@
-import { NextFunction, Request, Response } from "express";
-import { HttpError } from "../errors/HttpError.js";
+import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import { ValidationError } from "../../domain/errors/ValidationError.js";
-import { UnauthorizedError } from "../../domain/errors/UnauthorizedError.js";
+import { AppError, type ErrorType } from "../../domain/errors/AppError.js";
+import { HttpError } from "../errors/HttpError.js";
+
+export const ErrorToHttpStatusCode: Record<ErrorType, number> = {
+  NOT_FOUND: 404,
+  VALIDATION: 400,
+  UNAUTHORIZED: 401,
+  INVALID_CREDENTIALS: 401,
+  FORBIDDEN: 403,
+  CONFLICT: 409,
+  INTERNAL: 500,
+};
 
 const errorMiddleware = (
   err: Error,
@@ -10,21 +19,17 @@ const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  let status: number, message: string;
+  let status = 500;
+  let message = err.message || "Something went wrong";
 
   if (err instanceof ZodError) {
     status = 400;
-    err.message = err.issues[0].message;
-  } else if (err instanceof ValidationError) {
-    status = 400;
-  } else if (err instanceof UnauthorizedError) {
-    status = 401;
+    message = err.issues[0].message;
+  } else if (err instanceof AppError) {
+    status = ErrorToHttpStatusCode[err.type];
   } else if (err instanceof HttpError) {
     status = err.statusCode;
-  } else {
-    status = 500;
   }
-  message = err.message || "Something went wrong";
 
   res.status(status).json({
     status,

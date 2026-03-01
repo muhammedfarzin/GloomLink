@@ -1,12 +1,19 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { ITokenService, Tokens } from "../../domain/services/ITokenService";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
-import {
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type {
+  ITokenService,
+  Tokens,
+} from "../../domain/services/ITokenService";
+import type {
   IRefreshToken,
-  type RefreshTokenInput,
+  RefreshTokenInput,
 } from "../../domain/use-cases/IRefreshToken";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../domain/errors/AuthErrors";
 
 @injectable()
 export class RefreshToken implements IRefreshToken {
@@ -21,10 +28,12 @@ export class RefreshToken implements IRefreshToken {
     if (decoded.role === "user") {
       const user = await this.userRepository.findById(decoded.id);
       if (!user) {
-        throw new HttpError(404, "User associated with this token not found.");
+        throw new UserNotFoundError(
+          "User associated with this token not found",
+        );
       }
       if (user.isBlocked()) {
-        throw new HttpError(403, "Your account is blocked.");
+        throw new ForbiddenError("Your account is blocked");
       }
 
       return this.tokenService.generate(
@@ -38,6 +47,6 @@ export class RefreshToken implements IRefreshToken {
       );
     }
 
-    throw new HttpError(401, "Invalid token role.");
+    throw new UnauthorizedError("Invalid token role");
   }
 }

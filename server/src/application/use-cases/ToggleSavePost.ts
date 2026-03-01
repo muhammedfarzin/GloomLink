@@ -1,13 +1,16 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
-import {
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type {
   IToggleSavePost,
-  type ToggleSavePostInput,
-  type ToggleSavePostOutput,
+  ToggleSavePostInput,
+  ToggleSavePostOutput,
 } from "../../domain/use-cases/IToggleSavePost";
+import {
+  PostNotFoundError,
+  UserNotFoundError,
+} from "../../domain/errors/NotFoundErrors";
 
 @injectable()
 export class ToggleSavePost implements IToggleSavePost {
@@ -21,10 +24,10 @@ export class ToggleSavePost implements IToggleSavePost {
     const user = await this.userRepository.findById(userId);
     const post = await this.postRepository.findById(postId);
     if (!user) {
-      throw new HttpError(404, "User not found");
+      throw new UserNotFoundError();
     }
     if (!post) {
-      throw new HttpError(404, "Post not found or has been deleted");
+      throw new PostNotFoundError();
     }
 
     const isAlreadySaved = user.getSavedPosts().includes(postId);

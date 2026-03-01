@@ -1,5 +1,5 @@
 import { injectable, inject } from "inversify";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { TYPES } from "../../shared/types";
 import type { ILikeRepository } from "../../domain/repositories/ILikeRepository";
 import type { IPostRepository } from "../../domain/repositories/IPostRepository";
@@ -21,7 +21,7 @@ export class GetLikedUsers implements IGetLikedUsers {
 
     const post = await this.postRepository.findById(targetId);
     if (!post) {
-      throw new HttpError(404, "Post not found or has been deleted.");
+      throw new PostNotFoundError();
     }
 
     return this.likeRepository.findLikersByTarget(targetId, restInput);

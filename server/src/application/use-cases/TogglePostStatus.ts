@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { TYPES } from "../../shared/types";
-import {
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type {
   ITogglePostStatus,
-  type TogglePostStatusInput,
-  type TogglePostStatusOutput,
+  TogglePostStatusInput,
+  TogglePostStatusOutput,
 } from "../../domain/use-cases/ITogglePostStatus";
 
 @injectable()
@@ -19,7 +19,7 @@ export class TogglePostStatus implements ITogglePostStatus {
 
     const post = await this.postRepository.findById(postId);
     if (!post || post.isDeleted()) {
-      throw new HttpError(404, "Post not found or has been deleted");
+      throw new PostNotFoundError();
     }
 
     const newStatus = post.isActive() ? "blocked" : "active";

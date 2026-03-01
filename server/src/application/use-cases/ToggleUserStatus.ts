@@ -1,8 +1,8 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { TYPES } from "../../shared/types";
-import { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
 
 @injectable()
 export class ToggleUserStatus implements IToggleUserStatus {
@@ -13,7 +13,7 @@ export class ToggleUserStatus implements IToggleUserStatus {
   async execute(userId: string) {
     const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new HttpError(404, "User not found or has been removed");
+      throw new UserNotFoundError();
     }
 
     const newStatus = user.isActive() ? "blocked" : "active";

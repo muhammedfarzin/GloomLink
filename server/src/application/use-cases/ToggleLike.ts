@@ -1,13 +1,13 @@
 import { injectable, inject } from "inversify";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
-import { TYPES } from "../../shared/types";
 import { Like } from "../../domain/entities/Like";
+import { NotFoundError } from "../../domain/errors/NotFoundErrors";
+import { TYPES } from "../../shared/types";
 import type { ILikeRepository } from "../../domain/repositories/ILikeRepository";
 import type { IPostRepository } from "../../domain/repositories/IPostRepository";
-import {
+import type {
   IToggleLike,
-  type ToggleLikeInput,
-  type ToggleLikeOutput,
+  ToggleLikeInput,
+  ToggleLikeOutput,
 } from "../../domain/use-cases/IToggleLike";
 
 @injectable()
@@ -20,8 +20,7 @@ export class ToggleLike implements IToggleLike {
   async execute(input: ToggleLikeInput): Promise<ToggleLikeOutput> {
     const target = await this.postRepository.findById(input.targetId);
     if (!target) {
-      throw new HttpError(
-        404,
+      throw new NotFoundError(
         `${input.type[0].toUpperCase() + input.type.slice(1)} not found`,
       );
     }

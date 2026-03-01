@@ -1,6 +1,7 @@
 import { injectable, inject } from "inversify";
 import { Conversation } from "../../domain/entities/Conversation";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { ConversationNotFoundError } from "../../domain/errors/NotFoundErrors";
+import { ValidationError } from "../../domain/errors/ValidationError";
 import { TYPES } from "../../shared/types";
 import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import type { IUserRepository } from "../../domain/repositories/IUserRepository";
@@ -21,7 +22,7 @@ export class GetConversation implements IGetConversation {
     const { participantsUsername } = input;
 
     if (participantsUsername.length <= 1) {
-      throw new HttpError(404, "Conversation needs atleast 2 participants");
+      throw new ValidationError("Conversation needs atleast 2 participants");
     }
 
     const participantsData = await Promise.all(
@@ -35,14 +36,14 @@ export class GetConversation implements IGetConversation {
       .map((user) => user.getId());
 
     if (participantsId.length !== participantsUsername.length) {
-      throw new HttpError(404, "Conversation not found");
+      throw new ConversationNotFoundError();
     }
 
     const conversation =
       await this.conversationRepository.findByParticipants(participantsId);
 
     if (!conversation) {
-      throw new HttpError(404, "Conversation not found");
+      throw new ConversationNotFoundError();
     }
 
     return conversation;

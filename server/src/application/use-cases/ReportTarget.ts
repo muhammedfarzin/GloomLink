@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
 import { User } from "../../domain/entities/User";
-import { IReportRepository } from "../../domain/repositories/IReportRepository";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
-import { TYPES } from "../../shared/types";
-import {
-  IReportTarget,
-  type ReportTargetInput,
-} from "../../domain/use-cases/IReportTarget";
 import { Report } from "../../domain/entities/Report";
+import { NotFoundError } from "../../domain/errors/NotFoundErrors";
+import { TYPES } from "../../shared/types";
+import type { IReportRepository } from "../../domain/repositories/IReportRepository";
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type {
+  IReportTarget,
+  ReportTargetInput,
+} from "../../domain/use-cases/IReportTarget";
 
 const REPORT_THRESHOLD = 5;
 
@@ -33,8 +33,7 @@ export class ReportTarget implements IReportTarget {
     // ---Checking target exists---
 
     if (!target) {
-      throw new HttpError(
-        404,
+      throw new NotFoundError(
         `${type[0].toUpperCase() + type.slice(1)} to report not found.`,
       );
     }

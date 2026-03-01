@@ -2,12 +2,15 @@ import { injectable, inject } from "inversify";
 import { ICommentRepository } from "../../domain/repositories/ICommentRepository";
 import { IPostRepository } from "../../domain/repositories/IPostRepository";
 import { Comment } from "../../domain/entities/Comment";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
 import {
   IAddComment,
   type AddCommentInput,
 } from "../../domain/use-cases/IAddComment";
+import {
+  CommentNotFoundError,
+  PostNotFoundError,
+} from "../../domain/errors/NotFoundErrors";
 
 @injectable()
 export class AddComment implements IAddComment {
@@ -24,12 +27,12 @@ export class AddComment implements IAddComment {
     if (type === "post") {
       const post = await this.postRepository.findById(targetId);
       if (!post) {
-        throw new HttpError(404, "Post to comment on not found.");
+        throw new PostNotFoundError();
       }
     } else if (type === "comment") {
       const parentComment = await this.commentRepository.findById(targetId);
       if (!parentComment) {
-        throw new HttpError(404, "Comment to reply to not found.");
+        throw new CommentNotFoundError();
       }
     }
 

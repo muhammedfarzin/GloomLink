@@ -1,12 +1,13 @@
 import { injectable, inject } from "inversify";
-import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
 import { Message } from "../../domain/entities/Message";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { MessageNotFoundError } from "../../domain/errors/NotFoundErrors";
+import { ForbiddenError } from "../../domain/errors/AuthErrors";
 import { TYPES } from "../../shared/types";
-import {
+import type { IMessageRepository } from "../../domain/repositories/IMessageRepository";
+import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import type {
   IMarkMessageAsSeen,
-  type MarkMessageAsSeenInput,
+  MarkMessageAsSeenInput,
 } from "../../domain/use-cases/IMarkMessageAsSeen";
 
 @injectable()
@@ -23,15 +24,14 @@ export class MarkMessageAsSeen implements IMarkMessageAsSeen {
 
     const message = await this.messageRepository.findById(messageId);
     if (!message) {
-      throw new HttpError(404, "Message not found.");
+      throw new MessageNotFoundError();
     }
 
     const conversation = await this.conversationRepository.findById(
       message.getConversationId(),
     );
     if (!conversation || !conversation.isParticipant(viewerId)) {
-      throw new HttpError(
-        403,
+      throw new ForbiddenError(
         "You are not a participant of this conversation.",
       );
     }
@@ -43,7 +43,7 @@ export class MarkMessageAsSeen implements IMarkMessageAsSeen {
     message.updateStatus("seen");
     const updatedMessage = await this.messageRepository.update(message);
     if (!updatedMessage) {
-      throw new HttpError(500, "Failed mark message as seen.");
+      throw new Error("Failed mark message as seen");
     }
 
     return updatedMessage;

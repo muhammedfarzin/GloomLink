@@ -1,5 +1,5 @@
 import { injectable, inject } from "inversify";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { InvalidCredentialsError } from "../../domain/errors/AuthErrors";
 import { TYPES } from "../../shared/types";
 import {
   IAdminLogin,
@@ -22,7 +22,7 @@ export class AdminLogin implements IAdminLogin {
     const adminPassword = process.env.ADMIN_PASSWORD || "password";
 
     if (input.username !== adminUsername || input.password !== adminPassword) {
-      throw new HttpError(401, "Invalid credentials");
+      throw new InvalidCredentialsError();
     }
 
     const payload: TokenPayload = { role: "admin", id: adminUsername };

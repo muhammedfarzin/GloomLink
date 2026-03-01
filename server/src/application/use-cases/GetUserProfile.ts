@@ -1,5 +1,5 @@
 import { injectable, inject } from "inversify";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { TYPES } from "../../shared/types";
 import type { IUserRepository } from "../../domain/repositories/IUserRepository";
 import type { UserProfile } from "../../domain/models/User";
@@ -22,7 +22,7 @@ export class GetUserProfile implements IGetUserProfile {
     );
 
     if (!userProfile) {
-      throw new HttpError(404, "User profile not found or has been removed");
+      throw new UserNotFoundError();
     }
 
     return userProfile;

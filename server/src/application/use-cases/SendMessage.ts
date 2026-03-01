@@ -1,13 +1,15 @@
 import { injectable, inject } from "inversify";
-import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { Message } from "../../domain/entities/Message";
+import { ValidationError } from "../../domain/errors/ValidationError";
+import { ForbiddenError } from "../../domain/errors/AuthErrors";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { TYPES } from "../../shared/types";
-import {
+import type { IMessageRepository } from "../../domain/repositories/IMessageRepository";
+import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type {
   ISendMessage,
-  type SendMessageInput,
+  SendMessageInput,
 } from "../../domain/use-cases/ISendMessage";
 
 @injectable()
@@ -24,22 +26,21 @@ export class SendMessage implements ISendMessage {
     const { conversationId, senderId, message, type, image } = input;
 
     if (type === "text" && (!message || !message.trim()))
-      throw new HttpError(400, "Message is required");
+      throw new ValidationError("Message is required");
     if (type === "image" && (!image || !image.trim()))
-      throw new HttpError(400, "Image URL is required");
+      throw new ValidationError("Image URL is required");
     if (type === "post" && (!message || !message.trim()))
-      throw new HttpError(400, "Post ID is required");
+      throw new ValidationError("Post ID is required");
 
     const sender = await this.userRepository.findById(senderId);
     if (!sender) {
-      throw new HttpError(404, "Sender not found");
+      throw new UserNotFoundError("Sender not found");
     }
 
     const conversation =
       await this.conversationRepository.findById(conversationId);
     if (!conversation || !conversation.isParticipant(senderId)) {
-      throw new HttpError(
-        403,
+      throw new ForbiddenError(
         "You are not a participant of this conversation.",
       );
     }

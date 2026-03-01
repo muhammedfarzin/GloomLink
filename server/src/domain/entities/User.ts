@@ -1,4 +1,4 @@
-import { UserSelfBlockError } from "../errors/UserSelfBlockError";
+import { ValidationError } from "../errors/ValidationError";
 import { DateOfBirth } from "../value-objects/DateOfBirth";
 import { Email } from "../value-objects/Email";
 import { MobileNumber } from "../value-objects/MobileNumber";
@@ -94,7 +94,7 @@ export class User {
 
   blockUser(userId: string) {
     if (this.userId === userId) {
-      throw new UserSelfBlockError();
+      throw new ValidationError("User cannot block themselves");
     }
     this.blockedUsers.add(userId);
   }

@@ -1,10 +1,10 @@
 import { injectable, inject } from "inversify";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { ForbiddenError } from "../../domain/errors/AuthErrors";
 import { TYPES } from "../../shared/types";
-import {
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type {
   IDeletePost,
-  type DeletePostInput,
+  DeletePostInput,
 } from "../../domain/use-cases/IDeletePost";
 
 @injectable()
@@ -23,7 +23,7 @@ export class DeletePost implements IDeletePost {
 
     // --- AUTHORIZATION LOGIC ---
     if (userRole !== "admin" && post.getUserId() !== userId) {
-      throw new HttpError(403, "You are not authorized to delete this post");
+      throw new ForbiddenError("You are not authorized to delete this post");
     }
     await this.postRepository.deleteById(postId);
   }

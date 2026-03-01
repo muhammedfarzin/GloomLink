@@ -1,13 +1,14 @@
 import { injectable, inject } from "inversify";
-import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
-import { TYPES } from "../../shared/types";
 import { Follow } from "../../domain/entities/Follow";
-import {
+import { ValidationError } from "../../domain/errors/ValidationError";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
+import { TYPES } from "../../shared/types";
+import type { IFollowRepository } from "../../domain/repositories/IFollowRepository";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type {
   IToggleFollow,
-  type ToggleFollowInput,
-  type ToggleFollowResponse,
+  ToggleFollowInput,
+  ToggleFollowResponse,
 } from "../../domain/use-cases/IToggleFollow";
 
 @injectable()
@@ -22,13 +23,13 @@ export class ToggleFollow implements IToggleFollow {
     const { currentUserId, targetUserId } = input;
 
     if (currentUserId === targetUserId) {
-      throw new HttpError(400, "You cannot follow yourself.");
+      throw new ValidationError("You cannot follow yourself.");
     }
 
     // ---Ensure the target user exists---
     const targetUser = await this.userRepository.findById(targetUserId);
     if (!targetUser) {
-      throw new HttpError(404, "User to follow not found or has been removed");
+      throw new UserNotFoundError();
     }
 
     // ---Check if the follow relationship already exists---

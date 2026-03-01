@@ -1,12 +1,12 @@
 import { injectable, inject } from "inversify";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
+import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
 import { TYPES } from "../../shared/types";
-import {
-  IGetPostById,
-  type GetPostByIdInput,
-} from "../../domain/use-cases/IGetPostById";
 import type { EnrichedPost } from "../../domain/models/Post";
+import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type {
+  IGetPostById,
+  GetPostByIdInput,
+} from "../../domain/use-cases/IGetPostById";
 
 @injectable()
 export class GetPostById implements IGetPostById {
@@ -21,7 +21,7 @@ export class GetPostById implements IGetPostById {
     );
 
     if (!post) {
-      throw new HttpError(404, "Post not found or has been removed.");
+      throw new PostNotFoundError();
     }
 
     return post;

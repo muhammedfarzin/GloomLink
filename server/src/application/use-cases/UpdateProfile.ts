@@ -1,13 +1,16 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IFileStorageService } from "../../domain/services/IFileStorageService";
 import { User } from "../../domain/entities/User";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
-import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
+import { ValidationError } from "../../domain/errors/ValidationError";
+import { InvalidCredentialsError } from "../../domain/errors/AuthErrors";
+import { ConflictError } from "../../domain/errors/ConflictError";
 import { TYPES } from "../../shared/types";
-import {
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { IFileStorageService } from "../../domain/services/IFileStorageService";
+import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import type {
   IUpdateProfile,
-  type UpdateProfileInput,
+  UpdateProfileInput,
 } from "../../domain/use-cases/IUpdateProfile";
 
 @injectable()
@@ -24,12 +27,12 @@ export class UpdateProfile implements IUpdateProfile {
     const user = await this.userRepository.findById(userId);
 
     if (!user) {
-      throw new HttpError(404, "User not found or has been removed");
+      throw new UserNotFoundError();
     }
 
     // ---Validating User---
     if (user.getAuthType() === "email") {
-      if (!input.password) throw new HttpError(400, "Password is required");
+      if (!input.password) throw new ValidationError("Password is required");
 
       const isPasswordMatch = await this.passwordHasher.compare(
         input.password,
@@ -37,7 +40,7 @@ export class UpdateProfile implements IUpdateProfile {
       );
 
       if (!isPasswordMatch) {
-        throw new HttpError(401, "Password does not matching with our records");
+        throw new InvalidCredentialsError();
       }
 
       delete input.password;
@@ -54,7 +57,7 @@ export class UpdateProfile implements IUpdateProfile {
         input.username,
       );
       if (existingUser && existingUser.getId() !== userId) {
-        throw new HttpError(409, "This username is already taken.");
+        throw new ConflictError("This username is already taken");
       }
 
       user.changeUsername(input.username);
@@ -83,7 +86,7 @@ export class UpdateProfile implements IUpdateProfile {
 
     const updatedUser = await this.userRepository.update(userId, user);
     if (!updatedUser) {
-      throw new HttpError(500, "Failed to update profile.");
+      throw new Error("Failed to update profile.");
     }
 
     if (newImageUrl && currentImgUrl) {

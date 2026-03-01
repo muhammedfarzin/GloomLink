@@ -1,10 +1,13 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { IPasswordHasher } from "../../domain/services/IPasswordHasher";
 import { User } from "../../domain/entities/User";
-import { HttpError } from "../../interface-adapters/errors/HttpError";
 import { TYPES } from "../../shared/types";
-import { ILoginUser, type LoginInput } from "../../domain/use-cases/ILoginUser";
+import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import type { ILoginUser, LoginInput } from "../../domain/use-cases/ILoginUser";
+import {
+  ForbiddenError,
+  InvalidCredentialsError,
+} from "../../domain/errors/AuthErrors";
 
 @injectable()
 export class LoginUser implements ILoginUser {
@@ -17,7 +20,7 @@ export class LoginUser implements ILoginUser {
     const user = await this.userRepository.findByIdentifier(input.username);
 
     if (!user) {
-      throw new HttpError(401, "Invalid credentials");
+      throw new InvalidCredentialsError();
     }
 
     const isPasswordMatch = await this.passwordHasher.compare(
@@ -26,11 +29,11 @@ export class LoginUser implements ILoginUser {
     );
 
     if (!isPasswordMatch) {
-      throw new HttpError(401, "Invalid credentials");
+      throw new InvalidCredentialsError();
     }
 
     if (user.isBlocked()) {
-      throw new HttpError(403, "Your account has been blocked");
+      throw new ForbiddenError("Your account has been blocked");
     }
 
     return user;
