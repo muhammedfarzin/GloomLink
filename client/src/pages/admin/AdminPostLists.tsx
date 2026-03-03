@@ -86,8 +86,9 @@ const AdminPostLists: React.FC = () => {
                   <Suspense fallback={<PostSkeleton />}>
                     <PostListCard
                       postId={post.postId}
-                      isAdmin
                       postData={post}
+                      isAdmin
+                      noRecordInteraction
                       handleChange={setPosts}
                     />
                   </Suspense>

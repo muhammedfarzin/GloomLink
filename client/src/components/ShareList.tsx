@@ -79,8 +79,12 @@ const ShareList: React.FC<Props> = ({ data }) => {
       {chatList.length && !loading ? (
         chatList.map((chat) => (
           <UserListCard
-            key={chat.userId}
-            userData={chat}
+            key={chat.participantId}
+            userData={{
+              ...chat,
+              userId: chat.participantId,
+              fullname: `${chat.firstname} ${chat.lastname}`,
+            }}
             className="my-2"
             actions={
               <Button

@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import ChatItem from "./ChatItem";
 import { apiClient } from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
 import type { MessageType } from "@/types/message-type";
-import { useParams } from "react-router-dom";
-import { ChatUserDataType } from "@/components/types/user-data-types";
+import type {
+  ChatUserDataType,
+  UserDataType,
+} from "@/components/types/user-data-types";
 
 const ChatList = () => {
   const socket = useSocket();
   const { username: selectedUsername } = useParams();
   const [chats, setChats] = useState<ChatUserDataType[]>([]);
-  const [suggested, setSuggested] = useState<ChatUserDataType[]>([]);
+  const [suggestedUsers, setSuggestedUsers] = useState<UserDataType[]>([]);
 
   const handleIncomeMessage = useCallback(
     async (newMessage: MessageType) => {
       let chat: ChatUserDataType | undefined = chats.find(
-        (chat) => chat.username === newMessage.from,
+        (chat) => chat.username === newMessage.senderUsername,
       );
 
       if (chat) {
@@ -23,13 +26,13 @@ const ChatList = () => {
 
         if (
           /^\/messages\/[^/]+\/?$/.test(location.pathname) &&
-          selectedUsername === newMessage.from
+          selectedUsername === newMessage.senderUsername
         ) {
           newChat.unread = 0;
         } else newChat.unread = (newChat.unread || 0) + 1;
 
         const remaining = chats.filter(
-          (chat) => chat.username !== newMessage.from,
+          (chat) => chat.username !== newMessage.senderUsername,
         );
         return setChats([newChat, ...remaining]);
       }
@@ -39,21 +42,23 @@ const ChatList = () => {
 
   const handleNewConversation = useCallback(
     (conversation: ChatUserDataType) => {
-      const isExist = chats.find((chat) => chat.userId === conversation.userId);
+      const isExist = chats.find(
+        (chat) => chat.participantId === conversation.participantId,
+      );
       if (isExist) return;
 
       setChats((prevState) => [conversation, ...prevState]);
-      setSuggested((prevState) =>
-        prevState.filter((chat) => chat.userId !== conversation.userId),
+      setSuggestedUsers((prevState) =>
+        prevState.filter((chat) => chat.userId !== conversation.participantId),
       );
     },
-    [chats, setChats, setSuggested],
+    [chats, setChats, setSuggestedUsers],
   );
 
   useEffect(() => {
     apiClient.get("/conversations/").then((response) => {
       setChats(response.data.conversations);
-      setSuggested(response.data.suggested);
+      setSuggestedUsers(response.data.suggestedUsers);
     });
   }, []);
 
@@ -73,10 +78,10 @@ const ChatList = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("send-message", handleIncomeMessage);
+    socket.on("incoming-message", handleIncomeMessage);
     socket.on("new-conversation", handleNewConversation);
     return () => {
-      socket.off("send-message", handleIncomeMessage);
+      socket.off("incoming-message", handleIncomeMessage);
       socket.off("new-conversation", handleNewConversation);
     };
   }, [socket, handleIncomeMessage, handleNewConversation]);
@@ -84,7 +89,7 @@ const ChatList = () => {
   return (
     <>
       {/* Chat List */}
-      {chats.length || (!chats.length && !suggested.length) ? (
+      {chats.length || (!chats.length && !suggestedUsers.length) ? (
         <div>
           <h2 className="text-xl font-bold">Chats</h2>
 
@@ -92,14 +97,14 @@ const ChatList = () => {
             {chats.length ? (
               chats.map((chat) => (
                 <ChatItem
-                  key={chat.userId}
+                  key={chat.conversationId}
                   username={chat.username}
                   image={chat.imageUrl}
                   unread={chat.unread}
                   onClick={() => {
                     setChats((prevState) =>
                       prevState.map((chatState) => {
-                        if (chatState.userId === chat.userId) {
+                        if (chatState.participantId === chat.participantId) {
                           chatState.unread = 0;
                         }
                         return chatState;
@@ -116,12 +121,12 @@ const ChatList = () => {
       ) : null}
 
       {/* Suggested Chats */}
-      {suggested.length ? (
+      {suggestedUsers.length ? (
         <div>
           <h2 className="text-xl font-bold">Suggested</h2>
 
           <div className="flex flex-col gap-2 mt-2" id="suggested-chats">
-            {suggested.map((chat) => (
+            {suggestedUsers.map((chat) => (
               <ChatItem
                 key={chat.userId}
                 username={chat.username}

@@ -9,7 +9,7 @@ import type { SearchResultType } from "../Search";
 import { UserDataType } from "@/components/types/user-data-types";
 
 interface UserListCardProps {
-  userData: UserDataType;
+  userData: Omit<UserDataType, "type">;
   actions?: React.ReactNode;
   className?: string;
   handleChange?:

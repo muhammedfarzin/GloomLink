@@ -3,10 +3,19 @@ export interface UserDataType {
   username: string;
   firstname: string;
   lastname: string;
+  fullname: string;
   imageUrl?: string;
   isFollowing?: boolean;
+  type: "user";
 }
 
-export type ChatUserDataType = Omit<UserDataType, "isFollowing"> & {
-  unread?: number;
+export type ChatUserDataType = {
+  conversationId: string;
+  participantId: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  imageUrl: string;
+  unread: number;
+  type: "conversation";
 };

@@ -5,20 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
 import MessageCard from "./components/message/MessageCard";
-import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Video } from "lucide-react";
 import { useCall } from "@/hooks/use-call";
 import { useToast } from "@/hooks/use-toast";
-import { MessageType } from "@/types/message-type";
+import type { RootState } from "@/redux/store";
+import type { MessageType } from "@/types/message-type";
 
 const MessageViewer: React.FC = () => {
   const socket = useSocket();
   const navigate = useNavigate();
   const callHandler = useCall();
-  const myUsername = useSelector(
-    (state: RootState) => state.auth.userData?.username
+  const myUserId = useSelector(
+    (state: RootState) => state.auth.userData?.userId,
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
@@ -36,32 +36,40 @@ const MessageViewer: React.FC = () => {
 
     apiClient
       .get(`/conversations/${username}/conversationId`)
-      .then((response) => {
+      .then(async (response) => {
         const conversationId = response.data.conversationId;
+
+        const responseMessage = await apiClient.get(
+          `/conversations/${conversationId}`,
+        );
+
         setConversationId(conversationId);
-        apiClient.get(`/conversations/${conversationId}`).then((response) => {
-          setMessages(response.data.messagesData);
-          scrollChatViewToBottom();
+        setMessages(responseMessage.data.messagesData);
+        scrollChatViewToBottom();
 
-          const unreadMessages = (response.data.messagesData as MessageType[])
-            .filter(
-              (chat) => chat.status !== "seen" && chat.from !== myUsername
-            )
-            .map((message) => ({ messageId: message._id, from: message.from }));
+        const unreadMessages = (
+          responseMessage.data.messagesData as MessageType[]
+        )
+          .filter(
+            (chat) => chat.senderId !== myUserId && chat.status !== "seen",
+          )
+          .map((message) => ({
+            messageId: message.id,
+            senderUsername: message.senderUsername,
+          }));
 
-          socket.emit("message-seen", ...unreadMessages);
-        });
+        socket.emit("message-seen", ...unreadMessages);
       });
   }, [username, socket]);
 
   useEffect(() => {
     const handleIncomingMessage = (newMessage: MessageType) => {
-      if (newMessage.from === username) {
+      if (newMessage.senderUsername === username) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         scrollChatViewToBottom();
         socket?.emit("message-seen", {
-          messageId: newMessage._id,
-          from: newMessage.from,
+          messageId: newMessage.id,
+          senderUsername: newMessage.senderUsername,
         });
       }
     };
@@ -69,9 +77,9 @@ const MessageViewer: React.FC = () => {
     const handleSeenMessage = (seenMessage: MessageType) => {
       setMessages((prevState) =>
         prevState.map((message) => {
-          if (message._id === seenMessage._id) message.status = "seen";
+          if (message.id === seenMessage.id) message.status = "seen";
           return message;
-        })
+        }),
       );
     };
 
@@ -85,13 +93,13 @@ const MessageViewer: React.FC = () => {
           ) {
             return newMessage;
           } else return message;
-        })
+        }),
       );
     };
 
     const handleSendMessageError = (
       message: string,
-      messageData: Partial<Pick<MessageType, "message" | "type">>
+      messageData: Partial<Pick<MessageType, "message" | "type">>,
     ) => {
       if (messageInputRef.current) {
         messageInputRef.current.value = messageData.message ?? "";
@@ -106,19 +114,19 @@ const MessageViewer: React.FC = () => {
           ) {
             return false;
           } else return true;
-        })
+        }),
       );
 
       toast({ description: message, variant: "destructive" });
     };
 
-    socket?.on("send-message", handleIncomingMessage);
+    socket?.on("incoming-message", handleIncomingMessage);
     socket?.on("message-seen", handleSeenMessage);
     socket?.on("send-message-success", handleSendSuccessMessage);
     socket?.on("error-send-message", handleSendMessageError);
 
     return () => {
-      socket?.off("send-message", handleIncomingMessage);
+      socket?.off("incoming-message", handleIncomingMessage);
       socket?.off("message-seen", handleSeenMessage);
       socket?.off("send-message-success", handleSendSuccessMessage);
       socket?.off("error-send-message", handleSendMessageError);
@@ -139,15 +147,15 @@ const MessageViewer: React.FC = () => {
     image?: string;
     type: "text" | "image";
   }) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        ...data,
-        _id: `self${Date.now()}`,
-        status: "pending",
-        createdAt: new Date().toString(),
-      },
-    ]);
+    const messageToSend: MessageType = {
+      ...data,
+      id: `self${Date.now()}`,
+      senderId: myUserId ?? "",
+      status: "pending",
+      createdAt: new Date().toString(),
+    };
+
+    setMessages((prevMessages) => [...prevMessages, messageToSend]);
     scrollChatViewToBottom();
 
     let conversation = conversationId;
@@ -202,7 +210,7 @@ const MessageViewer: React.FC = () => {
           <MessageCard
             key={index}
             data={message}
-            sender={message.status === "pending" || myUsername === message.from}
+            sender={myUserId === message.senderId}
           />
         ))}
       </div>

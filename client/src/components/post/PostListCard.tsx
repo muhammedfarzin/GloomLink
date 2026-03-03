@@ -1,19 +1,19 @@
+import { useSelector } from "react-redux";
 import { ViewTracker } from "../ViewTracker";
 import { useInteraction } from "@/hooks/useInteraction";
+import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
 import { useCallback, useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import PostActions from "./PostActions";
 import { Post } from "./types/Post";
 import AccountViewCard from "@/components/AccountViewCard";
-import type PostDataType from "./types/PostDataType";
 import PostInteractionCount from "./PostInteractionCount";
 import PostView from "./PostView";
 import PostSkeleton from "../skeleton/PostSkeleton";
 import { formatTimeAgo } from "@/lib/dateUtils";
-import { useSelector } from "react-redux";
-import { type RootState } from "@/redux/store";
+import type PostDataType from "./types/PostDataType";
+import type { RootState } from "@/redux/store";
 
 export interface Props {
   postId: string;
@@ -23,6 +23,7 @@ export interface Props {
   hideComment?: boolean;
   showCommentsForSm?: boolean;
   captionLine?: number;
+  noRecordInteraction?: boolean;
   handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
@@ -34,6 +35,7 @@ const PostListCard: React.FC<Props> = ({
   hideComment,
   showCommentsForSm,
   captionLine,
+  noRecordInteraction,
   handleChange,
 }) => {
   const authId = useSelector((state: RootState) => state.auth.userData?.userId);
@@ -77,10 +79,14 @@ const PostListCard: React.FC<Props> = ({
   );
 
   const handleView = useCallback(() => {
-    if (postDataState && postDataState.uploadedBy.userId !== authId) {
+    if (
+      !noRecordInteraction &&
+      postDataState &&
+      postDataState.uploadedBy.userId !== authId
+    ) {
       recordInteraction(postDataState.postId, "view");
     }
-  }, [postDataState, recordInteraction, authId]);
+  }, [postDataState, recordInteraction, authId, noRecordInteraction]);
 
   if (!postDataState)
     return <PostSkeleton className="h-full rounded-s-lg rounded-e-none" />;
