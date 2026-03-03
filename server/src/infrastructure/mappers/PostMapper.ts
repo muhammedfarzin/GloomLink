@@ -45,6 +45,7 @@ export class PostMapper {
         imageUrl: data.uploadedBy?.imageUrl,
       },
       publishedFor: data.publishedFor,
+      status: data.status,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       type: "post",

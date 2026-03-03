@@ -23,14 +23,14 @@ export class UserPresenter {
 
   public static toResponseWithStatus(user: User): UserWithStatusDto {
     return {
-      ...this.toBasicPersistence(user),
+      ...UserPresenter.toBasicPersistence(user),
       status: user.getStatus(),
     };
   }
 
   public static toResponseWithAuthType(user: User): UserWithAuthDto {
     return {
-      ...this.toBasicPersistence(user),
+      ...UserPresenter.toBasicPersistence(user),
       authType: user.getAuthType(),
     };
   }

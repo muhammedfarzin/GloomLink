@@ -13,7 +13,7 @@ export interface PostType extends PostCompact {
   status: "active" | "blocked" | "deleted";
 }
 
-export interface EnrichedPost extends PostCompact {
+export interface EnrichedPost extends PostType {
   likesCount: number;
   commentsCount: number;
   isLiked?: boolean;

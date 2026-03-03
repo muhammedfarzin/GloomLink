@@ -25,7 +25,7 @@ export class SocketController {
     data: Partial<Pick<CompactMessage, "message" | "image" | "type">>,
   ) => {
     try {
-      const { message, image, type } = sendMessageSchema.parse({
+      const validatedData = sendMessageSchema.parse({
         ...data,
         conversationId,
       });
@@ -35,26 +35,22 @@ export class SocketController {
       );
 
       const newMessage = await sendMessageUseCase.execute({
-        message,
-        image,
-        type,
+        ...validatedData,
         senderId: this.socket.user.id,
         conversationId,
       });
 
-      this.socket
-        .to(conversationId)
-        .emit("send-message", MessagePresenter.toResponse(newMessage));
-      this.socket.emit(
-        "send-message-success",
-        MessagePresenter.toResponse(newMessage),
-      );
+      const resMessage = MessagePresenter.toResponse(newMessage);
+      this.socket.to(conversationId).emit("incoming-message", resMessage);
+      this.socket.emit("send-message-success", resMessage);
     } catch (error: any) {
       this.socket.emit("error-send-message", error.message, data);
     }
   };
 
-  markAsSeen = async (...messages: { messageId?: string; from?: string }[]) => {
+  markAsSeen = async (
+    ...messages: { messageId?: string; senderUsername?: string }[]
+  ) => {
     try {
       const validatedMessages = markAsSeenSchema.parse(messages);
 
@@ -67,7 +63,7 @@ export class SocketController {
           messageId: message.messageId,
           viewerId: this.socket.user.id,
         });
-        const senderSocketIds = activeUsers[message.from];
+        const senderSocketIds = activeUsers[message.senderUsername];
         if (senderSocketIds && senderSocketIds.size) {
           this.socket
             .to([...senderSocketIds])

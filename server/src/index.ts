@@ -1,10 +1,9 @@
-import "reflect-metadata"
+import "reflect-metadata";
 import express, { type Express } from "express";
 import http from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import { connectDatabase } from "./infrastructure/database";
-import router from "./interface-adapters/routes";
 import { setupSocket } from "./interface-adapters/websocket";
 
 dotenv.config();
@@ -14,12 +13,14 @@ const PORT = process.env.PORT || 5000;
 const app: Express = express();
 const server = http.createServer(app);
 
+setupSocket(server);
+
 app.use(express.json());
 app.use(cors());
 
-app.use(router);
-
-setupSocket(server);
+import("./interface-adapters/routes").then(({ default: router }) => {
+  app.use(router);
+});
 
 server.listen(PORT, () => {
   connectDatabase();

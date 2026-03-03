@@ -27,9 +27,9 @@ const seenMessageSchema = z.object({
     .refine((val) => isValidObjectId(val), {
       message: "Invalid message ID format",
     }),
-  from: z
-    .string(validateRequiredString("Sender username ('from')"))
-    .min(1, { message: "Sender username ('from') is required" }),
+  senderUsername: z
+    .string(validateRequiredString("Sender username"))
+    .min(1, { message: "Sender username is required" }),
 });
 
 export const markAsSeenSchema = z.array(seenMessageSchema);
