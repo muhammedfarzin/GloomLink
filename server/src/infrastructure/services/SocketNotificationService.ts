@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+import type { Server } from "socket.io";
 import type { INotificationService } from "../../domain/services/INotificationService";
 import type { Conversation } from "../../domain/entities/Conversation";
 import type { User } from "../../domain/entities/User";

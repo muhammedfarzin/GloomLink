@@ -70,6 +70,8 @@ const TYPES = {
   ReportController: Symbol.for("ReportController"),
   SearchController: Symbol.for("SearchController"),
   AdminController: Symbol.for("AdminController"),
+  SocketController: Symbol.for("SocketController"),
+  CallController: Symbol.for("CallController"),
 
   // Constants
   SocketServer: Symbol.for("SocketServer"),

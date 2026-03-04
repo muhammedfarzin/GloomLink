@@ -1,26 +1,28 @@
-import type { Socket } from "socket.io";
+import { inject, injectable } from "inversify";
+import type { Socket, SocketActiveUsers } from "socket.io";
 import type { CompactMessage } from "../../domain/models/Message";
 import type { ISendMessage } from "../../domain/use-cases/ISendMessage";
 import type { IMarkMessageAsSeen } from "../../domain/use-cases/IMarkMessageAsSeen";
-import { activeUsers } from "../websocket";
+import { TYPES } from "../../shared/types";
+import { MessagePresenter } from "../presenters/MessagePresenter";
 import {
   markAsSeenSchema,
   sendMessageSchema,
 } from "../validation/socketSchemas";
-import container from "../../shared/inversify.config";
-import { TYPES } from "../../shared/types";
-import { MessagePresenter } from "../presenters/MessagePresenter";
 
+@injectable()
 export class SocketController {
-  socket: Socket;
-  username: string;
-
-  constructor(socket: Socket) {
-    this.socket = socket;
-    this.username = socket.user.username;
-  }
+  constructor(
+    @inject(TYPES.SocketActiveUsers)
+    private readonly activeUsers: SocketActiveUsers,
+    @inject(TYPES.ISendMessage)
+    private readonly sendMessageUseCase: ISendMessage,
+    @inject(TYPES.IMarkMessageAsSeen)
+    private readonly markAsSeenUseCase: IMarkMessageAsSeen,
+  ) {}
 
   handleSendMessage = async (
+    socket: Socket,
     conversationId: string,
     data: Partial<Pick<CompactMessage, "message" | "image" | "type">>,
   ) => {
@@ -30,48 +32,41 @@ export class SocketController {
         conversationId,
       });
 
-      const sendMessageUseCase = container.get<ISendMessage>(
-        TYPES.ISendMessage,
-      );
-
-      const newMessage = await sendMessageUseCase.execute({
+      const newMessage = await this.sendMessageUseCase.execute({
         ...validatedData,
-        senderId: this.socket.user.id,
+        senderId: socket.user.id,
         conversationId,
       });
 
       const resMessage = MessagePresenter.toResponse(newMessage);
-      this.socket.to(conversationId).emit("incoming-message", resMessage);
-      this.socket.emit("send-message-success", resMessage);
+      socket.to(conversationId).emit("incoming-message", resMessage);
+      socket.emit("send-message-success", resMessage);
     } catch (error: any) {
-      this.socket.emit("error-send-message", error.message, data);
+      socket.emit("error-send-message", error.message, data);
     }
   };
 
   markAsSeen = async (
+    socket: Socket,
     ...messages: { messageId?: string; senderUsername?: string }[]
   ) => {
     try {
       const validatedMessages = markAsSeenSchema.parse(messages);
 
-      const markAsSeenUseCase = container.get<IMarkMessageAsSeen>(
-        TYPES.IMarkMessageAsSeen,
-      );
-
       for (const message of validatedMessages) {
-        const updatedMessage = await markAsSeenUseCase.execute({
+        const updatedMessage = await this.markAsSeenUseCase.execute({
           messageId: message.messageId,
-          viewerId: this.socket.user.id,
+          viewerId: socket.user.id,
         });
-        const senderSocketIds = activeUsers[message.senderUsername];
+        const senderSocketIds = this.activeUsers[message.senderUsername];
         if (senderSocketIds && senderSocketIds.size) {
-          this.socket
+          socket
             .to([...senderSocketIds])
             .emit("message-seen", MessagePresenter.toResponse(updatedMessage));
         }
       }
     } catch (error: any) {
-      this.socket.emit(
+      socket.emit(
         "markAsSeenError",
         {
           message: error.message || "Something went wrong",

@@ -1,3 +1,4 @@
+import type { SocketActiveUsers } from "socket.io";
 import { Container } from "inversify";
 import { TYPES } from "./types";
 import { BcryptPasswordHasher } from "../infrastructure/services/BcryptPasswordHasher";
@@ -86,6 +87,8 @@ import { ProfileController } from "../interface-adapters/controllers/profile.con
 import { ReportController } from "../interface-adapters/controllers/report.controller";
 import { SearchController } from "../interface-adapters/controllers/search.controller";
 import { AdminController } from "../interface-adapters/controllers/admin.controller";
+import { SocketController } from "../interface-adapters/controllers/socket.controller";
+import { CallController } from "../interface-adapters/controllers/call.controller";
 
 // Create a new container
 const container = new Container();
@@ -192,5 +195,10 @@ container
 container.bind<ReportController>(TYPES.ReportController).to(ReportController);
 container.bind<SearchController>(TYPES.SearchController).to(SearchController);
 container.bind<AdminController>(TYPES.AdminController).to(AdminController);
+container.bind<SocketController>(TYPES.SocketController).to(SocketController);
+container.bind<CallController>(TYPES.CallController).to(CallController);
+
+// --- BIND CONSTANTS ---
+container.bind<SocketActiveUsers>(TYPES.SocketActiveUsers).toConstantValue({});
 
 export default container;

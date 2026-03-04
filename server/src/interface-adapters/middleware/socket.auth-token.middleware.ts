@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 import { HttpError } from "../errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
-import { activeUsers } from "../websocket";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
-import type { ExtendedError, Socket } from "socket.io";
+import type { ExtendedError, Socket, SocketActiveUsers } from "socket.io";
 import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
 import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
 
@@ -13,6 +12,7 @@ export const authenticateTokenForSocket = async (
   next: (err?: ExtendedError) => void,
 ) => {
   const token = socket.handshake.auth.token;
+  const activeUsers = container.get<SocketActiveUsers>(TYPES.SocketActiveUsers);
 
   try {
     if (!token) {
