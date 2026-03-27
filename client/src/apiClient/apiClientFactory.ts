@@ -32,7 +32,7 @@ export const createApiClient = ({
     },
     (error) => {
       return Promise.reject(error);
-    }
+    },
   );
 
   apiClient.interceptors.response.use(
@@ -61,33 +61,23 @@ export const createApiClient = ({
           const newRefreshToken = response.data.tokens.refreshToken;
           localStorage.setItem(accessTokenKey, newAccessToken);
           localStorage.setItem(refreshTokenKey, newRefreshToken);
-          apiClient.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${newAccessToken}`;
+          apiClient.defaults.headers.common["Authorization"] =
+            `Bearer ${newAccessToken}`;
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
           return apiClient(originalRequest);
         } catch (responseError: any) {
-          if (
-            responseError.response?.data?.message ===
-              "Refresh token is required." ||
-            responseError.response?.data?.message ===
-              "Invalid or expired refresh token."
-          ) {
-            store.dispatch(logout({ type: authType }));
-            return Promise.reject(
-              new AxiosError(
-                "Your session session has expired",
-                responseError.status
-              )
-            );
-          }
-
-          return Promise.reject(responseError);
+          store.dispatch(logout({ type: authType }));
+          return Promise.reject(
+            new AxiosError(
+              "Your session session has expired",
+              responseError.status,
+            ),
+          );
         }
       }
 
       return Promise.reject(error);
-    }
+    },
   );
 
   return apiClient;

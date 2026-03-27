@@ -5,7 +5,7 @@ export interface UserAuthState {
   username: string;
   firstname: string;
   lastname: string;
-  status: "not-verified" | "active" | "inactive" | "blocked";
+  status: "not-verified" | "active" | "blocked";
   email: string;
   image?: string;
 }

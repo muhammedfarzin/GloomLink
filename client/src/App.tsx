@@ -32,7 +32,7 @@ function App() {
   }, [colorTheme]);
 
   return (
-    <div className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar">
+    <div id="app-container" className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar">
       <Routes location={location.state?.backgroundLocation || location}>
         <Route path="login" element={<UserLogin />} />
         <Route path="signup" element={<Signup />} />
