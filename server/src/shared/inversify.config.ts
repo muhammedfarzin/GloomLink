@@ -76,6 +76,7 @@ import { UpdateProfile } from "../application/use-cases/UpdateProfile";
 import { VerifyOtp } from "../application/use-cases/VerifyOtp";
 import { RecordInteraction } from "../application/use-cases/RecordInteraction";
 import { GetRecommendedPosts } from "../application/use-cases/GetRecommendedPosts";
+import { GetDashboardData } from "../application/use-cases/GetDashboardData";
 
 import { AuthController } from "../interface-adapters/controllers/auth.controller";
 import { CommentController } from "../interface-adapters/controllers/comment.controller";
@@ -177,6 +178,7 @@ container.bind<ToggleSavePost>(TYPES.IToggleSavePost).to(ToggleSavePost);
 container.bind<ToggleUserStatus>(TYPES.IToggleUserStatus).to(ToggleUserStatus);
 container.bind<UpdateProfile>(TYPES.IUpdateProfile).to(UpdateProfile);
 container.bind<VerifyOtp>(TYPES.IVerifyOtp).to(VerifyOtp);
+container.bind<GetDashboardData>(TYPES.IGetDashboardData).to(GetDashboardData);
 
 // --- BIND CONTROLLER ---
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);

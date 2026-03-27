@@ -58,6 +58,7 @@ const TYPES = {
   IUpdateProfile: Symbol.for("IUpdateProfile"),
   IVerifyOtp: Symbol.for("IVerifyOtp"),
   IRecordInteraction: Symbol.for("IRecordInteraction"),
+  IGetDashboardData: Symbol.for("IGetDashboardData"),
 
   // Controllers
   AuthController: Symbol.for("AuthController"),

@@ -38,6 +38,10 @@ export interface IUserRepository {
     limit: number;
   }): Promise<User[]>;
   findSuggestions(input: SuggestionInput): Promise<UserListView[]>;
+  getDashboardMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<UserDashboardMetrics>;
 }
 
 export type UserStatus = "active" | "blocked" | "inactive";
@@ -58,4 +62,10 @@ export interface SuggestionInput {
   userId: string;
   excludeIds: string[];
   limit: number;
+}
+
+export interface UserDashboardMetrics {
+  totalUsers: number;
+  newUsers: number;
+  chartData: { date: string; count: number }[];
 }

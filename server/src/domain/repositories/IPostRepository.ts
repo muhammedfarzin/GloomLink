@@ -39,4 +39,13 @@ export interface IPostRepository {
   }): Promise<EnrichedPost[]>;
   update(postId: string, post: Post): Promise<Post | null>;
   deleteById(postId: string): Promise<void>;
+  getDashboardMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<PostDashboardMetrics>;
+}
+
+export interface PostDashboardMetrics {
+  totalPosts: number;
+  chartData: { date: string; count: number }[];
 }

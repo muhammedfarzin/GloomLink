@@ -10,6 +10,7 @@ import type { UserListView, UserProfile } from "../../domain/models/User";
 import type {
   IUserRepository,
   SuggestionInput,
+  UserDashboardMetrics,
   UserIdentifier,
   UserOptions,
   UserStatus,
@@ -455,6 +456,46 @@ export class UserRepository implements IUserRepository {
 
     const users = await UserModel.aggregate(aggregationPipeline);
     return users;
+  }
+
+  async getDashboardMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<UserDashboardMetrics> {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const matchDateRange = {
+      $match: {
+        createdAt: {
+          $gte: start,
+          $lte: end,
+        },
+      },
+    };
+
+    const totalUsers = await UserModel.countDocuments();
+    const newUsers = await UserModel.countDocuments({
+      createdAt: { $gte: start, $lte: end },
+    });
+
+    const newUsersAgg = await UserModel.aggregate([
+      matchDateRange,
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const chartData = newUsersAgg.map((d) => ({
+      date: d._id,
+      count: d.count,
+    }));
+
+    return { totalUsers, newUsers, chartData };
   }
 
   private safeParseUserDoc(userDoc: UserDocument): Omit<UserDto, "fullname"> {

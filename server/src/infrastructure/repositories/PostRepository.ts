@@ -3,7 +3,10 @@ import { Post } from "../../domain/entities/Post";
 import { PostMapper } from "../mappers/PostMapper";
 import mongoose, { type PipelineStage } from "mongoose";
 import { type PostDocument, PostModel } from "../database/models/PostModel";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import type {
+  IPostRepository,
+  PostDashboardMetrics,
+} from "../../domain/repositories/IPostRepository";
 import type { EnrichedPost, PostType } from "../../domain/models/Post";
 
 @injectable()
@@ -445,6 +448,45 @@ export class PostRepository implements IPostRepository {
 
   async deleteById(postId: string): Promise<void> {
     await PostModel.findByIdAndUpdate(postId, { status: "deleted" });
+  }
+
+  async getDashboardMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<PostDashboardMetrics> {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const matchDateRange = {
+      $match: {
+        createdAt: {
+          $gte: start,
+          $lte: end,
+        },
+      },
+    };
+
+    const totalPosts = await PostModel.countDocuments({
+      createdAt: { $gte: start, $lte: end },
+    });
+
+    const postsAgg = await PostModel.aggregate([
+      matchDateRange,
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const chartData = postsAgg.map((d) => ({
+      date: d._id,
+      count: d.count,
+    }));
+
+    return { totalPosts, chartData };
   }
 
   private safeParsePostDoc(postDoc: PostDocument): PostType {

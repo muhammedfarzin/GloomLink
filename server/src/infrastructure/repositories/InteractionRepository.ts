@@ -1,9 +1,12 @@
+import mongoose from "mongoose";
 import { injectable } from "inversify";
-import { IInteractionRepository } from "../../domain/repositories/IInteractionRepository";
 import { Interaction } from "../../domain/entities/Interaction";
 import { InteractionModel } from "../database/models/InteractionModel";
 import { InteractionMapper } from "../mappers/InteractionMapper";
-import mongoose from "mongoose";
+import type {
+  IInteractionRepository,
+  InteractionDashboardMetrics,
+} from "../../domain/repositories/IInteractionRepository";
 
 @injectable()
 export class InteractionRepository implements IInteractionRepository {
@@ -75,5 +78,54 @@ export class InteractionRepository implements IInteractionRepository {
     ]);
 
     return result.map((r) => r.tag);
+  }
+
+  async getDashboardMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<InteractionDashboardMetrics> {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const matchDateRange = {
+      $match: {
+        createdAt: {
+          $gte: start,
+          $lte: end,
+        },
+      },
+    };
+
+    const totalInteractions = await InteractionModel.countDocuments({
+      createdAt: { $gte: start, $lte: end },
+    });
+
+    const activeUsersAggregation = await InteractionModel.aggregate([
+      matchDateRange,
+      { $group: { _id: "$userId" } },
+      { $count: "activeUsers" },
+    ]);
+    const activeUsers =
+      activeUsersAggregation.length > 0
+        ? activeUsersAggregation[0].activeUsers
+        : 0;
+
+    const interactionsAgg = await InteractionModel.aggregate([
+      matchDateRange,
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const chartData = interactionsAgg.map((d) => ({
+      date: d._id,
+      count: d.count,
+    }));
+
+    return { totalInteractions, activeUsers, chartData };
   }
 }

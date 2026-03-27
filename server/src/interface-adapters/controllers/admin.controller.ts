@@ -9,8 +9,13 @@ import type { IGetAdminUsers } from "../../domain/use-cases/IGetAdminUsers";
 import type { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
 import type { IGetAdminPosts } from "../../domain/use-cases/IGetAdminPosts";
 import type { ITogglePostStatus } from "../../domain/use-cases/ITogglePostStatus";
+import type { IGetDashboardData } from "../../domain/use-cases/IGetDashboardData";
 
-import { getPostsSchema, getUsersSchema } from "../validation/adminSchemas";
+import {
+  getPostsSchema,
+  getUsersSchema,
+  getDashboardDataSchema,
+} from "../validation/adminSchemas";
 
 @injectable()
 export class AdminController {
@@ -21,7 +26,26 @@ export class AdminController {
     @inject(TYPES.IGetAdminPosts) private getAdminPostsUseCase: IGetAdminPosts,
     @inject(TYPES.ITogglePostStatus)
     private togglePostStatusUseCase: ITogglePostStatus,
+    @inject(TYPES.IGetDashboardData)
+    private getDashboardDataUseCase: IGetDashboardData,
   ) {}
+
+  getDashboardData: RequestHandler = async (req, res, next) => {
+    try {
+      const { startDate, endDate } = getDashboardDataSchema.parse(req.query);
+      const metrics = await this.getDashboardDataUseCase.execute(
+        new Date(startDate),
+        new Date(endDate),
+      );
+
+      res.status(200).json({
+        metrics,
+        message: "Dashboard data fetched successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
   getUsers: RequestHandler = async (req, res, next) => {
     try {
