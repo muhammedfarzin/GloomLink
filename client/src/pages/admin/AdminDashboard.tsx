@@ -20,6 +20,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import StatCard from "@/components/StatCard";
+import AdminDashboardSkeleton from "@/components/skeleton/AdminDashboardSkeleton";
 
 interface DashboardStats {
   totalUsers: number;
@@ -166,10 +167,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {loading && !stats ? (
-        <div className="flex justify-center flex-col gap-4 items-center h-64">
-          <div className="w-10 h-10 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-neon-cyan animate-pulse">Loading Metrics...</p>
-        </div>
+        <AdminDashboardSkeleton />
       ) : stats ? (
         <div className="space-y-8 animate-in fade-in duration-700 slide-in-from-bottom-4">
           {/* Stats Grid */}
