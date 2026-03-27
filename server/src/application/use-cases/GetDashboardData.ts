@@ -40,12 +40,14 @@ export class GetDashboardData implements IGetDashboardData {
       const p = postMetrics.chartData.find((d) => d.date === date);
       const i = interactionMetrics.chartData.find((d) => d.date === date);
 
-      chartData.push({
-        date,
-        newUsers: u ? u.count : 0,
-        posts: p ? p.count : 0,
-        interactions: i ? i.count : 0,
-      });
+      if (u || p || i) {
+        chartData.push({
+          date,
+          newUsers: u ? u.count : 0,
+          posts: p ? p.count : 0,
+          interactions: i ? i.count : 0,
+        });
+      }
 
       currentDate.setDate(currentDate.getDate() + 1);
     }
