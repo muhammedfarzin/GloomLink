@@ -4,6 +4,7 @@ import { HttpError } from "../errors/HttpError";
 import { TokenPayloadType } from "../../types/tokens";
 import container from "../../shared/inversify.config";
 import { TYPES } from "../../shared/types";
+import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
 import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
 
 export const authenticateToken: RequestHandler = async (req, res, next) => {
@@ -31,7 +32,7 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
         throw new HttpError(401, "Unauthorized: User has been blocked");
       if (
         !user.isVerified() &&
-        req.originalUrl.startsWith("/api/user/signup/verify-otp")
+        !req.originalUrl.startsWith("/api/user/signup/verify-otp")
       ) {
         throw new HttpError(403, "Forbidden: User not verified");
       }
@@ -50,11 +51,16 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (
-      error instanceof TokenExpiredError ||
-      error instanceof JsonWebTokenError
-    ) {
-      next(new HttpError(401, "Your token has been expired"));
-    } else next(error);
+    switch (error) {
+      case UserNotFoundError:
+        next(new HttpError(401, "Unauthorized: User not found"));
+        break;
+      case TokenExpiredError:
+      case JsonWebTokenError:
+        next(new HttpError(401, "Your token has been expired"));
+        break;
+      default:
+        next(error);
+    }
   }
 };

@@ -66,7 +66,8 @@ export class UserRepository implements IUserRepository {
   ): Promise<
     { isExists: false } | { isExists: true; data: User; field: string }
   > {
-    for (const [field, value] of Object.entries(query)) {
+    const { username, email, mobile } = query;
+    for (const [field, value] of Object.entries({ username, email, mobile })) {
       if (!value) continue;
 
       const userDoc = await UserModel.findOne({ [field]: value });

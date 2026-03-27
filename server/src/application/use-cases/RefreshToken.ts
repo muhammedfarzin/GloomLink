@@ -9,7 +9,6 @@ import type {
   IRefreshToken,
   RefreshTokenInput,
 } from "../../domain/use-cases/IRefreshToken";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
 import {
   ForbiddenError,
   UnauthorizedError,
@@ -28,7 +27,7 @@ export class RefreshToken implements IRefreshToken {
     if (decoded.role === "user") {
       const user = await this.userRepository.findById(decoded.id);
       if (!user) {
-        throw new UserNotFoundError(
+        throw new UnauthorizedError(
           "User associated with this token not found",
         );
       }

@@ -8,10 +8,10 @@ import { OtpType } from "../../domain/models/Otp";
 @injectable()
 export class OtpRepository implements IOtpRepository {
   async create(otp: Otp): Promise<Otp> {
-    const { createdAt, otpId, ...otpToPersist } = OtpMapper.toPersistence(otp);
-    await OtpModel.findOneAndDelete({ email: otpToPersist.email });
+    const { createdAt, otpId, email, hashedOtp } = OtpMapper.toPersistence(otp);
+    await OtpModel.findOneAndDelete({ email });
 
-    const newOtpModel = new OtpModel(otpToPersist);
+    const newOtpModel = new OtpModel({ email, otp: hashedOtp });
     const savedOtp = await newOtpModel.save();
     return OtpMapper.toDomain(this.safeParseOtpDoc(savedOtp));
   }
@@ -31,6 +31,7 @@ export class OtpRepository implements IOtpRepository {
     return {
       ...otpObj,
       otpId: otpId.toString(),
+      hashedOtp: otpObj.otp,
     };
   }
 }
