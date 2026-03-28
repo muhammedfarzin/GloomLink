@@ -5,9 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { UserAuthState } from "../../redux/reducers/auth";
 import ConfirmButton from "@/components/ConfirmButton";
 import AdminUserListSkeleton from "@/components/skeleton/AdminUserListSkeleton";
+import ManagementToolbar from "./components/ManagementToolbar";
 import {
-  Search,
-  Filter,
   ShieldBan,
   CheckCircle,
   Mail,
@@ -111,58 +110,32 @@ const AdminUserLists: React.FC = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    document
-      .getElementById("app-container")
-      ?.scrollTo({ top: 0, behavior: "smooth" });
     if (newPage < 1) return;
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
     setSearchParams(params);
+    document
+      .getElementById("app-container")
+      ?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div className="px-6 pt-6 max-w-7xl w-full mx-auto">
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 animate-in slide-in-from-top duration-500">
-        <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
-            User Management
-          </h1>
-          <p className="text-gray-400 mt-1">
-            View, filter, and manage platform users
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 bg-primary/30 p-2 rounded-lg border border-primary/10 shadow-md">
-          <form onSubmit={handleSearch} className="relative flex items-center">
-            <Search className="absolute left-3 text-gray-500 z-10" size={16} />
-            <input
-              type="text"
-              placeholder="Search users..."
-              className="bg-primary/50 border border-primary/20 rounded-md pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan transition-all w-full sm:w-64"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
-
-          <div className="flex items-center relative">
-            <Filter
-              className="absolute left-3 text-gray-500 pointer-events-none z-10"
-              size={16}
-            />
-            <select
-              className="bg-primary/50 border border-primary/20 rounded-md pl-9 pr-8 py-2 text-sm text-white focus:outline-none focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan appearance-none cursor-pointer transition-all"
-              onChange={handleFilter}
-              value={searchParams.get("filter") || "all"}
-            >
-              <option value="all">All Users</option>
-              <option value="active">Active</option>
-              <option value="blocked">Blocked</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <ManagementToolbar
+        title="User Management"
+        description="View, filter, and manage platform users"
+        searchQuery={searchQuery}
+        searchPlaceholder="Search users..."
+        filter={searchParams.get("filter") || "all"}
+        filters={{
+          all: "All Users",
+          active: "Active",
+          blocked: "Blocked",
+        }}
+        onSearchQueryChange={setSearchQuery}
+        onSearch={handleSearch}
+        onFilterChange={handleFilter}
+      />
 
       {loading ? (
         <AdminUserListSkeleton />

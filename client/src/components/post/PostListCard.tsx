@@ -94,7 +94,7 @@ const PostListCard: React.FC<Props> = ({
   return (
     <ViewTracker onView={handleView}>
       <div
-        className={`flex flex-col gap-3 border bg-primary border-[#9ca3af33] p-4 w-full max-w-lg ${
+        className={`flex flex-col gap-4 bg-primary/30 hover:bg-primary/40 border border-primary/20 backdrop-blur-sm p-5 w-full max-w-lg shadow-lg transition-all duration-300 ${
           className || "rounded-2xl"
         }`}
       >
