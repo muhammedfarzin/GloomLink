@@ -51,16 +51,15 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
 
     next();
   } catch (error) {
-    switch (error) {
-      case UserNotFoundError:
-        next(new HttpError(401, "Unauthorized: User not found"));
-        break;
-      case TokenExpiredError:
-      case JsonWebTokenError:
-        next(new HttpError(401, "Your token has been expired"));
-        break;
-      default:
-        next(error);
+    if (error instanceof UserNotFoundError) {
+      next(new HttpError(401, "Unauthorized: User not found"));
+    } else if (
+      error instanceof TokenExpiredError ||
+      error instanceof JsonWebTokenError
+    ) {
+      next(new HttpError(401, "Your token has been expired"));
+    } else {
+      next(error);
     }
   }
 };
