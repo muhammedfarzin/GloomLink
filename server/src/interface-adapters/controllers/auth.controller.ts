@@ -2,9 +2,13 @@ import { RequestHandler } from "express";
 import { inject } from "inversify";
 import { HttpError } from "../errors/HttpError";
 import { UserPresenter } from "../presenters/UserPresenter";
+import { User } from "../../domain/entities/User";
 import { TYPES } from "../../shared/types";
 
-import type { ITokenService } from "../../domain/services/ITokenService";
+import type {
+  ITokenService,
+  Tokens,
+} from "../../domain/services/ITokenService";
 import type { IExternalAuthService } from "../../domain/services/IExternalAuthService";
 
 import type { ICreateUser } from "../../domain/use-cases/ICreateUser";
@@ -16,7 +20,6 @@ import type { IRefreshToken } from "../../domain/use-cases/IRefreshToken";
 import type { IAdminLogin } from "../../domain/use-cases/IAdminLogin";
 
 import {
-  adminLoginInputSchema,
   googleAuthSchema,
   loginInputSchema,
   otpInputSchema,
@@ -42,30 +45,34 @@ export class AuthController {
 
   login: RequestHandler = async (req, res, next) => {
     try {
-      const validatedBody = loginInputSchema.parse(req.body);
+      const { role, ...validatedBody } = loginInputSchema.parse(req.body);
+      let user: User | undefined;
+      let tokens: Tokens;
+      let userResponse: any;
+      let resMessage = "Login successful";
 
-      const user = await this.loginUserUseCase.execute(validatedBody);
+      if (role === "user") {
+        const authResponse = await this.loginUserUseCase.execute(validatedBody);
+        user = authResponse.user;
+        tokens = authResponse.tokens;
+        userResponse = UserPresenter.toResponseWithStatus(user);
 
-      if (!user.isVerified()) {
-        await this.sendVerificationEmailUseCase.execute({
-          email: user.getEmail(),
-        });
+        if (!user.isVerified()) {
+          resMessage = "Verify your email";
+
+          await this.sendVerificationEmailUseCase.execute({
+            email: user.getEmail(),
+          });
+        }
+      } else {
+        tokens = await this.adminLoginUseCase.execute(validatedBody);
+        userResponse = { username: validatedBody.username };
       }
-
-      const userResponse = UserPresenter.toResponseWithStatus(user);
-      const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse.userId },
-        userResponse.status !== "not-verified",
-      );
-      const messageResponse =
-        userResponse.status === "not-verified"
-          ? "Verify your email"
-          : "Login successful";
 
       res.status(200).json({
         userData: userResponse,
         tokens,
-        message: messageResponse,
+        message: resMessage,
       });
     } catch (error) {
       next(error);
@@ -188,22 +195,6 @@ export class AuthController {
       res.status(200).json({
         tokens: newTokens,
         message: "Token refreshed successfully",
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  adminLogin: RequestHandler = async (req, res, next) => {
-    try {
-      const validatedBody = adminLoginInputSchema.parse(req.body);
-
-      const tokens = await this.adminLoginUseCase.execute(validatedBody);
-
-      res.status(200).json({
-        tokens,
-        userData: { username: validatedBody.username },
-        message: "Admin login successful",
       });
     } catch (error) {
       next(error);

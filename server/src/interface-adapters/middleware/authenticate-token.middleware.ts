@@ -30,10 +30,7 @@ export const authenticateToken: RequestHandler = async (req, res, next) => {
       if (!user) throw new HttpError(401, "Unauthorized: User not found");
       if (user.isBlocked())
         throw new HttpError(401, "Unauthorized: User has been blocked");
-      if (
-        !user.isVerified() &&
-        !req.originalUrl.startsWith("/api/user/signup/verify-otp")
-      ) {
+      if (!user.isVerified() && !req.originalUrl.startsWith("/api/auth")) {
         throw new HttpError(403, "Forbidden: User not verified");
       }
 

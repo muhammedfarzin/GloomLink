@@ -20,9 +20,8 @@ export const loginInputSchema = z.object({
     .string(validateRequiredString("Password", "Invalid credentials"))
     .trim()
     .min(1, { message: "Password is required" }),
+  role: z.enum(["user", "admin"], { message: "Invalid role" }).default("user"),
 });
-
-export type LoginInput = z.infer<typeof loginInputSchema>;
 
 export const signupInputSchema = z.object({
   // --- Required Fields ---
@@ -66,15 +65,11 @@ export const signupInputSchema = z.object({
     }),
 });
 
-export type SignupInput = z.infer<typeof signupInputSchema>;
-
 export const otpInputSchema = z.object({
   otp: z
     .string(validateRequiredString("OTP"))
     .regex(/^\d{6}$/, { message: "Invalid OTP!" }),
 });
-
-export type OtpInput = z.infer<typeof otpInputSchema>;
 
 export const googleAuthSchema = z.object({
   token: z
@@ -82,23 +77,8 @@ export const googleAuthSchema = z.object({
     .min(1, { message: "Google auth token is required" }),
 });
 
-export type GoogleAuth = z.infer<typeof googleAuthSchema>;
-
 export const refreshTokenSchema = z.object({
   token: z
     .string(validateRequiredString("Refresh token"))
     .min(1, { message: "Refresh token is required" }),
 });
-
-export type RefreshToken = z.infer<typeof refreshTokenSchema>;
-
-export const adminLoginInputSchema = z.object({
-  username: z
-    .string(validateRequiredString("Username", "Invalid credentials!"))
-    .min(1, { message: "Username is required" }),
-  password: z
-    .string(validateRequiredString("Password", "Invalid credentials!"))
-    .min(1, { message: "Password is required" }),
-});
-
-export type AdminLoginInput = z.infer<typeof adminLoginInputSchema>;

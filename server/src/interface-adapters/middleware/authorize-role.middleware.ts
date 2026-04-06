@@ -3,7 +3,7 @@ import { TokenPayloadType } from "../../types/tokens";
 import { HttpError } from "../errors/HttpError";
 
 export const authorizeRole = (
-  role: TokenPayloadType["role"]
+  role: TokenPayloadType["role"],
 ): RequestHandler => {
   return (req, res, next) => {
     try {

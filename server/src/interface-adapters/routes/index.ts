@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { userApiRouter } from "./user.api";
 import { adminApiRouter } from "./admin.api";
+import { authApiRouter } from "./auth.router";
 import errorMiddleware from "../middleware/error.middleware";
 
 const router = Router();
 
+router.use("/api/auth", authApiRouter);
 router.use("/api/user", userApiRouter);
 router.use("/api/admin", adminApiRouter);
 
