@@ -9,10 +9,27 @@ interface TimerButtonProps {
   className?: string;
 }
 
+const formatTime = (totalSeconds: number) => {
+  let result = "";
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (totalSeconds >= 3600) {
+    result += `${hours.toString().padStart(2, "0")}:`;
+  }
+  if (totalSeconds >= 60) {
+    result += `${minutes.toString().padStart(2, "0")}:`;
+  }
+
+  result += seconds.toString().padStart(2, "0");
+  return result;
+};
+
 const TimerButton: React.FC<TimerButtonProps> = ({
   children,
   onClick,
-  disableDuration = 300,
+  disableDuration = 60,
   isDisabledByDefault = true,
   showTimer = true,
   className,
@@ -55,11 +72,9 @@ const TimerButton: React.FC<TimerButtonProps> = ({
       } ${className}`}
       onClick={!isDisabled ? handleOnClick : undefined}
     >
-      {children}
+      {children}{" "}
       {showTimer && isDisabled ? (
-        <span>
-          ({`${Math.floor(remainingSeconds / 60)}:${remainingSeconds % 60}`})
-        </span>
+        <span>({formatTime(remainingSeconds)})</span>
       ) : null}
     </div>
   );

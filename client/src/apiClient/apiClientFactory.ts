@@ -4,15 +4,15 @@ import { logout } from "../redux/reducers/auth";
 
 interface ApiClientConfig {
   baseURL: string;
-  accessTokenKey: string;
-  refreshTokenKey: string;
-  authType: "user" | "admin";
+  accessTokenKey?: string;
+  refreshTokenKey?: string;
+  authType?: "user" | "admin";
 }
 
 export const createApiClient = ({
   baseURL,
-  accessTokenKey,
-  refreshTokenKey,
+  accessTokenKey = "",
+  refreshTokenKey = "",
   authType,
 }: ApiClientConfig) => {
   const apiClient = axios.create({
@@ -51,10 +51,12 @@ export const createApiClient = ({
         try {
           const refreshToken = localStorage.getItem(refreshTokenKey);
           if (!refreshToken) {
-            store.dispatch(logout({ type: authType }));
+            if (authType) {
+              store.dispatch(logout({ type: authType }));
+            }
             return Promise.reject(error);
           }
-          const response = await axios.post(`/api/${authType}/auth/refresh`, {
+          const response = await axios.post(`/api/auth/refresh`, {
             token: refreshToken,
           });
           const newAccessToken = response.data.tokens.accessToken;
@@ -66,7 +68,9 @@ export const createApiClient = ({
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
           return apiClient(originalRequest);
         } catch (responseError: any) {
-          store.dispatch(logout({ type: authType }));
+          if (authType) {
+            store.dispatch(logout({ type: authType }));
+          }
           return Promise.reject(
             new AxiosError(
               "Your session session has expired",

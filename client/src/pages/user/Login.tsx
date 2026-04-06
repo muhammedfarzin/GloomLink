@@ -18,7 +18,7 @@ import { RootState } from "../../redux/store";
 import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleAuthProvider } from "@/firebase";
 import { FirebaseError } from "firebase/app";
-import { apiClient } from "@/apiClient";
+import { authApiClient } from "@/apiClient";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -58,12 +58,13 @@ const Login: React.FC = () => {
 
     if (isValidated) {
       try {
-        const response = await apiClient.post("/login", formData);
+        const response = await authApiClient.post("/login", {
+          ...formData,
+          role: "user",
+        });
         handleSuccessLogin(response.data);
       } catch (error: any) {
-        setErrorMessage(
-          error.response?.data?.message || "Something went wrong"
-        );
+        setErrorMessage(error.message);
       } finally {
         setLoading(null);
       }
@@ -79,10 +80,10 @@ const Login: React.FC = () => {
       setLoading("Logging in with Google");
       const credentials = await signInWithPopup(
         firebaseAuth,
-        googleAuthProvider
+        googleAuthProvider,
       );
       const token = await credentials.user.getIdToken();
-      const response = await apiClient.post("/auth/google", {
+      const response = await authApiClient.post("/google", {
         token,
       });
 
@@ -90,10 +91,9 @@ const Login: React.FC = () => {
     } catch (error: any) {
       if (error instanceof FirebaseError) {
         setErrorMessage("Google authentication failed");
-      } else
-        setErrorMessage(
-          error.response.data.message || error.message || "Something went wrong"
-        );
+      } else {
+        setErrorMessage(error.message);
+      }
     } finally {
       setLoading(null);
     }

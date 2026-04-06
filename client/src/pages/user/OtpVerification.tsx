@@ -14,7 +14,7 @@ import {
 } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import { apiClient } from "@/apiClient";
+import { authApiClient } from "@/apiClient";
 
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const OtpVerification: React.FC = () => {
   const handleResendOtp = async () => {
     try {
       setLoading("Resending OTP...");
-      const response = await apiClient.post("/signup/resend-otp");
+      const response = await authApiClient.post("/resend-otp");
       setErrorMessage(response.data.message || "");
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message || "Something went wrong");
@@ -42,7 +42,7 @@ const OtpVerification: React.FC = () => {
   };
 
   const handleVerifyOtp: React.MouseEventHandler<HTMLFormElement> = async (
-    e
+    e,
   ) => {
     e.preventDefault();
     setLoading("Verifying...");
@@ -52,7 +52,7 @@ const OtpVerification: React.FC = () => {
         throw new Error(errorMessage);
       });
 
-      const response = await apiClient.post("/signup/verify-otp", {
+      const response = await authApiClient.post("/verify-otp", {
         otp,
       });
       const userData = response.data.userData as UserAuthState;
@@ -62,15 +62,12 @@ const OtpVerification: React.FC = () => {
       navigate("/");
     } catch (error: any) {
       if (error.status === 401) {
-        error.response.data.message = "Time expired, please try again";
+        error.message = "Time expired, please try again";
         dispatch(logout({ type: "user" }));
       } else if (error.status === 404) {
-        error.response.data.message = "Your otp has been expired";
-        dispatch(logout({ type: "user" }));
+        error.message = "Your otp has been expired";
       }
-      setErrorMessage(
-        error.response?.data?.message || error.message || "Something went wrong"
-      );
+      setErrorMessage(error.message);
     } finally {
       setLoading(null);
     }

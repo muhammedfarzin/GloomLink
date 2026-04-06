@@ -13,7 +13,7 @@ import {
   TokensState,
 } from "../../redux/reducers/auth";
 import { LoginFormType, validateLoginForm } from "../user/formValidations";
-import { adminApiClient } from "@/apiClient";
+import { authApiClient } from "@/apiClient";
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +44,10 @@ const AdminLogin: React.FC = () => {
     if (!isValidated) return;
 
     try {
-      const response = await adminApiClient.post("/login", formData);
+      const response = await authApiClient.post("/login", {
+        ...formData,
+        role: "admin",
+      });
       const adminData = response.data.userData as AdminAuthState;
       const tokens = response.data.tokens as TokensState;
 

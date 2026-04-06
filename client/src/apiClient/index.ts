@@ -1,4 +1,3 @@
-import adminApiClient from "./adminApiClient";
-import apiClient from "./apiClient";
-
-export { adminApiClient, apiClient };
+export { default as apiClient } from "./apiClient";
+export { default as adminApiClient } from "./adminApiClient";
+export { default as authApiClient } from "./authApiClient";

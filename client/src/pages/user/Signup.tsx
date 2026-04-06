@@ -13,9 +13,9 @@ import {
   type UserAuthState,
 } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import type { RootState } from "../../redux/store";
 import DateInput from "@/components/DateInput";
-import { apiClient } from "@/apiClient";
+import { authApiClient } from "@/apiClient";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
@@ -53,7 +53,7 @@ const Signup = () => {
       const isValidated = validateSignUpForm(formData, setErrorMessage);
       if (!isValidated) return;
 
-      const response = await apiClient.post("/signup", {
+      const response = await authApiClient.post("/signup", {
         ...formData,
         dob: dob?.toISOString(),
         gender: gender,
