@@ -1,5 +1,5 @@
-import DialogBox from "../DialogBox";
-import UsersList from "../UsersList";
+import DialogBox from "@/components/DialogBox";
+import UsersList from "@/components/UsersList";
 
 interface Props {
   postId: string;

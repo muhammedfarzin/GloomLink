@@ -1,13 +1,13 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { adminApiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import { Post } from "@/components/post/types/Post";
+import type { Post } from "@/features/types/Post";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
-import { Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import ManagementToolbar from "./components/ManagementToolbar";
 
-const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
+const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
 
 const AdminPostLists: React.FC = () => {
   const { toast } = useToast();

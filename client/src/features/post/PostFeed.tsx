@@ -1,4 +1,3 @@
-import { useToast } from "@/hooks/use-toast";
 import React, {
   Suspense,
   useCallback,
@@ -7,10 +6,11 @@ import React, {
   useState,
 } from "react";
 import throttle from "lodash/throttle";
-import { Post } from "./types/Post";
+import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/apiClient";
-import EmptyIllustrationDark from "../../assets/images/Empty-Illustration-Dark.svg";
-import PostSkeletonList from "../skeleton/PostSkeletonList";
+import EmptyIllustrationDark from "@/assets/images/Empty-Illustration-Dark.svg";
+import PostSkeletonList from "@/components/skeleton/PostSkeletonList";
+import type { Post } from "../types/Post";
 
 const PostListCard = React.lazy(() => import("./PostListCard"));
 

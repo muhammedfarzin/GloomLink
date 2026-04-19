@@ -1,12 +1,12 @@
-import ProfileImage from "../ProfileImage";
-import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
 import { useState } from "react";
+import ProfileImage from "@/components/ProfileImage";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import type { HandleReplyCommentType } from "./types/ReplyCommentType";
-import type Comment from "./types/Comment";
 import { formatTimeAgo } from "@/lib/dateUtils";
+import type { HandleReplyCommentType } from "../types/ReplyCommentType";
+import type Comment from "../types/Comment";
 
 interface CommentListCardProps {
   comment: Comment;

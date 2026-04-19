@@ -4,13 +4,13 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "../ui/carousel";
+} from "@/components/ui/carousel";
 
-interface Props {
+interface Props extends React.ImgHTMLAttributes<HTMLImageElement> {
   images: string[];
 }
 
-const CarouselImageView: React.FC<Props> = ({ images }) => {
+const CarouselImageView: React.FC<Props> = ({ images, ...props }) => {
   return (
     <Carousel className="relative w-full">
       <CarouselContent>
@@ -19,7 +19,7 @@ const CarouselImageView: React.FC<Props> = ({ images }) => {
             <img
               className="mt-1 w-full bg-foreground/5 border-border object-contain rounded-xl min-h-40 max-h-80 border"
               src={image}
-              alt="post"
+              {...props}
             />
           </CarouselItem>
         ))}

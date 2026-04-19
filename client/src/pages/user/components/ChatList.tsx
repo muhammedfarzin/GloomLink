@@ -17,7 +17,7 @@ const ChatList = () => {
 
   const handleIncomeMessage = useCallback(
     async (newMessage: MessageType) => {
-      let chat: ChatUserDataType | undefined = chats.find(
+      const chat: ChatUserDataType | undefined = chats.find(
         (chat) => chat.username === newMessage.senderUsername,
       );
 

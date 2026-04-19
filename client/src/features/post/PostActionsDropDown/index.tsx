@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { apiClient, adminApiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Post } from "../types/Post";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import UserPostActionsMenu from "./UserPostActionsMenu";
 import AdminPostActionsMenu from "./AdminPostActionsMenu";
+import type { Post } from "../../types/Post";
+import type { RootState } from "@/redux/store";
 
 interface PostActionsDropDownProps {
   postId: string;

@@ -16,7 +16,7 @@ const PostView: React.FC<Props> = ({ caption, images, captionLine = 3 }) => {
         {caption}
       </p>
 
-      <CarouselImageView images={images} />
+      <CarouselImageView images={images} alt="Post" />
     </div>
   );
 };

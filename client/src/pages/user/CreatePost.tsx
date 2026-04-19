@@ -1,20 +1,21 @@
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import InputBox from "../../components/InputBox";
+import { useNavigate, useParams } from "react-router-dom";
+import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
-import DropDownBox from "../../components/DropDownBox";
-import Button from "../../components/Button";
+import DropDownBox from "@/components/DropDownBox";
+import Button from "@/components/Button";
 import TagsInput from "./components/TagsInput";
 import ImageInput from "./components/ImageInput";
 import { apiClient } from "@/apiClient";
-import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { postId } = useParams();
-  const myUserId = useSelector((state: RootState) => state.auth.userData?.userId);
+  const myUserId = useSelector(
+    (state: RootState) => state.auth.userData?.userId,
+  );
 
   const [caption, setCaption] = useState<string>("");
   const [images, setImages] = useState<(File | string)[]>([]);
@@ -116,8 +117,8 @@ const CreatePost: React.FC = () => {
                 setRemovedImages([...removedImages, image]);
             }}
           />
-          <InputBox
-            className="mt-2"
+          <input
+            className="input-box mt-2"
             placeholder="Write a caption"
             value={caption}
             onChange={(e) => setCaption(e.target.value)}

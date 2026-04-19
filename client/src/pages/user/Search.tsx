@@ -1,14 +1,14 @@
+import React, { Suspense, useEffect, useState } from "react";
 import SearchBox from "@/components/SearchBox";
 import UserListCard from "./components/UserListCard";
-import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import { Post } from "@/components/post/types/Post";
-import { UserDataType } from "@/components/types/user-data-types";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
+import type { Post } from "@/features/types/Post";
+import type { UserDataType } from "@/components/types/user-data-types";
 
-const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
+const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
 
 export type SearchResultType =
   | (UserDataType & { type: "user" })

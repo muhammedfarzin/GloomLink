@@ -1,21 +1,21 @@
 import { useSelector } from "react-redux";
-import { ViewTracker } from "../ViewTracker";
+import { ViewTracker } from "@/components/ViewTracker";
+import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import { useInteraction } from "@/hooks/useInteraction";
 import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
 import { useCallback, useEffect, useState } from "react";
 import PostActions from "./PostActions";
-import { Post } from "./types/Post";
 import AccountViewCard from "@/components/AccountViewCard";
 import PostInteractionCount from "./PostInteractionCount";
 import PostView from "./PostView";
-import PostSkeleton from "../skeleton/PostSkeleton";
 import { formatTimeAgo } from "@/lib/dateUtils";
-import type PostDataType from "./types/PostDataType";
+import type { Post } from "../types/Post";
+import type PostDataType from "../types/PostDataType";
 import type { RootState } from "@/redux/store";
 
-export interface Props {
+export interface PostListCardProps {
   postId: string;
   postData?: PostDataType;
   isAdmin?: boolean;
@@ -27,7 +27,7 @@ export interface Props {
   handleChange?: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
-const PostListCard: React.FC<Props> = ({
+const PostListCard: React.FC<PostListCardProps> = ({
   postId,
   postData,
   isAdmin = false,

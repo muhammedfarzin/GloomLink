@@ -1,10 +1,9 @@
 import React from "react";
 
-interface FormBoxProps
-  extends React.DetailedHTMLProps<
-    React.FormHTMLAttributes<HTMLFormElement>,
-    HTMLFormElement
-  > {
+interface FormBoxProps extends React.DetailedHTMLProps<
+  React.FormHTMLAttributes<HTMLFormElement>,
+  HTMLFormElement
+> {
   children: React.ReactNode;
   title: string;
   method?: string;

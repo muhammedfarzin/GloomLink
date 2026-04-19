@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
 import OtpIllustrationDark from "../../assets/images/OTP-Illustration-Dark.svg";
 import FormBox from "../../components/FormBox";
-import InputBox from "../../components/InputBox";
 import TimerButton from "./components/TimerButton";
 import { validateOtpForm } from "./formValidations";
 import { useNavigate } from "react-router-dom";
@@ -110,7 +109,8 @@ const OtpVerification: React.FC = () => {
               </span>
               <TimerButton onClick={handleResendOtp}>Resend OTP</TimerButton>
             </div>
-            <InputBox
+            <input
+              className="input-box"
               value={otp}
               name="otp"
               placeholder="Enter OTP send to your email"

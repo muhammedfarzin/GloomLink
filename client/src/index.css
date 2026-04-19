@@ -77,8 +77,11 @@ select.black option {
   color: #5f5f5f !important;
 }
 
-@layer utilities {
+.input-box {
+  @apply my-1 disabled:opacity-50 bg-input/80 focus:bg-input text-foreground;
+}
 
+@layer utilities {
   /* Hide scrollbar for Chrome, Safari, and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;

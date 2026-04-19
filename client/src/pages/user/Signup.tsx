@@ -1,5 +1,4 @@
 import FormBox from "../../components/FormBox";
-import InputBox from "../../components/InputBox";
 import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
 import SignUpIllustrationDark from "../../assets/images/SignUp-Illustration-Dark.svg";
 import { useEffect, useState } from "react";
@@ -104,14 +103,16 @@ const Signup = () => {
             onSubmit={handleOnSignup}
           >
             <div className="flex gap-2">
-              <InputBox
+              <input
+                className="input-box"
                 value={formData.firstname}
                 name="firstname"
                 onChange={handleOnChange}
                 placeholder="First name"
                 type="text"
               />
-              <InputBox
+              <input
+                className="input-box"
                 value={formData.lastname}
                 name="lastname"
                 onChange={handleOnChange}
@@ -120,21 +121,24 @@ const Signup = () => {
               />
             </div>
 
-            <InputBox
+            <input
+              className="input-box"
               value={formData.username}
               name="username"
               onChange={handleOnChange}
               placeholder="Username"
               type="text"
             />
-            <InputBox
+            <input
+              className="input-box"
               value={formData.email}
               name="email"
               onChange={handleOnChange}
               placeholder="Email"
               type="email"
             />
-            <InputBox
+            <input
+              className="input-box"
               value={formData.mobile}
               name="mobile"
               onChange={handleOnChange}
@@ -160,14 +164,16 @@ const Signup = () => {
               />
             </div>
 
-            <InputBox
+            <input
+              className="input-box"
               value={formData.password}
               name="password"
               onChange={handleOnChange}
               placeholder="Password"
               type="password"
             />
-            <InputBox
+            <input
+              className="input-box"
               value={formData.confirmPassword}
               name="confirmPassword"
               onChange={handleOnChange}

@@ -1,9 +1,9 @@
-import { apiClient } from "@/apiClient";
-import type PostDataType from "@/components/post/types/PostDataType";
-import { useToast } from "@/hooks/use-toast";
-import { MessageType } from "@/types/message-type";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiClient } from "@/apiClient";
+import type PostDataType from "@/features/types/PostDataType";
+import { useToast } from "@/hooks/use-toast";
+import { MessageType } from "@/types/message-type";
 
 interface Props {
   data: Omit<MessageType, "type">;
@@ -21,7 +21,7 @@ const PostMessage: React.FC<Props> = ({ data }) => {
         toast({
           description: error.message,
           variant: "destructive",
-        })
+        }),
       );
   }, [data]);
 

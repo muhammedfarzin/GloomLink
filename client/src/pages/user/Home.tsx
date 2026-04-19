@@ -1,4 +1,4 @@
-import PostFeed from "@/components/post/PostFeed";
+import PostFeed from "@/features/post/PostFeed";
 
 const Home = () => {
   return (

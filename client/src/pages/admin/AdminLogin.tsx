@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
-import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.svg";
-import FormBox from "../../components/FormBox";
-import InputBox from "../../components/InputBox";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import GloomLinkLogo from "@/assets/images/GloomLink-Logo.svg";
+import LoginIllustrationDark from "@/assets/images/Login-Illustration-Dark.svg";
+import FormBox from "@/components/FormBox";
+import { RootState } from "@/redux/store";
 import {
   AdminAuthState,
   logout,
   setAuthAdmin,
   TokensState,
-} from "../../redux/reducers/auth";
+} from "@/redux/reducers/auth";
 import { LoginFormType, validateLoginForm } from "../user/formValidations";
 import { authApiClient } from "@/apiClient";
 
@@ -90,16 +89,18 @@ const AdminLogin: React.FC = () => {
             errorMessage={errorMessage}
             onSubmit={handleOnLogin}
           >
-            <InputBox
+            <input
               placeholder="Username"
               type="text"
               name="username"
+              className="input-box"
               onChange={handleOnChange}
             />
-            <InputBox
+            <input
               placeholder="Password"
               type="password"
               name="password"
+              className="input-box"
               onChange={handleOnChange}
             />
             <button className="btn btn-primary border w-full">Login</button>

@@ -1,10 +1,10 @@
 import React, { Suspense } from "react";
-import IconButton from "../IconButton";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import IconButton from "@/components/IconButton";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import CommentIcon from "@/assets/icons/Comment.svg";
-import { type Props as PostListCardProps } from "./PostListCard";
+import type { PostListCardProps } from "./PostListCard";
 import CommentBox from "./CommentBox";
-import PostSkeleton from "../skeleton/PostSkeleton";
 
 const PostListCard = React.lazy(() => import("./PostListCard"));
 

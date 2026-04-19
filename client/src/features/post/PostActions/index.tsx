@@ -1,8 +1,8 @@
 import { apiClient } from "@/apiClient";
-import { Post } from "../types/Post";
 import PostActionsView from "./PostActionsView";
-import PostDataType from "../types/PostDataType";
 import { useToast } from "@/hooks/use-toast";
+import type { Post } from "../../types/Post";
+import type PostDataType from "../../types/PostDataType";
 
 export interface Props {
   postData: PostDataType;

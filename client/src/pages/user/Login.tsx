@@ -5,7 +5,6 @@ import LoginIllustrationDark from "../../assets/images/Login-Illustration-Dark.s
 import EnvelopeIcon from "../../assets/icons/Envelope.svg";
 import GoogleIcon from "../../assets/icons/Google.svg";
 import FormBox from "../../components/FormBox";
-import InputBox from "../../components/InputBox";
 import {
   logout,
   setAuthUser,
@@ -127,14 +126,16 @@ const Login: React.FC = () => {
             errorMessage={errorMessage}
             onSubmit={handleOnLogin}
           >
-            <InputBox
+            <input
+              className="input-box"
               value={formData.username}
               name="username"
               placeholder="Phone number, username, or email"
               type="text"
               onChange={handleOnChange}
             />
-            <InputBox
+            <input
+              className="input-box"
               value={formData.password}
               name="password"
               placeholder="Password"

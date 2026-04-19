@@ -1,7 +1,6 @@
-import InputBox, { type InputBoxProps } from "./InputBox";
 import SearchIcon from "../assets/icons/Search.svg";
 
-interface SearchBoxProps extends InputBoxProps {
+interface SearchBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   showSearchIcon?: boolean;
   onSubmit?: () => void;
 }
@@ -14,11 +13,11 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 }) => {
   return (
     <div className={"search-box w-full bg-primary " + className}>
-      <InputBox
-        type="search"
+      <input
         id="searchBox"
+        type="search"
         placeholder="Search"
-        className="!bg-transparent !m-0"
+        className="input-box !m-0"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();

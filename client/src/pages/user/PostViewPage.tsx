@@ -1,7 +1,7 @@
-import CommentBox from "@/components/post/CommentBox";
+import React, { Suspense } from "react";
+import CommentBox from "@/features/post/CommentBox";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import React, { Suspense } from "react";
 import {
   Navigate,
   useLocation,
@@ -9,7 +9,7 @@ import {
   useParams,
 } from "react-router-dom";
 
-const PostListCard = React.lazy(() => import("@/components/post/PostListCard"));
+const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
 
 const PostViewPage = () => {
   const navigate = useNavigate();

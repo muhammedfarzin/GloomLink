@@ -1,15 +1,14 @@
-import { X } from "lucide-react";
-import { Button } from "../ui/button";
-import { ReplyCommentType } from "./types/ReplyCommentType";
-import InputBox from "../InputBox";
 import { useState } from "react";
-import IconButton from "../IconButton";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import IconButton from "@/components/IconButton";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
 import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import Comment from "./types/Comment";
-import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
+import type { ReplyCommentType } from "../types/ReplyCommentType";
+import type Comment from "../types/Comment";
+import type { RootState } from "@/redux/store";
 
 interface Props {
   replyComment?: ReplyCommentType | null;
@@ -81,10 +80,11 @@ const CommentInputBox: React.FC<Props> = ({
       )}
 
       <div className="flex items-center gap-2 w-full border-t bg-secondary border-[#6b728033] py-1 px-2 rounded-b-lg md:rounded-bl-none">
-        <InputBox
+        <input
           type="text"
           placeholder={`Add a ${replyComment ? "reply" : "comment"}...`}
           value={commentInput}
+          className="input-box"
           onChange={(e) => setCommentInput?.(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {

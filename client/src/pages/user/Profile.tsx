@@ -1,14 +1,14 @@
-import ProfileImage from "../../components/ProfileImage";
-import PostGridCard from "../../components/post/PostGridCard";
 import { useEffect, useState } from "react";
-import { apiClient } from "@/apiClient";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { AxiosError } from "axios";
+import ProfileImage from "@/components/ProfileImage";
+import PostGridCard from "@/features/post/PostGridCard";
+import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
 import FollowDialogButton from "./components/FollowDialogButton";
 import ProfileActions from "./components/ProfileActions";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 
 interface ProfileProps {
   self?: boolean;

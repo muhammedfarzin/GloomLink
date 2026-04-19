@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import CommentListCard from "./CommentListCard";
 import { apiClient } from "@/apiClient";
 import { useToast } from "@/hooks/use-toast";
-import type { ReplyCommentType } from "./types/ReplyCommentType";
-import Comment from "./types/Comment";
+import type { ReplyCommentType } from "../types/ReplyCommentType";
+import type Comment from "../types/Comment";
 import CommentInputBox from "./CommentInputBox";
 
 interface CommentBoxProps {
@@ -15,7 +15,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
   const [replyComment, setReplyComment] = useState<ReplyCommentType | null>(
-    null
+    null,
   );
 
   useEffect(() => {

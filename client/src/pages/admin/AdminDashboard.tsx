@@ -69,7 +69,7 @@ const AdminDashboard: React.FC = () => {
       const chartData: DashboardChart[] = [];
       setStats(stats);
 
-      let currentDate = new Date(startDate);
+      const currentDate = new Date(startDate);
       while (currentDate <= endDate) {
         const date = currentDate.toISOString().split("T")[0];
         const resData = resChartData.find((d: any) => d.date === date);

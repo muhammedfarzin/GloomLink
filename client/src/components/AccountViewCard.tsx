@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import ProfileImage from "./ProfileImage";
-import { Post } from "./post/types/Post";
+import type { Post } from "../features/types/Post";
 
 interface Props {
   userData: Pick<Post["uploadedBy"], "username" | "imageUrl">;

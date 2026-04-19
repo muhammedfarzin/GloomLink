@@ -1,10 +1,9 @@
-import Button from "@/components/Button";
-import InputBox from "@/components/InputBox";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "@/components/Button";
 import { validateRequiredFields } from "./formValidations";
 import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/apiClient";
-import { useNavigate } from "react-router-dom";
 
 interface SubscriptionFormType {
   amount: string;
@@ -84,28 +83,32 @@ const SubscriptionEnableForm: React.FC = () => {
             className="bg-secondary border border-border rounded-xl mt-2 p-4"
             onSubmit={handleSubmit}
           >
-            <InputBox
+            <input
+              className="input-box"
               placeholder="Amount"
               type="number"
               value={formData.amount}
               name="amount"
               onChange={handleOnChange}
             />
-            <InputBox
+            <input
+              className="input-box"
               placeholder="Bank account holder name"
               type="text"
               value={formData.name}
               name="name"
               onChange={handleOnChange}
             />
-            <InputBox
+            <input
+              className="input-box"
               placeholder="Bank account number"
               type="number"
               value={formData.accNumber}
               name="accNumber"
               onChange={handleOnChange}
             />
-            <InputBox
+            <input
+              className="input-box"
               placeholder="Bank IFSC code"
               type="text"
               value={formData.ifsc}

@@ -1,19 +1,18 @@
-import InputBox from "@/components/InputBox";
-import ProfileImage from "@/components/ProfileImage";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { ReactCropperElement } from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import ProfileImage from "@/components/ProfileImage";
+import DropDownBox from "@/components/DropDownBox";
+import Button from "@/components/Button";
+import CropperDialogBox from "@/components/CropperDialogBox";
 import {
   EditProfileFormType,
   validateEditProfileForm,
 } from "./formValidations";
-import DropDownBox from "@/components/DropDownBox";
-import Button from "@/components/Button";
-import { ReactCropperElement } from "react-cropper";
-import "cropperjs/dist/cropper.css";
-import CropperDialogBox from "@/components/CropperDialogBox";
 import { apiClient } from "@/apiClient";
-import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { useDispatch } from "react-redux";
 import { updateUserData } from "@/redux/reducers/auth";
 import DateInput from "@/components/DateInput";
 
@@ -50,7 +49,7 @@ const EditProfile: React.FC = () => {
         const { dob, gender, imageUrl, authType, ...userData } =
           response.data.userData;
         setDob(dob);
-        setGender(gender);console.log(imageUrl)
+        setGender(gender);
         setImageUrl(imageUrl);
         setFormData({ ...formData, ...userData });
         setAuthType(authType);
@@ -175,7 +174,8 @@ const EditProfile: React.FC = () => {
               }}
               className="w-full"
             >
-              <InputBox
+              <input
+                className="input-box"
                 value={formData.username}
                 onChange={handleOnChange}
                 name="username"
@@ -183,14 +183,16 @@ const EditProfile: React.FC = () => {
                 type="text"
               />
               <div className="flex gap-2 w-full">
-                <InputBox
+                <input
+                  className="input-box"
                   value={formData.firstname}
                   onChange={handleOnChange}
                   name="firstname"
                   placeholder="First name"
                   type="text"
                 />
-                <InputBox
+                <input
+                  className="input-box"
                   value={formData.lastname}
                   onChange={handleOnChange}
                   name="lastname"
@@ -199,14 +201,16 @@ const EditProfile: React.FC = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <InputBox
+                <input
+                  className="input-box"
                   value={formData.email}
                   name="email"
                   placeholder="Email"
                   type="email"
                   disabled
                 />
-                <InputBox
+                <input
+                  className="input-box"
                   value={formData.mobile}
                   name="mobile"
                   onChange={handleOnChange}
@@ -237,14 +241,16 @@ const EditProfile: React.FC = () => {
               {authType === "email" ? (
                 <>
                   <div className="flex gap-2">
-                    <InputBox
+                    <input
+                      className="input-box"
                       value={formData.newPassword}
                       name="newPassword"
                       onChange={handleOnChange}
                       placeholder="New password"
                       type="password"
                     />
-                    <InputBox
+                    <input
+                      className="input-box"
                       value={formData.confirmPassword}
                       name="confirmPassword"
                       onChange={handleOnChange}
@@ -253,7 +259,8 @@ const EditProfile: React.FC = () => {
                     />
                   </div>
 
-                  <InputBox
+                  <input
+                    className="input-box"
                     value={formData.password}
                     name="password"
                     onChange={handleOnChange}

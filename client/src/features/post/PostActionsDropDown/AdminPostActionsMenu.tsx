@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { Post } from "../types/Post";
+import type { Post } from "../../types/Post";
 
 interface Props {
   postId: string;
