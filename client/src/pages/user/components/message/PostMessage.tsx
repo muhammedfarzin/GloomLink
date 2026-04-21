@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/apiClient";
 import type PostDataType from "@/features/types/PostDataType";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { MessageType } from "@/types/message-type";
 
 interface Props {
@@ -10,19 +10,14 @@ interface Props {
 }
 
 const PostMessage: React.FC<Props> = ({ data }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [postData, setPostData] = useState<PostDataType>();
 
   useEffect(() => {
     apiClient
       .get(`/posts/${data.message}`)
       .then((response) => setPostData(response.data.postData))
-      .catch((error) =>
-        toast({
-          description: error.message,
-          variant: "destructive",
-        }),
-      );
+      .catch((error) => toastError(error.message));
   }, [data]);
 
   return (

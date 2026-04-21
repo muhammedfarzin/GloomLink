@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiClient } from "@/apiClient";
 import { ChatUserDataType } from "./types/user-data-types";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import UserListCard from "@/pages/user/components/UserListCard";
 import { useSocket } from "@/hooks/use-socket";
 import { Button } from "./ui/button";
@@ -17,7 +17,7 @@ interface Props {
 
 const ShareList: React.FC<Props> = ({ data }) => {
   const socket = useSocket();
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [chatList, setChatList] = useState<ChatUserDataType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [sentList, setSentList] = useState<
@@ -38,13 +38,7 @@ const ShareList: React.FC<Props> = ({ data }) => {
       .get("/conversations/")
       .then((response) => setChatList(response.data.conversations))
       .catch((error) => {
-        toast({
-          description:
-            error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
-          variant: "destructive",
-        });
+        toastError(error.message);
       })
       .finally(() => setLoading(false));
   }, []);

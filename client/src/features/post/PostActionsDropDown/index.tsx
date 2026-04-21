@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { apiClient, adminApiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { useSelector } from "react-redux";
 import UserPostActionsMenu from "./UserPostActionsMenu";
 import AdminPostActionsMenu from "./AdminPostActionsMenu";
@@ -30,7 +30,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   const myUserId = useSelector(
     (state: RootState) => state.auth.userData?.userId,
   );
-  const { toast } = useToast();
+  const { toastMessage, toastError } = useToaster();
 
   const handleDeletePost = async (userType: "user" | "admin" = "user") => {
     try {
@@ -41,17 +41,9 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
       }
 
       handleChange?.((state) => state.filter((post) => post.postId !== postId));
-      toast({
-        description: response.data.message || "Post deleted successfully",
-      });
+      toastMessage(response.data.message || "Post deleted successfully");
     } catch (error: any) {
-      toast({
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Post deleted successfully",
-        variant: "destructive",
-      });
+      toastError(error.message);
     }
   };
 

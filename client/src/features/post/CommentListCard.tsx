@@ -3,7 +3,7 @@ import ProfileImage from "@/components/ProfileImage";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { formatTimeAgo } from "@/lib/dateUtils";
 import type { HandleReplyCommentType } from "../types/ReplyCommentType";
 import type Comment from "../types/Comment";
@@ -21,7 +21,7 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
   showReplies = false,
   handleReplyOnClick,
 }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [showReply, setShowReply] = useState<boolean>(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [replies, setReplies] = useState<Comment[]>([]);
@@ -43,11 +43,7 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
       }
     } catch (error: any) {
       setShowReply(false);
-      toast({
-        description:
-          error.response.data.message || error.message || "Someting went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     } finally {
       setLoading(null);
     }

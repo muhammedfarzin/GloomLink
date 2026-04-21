@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
 import DateInput from "@/components/DateInput";
 import { authApiClient } from "@/apiClient";
+import { useToaster } from "@/hooks/useToaster";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
@@ -22,6 +23,7 @@ const Signup = () => {
   const dispatch = useDispatch();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const { toastError } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<SignUpFormType>({
     firstname: "",
@@ -34,7 +36,6 @@ const Signup = () => {
   });
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
-  const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -45,11 +46,10 @@ const Signup = () => {
     }
   }, [userData]);
 
-  const handleOnSignup: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
+  const handleOnSignup = async () => {
     try {
       setLoading("Signing up...");
-      const isValidated = validateSignUpForm(formData, setErrorMessage);
+      const isValidated = validateSignUpForm(formData, toastError);
       if (!isValidated) return;
 
       const response = await authApiClient.post("/signup", {
@@ -64,7 +64,7 @@ const Signup = () => {
       dispatch(setAuthUser({ userData, tokens }));
       navigate("/signup/verify");
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || "Something went wrong");
+      toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -97,11 +97,7 @@ const Signup = () => {
         </div>
 
         <div className="w-full md:w-1/2 px-4 my-auto text-center md:mt-[-2.5rem]">
-          <FormBox
-            title="Sign Up"
-            errorMessage={errorMessage}
-            onSubmit={handleOnSignup}
-          >
+          <FormBox title="Sign Up" onSubmit={handleOnSignup}>
             <div className="flex gap-2">
               <input
                 className="input-box"

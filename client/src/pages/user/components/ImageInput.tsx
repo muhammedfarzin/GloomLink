@@ -3,7 +3,7 @@ import { RootState } from "../../../redux/store";
 import AddImageIcon from "../../../assets/icons/Add-Image.svg";
 import CloseIcon from "../../../assets/icons/Close.svg";
 import { useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 
 interface ImageInputProps {
   className?: string;
@@ -20,7 +20,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
   onChange,
   onRemove,
 }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -29,10 +29,7 @@ const ImageInput: React.FC<ImageInputProps> = ({
       const fileArray: File[] = [];
       Array.from(e.target.files).forEach((file) => {
         if (file.type.split("/")[0] !== "image") {
-          toast({
-            description: "Please upload only images",
-            variant: "destructive",
-          });
+          toastError("Please upload only images");
           return;
         }
 

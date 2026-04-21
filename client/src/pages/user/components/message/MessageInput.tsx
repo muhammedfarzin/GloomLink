@@ -1,6 +1,6 @@
 import IconButton from "@/components/IconButton";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
-import { toastError } from "@/hooks/toast";
+import { useToaster } from "@/hooks/useToaster";
 
 interface MessageInputProps {
   value?: string;
@@ -17,6 +17,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onChange,
   onSubmit,
 }) => {
+  const { toastError } = useToaster();
+
   const handleSubmit = () => {
     if (!value?.trim()) return toastError("Please enter a message");
 

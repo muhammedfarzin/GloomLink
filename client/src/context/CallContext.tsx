@@ -1,5 +1,5 @@
 import { useSocket } from "@/hooks/use-socket";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { peer } from "@/services/peer";
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ interface CallContextType {
   callAccepted: (
     answer: RTCSessionDescriptionInit,
     socketId: string,
-    username: string
+    username: string,
   ) => void;
   sendStreams: (stream: MediaStream) => void;
   endCall: (isMe: boolean) => void;
@@ -35,7 +35,7 @@ const callPathnameRegex = /^\/call\/?$/;
 const CallProvider: React.FC<CallProviderType> = ({ children }) => {
   const navigate = useNavigate();
   const socket = useSocket();
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [callData, setCallData] = useState<IncomeCallType | null>(null);
   const [status, setStatus] = useState<CallContextType["status"]>(null);
   const pathname = location.pathname;
@@ -69,7 +69,7 @@ const CallProvider: React.FC<CallProviderType> = ({ children }) => {
     return () => {
       peer.peer.removeEventListener(
         "negotiationneeded",
-        handleNegotiationNeeded
+        handleNegotiationNeeded,
       );
       peer.peer.removeEventListener("icecandidate", handleIceCandidate);
     };
@@ -79,7 +79,7 @@ const CallProvider: React.FC<CallProviderType> = ({ children }) => {
     const handleIncomeCallNegotiationNeeded = async (
       _username: string,
       offer: RTCSessionDescription,
-      socketId: string
+      socketId: string,
     ) => {
       const answer = await peer.getAnswer(offer);
       socket?.emit("call:negotiationdone", answer, socketId);
@@ -87,19 +87,16 @@ const CallProvider: React.FC<CallProviderType> = ({ children }) => {
 
     const handleCallNegotiationDone = (
       _username: string,
-      offer: RTCSessionDescription
+      offer: RTCSessionDescription,
     ) => peer.setLocalDescription(offer);
 
     const handleIceCandidate = (
       _username: string,
-      candidate: RTCIceCandidate
+      candidate: RTCIceCandidate,
     ) => peer.peer.addIceCandidate(candidate);
 
     const handleDeclinedCall = () => {
-      toast({
-        description: `Call declined`,
-        variant: "destructive",
-      });
+      toastError("Call declined");
       clearState();
       navigate(-1);
     };
@@ -134,7 +131,7 @@ const CallProvider: React.FC<CallProviderType> = ({ children }) => {
   const callAccepted: CallContextType["callAccepted"] = async (
     answer,
     socketId,
-    username
+    username,
   ) => {
     setStatus("connected");
     setCallData({ username, socketId, offer: answer });

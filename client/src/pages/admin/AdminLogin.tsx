@@ -13,17 +13,18 @@ import {
 } from "@/redux/reducers/auth";
 import { LoginFormType, validateLoginForm } from "../user/formValidations";
 import { authApiClient } from "@/apiClient";
+import { useToaster } from "@/hooks/useToaster";
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const adminData = useSelector((state: RootState) => state.auth.adminData);
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
+  const { toastError } = useToaster();
   const [formData, setFormData] = useState<LoginFormType>({
     username: "",
     password: "",
   });
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     const adminAccessToken = localStorage.getItem("adminAccessToken");
@@ -34,11 +35,8 @@ const AdminLogin: React.FC = () => {
     }
   }, [adminData]);
 
-  const handleOnLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-
-    const isValidated = validateLoginForm(formData, setErrorMessage);
+  const handleOnLogin = async () => {
+    const isValidated = validateLoginForm(formData, toastError);
 
     if (!isValidated) return;
 
@@ -53,7 +51,7 @@ const AdminLogin: React.FC = () => {
       dispatch(setAuthAdmin({ adminData, tokens }));
       navigate("/admin");
     } catch (error: any) {
-      setErrorMessage(error.message || "Something went wrong");
+      toastError(error.message);
     }
   };
 
@@ -84,11 +82,7 @@ const AdminLogin: React.FC = () => {
         </div>
 
         <div className="w-full md:w-1/2 px-4 my-auto text-center">
-          <FormBox
-            title="Admin Login"
-            errorMessage={errorMessage}
-            onSubmit={handleOnLogin}
-          >
+          <FormBox title="Admin Login" onSubmit={handleOnLogin}>
             <input
               placeholder="Username"
               type="text"

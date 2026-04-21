@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { adminApiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import type { UserAuthState } from "../../redux/reducers/auth";
 import ConfirmButton from "@/components/ConfirmButton";
 import AdminUserListSkeleton from "@/components/skeleton/AdminUserListSkeleton";
@@ -40,7 +40,7 @@ const statusMap = {
 };
 
 const AdminUserLists: React.FC = () => {
-  const { toast } = useToast();
+  const { toastMessage, toastError } = useToaster();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState<string>(
     searchParams.get("q") || "",
@@ -64,10 +64,7 @@ const AdminUserLists: React.FC = () => {
         setHasMore(fetchedUsers.length === limit);
       })
       .catch((error) => {
-        toast({
-          description: error.message || "Failed to load users",
-          variant: "destructive",
-        });
+        toastError(error.message || "Failed to load users");
       })
       .finally(() => setLoading(false));
   }, [searchParams]);
@@ -75,7 +72,7 @@ const AdminUserLists: React.FC = () => {
   const blockUser = async (userId: string) => {
     try {
       const response = await adminApiClient.patch(`/users/${userId}/status`);
-      toast({ description: response.data.message });
+      toastMessage(response.data.message);
       setUsers(
         users.map((user) => {
           if (user.userId === userId) {
@@ -85,10 +82,7 @@ const AdminUserLists: React.FC = () => {
         }),
       );
     } catch (error: any) {
-      toast({
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     }
   };
 

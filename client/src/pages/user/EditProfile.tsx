@@ -12,7 +12,7 @@ import {
   validateEditProfileForm,
 } from "./formValidations";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { updateUserData } from "@/redux/reducers/auth";
 import DateInput from "@/components/DateInput";
 
@@ -21,7 +21,7 @@ const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
@@ -55,10 +55,7 @@ const EditProfile: React.FC = () => {
         setAuthType(authType);
       })
       .catch((error) => {
-        toast({
-          description: error.message || "Something went wrong",
-          variant: "destructive",
-        });
+        toastError(error.message);
       })
       .finally(() => setLoading(null));
   }, []);
@@ -72,10 +69,7 @@ const EditProfile: React.FC = () => {
       const selectedImage = e.target.files[0];
 
       if (selectedImage.type.split("/")[0] !== "image") {
-        toast({
-          description: "Please upload only images",
-          variant: "destructive",
-        });
+        toastError("Please upload only images");
         return;
       }
 
@@ -133,10 +127,7 @@ const EditProfile: React.FC = () => {
       dispatch(updateUserData(response.data.userData));
       navigate("/profile");
     } catch (error: any) {
-      toast({
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     } finally {
       setLoading(null);
     }

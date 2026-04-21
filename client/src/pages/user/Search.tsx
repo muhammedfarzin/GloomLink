@@ -3,7 +3,7 @@ import SearchBox from "@/components/SearchBox";
 import UserListCard from "./components/UserListCard";
 import { useSearchParams } from "react-router-dom";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import type { Post } from "@/features/types/Post";
 import type { UserDataType } from "@/components/types/user-data-types";
@@ -15,21 +15,13 @@ export type SearchResultType =
   | (Post & { type: "post" });
 
 const Search: React.FC = () => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>(
     searchParams.get("q") || "",
   );
   const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
-
-  const handleApiError = (error?: any) => {
-    toast({
-      description:
-        error.response.data.message || error.message || "Something went wrong",
-      variant: "destructive",
-    });
-  };
 
   useEffect(() => {
     if (searchQuery) {
@@ -39,7 +31,7 @@ const Search: React.FC = () => {
       apiClient
         .get("/search", { params })
         .then((response) => setSearchResult(response.data.resultsData))
-        .catch((error) => handleApiError(error))
+        .catch((error) => toastError(error.message))
         .finally(() => setLoading(null));
     }
   }, [searchParams]);

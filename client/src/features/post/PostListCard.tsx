@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { ViewTracker } from "@/components/ViewTracker";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import { useInteraction } from "@/hooks/useInteraction";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { apiClient } from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
 import { useCallback, useEffect, useState } from "react";
@@ -39,7 +39,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
   handleChange,
 }) => {
   const authId = useSelector((state: RootState) => state.auth.userData?.userId);
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const { recordInteraction } = useInteraction();
   const [postDataState, setPostDataState] = useState<PostDataType | undefined>(
     postData,
@@ -53,10 +53,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
           setPostDataState(response.data.postData);
         })
         .catch((error) => {
-          toast({
-            description: error.message || "Something went wrong",
-            variant: "destructive",
-          });
+          toastError(error.message);
         });
     }
   }, [postData]);

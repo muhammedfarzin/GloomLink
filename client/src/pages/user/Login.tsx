@@ -18,18 +18,19 @@ import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleAuthProvider } from "@/firebase";
 import { FirebaseError } from "firebase/app";
 import { authApiClient } from "@/apiClient";
+import { useToaster } from "@/hooks/useToaster";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const { toastError } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<LoginFormType>({
     username: "",
     password: "",
   });
-  const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -48,25 +49,24 @@ const Login: React.FC = () => {
     navigate("/");
   };
 
-  const handleOnLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
+  const handleOnLogin = async () => {
     setLoading("Authenticating...");
-    setErrorMessage("");
 
-    const isValidated = validateLoginForm(formData, setErrorMessage);
-
-    if (isValidated) {
-      try {
-        const response = await authApiClient.post("/login", {
-          ...formData,
-          role: "user",
-        });
-        handleSuccessLogin(response.data);
-      } catch (error: any) {
-        setErrorMessage(error.message);
-      } finally {
-        setLoading(null);
+    try {
+      const isValidated = validateLoginForm(formData, toastError);
+      if (!isValidated) {
+        throw new Error("Please enter valid username and password");
       }
+
+      const response = await authApiClient.post("/login", {
+        ...formData,
+        role: "user",
+      });
+      handleSuccessLogin(response.data);
+    } catch (error: any) {
+      toastError(error.message);
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -89,9 +89,9 @@ const Login: React.FC = () => {
       handleSuccessLogin(response.data);
     } catch (error: any) {
       if (error instanceof FirebaseError) {
-        setErrorMessage("Google authentication failed");
+        toastError("Google authentication failed");
       } else {
-        setErrorMessage(error.message);
+        toastError(error.message);
       }
     } finally {
       setLoading(null);
@@ -121,11 +121,7 @@ const Login: React.FC = () => {
         </div>
 
         <div className="w-full md:w-1/2 px-4 my-auto text-center">
-          <FormBox
-            title="Login"
-            errorMessage={errorMessage}
-            onSubmit={handleOnLogin}
-          >
+          <FormBox title="Login" onSubmit={handleOnLogin}>
             <input
               className="input-box"
               value={formData.username}

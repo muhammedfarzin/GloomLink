@@ -14,15 +14,16 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
 import { authApiClient } from "@/apiClient";
+import { useToaster } from "@/hooks/useToaster";
 
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const userData = useSelector((state: RootState) => state.auth.userData);
+  const { toastError, toastMessage } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [otp, setOtp] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
     if (!userData || userData.status !== "not-verified") navigate("/login");
@@ -32,20 +33,17 @@ const OtpVerification: React.FC = () => {
     try {
       setLoading("Resending OTP...");
       const response = await authApiClient.post("/resend-otp");
-      setErrorMessage(response.data.message || "");
+      toastMessage(response.data.message);
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || "Something went wrong");
+      toastError(error.message);
     } finally {
       setLoading(null);
     }
   };
 
-  const handleVerifyOtp: React.MouseEventHandler<HTMLFormElement> = async (
-    e,
-  ) => {
-    e.preventDefault();
+  const handleVerifyOtp = async () => {
     setLoading("Verifying...");
-    setErrorMessage("");
+
     try {
       validateOtpForm(otp, (errorMessage) => {
         throw new Error(errorMessage);
@@ -66,7 +64,7 @@ const OtpVerification: React.FC = () => {
       } else if (error.status === 404) {
         error.message = "Your otp has been expired";
       }
-      setErrorMessage(error.message);
+      toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -95,11 +93,7 @@ const OtpVerification: React.FC = () => {
         </div>
 
         <div className="w-full md:w-1/2 px-4 my-auto text-center">
-          <FormBox
-            title="Enter OTP"
-            errorMessage={errorMessage}
-            onSubmit={handleVerifyOtp}
-          >
+          <FormBox title="Enter OTP" onSubmit={handleVerifyOtp}>
             <div className="w-full flex justify-between mt-[-1rem]">
               <span
                 className="cursor-pointer hover:opacity-75"

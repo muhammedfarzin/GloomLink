@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import ProfileImage from "@/components/ProfileImage";
 import PostGridCard from "@/features/post/PostGridCard";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import FollowDialogButton from "./components/FollowDialogButton";
 import ProfileActions from "./components/ProfileActions";
 import type { RootState } from "@/redux/store";
@@ -37,7 +37,7 @@ interface PostsType {
 }
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const myUsername = useSelector(
     (state: RootState) => state.auth.userData?.username,
   );
@@ -71,13 +71,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
       if (userData) await apiClient.post(`/profile/follow/${userData.userId}`);
     } catch (error: any) {
       setIsFollowing(isFollowing);
-      toast({
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     }
   };
 

@@ -4,7 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import type { Post } from "../../types/Post";
 
 interface Props {
@@ -20,22 +20,17 @@ const AdminPostActionsMenu: React.FC<Props> = ({
   onDeletePost,
   onBlockStatusChange,
 }) => {
-  const { toast } = useToast();
+  const { toastMessage, toastError } = useToaster();
 
   const handleBlockPost = (type: "block" | "unblock") => {
     adminApiClient
       .patch(`/posts/block/${postId}`)
       .then((response) => {
         onBlockStatusChange?.(type === "block" ? "blocked" : "active");
-        toast({
-          description: response.data.message || `Post ${type}ed successfully`,
-        });
+        toastMessage(response.data.message || `Post ${type}ed successfully`);
       })
       .catch((error) => {
-        toast({
-          description: error.message || "Something went wrong",
-          variant: "destructive",
-        });
+        toastError(error.message);
       });
   };
 

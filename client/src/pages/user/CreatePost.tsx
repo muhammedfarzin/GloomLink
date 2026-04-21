@@ -7,11 +7,11 @@ import Button from "@/components/Button";
 import TagsInput from "./components/TagsInput";
 import ImageInput from "./components/ImageInput";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const { postId } = useParams();
   const myUserId = useSelector(
     (state: RootState) => state.auth.userData?.userId,
@@ -39,13 +39,7 @@ const CreatePost: React.FC = () => {
           setpublishedFor(publishedFor);
         })
         .catch((error) => {
-          toast({
-            description:
-              error.response?.data.message ||
-              error.message ||
-              "Something went wrong",
-            variant: "destructive",
-          });
+          toastError(error.message);
         });
     } else {
       setCaption("");
@@ -93,13 +87,7 @@ const CreatePost: React.FC = () => {
       }
       navigate("/profile");
     } catch (error: any) {
-      toast({
-        description:
-          error.response?.data.message ||
-          error.message ||
-          "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     } finally {
       setLoading(null);
     }

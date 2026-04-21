@@ -4,7 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { Edit, FlagTriangleLeft, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -20,21 +20,16 @@ const UserPostActionsMenu: React.FC<Props> = ({
   onDeletePost,
 }) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toastMessage, toastError } = useToaster();
 
   const reportPost = () => {
     apiClient
       .post(`/report`, { targetId: postId, type: "post" })
       .then((response) => {
-        toast({
-          description: response.data?.message || "Post reported successfully",
-        });
+        toastMessage(response.data?.message || "Post reported successfully");
       })
       .catch((error) => {
-        toast({
-          description: error.message || "Something went wrong",
-          variant: "destructive",
-        });
+        toastError(error.message);
       });
   };
 

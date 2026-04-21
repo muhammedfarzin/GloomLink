@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CommentListCard from "./CommentListCard";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import type { ReplyCommentType } from "../types/ReplyCommentType";
 import type Comment from "../types/Comment";
 import CommentInputBox from "./CommentInputBox";
@@ -11,7 +11,7 @@ interface CommentBoxProps {
 }
 
 const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
   const [replyComment, setReplyComment] = useState<ReplyCommentType | null>(
@@ -20,15 +20,6 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
 
   useEffect(() => {
     setLoading("Fetching comments...");
-    const toastError = (error: any) => {
-      toast({
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Something went wrong",
-        variant: "destructive",
-      });
-    };
 
     apiClient
       .get(`/comments`, { params: { targetId: postId, type: "post" } })
@@ -36,7 +27,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
         setComments(response.data.commentsData);
       })
       .catch((error) => {
-        toastError(error);
+        toastError(error.message);
       })
       .finally(() => setLoading(null));
   }, [postId]);

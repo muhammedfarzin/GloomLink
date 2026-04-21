@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 
 interface FormBoxProps extends React.DetailedHTMLProps<
   React.FormHTMLAttributes<HTMLFormElement>,
@@ -7,28 +7,31 @@ interface FormBoxProps extends React.DetailedHTMLProps<
   children: React.ReactNode;
   title: string;
   method?: string;
-  errorMessage?: string;
 }
 
 const FormBox: React.FC<FormBoxProps> = ({
   children,
   title,
+  onSubmit,
   method = "post",
-  errorMessage,
   ...props
 }) => {
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      if (onSubmit) {
+        e.preventDefault();
+        onSubmit(e);
+      }
+    },
+    [onSubmit],
+  );
+
   return (
-    <div
-      className="w-full max-w-[450px] mx-auto rounded-2xl p-4 bg-formBox"
-      id="login-box"
-    >
+    <div className="w-full max-w-[450px] mx-auto rounded-2xl p-4 bg-formBox">
       <h3 className="text-center text-3xl font-bold mb-2 text-foreground">
         {title}
       </h3>
-      <form method={method} {...props}>
-        {errorMessage ? (
-          <p className="text-destructive font-bold text-xs">{errorMessage}</p>
-        ) : null}
+      <form method={method} onSubmit={handleSubmit} {...props}>
         {children}
       </form>
     </div>

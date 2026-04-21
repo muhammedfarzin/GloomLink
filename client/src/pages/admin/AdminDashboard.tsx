@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { adminApiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import {
   LineChart,
   Line,
@@ -38,7 +38,7 @@ interface DashboardChart {
 }
 
 const AdminDashboard: React.FC = () => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [chartData, setChartData] = useState<DashboardChart[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,12 +86,7 @@ const AdminDashboard: React.FC = () => {
 
       setChartData(chartData);
     } catch (error: any) {
-      console.log(error);
-      toast({
-        description:
-          error?.response?.data?.message || "Failed to fetch dashboard metrics",
-        variant: "destructive",
-      });
+      toastError(error.message || "Failed to fetch dashboard metrics");
     } finally {
       setLoading(false);
     }

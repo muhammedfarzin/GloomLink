@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@/components/Button";
 import { validateRequiredFields } from "./formValidations";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { apiClient } from "@/apiClient";
 
 interface SubscriptionFormType {
@@ -14,7 +14,7 @@ interface SubscriptionFormType {
 
 const SubscriptionEnableForm: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toastMessage, toastError } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<SubscriptionFormType>({
     amount: "",
@@ -31,13 +31,7 @@ const SubscriptionEnableForm: React.FC = () => {
           throw new Error("You are not eligible for this feature");
       })
       .catch((error) => {
-        toast({
-          description:
-            error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
-          variant: "destructive",
-        });
+        toastError(error.message);
         navigate("/profile");
       });
   }, []);
@@ -55,20 +49,13 @@ const SubscriptionEnableForm: React.FC = () => {
       });
 
       const response = await apiClient.post("/subscriptions/enable", formData);
-      toast({
-        description:
-          response.data?.message || "Your request submitted successfully",
-      });
+      toastMessage(
+        response.data?.message || "Your request submitted successfully",
+      );
 
       navigate("/profile");
     } catch (error: any) {
-      toast({
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     } finally {
       setLoading(null);
     }

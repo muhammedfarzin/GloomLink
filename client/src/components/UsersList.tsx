@@ -1,5 +1,5 @@
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import UserListCard from "@/pages/user/components/UserListCard";
 import { useEffect, useState } from "react";
 import { UserDataType } from "./types/user-data-types";
@@ -10,7 +10,7 @@ interface UsersListProps {
 }
 
 const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [users, setUsers] = useState<UserDataType[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -19,15 +19,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
     apiClient
       .get(apiUrl)
       .then((response) => setUsers(response.data.usersData))
-      .catch((error) => {
-        toast({
-          description:
-            error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
-          variant: "destructive",
-        });
-      })
+      .catch((error) => toastError(error.message))
       .finally(() => setLoading(null));
   }, []);
 

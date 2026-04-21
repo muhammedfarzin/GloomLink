@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import throttle from "lodash/throttle";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { apiClient } from "@/apiClient";
 import EmptyIllustrationDark from "@/assets/images/Empty-Illustration-Dark.svg";
 import PostSkeletonList from "@/components/skeleton/PostSkeletonList";
@@ -22,7 +22,7 @@ interface Props {
 const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
   const pageRef = useRef(1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
@@ -36,10 +36,7 @@ const PostFeed: React.FC<Props> = ({ apiUrl, emptyLabel }) => {
       pageRef.current++;
       setIsEnd(response.data.isEnd);
     } catch (error: any) {
-      toast({
-        description: error.message,
-        variant: "destructive",
-      });
+      toastError(error.message);
     } finally {
       setLoading(false);
     }

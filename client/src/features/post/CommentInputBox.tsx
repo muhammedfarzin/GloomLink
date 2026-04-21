@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import IconButton from "@/components/IconButton";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { useSelector } from "react-redux";
 import type { ReplyCommentType } from "../types/ReplyCommentType";
 import type Comment from "../types/Comment";
@@ -23,7 +23,7 @@ const CommentInputBox: React.FC<Props> = ({
   onReplyCancel,
   onPublished,
 }) => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [commentInput, setCommentInput] = useState<string>("");
   const [disableForm, setDisableForm] = useState<boolean>(false);
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -52,13 +52,7 @@ const CommentInputBox: React.FC<Props> = ({
 
       onPublished?.({ ...newComment, uploadedBy: userData });
     } catch (error: any) {
-      toast({
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     } finally {
       setDisableForm(false);
     }

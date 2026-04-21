@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import ProfileImage from "@/components/ProfileImage";
 import { useSocket } from "@/hooks/use-socket";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 
 const CallViewer: React.FC = () => {
   const socket = useSocket();
-  const { toast } = useToast();
+  const { toastMessage, toastError } = useToaster();
   const callHandler = useCall();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
@@ -32,16 +32,16 @@ const CallViewer: React.FC = () => {
     const handleCallAccepted = async (
       username: string,
       answer: RTCSessionDescriptionInit,
-      socketId: string
+      socketId: string,
     ) => callHandler.callAccepted(answer, socketId, username);
 
     const handleEndCall = () => {
-      toast({ description: `Call ended by ${callHandler.callData?.username}` });
+      toastMessage(`${callHandler.callData?.username} left the call`);
       callHandler.endCall(false);
     };
 
     const handleCallError = (message: string) => {
-      toast({ description: message, variant: "destructive" });
+      toastError(message);
       callHandler.endCall(false);
     };
 

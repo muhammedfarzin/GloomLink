@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Video } from "lucide-react";
 import { useCall } from "@/hooks/use-call";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import type { RootState } from "@/redux/store";
 import type { MessageType } from "@/types/message-type";
 
@@ -22,7 +22,7 @@ const MessageViewer: React.FC = () => {
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const { username } = useParams();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -117,7 +117,7 @@ const MessageViewer: React.FC = () => {
         }),
       );
 
-      toast({ description: message, variant: "destructive" });
+      toastError(message);
     };
 
     socket?.on("incoming-message", handleIncomingMessage);

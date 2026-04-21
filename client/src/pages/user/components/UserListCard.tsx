@@ -1,5 +1,5 @@
 import { apiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import { Link } from "react-router-dom";
 import ProfileImage from "@/components/ProfileImage";
 import { useSelector } from "react-redux";
@@ -26,7 +26,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
   const myUserId = useSelector(
     (state: RootState) => state.auth.userData?.userId,
   );
-  const { toast } = useToast();
+  const { toastError } = useToaster();
 
   const handleFollowUser = async () => {
     const userId = userData.userId;
@@ -46,13 +46,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
       await apiClient.post(`/profile/follow/${userId}`);
     } catch (error: any) {
       toggleFollowStatus();
-      toast({
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Something went wrong",
-        variant: "destructive",
-      });
+      toastError(error.message);
     }
   };
 

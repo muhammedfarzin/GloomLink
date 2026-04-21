@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { adminApiClient } from "@/apiClient";
-import { useToast } from "@/hooks/use-toast";
+import { useToaster } from "@/hooks/useToaster";
 import type { Post } from "@/features/types/Post";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import ManagementToolbar from "./components/ManagementToolbar";
@@ -10,7 +10,7 @@ import ManagementToolbar from "./components/ManagementToolbar";
 const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
 
 const AdminPostLists: React.FC = () => {
-  const { toast } = useToast();
+  const { toastError } = useToaster();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState<string>(
     searchParams.get("q") || "",
@@ -34,10 +34,7 @@ const AdminPostLists: React.FC = () => {
         setHasMore(fetchedPosts.length === limit);
       })
       .catch((error) => {
-        toast({
-          description: error.message || "Something went wrong",
-          variant: "destructive",
-        });
+        toastError(error.message);
       })
       .finally(() => setLoading(false));
   }, [searchParams]);
