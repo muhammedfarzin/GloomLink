@@ -7,7 +7,7 @@ import SavedIcon from "@/assets/icons/Saved.svg";
 import CommentButton from "../CommentButton";
 import { Props as PostActionsProps } from ".";
 import DialogBox from "@/components/DialogBox";
-import ShareList from "@/components/ShareList";
+import ShareList from "@/features/chat/ShareList";
 import { Flag, Activity } from "lucide-react";
 
 interface Props extends PostActionsProps {

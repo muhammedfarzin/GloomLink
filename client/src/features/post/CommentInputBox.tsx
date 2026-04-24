@@ -1,13 +1,12 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import IconButton from "@/components/IconButton";
 import PaperPlaneIcon from "@/assets/icons/PaperPlane.svg";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
-import { useSelector } from "react-redux";
-import type { ReplyCommentType } from "../types/ReplyCommentType";
-import type Comment from "../types/Comment";
+import type { Comment, ReplyCommentType } from "@/types/comment";
 import type { RootState } from "@/redux/store";
 
 interface Props {

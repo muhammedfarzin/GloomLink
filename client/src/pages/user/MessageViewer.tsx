@@ -1,13 +1,13 @@
-import ProfileImage from "@/components/ProfileImage";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import MessageInput from "./components/message/MessageInput";
 import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { ArrowLeft, Video } from "lucide-react";
+import ProfileImage from "@/features/profile/ProfileImage";
+import MessageInput from "@/features/chat/MessageInput";
+import MessageCard from "@/features/chat/MessageCard";
+import { Button } from "@/components/ui/button";
 import { apiClient } from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
-import MessageCard from "./components/message/MessageCard";
-import { useSelector } from "react-redux";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Video } from "lucide-react";
 import { useCall } from "@/hooks/use-call";
 import { useToaster } from "@/hooks/useToaster";
 import type { RootState } from "@/redux/store";
@@ -149,6 +149,7 @@ const MessageViewer: React.FC = () => {
   }) => {
     const messageToSend: MessageType = {
       ...data,
+      conversationId: conversationId ?? "null",
       id: `self${Date.now()}`,
       senderId: myUserId ?? "",
       status: "pending",
@@ -158,16 +159,15 @@ const MessageViewer: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, messageToSend]);
     scrollChatViewToBottom();
 
-    let conversation = conversationId;
-    if (!conversation) {
+    if (!conversationId) {
       const response = await apiClient.post("/conversations/create", {
         participants: username,
       });
-      conversation = response.data.conversationId;
-      setConversationId(response.data.conversationId as string);
+      messageToSend.conversationId = response.data.conversationId;
+      setConversationId(messageToSend.conversationId);
     }
 
-    socket?.emit("send-message", conversation, data);
+    socket?.emit("send-message", messageToSend.conversationId, data);
   };
 
   return (

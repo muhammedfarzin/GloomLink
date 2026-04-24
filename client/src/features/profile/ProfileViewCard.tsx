@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import ProfileImage from "./ProfileImage";
-import type { Post } from "../features/types/Post";
+import type { Post } from "@/types/post";
 
 interface Props {
   userData: Pick<Post["uploadedBy"], "username" | "imageUrl">;
   children?: React.ReactNode;
 }
 
-const AccountViewCard: React.FC<Props> = ({ userData, children }) => {
+const ProfileViewCard: React.FC<Props> = ({ userData, children }) => {
   return (
     <div className="flex flex-row items-center">
       <Link to={`/${userData.username}`}>
@@ -29,4 +29,4 @@ const AccountViewCard: React.FC<Props> = ({ userData, children }) => {
   );
 };
 
-export default AccountViewCard;
+export default ProfileViewCard;

@@ -1,7 +1,7 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import CloseIcon from "../../../assets/icons/Close.svg";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import CloseIcon from "@/assets/icons/Close.svg";
 
 interface TagsInputProps {
   className?: string;
@@ -10,7 +10,7 @@ interface TagsInputProps {
   onChange?: (values: string[]) => void;
 }
 
-const TagsInput: React.FC<TagsInputProps> = ({
+const TagInput: React.FC<TagsInputProps> = ({
   className = "",
   placeholder = "Add tags",
   values = [],
@@ -77,4 +77,4 @@ const TagsInput: React.FC<TagsInputProps> = ({
   );
 };
 
-export default TagsInput;
+export default TagInput;

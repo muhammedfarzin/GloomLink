@@ -1,11 +1,11 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import AddImageIcon from "../../../assets/icons/Add-Image.svg";
-import CloseIcon from "../../../assets/icons/Close.svg";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
+import AddImageIcon from "@/assets/icons/Add-Image.svg";
+import CloseIcon from "@/assets/icons/Close.svg";
 import { useToaster } from "@/hooks/useToaster";
+import type { RootState } from "@/redux/store";
 
-interface ImageInputProps {
+interface ImageListInputProps {
   className?: string;
   cardClassName?: string;
   values?: (File | string)[];
@@ -13,7 +13,7 @@ interface ImageInputProps {
   onRemove?: (imageList: File | string) => void;
 }
 
-const ImageInput: React.FC<ImageInputProps> = ({
+const ImageListInputCard: React.FC<ImageListInputProps> = ({
   className,
   cardClassName = "",
   values = [],
@@ -112,4 +112,4 @@ const ImageInput: React.FC<ImageInputProps> = ({
   );
 };
 
-export default ImageInput;
+export default ImageListInputCard;

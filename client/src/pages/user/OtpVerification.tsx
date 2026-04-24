@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import GloomLinkLogo from "../../assets/images/GloomLink-Logo.svg";
-import OtpIllustrationDark from "../../assets/images/OTP-Illustration-Dark.svg";
-import FormBox from "../../components/FormBox";
-import TimerButton from "./components/TimerButton";
-import { validateOtpForm } from "./formValidations";
 import { useNavigate } from "react-router-dom";
+import GloomLinkLogo from "@/assets/images/GloomLink-Logo.svg";
+import OtpIllustrationDark from "@/assets/images/OTP-Illustration-Dark.svg";
+import FormBox from "@/components/FormBox";
+import TimerButton from "@/components/TimerButton";
+import { validateOtpForm } from "./formValidations";
 import {
   logout,
   setAuthUser,
   type TokensState,
   type UserAuthState,
-} from "../../redux/reducers/auth";
+} from "@/redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store";
+import type { RootState } from "@/redux/store";
 import { authApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
 

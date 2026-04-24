@@ -2,25 +2,20 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AxiosError } from "axios";
-import ProfileImage from "@/components/ProfileImage";
+import ProfileImage from "@/features/profile/ProfileImage";
 import PostGridCard from "@/features/post/PostGridCard";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
-import FollowDialogButton from "./components/FollowDialogButton";
-import ProfileActions from "./components/ProfileActions";
+import FollowDialogButton from "@/features/profile/FollowDialogButton";
+import ProfileActions from "@/features/profile/ProfileActions";
+import type { CompactUser } from "@/types/user";
 import type { RootState } from "@/redux/store";
 
 interface ProfileProps {
   self?: boolean;
 }
 
-interface UserDataType {
-  userId: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  imageUrl?: string;
-  fullname: string;
+interface UserProfile extends CompactUser {
   followersCount: number;
   followingCount: number;
   subscriptionAmount?: number;
@@ -42,7 +37,7 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
     (state: RootState) => state.auth.userData?.username,
   );
   const { username } = useParams();
-  const [userData, setUserData] = useState<UserDataType>();
+  const [userData, setUserData] = useState<UserProfile>();
   const [posts, setPosts] = useState<PostsType[]>([]);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [loading, setLoading] = useState<string | null>();

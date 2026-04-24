@@ -5,7 +5,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import UsersList from "@/components/UsersList";
+import UsersList from "@/features/profile/UsersList";
 
 interface FollowDialogButtonProps {
   userId: string;

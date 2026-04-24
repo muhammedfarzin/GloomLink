@@ -1,13 +1,13 @@
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { RootState } from "@/redux/store";
-import { useEffect, useState } from "react";
 import DropDownBox from "@/components/DropDownBox";
 import Button from "@/components/Button";
-import TagsInput from "./components/TagsInput";
-import ImageInput from "./components/ImageInput";
+import TagInput from "@/components/TagInput";
+import ImageListInputCard from "@/components/ImageListInputCard";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
+import type { RootState } from "@/redux/store";
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
@@ -97,7 +97,7 @@ const CreatePost: React.FC = () => {
     <div className="mx-4 mt-4">
       <div className="border border-border bg-secondary rounded-lg md:rounded-2xl my-1 p-4">
         <form method="post" onSubmit={handleSubmit}>
-          <ImageInput
+          <ImageListInputCard
             values={images}
             onChange={setImages}
             onRemove={(image) => {
@@ -111,7 +111,8 @@ const CreatePost: React.FC = () => {
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
           />
-          <TagsInput values={tags} onChange={setTags} />
+
+          <TagInput values={tags} onChange={setTags} />
 
           <div className="flex justify-between">
             <DropDownBox

@@ -1,12 +1,12 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import UserSideMenuBar from "./components/UserSideMenuBar";
 import { useEffect, useState } from "react";
-import ChatList from "./components/ChatList";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { logout } from "../../redux/reducers/auth";
+import UserSideMenuBar from "./components/UserSideMenuBar";
+import ChatList from "@/features/chat/ChatList";
+import IncomeCallListener from "@/features/call/IncomeCallListener";
+import type { RootState } from "@/redux/store";
+import { logout } from "@/redux/reducers/auth";
 import XsTopMenuBar from "./XsTopMenuBar";
-import IncomeCallListener from "./components/IncomeCallListener";
 import { ScreenSizeEnum, useScreenSize } from "@/hooks/useScreenSize";
 
 const User = () => {

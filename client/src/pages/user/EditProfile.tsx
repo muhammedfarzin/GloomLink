@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import ProfileImage from "@/components/ProfileImage";
+import ProfileImage from "@/features/profile/ProfileImage";
 import DropDownBox from "@/components/DropDownBox";
 import Button from "@/components/Button";
 import CropperDialogBox from "@/components/CropperDialogBox";

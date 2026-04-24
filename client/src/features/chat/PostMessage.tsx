@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/apiClient";
-import type PostDataType from "@/features/types/PostDataType";
 import { useToaster } from "@/hooks/useToaster";
-import { MessageType } from "@/types/message-type";
+import type { CompactPost } from "@/types/post";
+import type { MessageType } from "@/types/message-type";
 
 interface Props {
   data: Omit<MessageType, "type">;
@@ -11,7 +11,7 @@ interface Props {
 
 const PostMessage: React.FC<Props> = ({ data }) => {
   const { toastError } = useToaster();
-  const [postData, setPostData] = useState<PostDataType>();
+  const [postData, setPostData] = useState<CompactPost>();
 
   useEffect(() => {
     apiClient

@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ViewTracker } from "@/components/ViewTracker";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
@@ -5,19 +6,17 @@ import { useInteraction } from "@/hooks/useInteraction";
 import { useToaster } from "@/hooks/useToaster";
 import { apiClient } from "@/apiClient";
 import PostActionsDropDown from "./PostActionsDropDown";
-import { useCallback, useEffect, useState } from "react";
 import PostActions from "./PostActions";
-import AccountViewCard from "@/components/AccountViewCard";
+import ProfileViewCard from "@/features/profile/ProfileViewCard";
 import PostInteractionCount from "./PostInteractionCount";
 import PostView from "./PostView";
 import { formatTimeAgo } from "@/lib/dateUtils";
-import type { Post } from "../types/Post";
-import type PostDataType from "../types/PostDataType";
+import type { Post, CompactPost } from "@/types/post";
 import type { RootState } from "@/redux/store";
 
 export interface PostListCardProps {
   postId: string;
-  postData?: PostDataType;
+  postData?: CompactPost;
   isAdmin?: boolean;
   className?: string;
   hideComment?: boolean;
@@ -41,9 +40,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
   const authId = useSelector((state: RootState) => state.auth.userData?.userId);
   const { toastError } = useToaster();
   const { recordInteraction } = useInteraction();
-  const [postDataState, setPostDataState] = useState<PostDataType | undefined>(
-    postData,
-  );
+  const [postDataState, setPostDataState] = useState(postData);
 
   useEffect(() => {
     if (!postData) {
@@ -97,11 +94,11 @@ const PostListCard: React.FC<PostListCardProps> = ({
       >
         {/* Uploaded By */}
         <div className="flex justify-between">
-          <AccountViewCard userData={postDataState.uploadedBy}>
+          <ProfileViewCard userData={postDataState.uploadedBy}>
             <span className="text-xs text-gray-500 mt-0">
               {formatTimeAgo(postDataState.createdAt)}
             </span>
-          </AccountViewCard>
+          </ProfileViewCard>
           <PostActionsDropDown
             postId={postDataState.postId}
             userId={postDataState.uploadedBy.userId}

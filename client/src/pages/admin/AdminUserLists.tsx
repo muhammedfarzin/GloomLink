@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { adminApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
-import type { UserAuthState } from "../../redux/reducers/auth";
+import type { UserAuthState } from "@/redux/reducers/auth";
 import ConfirmButton from "@/components/ConfirmButton";
 import AdminUserListSkeleton from "@/components/skeleton/AdminUserListSkeleton";
-import ManagementToolbar from "./components/ManagementToolbar";
+import ManagementToolbar from "@/components/ManagementToolbar";
 import {
   ShieldBan,
   CheckCircle,

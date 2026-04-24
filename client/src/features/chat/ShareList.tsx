@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiClient } from "@/apiClient";
-import { ChatUserDataType } from "./types/user-data-types";
+import { Conversation } from "@/types/user";
+import { Button } from "@/components/ui/button";
+import UserListCard from "@/features/profile/UserListCard";
 import { useToaster } from "@/hooks/useToaster";
-import UserListCard from "@/pages/user/components/UserListCard";
 import { useSocket } from "@/hooks/use-socket";
-import { Button } from "./ui/button";
-import { MessageType } from "@/types/message-type";
+import type { MessageType } from "@/types/message-type";
 
 interface Props {
   data: {
@@ -18,16 +18,20 @@ interface Props {
 const ShareList: React.FC<Props> = ({ data }) => {
   const socket = useSocket();
   const { toastError } = useToaster();
-  const [chatList, setChatList] = useState<ChatUserDataType[]>([]);
+  const [chatList, setChatList] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [sentList, setSentList] = useState<
     Record<string, "shared" | "sharing">
   >({});
 
   const sharePost = useCallback(
-    (username: string) => {
-      setSentList({ ...sentList, [username]: "sharing" });
-      socket?.emit("send-message", username, data);
+    (conversationId: string) => {
+      setSentList((prevState) => ({
+        ...prevState,
+        [conversationId]: "sharing",
+      }));
+
+      socket?.emit("send-message", conversationId, data);
     },
     [socket, data],
   );
@@ -51,17 +55,21 @@ const ShareList: React.FC<Props> = ({ data }) => {
         if (
           newMessage.type === data.type &&
           newMessage.message === data.message &&
-          newMessage.to &&
-          sentList[newMessage.to]
+          sentList[newMessage.conversationId]
         ) {
-          return { ...prevState, [newMessage.to]: "shared" };
+          return { ...prevState, [newMessage.conversationId]: "shared" };
         }
 
         return prevState;
       });
     };
 
+    const handleShareFailed = (errMessage: string) => {
+      toastError(errMessage);
+    };
+
     socket.on("send-message-success", handleShareSuccess);
+    socket.on("error-send-message", handleShareFailed);
 
     return () => {
       socket.off("send-message-success", handleShareSuccess);
@@ -73,7 +81,7 @@ const ShareList: React.FC<Props> = ({ data }) => {
       {chatList.length && !loading ? (
         chatList.map((chat) => (
           <UserListCard
-            key={chat.participantId}
+            key={chat.conversationId}
             userData={{
               ...chat,
               userId: chat.participantId,
@@ -83,10 +91,10 @@ const ShareList: React.FC<Props> = ({ data }) => {
             actions={
               <Button
                 className="h-7 capitalize"
-                onClick={() => sharePost(chat.username)}
-                disabled={!!sentList[chat.username]}
+                onClick={() => sharePost(chat.conversationId)}
+                disabled={!!sentList[chat.conversationId]}
               >
-                {sentList[chat.username] || "Share"}
+                {sentList[chat.conversationId] ?? "Share"}
               </Button>
             }
           />

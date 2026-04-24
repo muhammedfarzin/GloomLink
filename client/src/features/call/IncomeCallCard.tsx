@@ -1,6 +1,6 @@
-import ProfileImage from "@/components/ProfileImage";
-import { Button } from "@/components/ui/button";
 import { Phone } from "lucide-react";
+import ProfileImage from "@/features/profile/ProfileImage";
+import { Button } from "@/components/ui/button";
 
 interface IncomeCallCardType {
   username: string;

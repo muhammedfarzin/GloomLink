@@ -1,11 +1,10 @@
 import { apiClient } from "@/apiClient";
 import PostActionsView from "./PostActionsView";
 import { useToaster } from "@/hooks/useToaster";
-import type { Post } from "../../types/Post";
-import type PostDataType from "../../types/PostDataType";
+import type { Post, CompactPost } from "@/types/post";
 
 export interface Props {
-  postData: PostDataType;
+  postData: CompactPost;
   hideComment?: boolean;
   showCommentsForSm?: boolean;
   isAdmin?: boolean;

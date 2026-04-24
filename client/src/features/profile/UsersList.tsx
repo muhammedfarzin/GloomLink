@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
-import UserListCard from "@/pages/user/components/UserListCard";
-import { useEffect, useState } from "react";
-import { UserDataType } from "./types/user-data-types";
+import UserListCard from "@/features/profile/UserListCard";
+import type { CompactUser } from "@/types/user";
 
 interface UsersListProps {
   apiUrl: string;
@@ -11,7 +11,7 @@ interface UsersListProps {
 
 const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
   const { toastError } = useToaster();
-  const [users, setUsers] = useState<UserDataType[]>([]);
+  const [users, setUsers] = useState<CompactUser[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,6 +23,17 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
       .finally(() => setLoading(null));
   }, []);
 
+  const updateUserData = (updatedData: CompactUser) => {
+    setUsers((prevState) =>
+      prevState.map((user) => {
+        if (user.userId === updatedData.userId) {
+          return updatedData;
+        }
+        return user;
+      }),
+    );
+  };
+
   return (
     <div className="w-full h-full mt-[-0.5rem] overflow-y-scroll no-scrollbar">
       {users.length && !loading ? (
@@ -31,7 +42,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
             key={user.userId}
             userData={user}
             className="my-2"
-            handleChange={setUsers}
+            handleChange={updateUserData}
           />
         ))
       ) : (
