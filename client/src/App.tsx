@@ -32,7 +32,10 @@ function App() {
   }, [colorTheme]);
 
   return (
-    <div id="app-container" className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar">
+    <div
+      id="app-container"
+      className="h-screen w-screen bg-background text-foreground overflow-y-scroll no-scrollbar"
+    >
       <Routes location={location.state?.backgroundLocation || location}>
         <Route path="login" element={<UserLogin />} />
         <Route path="signup" element={<Signup />} />
@@ -51,7 +54,7 @@ function App() {
           <Route path=":username" element={<Profile />} />
           <Route path="messages/:username" element={<MessageViewer />} />
           <Route path="post/:postId" element={<PostViewPage />} />
-          <Route path="edit-post/:postId" element={<CreatePost />} />
+          <Route path="post/:postId/edit" element={<CreatePost />} />
           <Route
             path="subscription/enable"
             element={<SubscriptionEnableForm />}

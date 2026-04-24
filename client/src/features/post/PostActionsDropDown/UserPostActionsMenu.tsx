@@ -37,7 +37,7 @@ const UserPostActionsMenu: React.FC<Props> = ({
     <DropdownMenuContent className="w-20">
       {isPublisher ? (
         <>
-          <DropdownMenuItem onClick={() => navigate(`/edit-post/${postId}`)}>
+          <DropdownMenuItem onClick={() => navigate(`/post/${postId}/edit`)}>
             <Edit />
             <span>Edit</span>
           </DropdownMenuItem>
