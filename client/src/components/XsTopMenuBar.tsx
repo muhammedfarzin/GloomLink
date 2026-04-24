@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import GloomLinkLogo from "@/assets/images/GloomLink-Logo.svg";
 import { useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import SideMenuViewer from "@/components/SideMenuViewer";
-import UserSideMenuBar from "./components/UserSideMenuBar";
+import SideMenuBar from "@/components/SideMenuBar";
+import type { RootState } from "@/redux/store";
 
 const XsTopMenuBar = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const XsTopMenuBar = () => {
         </Button>
 
         <SideMenuViewer className="p-0">
-          <UserSideMenuBar className="" />
+          <SideMenuBar className="" userType="user" />
         </SideMenuViewer>
       </div>
     </div>

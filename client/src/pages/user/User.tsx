@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import UserSideMenuBar from "./components/UserSideMenuBar";
+import SideMenuBar from "@/components/SideMenuBar";
 import ChatList from "@/features/chat/ChatList";
 import IncomeCallListener from "@/features/call/IncomeCallListener";
-import type { RootState } from "@/redux/store";
 import { logout } from "@/redux/reducers/auth";
-import XsTopMenuBar from "./XsTopMenuBar";
+import XsTopMenuBar from "@/components/XsTopMenuBar";
 import { ScreenSizeEnum, useScreenSize } from "@/hooks/useScreenSize";
+import type { RootState } from "@/redux/store";
 
 const User = () => {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ const User = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
   const { screenGreaterThan, screenLessThan } = useScreenSize();
-  const [selectedValue, setSelectedValue] = useState("home");
   const [userAuthenticated, setUserAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -29,16 +28,9 @@ const User = () => {
     } else setUserAuthenticated(true);
   }, [userData]);
 
-  useEffect(() => {
-    const selected = location.pathname.split("/").pop();
-    setSelectedValue(selected || "home");
-  }, [location]);
-
   return userAuthenticated ? (
     <>
-      {screenGreaterThan(ScreenSizeEnum.xs) && (
-        <UserSideMenuBar selected={selectedValue} />
-      )}
+      {screenGreaterThan(ScreenSizeEnum.xs) && <SideMenuBar userType="user" />}
 
       {!/^\/messages\/[^/]+\/?$/.test(location.pathname) &&
       screenLessThan(ScreenSizeEnum.sm) ? (
