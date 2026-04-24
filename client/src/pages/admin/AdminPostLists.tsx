@@ -3,9 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import { Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { adminApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
-import type { Post } from "@/features/types/Post";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
-import ManagementToolbar from "./components/ManagementToolbar";
+import ManagementToolbar from "@/components/ManagementToolbar";
+import type { Post } from "@/types/post";
 
 const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
 

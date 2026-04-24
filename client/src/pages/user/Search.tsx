@@ -1,18 +1,14 @@
 import React, { Suspense, useEffect, useState } from "react";
-import SearchBox from "@/components/SearchBox";
-import UserListCard from "./components/UserListCard";
 import { useSearchParams } from "react-router-dom";
+import SearchBox from "@/components/SearchBox";
+import UserListCard from "@/features/profile/UserListCard";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
-import type { Post } from "@/features/types/Post";
-import type { UserDataType } from "@/components/types/user-data-types";
+import type { SearchResultType } from "@/types/search";
+import type { CompactUser } from "@/types/user";
 
 const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
-
-export type SearchResultType =
-  | (UserDataType & { type: "user" })
-  | (Post & { type: "post" });
 
 const Search: React.FC = () => {
   const { toastError } = useToaster();
@@ -35,6 +31,17 @@ const Search: React.FC = () => {
         .finally(() => setLoading(null));
     }
   }, [searchParams]);
+
+  const handleUpdateUserData = (updatedData: CompactUser) => {
+    setSearchResult((prevState) =>
+      prevState.map((user) => {
+        if (user.type === "user" && user.userId === updatedData.userId) {
+          return updatedData;
+        }
+        return user;
+      }),
+    );
+  };
 
   return (
     <div className="m-auto max-w-[704px]">
@@ -67,7 +74,7 @@ const Search: React.FC = () => {
                   key={data.type + data.userId}
                   className="w-full"
                   userData={data}
-                  handleChange={setSearchResult}
+                  handleChange={handleUpdateUserData}
                 />
               ) : (
                 <Suspense

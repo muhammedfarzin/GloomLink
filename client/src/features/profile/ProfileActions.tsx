@@ -1,9 +1,9 @@
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 import DialogBox from "@/components/DialogBox";
 import Button from "@/components/Button";
-import type { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import ColorThemeList from "./ColorThemeList";
+import ColorThemeList from "@/components/ColorThemeList";
 
 interface ProfileActionsProps {
   username?: string;
@@ -24,7 +24,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
 }) => {
   const navigate = useNavigate();
   const myUsername = useSelector(
-    (state: RootState) => state.auth.userData?.username
+    (state: RootState) => state.auth.userData?.username,
   );
 
   return (

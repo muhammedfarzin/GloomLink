@@ -1,18 +1,19 @@
 import { useState } from "react";
-import ProfileImage from "@/components/ProfileImage";
+import ProfileImage from "@/features/profile/ProfileImage";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
 import { formatTimeAgo } from "@/lib/dateUtils";
-import type { HandleReplyCommentType } from "../types/ReplyCommentType";
-import type Comment from "../types/Comment";
+import type { Comment } from "@/types/comment";
 
 interface CommentListCardProps {
   comment: Comment;
   showReplies?: boolean;
   isReply?: boolean;
-  handleReplyOnClick?: (handleReplyComment: HandleReplyCommentType) => void;
+  handleReplyOnClick?: (
+    handleReplyComment: (newReply: Comment) => void,
+  ) => void;
 }
 
 const CommentListCard: React.FC<CommentListCardProps> = ({
@@ -26,7 +27,7 @@ const CommentListCard: React.FC<CommentListCardProps> = ({
   const [loading, setLoading] = useState<string | null>(null);
   const [replies, setReplies] = useState<Comment[]>([]);
 
-  const handleReplyComment: HandleReplyCommentType = (newReply) => {
+  const handleReplyComment = (newReply: Comment) => {
     setReplies([newReply, ...replies]);
     setShowReply(true);
   };

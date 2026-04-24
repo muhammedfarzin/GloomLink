@@ -9,7 +9,7 @@ import { useToaster } from "@/hooks/useToaster";
 import { useSelector } from "react-redux";
 import UserPostActionsMenu from "./UserPostActionsMenu";
 import AdminPostActionsMenu from "./AdminPostActionsMenu";
-import type { Post } from "../../types/Post";
+import type { Post } from "@/types/post";
 import type { RootState } from "@/redux/store";
 
 interface PostActionsDropDownProps {

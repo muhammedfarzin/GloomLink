@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import CommentListCard from "./CommentListCard";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
-import type { ReplyCommentType } from "../types/ReplyCommentType";
-import type Comment from "../types/Comment";
+import type { Comment, ReplyCommentType } from "@/types/comment";
+import CommentListCard from "./CommentListCard";
 import CommentInputBox from "./CommentInputBox";
 
 interface CommentBoxProps {

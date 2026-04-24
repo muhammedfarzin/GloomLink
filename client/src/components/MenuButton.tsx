@@ -1,15 +1,11 @@
+import React from "react";
 import { useSelector } from "react-redux";
 import { Link, type LinkProps } from "react-router-dom";
 import type { RootState } from "../redux/store";
-import type { LucideProps } from "lucide-react";
-import React from "react";
+import type { LucideIcon } from "lucide-react";
 
 interface MenuButtonProps extends LinkProps {
-  icon?:
-    | string
-    | React.ForwardRefExoticComponent<
-        Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
-      >;
+  icon?: string | LucideIcon;
   text: string;
   iconClassName?: string;
   alt?: string;

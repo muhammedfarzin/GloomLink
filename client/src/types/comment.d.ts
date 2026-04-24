@@ -1,4 +1,4 @@
-export default interface Comment {
+export interface Comment {
   id: string;
   comment: string;
   targetId: string;
@@ -14,4 +14,10 @@ export default interface Comment {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ReplyCommentType {
+  commentId: string;
+  username: string;
+  handleReplyComment: HandleReplyCommentType;
 }

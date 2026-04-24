@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
-import ProfileImage from "../../../components/ProfileImage";
+import { useParams } from "react-router-dom";
+import ProfileImage from "../profile/ProfileImage";
 
 interface ChatItemProps {
   username: string;
@@ -16,13 +16,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
   image,
   onClick,
 }) => {
-  const navigate = useNavigate();
   const { username: currentUsername } = useParams();
-
-  const handleOnClick = () => {
-    onClick?.();
-    navigate(`/messages/${username}`);
-  };
 
   return (
     <div
@@ -32,7 +26,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
           ? "bg-selection"
           : "bg-primary hover:bg-primary/75"
       } text-foreground rounded-2xl cursor-pointer`}
-      onClick={handleOnClick}
+      onClick={onClick}
     >
       <ProfileImage
         profileImage={image}

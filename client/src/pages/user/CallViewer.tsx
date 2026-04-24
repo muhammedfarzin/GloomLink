@@ -1,11 +1,11 @@
-import StreamVideoPlayer from "@/components/StreamVideoPlayer";
-import { Button } from "@/components/ui/button";
-import { useCall } from "@/hooks/use-call";
-import { Phone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import ProfileImage from "@/components/ProfileImage";
+import { Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import StreamVideoPlayer from "@/components/StreamVideoPlayer";
+import ProfileImage from "@/features/profile/ProfileImage";
 import { useSocket } from "@/hooks/use-socket";
+import { useCall } from "@/hooks/use-call";
 import { useToaster } from "@/hooks/useToaster";
 
 const CallViewer: React.FC = () => {

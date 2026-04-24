@@ -1,20 +1,17 @@
-import { apiClient } from "@/apiClient";
-import { useToaster } from "@/hooks/useToaster";
 import { Link } from "react-router-dom";
-import ProfileImage from "@/components/ProfileImage";
 import { useSelector } from "react-redux";
+import { apiClient } from "@/apiClient";
 import type { RootState } from "@/redux/store";
+import { useToaster } from "@/hooks/useToaster";
+import ProfileImage from "@/features/profile/ProfileImage";
 import { Button } from "@/components/ui/button";
-import type { SearchResultType } from "../Search";
-import { UserDataType } from "@/components/types/user-data-types";
+import type { CompactUser } from "@/types/user";
 
 interface UserListCardProps {
-  userData: Omit<UserDataType, "type">;
+  userData: Omit<CompactUser, "type">;
   actions?: React.ReactNode;
   className?: string;
-  handleChange?:
-    | React.Dispatch<React.SetStateAction<UserDataType[]>>
-    | React.Dispatch<React.SetStateAction<SearchResultType[]>>;
+  handleChange?: (updatedData: CompactUser) => void;
 }
 
 const UserListCard: React.FC<UserListCardProps> = ({
@@ -31,14 +28,7 @@ const UserListCard: React.FC<UserListCardProps> = ({
   const handleFollowUser = async () => {
     const userId = userData.userId;
     function toggleFollowStatus() {
-      handleChange?.((prevState: any[]) =>
-        prevState.map((user) => {
-          if (user._id === userId && (!user.type || user.type === "user")) {
-            user.isFollowing = !user.isFollowing;
-          }
-          return user;
-        }),
-      );
+      handleChange?.({ ...userData, isFollowing: !isFollowing, type: "user" });
     }
 
     try {

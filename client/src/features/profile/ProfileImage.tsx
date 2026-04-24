@@ -1,4 +1,4 @@
-import ProfileAvatar from "../assets/icons/Profile-Avatar.svg";
+import ProfileAvatar from "@/assets/icons/Profile-Avatar.svg";
 
 interface ProfileImageProps {
   className?: string;

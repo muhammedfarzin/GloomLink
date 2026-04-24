@@ -10,7 +10,7 @@ import { useToaster } from "@/hooks/useToaster";
 import { apiClient } from "@/apiClient";
 import EmptyIllustrationDark from "@/assets/images/Empty-Illustration-Dark.svg";
 import PostSkeletonList from "@/components/skeleton/PostSkeletonList";
-import type { Post } from "../types/Post";
+import type { Post } from "@/types/post";
 
 const PostListCard = React.lazy(() => import("./PostListCard"));
 

@@ -1,4 +1,4 @@
-export interface UserDataType {
+export interface CompactUser {
   userId: string;
   username: string;
   firstname: string;
@@ -9,7 +9,7 @@ export interface UserDataType {
   type: "user";
 }
 
-export type ChatUserDataType = {
+export type Conversation = {
   conversationId: string;
   participantId: string;
   username: string;

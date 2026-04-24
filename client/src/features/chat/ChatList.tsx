@@ -1,23 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ChatItem from "./ChatItem";
 import { apiClient } from "@/apiClient";
 import { useSocket } from "@/hooks/use-socket";
 import type { MessageType } from "@/types/message-type";
-import type {
-  ChatUserDataType,
-  UserDataType,
-} from "@/components/types/user-data-types";
+import type { Conversation, CompactUser } from "@/types/user";
 
 const ChatList = () => {
   const socket = useSocket();
+  const navigate = useNavigate();
   const { username: selectedUsername } = useParams();
-  const [chats, setChats] = useState<ChatUserDataType[]>([]);
-  const [suggestedUsers, setSuggestedUsers] = useState<UserDataType[]>([]);
+  const [chats, setChats] = useState<Conversation[]>([]);
+  const [suggestedUsers, setSuggestedUsers] = useState<CompactUser[]>([]);
 
   const handleIncomeMessage = useCallback(
     async (newMessage: MessageType) => {
-      const chat: ChatUserDataType | undefined = chats.find(
+      const chat: Conversation | undefined = chats.find(
         (chat) => chat.username === newMessage.senderUsername,
       );
 
@@ -41,7 +39,7 @@ const ChatList = () => {
   );
 
   const handleNewConversation = useCallback(
-    (conversation: ChatUserDataType) => {
+    (conversation: Conversation) => {
       const isExist = chats.find(
         (chat) => chat.participantId === conversation.participantId,
       );
@@ -110,6 +108,8 @@ const ChatList = () => {
                         return chatState;
                       }),
                     );
+
+                    navigate(`/messages/${chat.username}`);
                   }}
                 />
               ))
@@ -131,6 +131,7 @@ const ChatList = () => {
                 key={chat.userId}
                 username={chat.username}
                 image={chat.imageUrl}
+                onClick={() => navigate(`/${chat.username}`)}
               />
             ))}
           </div>
