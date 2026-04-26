@@ -1,24 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { AxiosError } from "axios";
-import ProfileImage from "@/features/profile/ProfileImage";
-import PostGridCard from "@/features/post/PostGridCard";
 import { apiClient } from "@/apiClient";
-import { useToaster } from "@/hooks/useToaster";
-import FollowDialogButton from "@/features/profile/FollowDialogButton";
-import ProfileActions from "@/features/profile/ProfileActions";
-import type { CompactUser } from "@/types/user";
+import UserOverviewCard from "@/features/profile/UserOverviewCard";
+import PostGridCard from "@/features/post/PostGridCard";
+import ProfileSkeleton from "@/components/skeleton/ProfileSkeleton";
+import type { UserProfile } from "@/types/user";
 import type { RootState } from "@/redux/store";
 
 interface ProfileProps {
   self?: boolean;
-}
-
-interface UserProfile extends CompactUser {
-  followersCount: number;
-  followingCount: number;
-  subscriptionAmount?: number;
 }
 
 interface PostsType {
@@ -32,7 +23,6 @@ interface PostsType {
 }
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
-  const { toastError } = useToaster();
   const myUsername = useSelector(
     (state: RootState) => state.auth.userData?.username,
   );
@@ -40,10 +30,11 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   const [userData, setUserData] = useState<UserProfile>();
   const [posts, setPosts] = useState<PostsType[]>([]);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [loading, setLoading] = useState<string | null>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading("Loading...");
+    setLoading(true);
     apiClient
       .get(`/profile/${username || myUsername}`)
       .then((response) => {
@@ -51,75 +42,31 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
         setIsFollowing(isFollowing);
         setUserData(userData);
         setPosts(posts);
-        setLoading(null);
       })
       .catch((error) => {
-        if (error instanceof AxiosError) {
-          setLoading(error.response?.data.message || error.message);
-        } else setLoading("Something went wrong");
-      });
+        setError(error.message);
+      })
+      .finally(() => setLoading(false));
   }, [username]);
-
-  const handleFollow = async () => {
-    try {
-      setIsFollowing(!isFollowing);
-      if (userData) await apiClient.post(`/profile/follow/${userData.userId}`);
-    } catch (error: any) {
-      setIsFollowing(isFollowing);
-      toastError(error.message);
-    }
-  };
 
   return (
     <div className="m-auto max-w-[704px]">
-      {loading || !userData ? (
-        <div className="w-full h-screen flex justify-center items-center">
-          {loading}
+      {loading ? (
+        <ProfileSkeleton />
+      ) : !userData ? (
+        <div className="w-full h-[100vh] flex flex-col justify-center items-center text-center gap-4">
+          <h2 className="text-2xl md:text-xl font-bold text-foreground">
+            {error || "Something went wrong"}
+          </h2>
         </div>
       ) : (
         <div className="m-2">
-          <div className="border border-border bg-secondary rounded-lg md:rounded-2xl mt-8 p-4 md:p-8">
-            <div className="flex gap-4 md:gap-8 max-h-16 items-center">
-              <ProfileImage
-                profileImage={userData.imageUrl}
-                className="min-w-12"
-              />
-              <div className="flex justify-between w-full">
-                <div
-                  id="profile-deta"
-                  className="flex flex-col justify-center w-1/3"
-                >
-                  <span className="text-lg font-bold truncate">
-                    {userData?.username}
-                  </span>
-                  <span className="text-sm font-light truncate">
-                    {userData?.fullname}
-                  </span>
-                </div>
-                <div className="flex justify-around w-2/3">
-                  <FollowDialogButton
-                    userId={userData.userId}
-                    followCount={userData?.followersCount}
-                    type="followers"
-                  />
-                  <FollowDialogButton
-                    userId={userData.userId}
-                    followCount={userData?.followingCount}
-                    type="following"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <ProfileActions
-              username={username}
-              self={self}
-              followersCount={userData.followersCount}
-              isFollowing={isFollowing}
-              handleFollow={handleFollow}
-              subscriptionAmount={userData.subscriptionAmount}
-            />
-          </div>
+          <UserOverviewCard
+            userData={userData}
+            self={self}
+            isFollowing={isFollowing}
+            onClickFollow={setIsFollowing}
+          />
 
           <div id="posts">
             <h3 className="text-xl font-bold my-2">Posts</h3>

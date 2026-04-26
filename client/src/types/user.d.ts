@@ -9,6 +9,12 @@ export interface CompactUser {
   type: "user";
 }
 
+export interface UserProfile extends CompactUser {
+  followersCount: number;
+  followingCount: number;
+  subscriptionAmount?: number;
+}
+
 export type Conversation = {
   conversationId: string;
   participantId: string;

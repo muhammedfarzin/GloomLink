@@ -1,5 +1,4 @@
-import DialogBox from "@/components/DialogBox";
-import UsersList from "@/features/profile/UsersList";
+import UserListDialogButton from "../profile/UserListDialogButton";
 
 interface Props {
   postId: string;
@@ -16,14 +15,9 @@ const PostInteractionCount: React.FC<Props> = ({
     <div className="relative h-2">
       <div className="absolute bottom-[-0.3rem]">
         {likesCount ? (
-          <DialogBox
-            dialogElement={
-              <UsersList apiUrl={`/likes/post/${postId}`} title="users" />
-            }
-            title="Liked by"
-          >
+          <UserListDialogButton apiUrl={`/likes/post/${postId}`} title="users">
             <span className="cursor-pointer">{`${likesCount} likes`}</span>
-          </DialogBox>
+          </UserListDialogButton>
         ) : null}
         {likesCount && commentsCount ? " • " : null}
         {commentsCount ? `${commentsCount} comments` : null}

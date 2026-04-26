@@ -11,7 +11,7 @@ interface ProfileActionsProps {
   isFollowing?: boolean;
   followersCount?: number;
   subscriptionAmount?: number;
-  handleFollow?: () => Promise<void>;
+  onClickFollow?: () => Promise<void>;
 }
 
 const ProfileActions: React.FC<ProfileActionsProps> = ({
@@ -20,7 +20,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
   followersCount,
   isFollowing,
   subscriptionAmount,
-  handleFollow,
+  onClickFollow,
 }) => {
   const navigate = useNavigate();
   const myUsername = useSelector(
@@ -64,7 +64,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           <div className="flex gap-2">
             <Button
               className="w-full"
-              onClick={() => handleFollow?.()}
+              onClick={onClickFollow}
               disabled={username === myUsername}
             >
               {isFollowing ? "Unfollow" : "Follow"}
