@@ -21,6 +21,7 @@ const AdminLogin: React.FC = () => {
   const adminData = useSelector((state: RootState) => state.auth.adminData);
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
   const { toastError } = useToaster();
+  const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState<LoginFormType>({
     username: "",
     password: "",
@@ -36,6 +37,7 @@ const AdminLogin: React.FC = () => {
   }, [adminData]);
 
   const handleOnLogin = async () => {
+    setLoading("Authenticating...");
     const isValidated = validateLoginForm(formData, toastError);
 
     if (!isValidated) return;
@@ -52,6 +54,8 @@ const AdminLogin: React.FC = () => {
       navigate("/admin");
     } catch (error: any) {
       toastError(error.message);
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -97,7 +101,13 @@ const AdminLogin: React.FC = () => {
               className="input-box"
               onChange={handleOnChange}
             />
-            <button className="btn btn-primary border w-full">Login</button>
+            <button
+              className="btn btn-primary border w-full"
+              disabled={!!loading}
+              type="submit"
+            >
+              {loading || "Login"}
+            </button>
           </FormBox>
         </div>
       </div>

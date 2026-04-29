@@ -4,6 +4,7 @@ import { useToaster } from "@/hooks/useToaster";
 import type { Comment, ReplyCommentType } from "@/types/comment";
 import CommentListCard from "./CommentListCard";
 import CommentInputBox from "./CommentInputBox";
+import { CommentSkeleton } from "@/components/skeleton/CommentBoxSkeleton";
 
 interface CommentBoxProps {
   postId: string;
@@ -38,28 +39,32 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
         <div
           className={[
             "flex gap-2 w-full h-[calc(95vh-6.35rem)] md:h-[calc(82vh-6.35rem)]",
-            loading || !comments.length
+            !loading && !comments.length
               ? "justify-center items-center"
               : "flex-col",
           ].join(" ")}
         >
-          {loading || !comments.length
-            ? loading || "No comments yet!"
-            : comments.map((comment) => (
-                <div key={comment.id}>
-                  <CommentListCard
-                    comment={comment}
-                    showReplies={!!comment.repliesCount}
-                    handleReplyOnClick={(handleReplyComment) =>
-                      setReplyComment({
-                        commentId: comment.id,
-                        username: comment.uploadedBy.username,
-                        handleReplyComment,
-                      })
-                    }
-                  />
-                </div>
-              ))}
+          {loading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <CommentSkeleton key={i} />
+              ))
+            : !comments.length
+              ? "No comments yet!"
+              : comments.map((comment) => (
+                  <div key={comment.id}>
+                    <CommentListCard
+                      comment={comment}
+                      showReplies={!!comment.repliesCount}
+                      handleReplyOnClick={(handleReplyComment) =>
+                        setReplyComment({
+                          commentId: comment.id,
+                          username: comment.uploadedBy.username,
+                          handleReplyComment,
+                        })
+                      }
+                    />
+                  </div>
+                ))}
         </div>
       </div>
 

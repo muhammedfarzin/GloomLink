@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import SideMenuBar from "@/components/SideMenuBar";
 import ChatList from "@/features/chat/ChatList";
@@ -9,26 +9,24 @@ import XsTopMenuBar from "@/components/XsTopMenuBar";
 import { ScreenSizeEnum, useScreenSize } from "@/hooks/useScreenSize";
 import type { RootState } from "@/redux/store";
 
-const User = () => {
+const UserLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
   const { screenGreaterThan, screenLessThan } = useScreenSize();
-  const [userAuthenticated, setUserAuthenticated] = useState(false);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken || !userData) {
-      navigate("/login");
-    } else if (userData.status === "blocked") {
-      dispatch(logout({ type: "user" }));
-    } else if (userData.status === "not-verified") {
-      navigate("/signup/verify");
-    } else setUserAuthenticated(true);
+    if (userData) {
+      if (userData.status === "blocked") {
+        dispatch(logout({ type: "user" }));
+      } else if (userData.status === "not-verified") {
+        navigate("/signup/verify");
+      }
+    }
   }, [userData]);
 
-  return userAuthenticated ? (
+  return userData ? (
     <>
       {screenGreaterThan(ScreenSizeEnum.xs) && <SideMenuBar userType="user" />}
 
@@ -48,7 +46,9 @@ const User = () => {
         </div>
       )}
     </>
-  ) : null;
+  ) : (
+    <Navigate to="/auth/login" />
+  );
 };
 
-export default User;
+export default UserLayout;

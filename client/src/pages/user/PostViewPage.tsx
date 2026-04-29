@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
-import CommentBox from "@/features/post/CommentBox";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
+import CommentBoxSkeleton from "@/components/skeleton/CommentBoxSkeleton";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Navigate,
@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 
 const PostListCard = React.lazy(() => import("@/features/post/PostListCard"));
+const CommentBox = React.lazy(() => import("@/features/post/CommentBox"));
 
 const PostViewPage = () => {
   const navigate = useNavigate();
@@ -51,7 +52,9 @@ const PostViewPage = () => {
 
           {/* Comment Box */}
           <div className="hidden md:block w-1/2 h-full">
-            <CommentBox postId={postId} />
+            <Suspense fallback={<CommentBoxSkeleton />}>
+              <CommentBox postId={postId} />
+            </Suspense>
           </div>
         </div>
       </DialogContent>

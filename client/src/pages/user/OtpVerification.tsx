@@ -26,7 +26,7 @@ const OtpVerification: React.FC = () => {
   const [otp, setOtp] = useState<string>("");
 
   useEffect(() => {
-    if (!userData || userData.status !== "not-verified") navigate("/login");
+    if (!userData || userData.status !== "not-verified") navigate("/auth/login");
   }, [userData]);
 
   const handleResendOtp = async () => {

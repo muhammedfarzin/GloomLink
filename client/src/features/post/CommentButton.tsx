@@ -2,11 +2,12 @@ import React, { Suspense } from "react";
 import IconButton from "@/components/IconButton";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import PostSkeleton from "@/components/skeleton/PostSkeleton";
+import CommentBoxSkeleton from "@/components/skeleton/CommentBoxSkeleton";
 import CommentIcon from "@/assets/icons/Comment.svg";
 import type { PostListCardProps } from "./PostListCard";
-import CommentBox from "./CommentBox";
 
 const PostListCard = React.lazy(() => import("./PostListCard"));
+const CommentBox = React.lazy(() => import("./CommentBox"));
 
 interface CommentButtonProps {
   postCardData: PostListCardProps;
@@ -47,7 +48,9 @@ const CommentButton: React.FC<CommentButtonProps> = ({
 
           {/* Comment Box */}
           <div className="w-full md:w-1/2 h-full">
-            <CommentBox postId={postId} />
+            <Suspense fallback={<CommentBoxSkeleton />}>
+              <CommentBox postId={postId} />
+            </Suspense>
           </div>
         </div>
       </DialogContent>

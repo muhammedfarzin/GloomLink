@@ -187,7 +187,7 @@ const Signup = () => {
           </FormBox>
 
           <Link
-            to="/login"
+            to="../login"
             className="btn btn-dark border w-72 block mx-auto !mt-4 p-3"
           >
             <span className="ml-4 text-sm">Already have an account?</span>

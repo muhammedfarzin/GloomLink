@@ -154,7 +154,7 @@ const Login: React.FC = () => {
 
           <div id="auth-options">
             <Link
-              to="/signup"
+              to="../signup"
               className="btn btn-dark border w-72 block mx-auto p-3"
             >
               <img src={EnvelopeIcon} alt="email" className="inline" />
