@@ -31,7 +31,12 @@ const SideMenuBar: React.FC<SideMenuBarProps> = ({
   const userSideMenuItems: SideMenuItem[] = [
     { title: "Home", icon: HomeIcon, path: "/" },
     { title: "Search", icon: SearchIcon, path: "/search" },
-    { title: "Messages", icon: MessageSquare, path: "/messages" },
+    {
+      title: "Messages",
+      icon: MessageSquare,
+      path: "/messages",
+      className: "!hidden sm:!flex lg:!hidden",
+    },
     { title: "Create Posts", icon: AddSquareIcon, path: "/create-post" },
     { title: "Saved Posts", icon: SaveIcon, path: "/saved-post" },
     { title: "Profile", icon: ProfileCircleIcon, path: "/profile" },
@@ -69,6 +74,7 @@ const SideMenuBar: React.FC<SideMenuBarProps> = ({
               text={menu.title}
               icon={menu.icon}
               selected={currentPath === menu.path}
+              className={menu.className}
             />
           ),
         )}
@@ -103,6 +109,7 @@ interface SideMenuItem {
   title: string;
   icon?: string | LucideIcon;
   path: string;
+  className?: string;
 }
 
 export default SideMenuBar;
