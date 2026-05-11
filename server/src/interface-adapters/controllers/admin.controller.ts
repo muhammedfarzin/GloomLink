@@ -1,15 +1,15 @@
 import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
-import { UserPresenter } from "../presenters/UserPresenter";
+import { UserMapper } from "../mappers/UserMapper";
 import { HttpError } from "../errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { IGetAdminUsers } from "../../domain/use-cases/IGetAdminUsers";
-import type { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
-import type { IGetAdminPosts } from "../../domain/use-cases/IGetAdminPosts";
-import type { ITogglePostStatus } from "../../domain/use-cases/ITogglePostStatus";
-import type { IGetDashboardData } from "../../domain/use-cases/IGetDashboardData";
+import type { IGetAdminUsers } from "@/domain/use-cases/IGetAdminUsers";
+import type { IToggleUserStatus } from "@/domain/use-cases/IToggleUserStatus";
+import type { IGetAdminPosts } from "@/domain/use-cases/IGetAdminPosts";
+import type { ITogglePostStatus } from "@/domain/use-cases/ITogglePostStatus";
+import type { IGetDashboardData } from "@/domain/use-cases/IGetDashboardData";
 
 import {
   getPostsSchema,
@@ -61,7 +61,7 @@ export class AdminController {
         ...validatedData,
       });
 
-      const usersData = users.map(UserPresenter.toResponseWithStatus);
+      const usersData = users.map(UserMapper.toResponseWithStatus);
 
       res.status(200).json({
         usersData,

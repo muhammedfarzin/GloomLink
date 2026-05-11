@@ -1,14 +1,11 @@
 import { injectable, inject } from "inversify";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { ForbiddenError } from "../../domain/errors/AuthErrors";
-import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { Post } from "../../domain/entities/Post";
-import { IFileStorageService } from "../../domain/services/IFileStorageService";
-import {
-  IEditPost,
-  type EditPostInput,
-} from "../../domain/use-cases/IEditPost";
-import { TYPES } from "../../shared/types";
+import { ForbiddenError } from "@/domain/errors/AuthErrors";
+import { PostNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { Post } from "@/domain/entities/Post";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { IFileStorageService } from "@/domain/services/IFileStorageService";
+import type { IEditPost, EditPostInput } from "@/domain/use-cases/IEditPost";
+import { TYPES } from "@/shared/types";
 
 @injectable()
 export class EditPost implements IEditPost {

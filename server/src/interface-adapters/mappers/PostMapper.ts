@@ -1,7 +1,7 @@
-import type { PostResponseDto } from "../../application/dtos/PostDto";
-import type { Post } from "../../domain/entities/Post";
+import type { PostResponseDto } from "@/application/dtos/PostDto";
+import type { Post } from "@/domain/entities/Post";
 
-export class PostPresenter {
+export class PostMapper {
   public static toResponse(post: Post): PostResponseDto {
     const images = post.getImages();
 

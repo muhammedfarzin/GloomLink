@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import { AppError, type ErrorType } from "../../domain/errors/AppError.js";
+import { AppError, type ErrorType } from "@/domain/errors/AppError.js";
 import { HttpError } from "../errors/HttpError.js";
 
 export const ErrorToHttpStatusCode: Record<ErrorType, number> = {

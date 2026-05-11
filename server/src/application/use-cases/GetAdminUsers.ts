@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { User } from "../../domain/entities/User";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { TYPES } from "@/shared/types";
+import type { User } from "@/domain/entities/User";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   IGetAdminUsers,
   GetAdminUsersInput,
-} from "../../domain/use-cases/IGetAdminUsers";
+} from "@/domain/use-cases/IGetAdminUsers";
 
 @injectable()
 export class GetAdminUsers implements IGetAdminUsers {

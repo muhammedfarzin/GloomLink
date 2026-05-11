@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { TYPES } from "../../shared/types";
-import {
+import { IPostRepository } from "@/domain/repositories/IPostRepository";
+import { TYPES } from "@/shared/types";
+import type {
   IGetAdminPosts,
-  type GetAdminPostsInput,
-} from "../../domain/use-cases/IGetAdminPosts";
-import type { EnrichedPost } from "../../domain/models/Post";
+  GetAdminPostsInput,
+} from "@/domain/use-cases/IGetAdminPosts";
+import type { EnrichedPost } from "@/domain/models/Post";
 
 @injectable()
 export class GetAdminPosts implements IGetAdminPosts {

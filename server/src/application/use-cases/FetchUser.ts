@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   FetchUserOptions,
   IFetchUser,
-} from "../../domain/use-cases/IFetchUser";
+} from "@/domain/use-cases/IFetchUser";
 
 @injectable()
 export class FetchUser implements IFetchUser {

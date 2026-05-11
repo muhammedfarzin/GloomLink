@@ -4,9 +4,9 @@ import { PostMapper } from "../mappers/PostMapper";
 import { UserDocument, UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../mappers/UserMapper";
 
-import { User } from "../../domain/entities/User";
-import type { EnrichedPost } from "../../domain/models/Post";
-import type { UserListView, UserProfile } from "../../domain/models/User";
+import { User } from "@/domain/entities/User";
+import type { EnrichedPost } from "@/domain/models/Post";
+import type { UserListView, UserProfile } from "@/domain/models/User";
 import type {
   IUserRepository,
   SuggestionInput,
@@ -14,8 +14,8 @@ import type {
   UserIdentifier,
   UserOptions,
   UserStatus,
-} from "../../domain/repositories/IUserRepository";
-import type { UserDto } from "../../application/dtos/UserDto";
+} from "@/domain/repositories/IUserRepository";
+import type { UserDto } from "@/application/dtos/UserDto";
 
 @injectable()
 export class UserRepository implements IUserRepository {

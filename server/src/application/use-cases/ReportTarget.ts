@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
-import { User } from "../../domain/entities/User";
-import { Report } from "../../domain/entities/Report";
-import { NotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IReportRepository } from "../../domain/repositories/IReportRepository";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { User } from "@/domain/entities/User";
+import { Report } from "@/domain/entities/Report";
+import { NotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IReportRepository } from "@/domain/repositories/IReportRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   IReportTarget,
   ReportTargetInput,
-} from "../../domain/use-cases/IReportTarget";
+} from "@/domain/use-cases/IReportTarget";
 
 const REPORT_THRESHOLD = 5;
 

@@ -1,13 +1,13 @@
 import { inject, injectable } from "inversify";
-import { TYPES } from "../../shared/types";
-import { IInteractionRepository } from "../../domain/repositories/IInteractionRepository";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import {
+import { TYPES } from "@/shared/types";
+import type { IInteractionRepository } from "@/domain/repositories/IInteractionRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { IFollowRepository } from "@/domain/repositories/IFollowRepository";
+import type { EnrichedPost } from "@/domain/models/Post";
+import type {
   IGetRecommendedPosts,
-  type GetRecommendedPostsInput,
-} from "../../domain/use-cases/IGetRecommendedPosts";
-import type { EnrichedPost } from "../../domain/models/Post";
+  GetRecommendedPostsInput,
+} from "@/domain/use-cases/IGetRecommendedPosts";
 
 @injectable()
 export class GetRecommendedPosts implements IGetRecommendedPosts {

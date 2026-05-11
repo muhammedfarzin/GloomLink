@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
-import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import { TYPES } from "@/shared/types";
+import type { IGetConversations } from "@/domain/use-cases/IGetConversations";
+import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 
 const CONVERSATION_SUGGESTION_THRESHOLD = 10;
 

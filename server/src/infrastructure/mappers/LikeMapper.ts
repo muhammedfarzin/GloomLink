@@ -1,5 +1,5 @@
-import { Like } from "../../domain/entities/Like";
-import type { LikeType } from "../../domain/models/Like";
+import { Like } from "@/domain/entities/Like";
+import type { LikeType } from "@/domain/models/Like";
 import type { LikeDocument } from "../database/models/LikeModel";
 
 export class LikeMapper {

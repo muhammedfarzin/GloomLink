@@ -1,8 +1,8 @@
-import { Conversation } from "../../domain/entities/Conversation";
+import { Conversation } from "@/domain/entities/Conversation";
 import type {
   ConversationType,
   ConversationList,
-} from "../../domain/models/Conversation";
+} from "@/domain/models/Conversation";
 
 export class ConversationMapper {
   public static toDomain(conversation: ConversationType): Conversation {

@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import { injectable } from "inversify";
-import { Interaction } from "../../domain/entities/Interaction";
+import { Interaction } from "@/domain/entities/Interaction";
 import { InteractionModel } from "../database/models/InteractionModel";
 import { InteractionMapper } from "../mappers/InteractionMapper";
 import type {
   IInteractionRepository,
   InteractionDashboardMetrics,
-} from "../../domain/repositories/IInteractionRepository";
+} from "@/domain/repositories/IInteractionRepository";
 
 @injectable()
 export class InteractionRepository implements IInteractionRepository {

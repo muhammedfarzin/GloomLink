@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { IOtpService } from "../../domain/services/IOtpService";
-import { IMailService } from "../../domain/services/IMailService";
-import { TYPES } from "../../shared/types";
-import {
+import { TYPES } from "@/shared/types";
+import type { IOtpService } from "@/domain/services/IOtpService";
+import type { IMailService } from "@/domain/services/IMailService";
+import type {
   ISendVerificationEmail,
-  type SendVerificationEmailInput,
-} from "../../domain/use-cases/ISendVerificationEmail";
+  SendVerificationEmailInput,
+} from "@/domain/use-cases/ISendVerificationEmail";
 
 @injectable()
 export class SendVerificationEmail implements ISendVerificationEmail {

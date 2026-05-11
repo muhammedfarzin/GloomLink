@@ -1,10 +1,6 @@
-import { Post } from "../../domain/entities/Post";
-import type { UserProfile } from "../../domain/models/User";
-import type {
-  EnrichedPost,
-  PostCompact,
-  PostType,
-} from "../../domain/models/Post";
+import { Post } from "@/domain/entities/Post";
+import type { UserProfile } from "@/domain/models/User";
+import type { EnrichedPost, PostCompact, PostType } from "@/domain/models/Post";
 
 export class PostMapper {
   public static toDomain(data: PostType): Post {

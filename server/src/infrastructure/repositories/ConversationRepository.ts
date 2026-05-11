@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
 import mongoose, { PipelineStage } from "mongoose";
-import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import type { ConversationList } from "../../domain/models/Conversation";
-import { Conversation } from "../../domain/entities/Conversation";
+import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
+import type { ConversationList } from "@/domain/models/Conversation";
+import { Conversation } from "@/domain/entities/Conversation";
 import { ConversationModel } from "../database/models/ConversationModel";
 import { ConversationMapper } from "../mappers/ConversationMapper";
 

@@ -1,13 +1,13 @@
 import { injectable, inject } from "inversify";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { Post } from "../../domain/entities/Post";
-import { TYPES } from "../../shared/types";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
-import type { IFileStorageService } from "../../domain/services/IFileStorageService";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { Post } from "@/domain/entities/Post";
+import { TYPES } from "@/shared/types";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { IFileStorageService } from "@/domain/services/IFileStorageService";
 import type {
   ICreatePost,
   CreatePostInput,
-} from "../../domain/use-cases/ICreatePost";
+} from "@/domain/use-cases/ICreatePost";
 
 @injectable()
 export class CreatePost implements ICreatePost {

@@ -1,13 +1,13 @@
 import { injectable } from "inversify";
-import { Comment } from "../../domain/entities/Comment";
+import { Comment } from "@/domain/entities/Comment";
 import { CommentModel } from "../database/models/CommentModel";
 import { CommentMapper } from "../mappers/CommentMapper";
 import mongoose, { PipelineStage } from "mongoose";
-import type { CommentResponse } from "../../domain/models/Comment";
+import type { CommentResponse } from "@/domain/models/Comment";
 import type {
   ICommentRepository,
   CommentableType,
-} from "../../domain/repositories/ICommentRepository";
+} from "@/domain/repositories/ICommentRepository";
 
 @injectable()
 export class CommentRepository implements ICommentRepository {

@@ -1,10 +1,10 @@
 import { injectable, inject } from "inversify";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { User } from "../../domain/entities/User";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { TYPES } from "../../shared/types";
-import { ExternalAuthUser } from "../../domain/services/IExternalAuthService";
-import { ISignInWithGoogle } from "../../domain/use-cases/ISignInWithGoogle";
+import { User } from "@/domain/entities/User";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { ExternalAuthUser } from "@/domain/services/IExternalAuthService";
+import type { ISignInWithGoogle } from "@/domain/use-cases/ISignInWithGoogle";
 
 @injectable()
 export class SignInWithGoogle implements ISignInWithGoogle {

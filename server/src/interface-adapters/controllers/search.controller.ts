@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { HttpError } from "../errors/HttpError";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import { ISearchContent } from "../../domain/use-cases/ISearchContent";
+import { ISearchContent } from "@/domain/use-cases/ISearchContent";
 
 import { searchSchema } from "../validation/searchSchemas";
 

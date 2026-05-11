@@ -1,12 +1,12 @@
 import { injectable, inject } from "inversify";
-import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import { PostNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type {
   ITogglePostStatus,
   TogglePostStatusInput,
   TogglePostStatusOutput,
-} from "../../domain/use-cases/ITogglePostStatus";
+} from "@/domain/use-cases/ITogglePostStatus";
 
 @injectable()
 export class TogglePostStatus implements ITogglePostStatus {

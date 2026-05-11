@@ -1,14 +1,14 @@
 import { injectable, inject } from "inversify";
-import { User } from "../../domain/entities/User";
-import { ConflictError } from "../../domain/errors/ConflictError";
-import { TYPES } from "../../shared/types";
+import { User } from "@/domain/entities/User";
+import { ConflictError } from "@/domain/errors/ConflictError";
+import { TYPES } from "@/shared/types";
 
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
 import type {
   CreateUserInput,
   ICreateUser,
-} from "../../domain/use-cases/ICreateUser";
+} from "@/domain/use-cases/ICreateUser";
 
 @injectable()
 export class CreateUser implements ICreateUser {

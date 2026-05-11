@@ -1,17 +1,17 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
+import type { ITokenService } from "@/domain/services/ITokenService";
 import type {
   ILoginUser,
   LoginInput,
   UserWithTokens,
-} from "../../domain/use-cases/ILoginUser";
+} from "@/domain/use-cases/ILoginUser";
 import {
   ForbiddenError,
   InvalidCredentialsError,
-} from "../../domain/errors/AuthErrors";
-import { ITokenService } from "../../domain/services/ITokenService";
+} from "@/domain/errors/AuthErrors";
 
 @injectable()
 export class LoginUser implements ILoginUser {

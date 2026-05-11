@@ -1,16 +1,16 @@
 import { injectable, inject } from "inversify";
-import { ICommentRepository } from "../../domain/repositories/ICommentRepository";
-import { IPostRepository } from "../../domain/repositories/IPostRepository";
-import { Comment } from "../../domain/entities/Comment";
-import { TYPES } from "../../shared/types";
-import {
+import { ICommentRepository } from "@/domain/repositories/ICommentRepository";
+import { IPostRepository } from "@/domain/repositories/IPostRepository";
+import { Comment } from "@/domain/entities/Comment";
+import { TYPES } from "@/shared/types";
+import type {
   IAddComment,
-  type AddCommentInput,
-} from "../../domain/use-cases/IAddComment";
+  AddCommentInput,
+} from "@/domain/use-cases/IAddComment";
 import {
   CommentNotFoundError,
   PostNotFoundError,
-} from "../../domain/errors/NotFoundErrors";
+} from "@/domain/errors/NotFoundErrors";
 
 @injectable()
 export class AddComment implements IAddComment {

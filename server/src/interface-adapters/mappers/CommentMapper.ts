@@ -1,7 +1,7 @@
-import type { CommentResponseDto } from "../../application/dtos/CommentDto";
-import type { Comment } from "../../domain/entities/Comment";
+import type { CommentResponseDto } from "@/application/dtos/CommentDto";
+import type { Comment } from "@/domain/entities/Comment";
 
-export class CommentPresenter {
+export class CommentMapper {
   public static toResponse(comment: Comment): CommentResponseDto {
     return {
       id: comment.getId(),

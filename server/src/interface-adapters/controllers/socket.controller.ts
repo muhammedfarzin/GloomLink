@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
 import type { Socket, SocketActiveUsers } from "socket.io";
-import type { CompactMessage } from "../../domain/models/Message";
-import type { ISendMessage } from "../../domain/use-cases/ISendMessage";
-import type { IMarkMessageAsSeen } from "../../domain/use-cases/IMarkMessageAsSeen";
-import { TYPES } from "../../shared/types";
-import { MessagePresenter } from "../presenters/MessagePresenter";
+import type { CompactMessage } from "@/domain/models/Message";
+import type { ISendMessage } from "@/domain/use-cases/ISendMessage";
+import type { IMarkMessageAsSeen } from "@/domain/use-cases/IMarkMessageAsSeen";
+import { TYPES } from "@/shared/types";
+import { MessageMapper } from "../mappers/MessageMapper";
 import {
   markAsSeenSchema,
   sendMessageSchema,
@@ -38,7 +38,7 @@ export class SocketController {
         conversationId,
       });
 
-      const resMessage = MessagePresenter.toResponse(newMessage);
+      const resMessage = MessageMapper.toResponse(newMessage);
       socket.to(conversationId).emit("incoming-message", resMessage);
       socket.emit("send-message-success", resMessage);
     } catch (error: any) {
@@ -62,7 +62,7 @@ export class SocketController {
         if (senderSocketIds && senderSocketIds.size) {
           socket
             .to([...senderSocketIds])
-            .emit("message-seen", MessagePresenter.toResponse(updatedMessage));
+            .emit("message-seen", MessageMapper.toResponse(updatedMessage));
         }
       }
     } catch (error: any) {

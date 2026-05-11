@@ -1,15 +1,12 @@
 import { injectable, inject } from "inversify";
-import { User } from "../../domain/entities/User";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IOtpRepository } from "../../domain/repositories/IOtpRepository";
-import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
-import type {
-  IVerifyOtp,
-  VerifyOtpInput,
-} from "../../domain/use-cases/IVerifyOtp";
+import { User } from "@/domain/entities/User";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IOtpRepository } from "@/domain/repositories/IOtpRepository";
+import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
+import type { IVerifyOtp, VerifyOtpInput } from "@/domain/use-cases/IVerifyOtp";
 
 @injectable()
 export class VerifyOtp implements IVerifyOtp {

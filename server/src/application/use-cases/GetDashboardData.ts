@@ -1,14 +1,14 @@
 import { inject, injectable } from "inversify";
-import { TYPES } from "../../shared/types";
-import { ValidationError } from "../../domain/errors/ValidationError";
+import { TYPES } from "@/shared/types";
+import { ValidationError } from "@/domain/errors/ValidationError";
 
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
-import type { IInteractionRepository } from "../../domain/repositories/IInteractionRepository";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { IInteractionRepository } from "@/domain/repositories/IInteractionRepository";
 import type {
   IGetDashboardData,
   DashboardMetrics,
-} from "../../domain/use-cases/IGetDashboardData";
+} from "@/domain/use-cases/IGetDashboardData";
 
 @injectable()
 export class GetDashboardData implements IGetDashboardData {

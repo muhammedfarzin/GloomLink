@@ -1,16 +1,16 @@
 import { injectable, inject } from "inversify";
-import { Message } from "../../domain/entities/Message";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { ForbiddenError } from "../../domain/errors/AuthErrors";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { Message } from "@/domain/entities/Message";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { ForbiddenError } from "@/domain/errors/AuthErrors";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IMessageRepository } from "@/domain/repositories/IMessageRepository";
+import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   ISendMessage,
   SendMessageInput,
-} from "../../domain/use-cases/ISendMessage";
+} from "@/domain/use-cases/ISendMessage";
 
 @injectable()
 export class SendMessage implements ISendMessage {

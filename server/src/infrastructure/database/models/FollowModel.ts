@@ -1,5 +1,5 @@
 import { type Document, model, Schema } from "mongoose";
-import { ValidationError } from "../../../domain/errors/ValidationError";
+import { ValidationError } from "@/domain/errors/ValidationError";
 
 export interface FollowType {
   _id: Schema.Types.ObjectId;

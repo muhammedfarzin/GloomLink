@@ -1,23 +1,20 @@
 import { RequestHandler } from "express";
 import { inject } from "inversify";
 import { HttpError } from "../errors/HttpError";
-import { UserPresenter } from "../presenters/UserPresenter";
-import { User } from "../../domain/entities/User";
-import { TYPES } from "../../shared/types";
+import { UserMapper } from "../mappers/UserMapper";
+import { User } from "@/domain/entities/User";
+import { TYPES } from "@/shared/types";
 
-import type {
-  ITokenService,
-  Tokens,
-} from "../../domain/services/ITokenService";
-import type { IExternalAuthService } from "../../domain/services/IExternalAuthService";
+import type { ITokenService, Tokens } from "@/domain/services/ITokenService";
+import type { IExternalAuthService } from "@/domain/services/IExternalAuthService";
 
-import type { ICreateUser } from "../../domain/use-cases/ICreateUser";
-import type { ILoginUser } from "../../domain/use-cases/ILoginUser";
-import type { ISignInWithGoogle } from "../../domain/use-cases/ISignInWithGoogle";
-import type { ISendVerificationEmail } from "../../domain/use-cases/ISendVerificationEmail";
-import type { IVerifyOtp } from "../../domain/use-cases/IVerifyOtp";
-import type { IRefreshToken } from "../../domain/use-cases/IRefreshToken";
-import type { IAdminLogin } from "../../domain/use-cases/IAdminLogin";
+import type { ICreateUser } from "@/domain/use-cases/ICreateUser";
+import type { ILoginUser } from "@/domain/use-cases/ILoginUser";
+import type { ISignInWithGoogle } from "@/domain/use-cases/ISignInWithGoogle";
+import type { ISendVerificationEmail } from "@/domain/use-cases/ISendVerificationEmail";
+import type { IVerifyOtp } from "@/domain/use-cases/IVerifyOtp";
+import type { IRefreshToken } from "@/domain/use-cases/IRefreshToken";
+import type { IAdminLogin } from "@/domain/use-cases/IAdminLogin";
 
 import {
   googleAuthSchema,
@@ -55,7 +52,7 @@ export class AuthController {
         const authResponse = await this.loginUserUseCase.execute(validatedBody);
         user = authResponse.user;
         tokens = authResponse.tokens;
-        userResponse = UserPresenter.toResponseWithStatus(user);
+        userResponse = UserMapper.toResponseWithStatus(user);
 
         if (!user.isVerified()) {
           resMessage = "Verify your email";
@@ -95,7 +92,7 @@ export class AuthController {
       });
 
       // --- Generate Token & Respond ---
-      const userResponse = UserPresenter.toResponseWithStatus(newUser);
+      const userResponse = UserMapper.toResponseWithStatus(newUser);
 
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
@@ -139,7 +136,7 @@ export class AuthController {
         otp,
       });
 
-      const userResponse = UserPresenter.toResponseWithStatus(updatedUser);
+      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
 
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
@@ -163,7 +160,7 @@ export class AuthController {
       const authData =
         await this.externalAuthService.verifyGoogleAuthToken(token);
       const user = await this.signInWithGoogleUseCase.execute(authData);
-      const userResponse = UserPresenter.toResponseWithStatus(user);
+      const userResponse = UserMapper.toResponseWithStatus(user);
       const tokens = this.tokenService.generate(
         { role: "user", id: userResponse.userId },
         true,

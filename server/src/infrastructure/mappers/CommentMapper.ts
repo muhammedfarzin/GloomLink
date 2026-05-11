@@ -1,7 +1,7 @@
-import { Comment } from "../../domain/entities/Comment";
+import { Comment } from "@/domain/entities/Comment";
 import type { CommentDocument } from "../database/models/CommentModel";
-import type { CommentResponse } from "../../domain/models/Comment";
-import type { CommentType } from "../../domain/models/Comment";
+import type { CommentResponse } from "@/domain/models/Comment";
+import type { CommentType } from "@/domain/models/Comment";
 
 export class CommentMapper {
   public static toDomain(comment: CommentType | CommentDocument): Comment {

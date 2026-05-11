@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import { Message } from "../../domain/entities/Message";
+import { IMessageRepository } from "@/domain/repositories/IMessageRepository";
+import { Message } from "@/domain/entities/Message";
 import { MessageModel } from "../database/models/MessageModel";
 import { MessageMapper } from "../mappers/MessageMapper";
 import mongoose, { PipelineStage } from "mongoose";

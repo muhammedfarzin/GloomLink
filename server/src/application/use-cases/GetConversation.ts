@@ -1,14 +1,14 @@
 import { injectable, inject } from "inversify";
-import { Conversation } from "../../domain/entities/Conversation";
-import { ConversationNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { TYPES } from "../../shared/types";
-import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { Conversation } from "@/domain/entities/Conversation";
+import { ConversationNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { TYPES } from "@/shared/types";
+import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   IGetConversation,
   GetConversationIdInput,
-} from "../../domain/use-cases/IGetConversation";
+} from "@/domain/use-cases/IGetConversation";
 
 @injectable()
 export class GetConversation implements IGetConversation {

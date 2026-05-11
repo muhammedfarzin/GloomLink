@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { HttpError } from "../errors/HttpError";
-import { TokenPayloadType } from "../../types/tokens";
-import container from "../../shared/inversify.config";
-import { TYPES } from "../../shared/types";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
+import { TokenPayloadType } from "@/types/tokens";
+import container from "@/shared/inversify.config";
+import { TYPES } from "@/shared/types";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import type { IFetchUser } from "@/domain/use-cases/IFetchUser";
 
 export const authenticateToken: RequestHandler = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];

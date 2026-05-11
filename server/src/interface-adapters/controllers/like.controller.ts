@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { HttpError } from "../errors/HttpError";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { IGetLikedUsers } from "../../domain/use-cases/IGetLikedUsers";
-import type { IToggleLike } from "../../domain/use-cases/IToggleLike";
-import type { IRecordInteraction } from "../../domain/use-cases/IRecordInteraction";
+import type { IGetLikedUsers } from "@/domain/use-cases/IGetLikedUsers";
+import type { IToggleLike } from "@/domain/use-cases/IToggleLike";
+import type { IRecordInteraction } from "@/domain/use-cases/IRecordInteraction";
 
 import {
   getLikedUsersSchema,

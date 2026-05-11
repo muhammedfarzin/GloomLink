@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
-import { Follow } from "../../domain/entities/Follow";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { Follow } from "@/domain/entities/Follow";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IFollowRepository } from "@/domain/repositories/IFollowRepository";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   IToggleFollow,
   ToggleFollowInput,
   ToggleFollowResponse,
-} from "../../domain/use-cases/IToggleFollow";
+} from "@/domain/use-cases/IToggleFollow";
 
 @injectable()
 export class ToggleFollow implements IToggleFollow {

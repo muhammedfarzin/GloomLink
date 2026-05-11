@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { HttpError } from "../errors/HttpError";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { IReportTarget } from "../../domain/use-cases/IReportTarget";
+import type { IReportTarget } from "@/domain/use-cases/IReportTarget";
 
 import { reportTargetSchema } from "../validation/reportSchemas";
 

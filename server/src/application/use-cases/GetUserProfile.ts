@@ -1,12 +1,12 @@
 import { injectable, inject } from "inversify";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { UserProfile } from "../../domain/models/User";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { UserProfile } from "@/domain/models/User";
 import type {
   IGetUserProfile,
   GetUserProfileInput,
-} from "../../domain/use-cases/IGetUserProfile";
+} from "@/domain/use-cases/IGetUserProfile";
 
 @injectable()
 export class GetUserProfile implements IGetUserProfile {

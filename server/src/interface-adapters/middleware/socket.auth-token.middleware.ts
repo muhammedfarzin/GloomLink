@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 import { HttpError } from "../errors/HttpError";
-import { TokenPayloadType } from "../../types/tokens";
-import container from "../../shared/inversify.config";
-import { TYPES } from "../../shared/types";
+import { TokenPayloadType } from "@/types/tokens";
+import container from "@/shared/inversify.config";
+import { TYPES } from "@/shared/types";
 import type { ExtendedError, Socket, SocketActiveUsers } from "socket.io";
-import type { IFetchUser } from "../../domain/use-cases/IFetchUser";
-import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
+import type { IFetchUser } from "@/domain/use-cases/IFetchUser";
+import type { IGetConversations } from "@/domain/use-cases/IGetConversations";
 
 export const authenticateTokenForSocket = async (
   socket: Socket,

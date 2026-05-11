@@ -1,6 +1,6 @@
 import type { Socket, SocketActiveUsers } from "socket.io";
 import { inject, injectable } from "inversify";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
 @injectable()
 export class CallController {

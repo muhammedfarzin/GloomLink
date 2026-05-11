@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { usernameRegex } from "../../shared/regexPatterns";
+import { usernameRegex } from "@/shared/regexPatterns";
 import { validateRequiredString } from "./validations";
 
 export const updateProfileSchema = z.object({
@@ -29,12 +29,12 @@ export const updateProfileSchema = z.object({
       (val) =>
         !val ||
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
-          val
+          val,
         ),
       {
         message:
           "Password must be at least 8 characters long and include at least one letter, one number, and one special character.",
-      }
+      },
     )
     .optional(),
   dob: z.iso

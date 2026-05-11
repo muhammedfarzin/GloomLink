@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { ICommentRepository } from "../../domain/repositories/ICommentRepository";
-import type { CommentResponse } from "../../domain/models/Comment";
-import {
+import { TYPES } from "@/shared/types";
+import type { ICommentRepository } from "@/domain/repositories/ICommentRepository";
+import type { CommentResponse } from "@/domain/models/Comment";
+import type {
   IGetComments,
-  type GetCommentsInput,
-} from "../../domain/use-cases/IGetComments";
+  GetCommentsInput,
+} from "@/domain/use-cases/IGetComments";
 
 @injectable()
 export class GetComments implements IGetComments {

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { TokenPayloadType } from "../../types/tokens";
+import { TokenPayloadType } from "@/types/tokens";
 import { HttpError } from "../errors/HttpError";
 
 export const authorizeRole = (

@@ -2,10 +2,10 @@ import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { HttpError } from "../errors/HttpError";
 import { isValidObjectId } from "../validation/validations";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { IGetFollowList } from "../../domain/use-cases/IGetFollowList";
-import type { IToggleFollow } from "../../domain/use-cases/IToggleFollow";
+import type { IGetFollowList } from "@/domain/use-cases/IGetFollowList";
+import type { IToggleFollow } from "@/domain/use-cases/IToggleFollow";
 
 import { getFollowListSchema } from "../validation/followSchemas";
 

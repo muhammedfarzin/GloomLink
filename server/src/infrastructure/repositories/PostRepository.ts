@@ -1,13 +1,13 @@
-import { injectable } from "inversify";
-import { Post } from "../../domain/entities/Post";
-import { PostMapper } from "../mappers/PostMapper";
 import mongoose, { type PipelineStage } from "mongoose";
+import { injectable } from "inversify";
+import { PostMapper } from "../mappers/PostMapper";
 import { type PostDocument, PostModel } from "../database/models/PostModel";
+import { Post } from "@/domain/entities/Post";
 import type {
   IPostRepository,
   PostDashboardMetrics,
-} from "../../domain/repositories/IPostRepository";
-import type { EnrichedPost, PostType } from "../../domain/models/Post";
+} from "@/domain/repositories/IPostRepository";
+import type { EnrichedPost, PostType } from "@/domain/models/Post";
 
 @injectable()
 export class PostRepository implements IPostRepository {

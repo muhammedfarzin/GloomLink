@@ -1,18 +1,12 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type {
-  ITokenService,
-  Tokens,
-} from "../../domain/services/ITokenService";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { ITokenService, Tokens } from "@/domain/services/ITokenService";
 import type {
   IRefreshToken,
   RefreshTokenInput,
-} from "../../domain/use-cases/IRefreshToken";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../domain/errors/AuthErrors";
+} from "@/domain/use-cases/IRefreshToken";
+import { ForbiddenError, UnauthorizedError } from "@/domain/errors/AuthErrors";
 
 @injectable()
 export class RefreshToken implements IRefreshToken {

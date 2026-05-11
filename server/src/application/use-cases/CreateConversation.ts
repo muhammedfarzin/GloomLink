@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
-import { IConversationRepository } from "../../domain/repositories/IConversationRepository";
-import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { Conversation } from "../../domain/entities/Conversation";
-import { TYPES } from "../../shared/types";
-import type { INotificationService } from "../../domain/services/INotificationService";
-import {
+import { IConversationRepository } from "@/domain/repositories/IConversationRepository";
+import { IUserRepository } from "@/domain/repositories/IUserRepository";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { Conversation } from "@/domain/entities/Conversation";
+import { TYPES } from "@/shared/types";
+import type { INotificationService } from "@/domain/services/INotificationService";
+import type {
   ICreateConversation,
-  type CreateConversationInput,
-} from "../../domain/use-cases/ICreateConversation";
+  CreateConversationInput,
+} from "@/domain/use-cases/ICreateConversation";
 
 @injectable()
 export class CreateConversation implements ICreateConversation {

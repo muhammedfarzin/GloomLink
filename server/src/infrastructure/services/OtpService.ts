@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
 import otpGenerator from "otp-generator";
-import { TYPES } from "../../shared/types";
-import { Otp } from "../../domain/entities/Otp";
+import { TYPES } from "@/shared/types";
+import { Otp } from "@/domain/entities/Otp";
 
-import type { IOtpRepository } from "../../domain/repositories/IOtpRepository";
-import type { IOtpService } from "../../domain/services/IOtpService";
-import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import type { IOtpRepository } from "@/domain/repositories/IOtpRepository";
+import type { IOtpService } from "@/domain/services/IOtpService";
+import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
 
 @injectable()
 export class OtpService implements IOtpService {

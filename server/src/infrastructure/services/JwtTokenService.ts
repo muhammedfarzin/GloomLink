@@ -1,11 +1,11 @@
 import { injectable } from "inversify";
 import jwt from "jsonwebtoken";
-import { UnauthorizedError } from "../../domain/errors/AuthErrors";
+import { UnauthorizedError } from "@/domain/errors/AuthErrors";
 import type {
   ITokenService,
   TokenPayload,
   Tokens,
-} from "../../domain/services/ITokenService";
+} from "@/domain/services/ITokenService";
 
 @injectable()
 export class JwtTokenService implements ITokenService {

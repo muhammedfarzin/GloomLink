@@ -1,13 +1,13 @@
 import { injectable, inject } from "inversify";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { UserListView } from "../../domain/models/User";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IFollowRepository } from "@/domain/repositories/IFollowRepository";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { UserListView } from "@/domain/models/User";
 import type {
   IGetFollowList,
   GetFollowListInput,
-} from "../../domain/use-cases/IGetFollowList";
+} from "@/domain/use-cases/IGetFollowList";
 
 @injectable()
 export class GetFollowList implements IGetFollowList {

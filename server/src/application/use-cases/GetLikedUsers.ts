@@ -1,13 +1,13 @@
 import { injectable, inject } from "inversify";
-import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { ILikeRepository } from "../../domain/repositories/ILikeRepository";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
-import type { UserListView } from "../../domain/models/User";
+import { PostNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { ILikeRepository } from "@/domain/repositories/ILikeRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { UserListView } from "@/domain/models/User";
 import type {
   IGetLikedUsers,
   GetLikedUsersInput,
-} from "../../domain/use-cases/IGetLikedUsers";
+} from "@/domain/use-cases/IGetLikedUsers";
 
 @injectable()
 export class GetLikedUsers implements IGetLikedUsers {

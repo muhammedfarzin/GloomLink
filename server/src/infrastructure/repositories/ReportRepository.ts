@@ -1,9 +1,9 @@
 import { injectable } from "inversify";
-import { IReportRepository } from "../../domain/repositories/IReportRepository";
-import { Report } from "../../domain/entities/Report";
 import { ReportDocument, ReportModel } from "../database/models/ReportModel";
 import { ReportMapper } from "../mappers/ReportMapper";
-import { ReportType } from "../../domain/models/Report";
+import { IReportRepository } from "@/domain/repositories/IReportRepository";
+import { Report } from "@/domain/entities/Report";
+import { ReportType } from "@/domain/models/Report";
 
 @injectable()
 export class ReportRepository implements IReportRepository {

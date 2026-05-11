@@ -1,7 +1,7 @@
-import type { MessageResponseDto } from "../../application/dtos/MessageDto";
-import type { Message } from "../../domain/entities/Message";
+import type { MessageResponseDto } from "@/application/dtos/MessageDto";
+import type { Message } from "@/domain/entities/Message";
 
-export class MessagePresenter {
+export class MessageMapper {
   public static toResponse(message: Message): MessageResponseDto {
     return {
       id: message.getId(),

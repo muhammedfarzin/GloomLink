@@ -1,8 +1,8 @@
 import { injectable, inject } from "inversify";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IToggleUserStatus } from "../../domain/use-cases/IToggleUserStatus";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IToggleUserStatus } from "@/domain/use-cases/IToggleUserStatus";
 
 @injectable()
 export class ToggleUserStatus implements IToggleUserStatus {

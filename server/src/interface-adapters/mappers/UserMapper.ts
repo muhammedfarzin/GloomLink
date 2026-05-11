@@ -1,11 +1,11 @@
-import type { User } from "../../domain/entities/User";
+import type { User } from "@/domain/entities/User";
 import type {
   UserBasicDto,
   UserWithAuthDto,
   UserWithStatusDto,
-} from "../../application/dtos/UserDto";
+} from "@/application/dtos/UserDto";
 
-export class UserPresenter {
+export class UserMapper {
   private static toBasicPersistence(user: User): UserBasicDto {
     return {
       userId: user.getId(),
@@ -23,14 +23,14 @@ export class UserPresenter {
 
   public static toResponseWithStatus(user: User): UserWithStatusDto {
     return {
-      ...UserPresenter.toBasicPersistence(user),
+      ...UserMapper.toBasicPersistence(user),
       status: user.getStatus(),
     };
   }
 
   public static toResponseWithAuthType(user: User): UserWithAuthDto {
     return {
-      ...UserPresenter.toBasicPersistence(user),
+      ...UserMapper.toBasicPersistence(user),
       authType: user.getAuthType(),
     };
   }

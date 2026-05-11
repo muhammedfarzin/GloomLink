@@ -1,14 +1,14 @@
 import { injectable, inject } from "inversify";
-import { Message } from "../../domain/entities/Message";
-import { MessageNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { ForbiddenError } from "../../domain/errors/AuthErrors";
-import { TYPES } from "../../shared/types";
-import type { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import { Message } from "@/domain/entities/Message";
+import { MessageNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { ForbiddenError } from "@/domain/errors/AuthErrors";
+import { TYPES } from "@/shared/types";
+import type { IMessageRepository } from "@/domain/repositories/IMessageRepository";
+import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 import type {
   IMarkMessageAsSeen,
   MarkMessageAsSeenInput,
-} from "../../domain/use-cases/IMarkMessageAsSeen";
+} from "@/domain/use-cases/IMarkMessageAsSeen";
 
 @injectable()
 export class MarkMessageAsSeen implements IMarkMessageAsSeen {

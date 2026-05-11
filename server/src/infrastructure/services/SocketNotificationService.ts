@@ -1,10 +1,10 @@
-import type { Server } from "socket.io";
-import type { INotificationService } from "../../domain/services/INotificationService";
-import type { Conversation } from "../../domain/entities/Conversation";
-import type { User } from "../../domain/entities/User";
-import { ConversationMapper } from "../mappers/ConversationMapper";
 import { inject } from "inversify";
-import { TYPES } from "../../shared/types";
+import type { Server } from "socket.io";
+import { ConversationMapper } from "../mappers/ConversationMapper";
+import type { INotificationService } from "@/domain/services/INotificationService";
+import type { Conversation } from "@/domain/entities/Conversation";
+import type { User } from "@/domain/entities/User";
+import { TYPES } from "@/shared/types";
 
 export class SocketNotificationService implements INotificationService {
   constructor(

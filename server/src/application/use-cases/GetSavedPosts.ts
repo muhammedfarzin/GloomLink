@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { EnrichedPost } from "../../domain/models/Post";
-import { TYPES } from "../../shared/types";
-import {
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { EnrichedPost } from "@/domain/models/Post";
+import { TYPES } from "@/shared/types";
+import type {
   IGetSavedPosts,
-  type GetSavedPostsInput,
-} from "../../domain/use-cases/IGetSavedPosts";
+  GetSavedPostsInput,
+} from "@/domain/use-cases/IGetSavedPosts";
 
 @injectable()
 export class GetSavedPosts implements IGetSavedPosts {

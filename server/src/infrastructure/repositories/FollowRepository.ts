@@ -1,12 +1,12 @@
 import { injectable } from "inversify";
 import mongoose, { type PipelineStage } from "mongoose";
-import type { Follow } from "../../domain/entities/Follow";
-import type { UserListView } from "../../domain/models/User";
+import type { Follow } from "@/domain/entities/Follow";
+import type { UserListView } from "@/domain/models/User";
 import type {
   FollowListOptions,
   FollowListType,
   IFollowRepository,
-} from "../../domain/repositories/IFollowRepository";
+} from "@/domain/repositories/IFollowRepository";
 import { FollowModel } from "../database/models/FollowModel";
 import { FollowMapper } from "../mappers/FollowMapper";
 

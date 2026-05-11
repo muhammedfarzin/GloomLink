@@ -1,5 +1,5 @@
-import { Interaction } from "../../domain/entities/Interaction";
-import type { InteractionType } from "../../domain/models/Interaction";
+import { Interaction } from "@/domain/entities/Interaction";
+import type { InteractionType } from "@/domain/models/Interaction";
 import type { InteractionDocument } from "../database/models/InteractionModel";
 
 export class InteractionMapper {

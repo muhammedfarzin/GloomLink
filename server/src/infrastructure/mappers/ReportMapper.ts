@@ -1,5 +1,5 @@
-import { Report } from "../../domain/entities/Report";
-import { ReportType } from "../../domain/models/Report";
+import { Report } from "@/domain/entities/Report";
+import { ReportType } from "@/domain/models/Report";
 
 export class ReportMapper {
   public static toDomain(report: ReportType): Report {

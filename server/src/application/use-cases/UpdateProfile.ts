@@ -1,17 +1,17 @@
 import { injectable, inject } from "inversify";
-import { User } from "../../domain/entities/User";
-import { UserNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { ValidationError } from "../../domain/errors/ValidationError";
-import { InvalidCredentialsError } from "../../domain/errors/AuthErrors";
-import { ConflictError } from "../../domain/errors/ConflictError";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IFileStorageService } from "../../domain/services/IFileStorageService";
-import type { IPasswordHasher } from "../../domain/services/IPasswordHasher";
+import { User } from "@/domain/entities/User";
+import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { ValidationError } from "@/domain/errors/ValidationError";
+import { InvalidCredentialsError } from "@/domain/errors/AuthErrors";
+import { ConflictError } from "@/domain/errors/ConflictError";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IFileStorageService } from "@/domain/services/IFileStorageService";
+import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
 import type {
   IUpdateProfile,
   UpdateProfileInput,
-} from "../../domain/use-cases/IUpdateProfile";
+} from "@/domain/use-cases/IUpdateProfile";
 
 @injectable()
 export class UpdateProfile implements IUpdateProfile {

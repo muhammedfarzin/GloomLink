@@ -1,6 +1,6 @@
-import { Message } from "../../domain/entities/Message";
+import { Message } from "@/domain/entities/Message";
+import type { CompactMessage } from "@/domain/models/Message";
 import type { MessageDocument } from "../database/models/MessageModel";
-import type { CompactMessage } from "../../domain/models/Message";
 
 export class MessageMapper {
   public static toDomain(

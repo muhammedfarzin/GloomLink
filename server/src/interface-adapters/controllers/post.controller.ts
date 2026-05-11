@@ -1,18 +1,18 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
-import { PostPresenter } from "../presenters/PostPresenter";
+import { PostMapper } from "../mappers/PostMapper";
 import { HttpError } from "../errors/HttpError";
 import { recordInteractionSchema } from "../validation/interactionSchemas";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { ICreatePost } from "../../domain/use-cases/ICreatePost";
-import type { IGetPostById } from "../../domain/use-cases/IGetPostById";
-import type { IGetSavedPosts } from "../../domain/use-cases/IGetSavedPosts";
-import type { IToggleSavePost } from "../../domain/use-cases/IToggleSavePost";
-import type { IEditPost } from "../../domain/use-cases/IEditPost";
-import type { IDeletePost } from "../../domain/use-cases/IDeletePost";
-import type { IRecordInteraction } from "../../domain/use-cases/IRecordInteraction";
-import type { IGetRecommendedPosts } from "../../domain/use-cases/IGetRecommendedPosts";
+import type { ICreatePost } from "@/domain/use-cases/ICreatePost";
+import type { IGetPostById } from "@/domain/use-cases/IGetPostById";
+import type { IGetSavedPosts } from "@/domain/use-cases/IGetSavedPosts";
+import type { IToggleSavePost } from "@/domain/use-cases/IToggleSavePost";
+import type { IEditPost } from "@/domain/use-cases/IEditPost";
+import type { IDeletePost } from "@/domain/use-cases/IDeletePost";
+import type { IRecordInteraction } from "@/domain/use-cases/IRecordInteraction";
+import type { IGetRecommendedPosts } from "@/domain/use-cases/IGetRecommendedPosts";
 
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
 
@@ -57,7 +57,7 @@ export class PostController {
       });
 
       res.status(201).json({
-        postData: PostPresenter.toResponse(newPost),
+        postData: PostMapper.toResponse(newPost),
         message: "Post created successfully",
       });
     } catch (error) {
@@ -84,12 +84,10 @@ export class PostController {
         userId: req.user.id,
       });
 
-      res
-        .status(200)
-        .json({
-          postData: PostPresenter.toResponse(updatedPost),
-          message: "Post updated successfully",
-        });
+      res.status(200).json({
+        postData: PostMapper.toResponse(updatedPost),
+        message: "Post updated successfully",
+      });
     } catch (error) {
       next(error);
     }

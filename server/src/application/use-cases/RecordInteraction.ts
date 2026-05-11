@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
-import { TYPES } from "../../shared/types";
-import { IInteractionRepository } from "../../domain/repositories/IInteractionRepository";
-import { Interaction } from "../../domain/entities/Interaction";
-import {
+import { TYPES } from "@/shared/types";
+import { Interaction } from "@/domain/entities/Interaction";
+import type { IInteractionRepository } from "@/domain/repositories/IInteractionRepository";
+import type {
   IRecordInteraction,
-  type RecordInteractionInput,
-} from "../../domain/use-cases/IRecordInteraction";
+  RecordInteractionInput,
+} from "@/domain/use-cases/IRecordInteraction";
 
 @injectable()
 export class RecordInteraction implements IRecordInteraction {

@@ -1,12 +1,12 @@
 import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
-import { CommentPresenter } from "../presenters/CommentPresenter";
+import { CommentMapper } from "../mappers/CommentMapper";
 import { HttpError } from "../errors/HttpError";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { IAddComment } from "../../domain/use-cases/IAddComment";
-import type { IGetComments } from "../../domain/use-cases/IGetComments";
-import type { IRecordInteraction } from "../../domain/use-cases/IRecordInteraction";
+import type { IAddComment } from "@/domain/use-cases/IAddComment";
+import type { IGetComments } from "@/domain/use-cases/IGetComments";
+import type { IRecordInteraction } from "@/domain/use-cases/IRecordInteraction";
 
 import {
   addCommentSchema,
@@ -43,7 +43,7 @@ export class CommentController {
       }
 
       res.status(201).json({
-        commentData: CommentPresenter.toResponse(newComment),
+        commentData: CommentMapper.toResponse(newComment),
         message: "Comment added successfully",
       });
     } catch (error) {

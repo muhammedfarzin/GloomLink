@@ -1,11 +1,11 @@
 import { injectable, inject } from "inversify";
-import { ForbiddenError } from "../../domain/errors/AuthErrors";
-import { TYPES } from "../../shared/types";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import { ForbiddenError } from "@/domain/errors/AuthErrors";
+import { TYPES } from "@/shared/types";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type {
   IDeletePost,
   DeletePostInput,
-} from "../../domain/use-cases/IDeletePost";
+} from "@/domain/use-cases/IDeletePost";
 
 @injectable()
 export class DeletePost implements IDeletePost {

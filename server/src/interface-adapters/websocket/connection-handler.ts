@@ -1,8 +1,8 @@
 import type { Socket, SocketActiveUsers } from "socket.io";
 import type { SocketController } from "../controllers/socket.controller";
 import type { CallController } from "../controllers/call.controller";
-import container from "../../shared/inversify.config";
-import { TYPES } from "../../shared/types";
+import container from "@/shared/inversify.config";
+import { TYPES } from "@/shared/types";
 
 export const handleSocketConnection = async (socket: Socket) => {
   const controller = container.get<SocketController>(TYPES.SocketController);

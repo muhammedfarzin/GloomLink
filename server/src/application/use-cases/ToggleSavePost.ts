@@ -1,16 +1,16 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type {
   IToggleSavePost,
   ToggleSavePostInput,
   ToggleSavePostOutput,
-} from "../../domain/use-cases/IToggleSavePost";
+} from "@/domain/use-cases/IToggleSavePost";
 import {
   PostNotFoundError,
   UserNotFoundError,
-} from "../../domain/errors/NotFoundErrors";
+} from "@/domain/errors/NotFoundErrors";
 
 @injectable()
 export class ToggleSavePost implements IToggleSavePost {

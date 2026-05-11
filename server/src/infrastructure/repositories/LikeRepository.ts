@@ -1,11 +1,11 @@
 import { injectable } from "inversify";
 import mongoose, { PipelineStage } from "mongoose";
-import type { UserListView } from "../../domain/models/User";
+import type { UserListView } from "@/domain/models/User";
 import type {
   ILikeRepository,
   LikeOptions,
-} from "../../domain/repositories/ILikeRepository";
-import { Like } from "../../domain/entities/Like";
+} from "@/domain/repositories/ILikeRepository";
+import { Like } from "@/domain/entities/Like";
 import { LikeModel } from "../database/models/LikeModel";
 import { LikeMapper } from "../mappers/LikeMapper";
 

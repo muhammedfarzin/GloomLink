@@ -3,8 +3,8 @@ import { authenticateToken } from "../../middleware/authenticate-token.middlewar
 import { authorizeRole } from "../../middleware/authorize-role.middleware";
 import { uploadImage } from "../../middleware/file-upload.middleware";
 import { followRouter } from "./follow.router";
-import container from "../../../shared/inversify.config";
-import { TYPES } from "../../../shared/types";
+import container from "@/shared/inversify.config";
+import { TYPES } from "@/shared/types";
 
 import type { ProfileController } from "../../controllers/profile.controller";
 

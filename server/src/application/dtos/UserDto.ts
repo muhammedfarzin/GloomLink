@@ -1,4 +1,4 @@
-import type { UserCompactProfile } from "../../domain/models/User";
+import type { UserCompactProfile } from "@/domain/models/User";
 
 type AuthType = "email" | "google";
 type UserStatus = "active" | "inactive" | "blocked" | "not-verified";

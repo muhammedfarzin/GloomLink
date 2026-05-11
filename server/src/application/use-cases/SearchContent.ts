@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../shared/types";
-import type { IUserRepository } from "../../domain/repositories/IUserRepository";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
-import type { IFollowRepository } from "../../domain/repositories/IFollowRepository";
-import type { UserListView } from "../../domain/models/User";
-import type { EnrichedPost } from "../../domain/models/Post";
+import { TYPES } from "@/shared/types";
+import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
+import type { IFollowRepository } from "@/domain/repositories/IFollowRepository";
+import type { UserListView } from "@/domain/models/User";
+import type { EnrichedPost } from "@/domain/models/Post";
 import type {
   ISearchContent,
   SearchContentInput,
   SearchResult,
-} from "../../domain/use-cases/ISearchContent";
+} from "@/domain/use-cases/ISearchContent";
 
 @injectable()
 export class SearchContent implements ISearchContent {

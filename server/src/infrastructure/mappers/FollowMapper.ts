@@ -1,5 +1,5 @@
-import { Follow } from "../../domain/entities/Follow";
-import type { FollowType } from "../../domain/models/Follow";
+import { Follow } from "@/domain/entities/Follow";
+import type { FollowType } from "@/domain/models/Follow";
 import type { FollowDocument } from "../database/models/FollowModel";
 
 export class FollowMapper {

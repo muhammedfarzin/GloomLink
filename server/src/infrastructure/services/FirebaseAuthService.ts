@@ -3,7 +3,7 @@ import firebaseAdmin from "firebase-admin";
 import {
   IExternalAuthService,
   ExternalAuthUser,
-} from "../../domain/services/IExternalAuthService";
+} from "@/domain/services/IExternalAuthService";
 import firebaseServiceAccount from "../configuration/firebase-service-account-file.json";
 
 @injectable()

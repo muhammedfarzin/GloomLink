@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { validateRequiredString } from "./validations";
-import { usernameRegex } from "../../shared/regexPatterns";
+import { usernameRegex } from "@/shared/regexPatterns";
 
 export const passwordSchema = z
   .string(validateRequiredString("Password", "Invalid credentials"))

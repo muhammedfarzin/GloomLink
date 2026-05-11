@@ -1,4 +1,4 @@
-import type { PostType } from "../../domain/models/Post";
+import type { PostType } from "@/domain/models/Post";
 
 export interface PostResponseDto {
   readonly postId: string;

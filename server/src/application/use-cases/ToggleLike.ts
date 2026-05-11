@@ -1,14 +1,14 @@
 import { injectable, inject } from "inversify";
-import { Like } from "../../domain/entities/Like";
-import { NotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { ILikeRepository } from "../../domain/repositories/ILikeRepository";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import { Like } from "@/domain/entities/Like";
+import { NotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { ILikeRepository } from "@/domain/repositories/ILikeRepository";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type {
   IToggleLike,
   ToggleLikeInput,
   ToggleLikeOutput,
-} from "../../domain/use-cases/IToggleLike";
+} from "@/domain/use-cases/IToggleLike";
 
 @injectable()
 export class ToggleLike implements IToggleLike {

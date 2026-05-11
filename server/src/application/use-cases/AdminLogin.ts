@@ -1,15 +1,15 @@
 import { injectable, inject } from "inversify";
-import { InvalidCredentialsError } from "../../domain/errors/AuthErrors";
-import { TYPES } from "../../shared/types";
-import {
+import { InvalidCredentialsError } from "@/domain/errors/AuthErrors";
+import { TYPES } from "@/shared/types";
+import type {
   IAdminLogin,
-  type AdminLoginInput,
-} from "../../domain/use-cases/IAdminLogin";
-import {
-  type ITokenService,
-  type TokenPayload,
-  type Tokens,
-} from "../../domain/services/ITokenService";
+  AdminLoginInput,
+} from "@/domain/use-cases/IAdminLogin";
+import type {
+  ITokenService,
+  TokenPayload,
+  Tokens,
+} from "@/domain/services/ITokenService";
 
 @injectable()
 export class AdminLogin implements IAdminLogin {

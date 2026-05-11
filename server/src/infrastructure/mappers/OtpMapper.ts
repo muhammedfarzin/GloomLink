@@ -1,5 +1,5 @@
-import { Otp } from "../../domain/entities/Otp";
-import { OtpType } from "../../domain/models/Otp";
+import { Otp } from "@/domain/entities/Otp";
+import { OtpType } from "@/domain/models/Otp";
 
 export class OtpMapper {
   public static toDomain(otp: OtpType): Otp {

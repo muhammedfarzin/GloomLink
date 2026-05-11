@@ -2,16 +2,16 @@ import { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { getMessagesSchema } from "../validation/followSchemas";
 import { HttpError } from "../errors/HttpError";
-import { TYPES } from "../../shared/types";
+import { TYPES } from "@/shared/types";
 
-import type { ICreateConversation } from "../../domain/use-cases/ICreateConversation";
-import type { IGetConversations } from "../../domain/use-cases/IGetConversations";
-import type { IGetConversation } from "../../domain/use-cases/IGetConversation";
-import type { IGetMessages } from "../../domain/use-cases/IGetMessages";
-import type { ISuggestUser } from "../../domain/use-cases/ISuggestUser";
+import type { ICreateConversation } from "@/domain/use-cases/ICreateConversation";
+import type { IGetConversations } from "@/domain/use-cases/IGetConversations";
+import type { IGetConversation } from "@/domain/use-cases/IGetConversation";
+import type { IGetMessages } from "@/domain/use-cases/IGetMessages";
+import type { ISuggestUser } from "@/domain/use-cases/ISuggestUser";
 
 import { createConversationSchema } from "../validation/conversationSchemas";
-import { MessagePresenter } from "../presenters/MessagePresenter";
+import { MessageMapper } from "../mappers/MessageMapper";
 
 @injectable()
 export class ConversationController {
@@ -114,7 +114,7 @@ export class ConversationController {
       });
 
       res.status(200).json({
-        messagesData: messages.map(MessagePresenter.toResponse),
+        messagesData: messages.map(MessageMapper.toResponse),
         message: "Messages fetched successfully.",
       });
     } catch (error) {

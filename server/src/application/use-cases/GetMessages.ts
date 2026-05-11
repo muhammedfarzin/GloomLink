@@ -1,14 +1,14 @@
 import { injectable, inject } from "inversify";
-import { Message } from "../../domain/entities/Message";
-import { ConversationNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { ForbiddenError } from "../../domain/errors/AuthErrors";
-import { TYPES } from "../../shared/types";
-import type { IMessageRepository } from "../../domain/repositories/IMessageRepository";
-import type { IConversationRepository } from "../../domain/repositories/IConversationRepository";
+import { Message } from "@/domain/entities/Message";
+import { ConversationNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { ForbiddenError } from "@/domain/errors/AuthErrors";
+import { TYPES } from "@/shared/types";
+import type { IMessageRepository } from "@/domain/repositories/IMessageRepository";
+import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 import type {
   IGetMessages,
   GetMessagesInput,
-} from "../../domain/use-cases/IGetMessages";
+} from "@/domain/use-cases/IGetMessages";
 
 @injectable()
 export class GetMessages implements IGetMessages {

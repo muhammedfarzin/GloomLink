@@ -1,12 +1,12 @@
 import { injectable, inject } from "inversify";
-import { PostNotFoundError } from "../../domain/errors/NotFoundErrors";
-import { TYPES } from "../../shared/types";
-import type { EnrichedPost } from "../../domain/models/Post";
-import type { IPostRepository } from "../../domain/repositories/IPostRepository";
+import { PostNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { TYPES } from "@/shared/types";
+import type { EnrichedPost } from "@/domain/models/Post";
+import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type {
   IGetPostById,
   GetPostByIdInput,
-} from "../../domain/use-cases/IGetPostById";
+} from "@/domain/use-cases/IGetPostById";
 
 @injectable()
 export class GetPostById implements IGetPostById {

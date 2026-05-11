@@ -1,11 +1,11 @@
-import { User } from "../../domain/entities/User";
-import type { UserListView } from "../../domain/models/User";
-import type { UserDto } from "../../application/dtos/UserDto";
+import { User } from "@/domain/entities/User";
+import type { UserListView } from "@/domain/models/User";
+import type { UserDto } from "@/application/dtos/UserDto";
 import type {
   UserBasicDto,
   UserWithAuthDto,
   UserWithStatusDto,
-} from "../../application/dtos/UserDto";
+} from "@/application/dtos/UserDto";
 
 export class UserMapper {
   public static toDomain(data: Omit<UserDto, "fullname">): User {
