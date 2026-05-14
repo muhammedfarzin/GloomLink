@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +29,10 @@ const DialogBox: React.FC<DialogBoxProps> = ({
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent
-        className={`flex flex-col w-full md:w-80 h-full md:max-h-[80vh] p-4 ${dialogClassName}`}
+        className={cn(
+          "flex flex-col w-full md:w-80 h-full md:max-h-[80vh] p-4",
+          dialogClassName,
+        )}
         closeClassName={closeClassName}
       >
         <DialogHeader>

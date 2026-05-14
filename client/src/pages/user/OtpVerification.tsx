@@ -26,7 +26,8 @@ const OtpVerification: React.FC = () => {
   const [otp, setOtp] = useState<string>("");
 
   useEffect(() => {
-    if (!userData || userData.status !== "not-verified") navigate("/auth/login");
+    if (!userData || userData.status !== "not-verified")
+      navigate("/auth/login");
   }, [userData]);
 
   const handleResendOtp = async () => {
@@ -114,7 +115,7 @@ const OtpVerification: React.FC = () => {
 
             <button
               type="submit"
-              className="btn btn-primary border w-full"
+              className="btn btn-primary border w-full p-2"
               disabled={!!loading}
             >
               {loading || "Verify"}

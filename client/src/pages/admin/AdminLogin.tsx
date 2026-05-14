@@ -102,7 +102,7 @@ const AdminLogin: React.FC = () => {
               onChange={handleOnChange}
             />
             <button
-              className="btn btn-primary border w-full"
+              className="btn btn-primary border w-full p-2"
               disabled={!!loading}
               type="submit"
             >

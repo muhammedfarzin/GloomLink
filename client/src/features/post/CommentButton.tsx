@@ -5,6 +5,7 @@ import PostSkeleton from "@/components/skeleton/PostSkeleton";
 import CommentBoxSkeleton from "@/components/skeleton/CommentBoxSkeleton";
 import CommentIcon from "@/assets/icons/Comment.svg";
 import type { PostListCardProps } from "./PostListCard";
+import { cn } from "@/lib/utils";
 
 const PostListCard = React.lazy(() => import("./PostListCard"));
 const CommentBox = React.lazy(() => import("./CommentBox"));
@@ -28,10 +29,10 @@ const CommentButton: React.FC<CommentButtonProps> = ({
         <IconButton className={className} icon={CommentIcon} alt="comment" />
       </DialogTrigger>
       <DialogContent
-        className={[
+        className={cn(
           "w-11/12 max-w-lg md:max-w-[1000px] h-[95vh] md:h-[82vh] max-h-screen rounded-lg p-0",
           dialogClassName,
-        ].join(" ")}
+        )}
       >
         <div className="flex">
           {/* Post Card */}

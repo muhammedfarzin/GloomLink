@@ -141,7 +141,7 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="btn btn-primary border w-full"
+              className="btn btn-primary border w-full p-2"
               disabled={!!loading}
             >
               {loading || "Login"}
@@ -155,14 +155,14 @@ const Login: React.FC = () => {
           <div id="auth-options">
             <Link
               to="../signup"
-              className="btn btn-dark border w-72 block mx-auto p-3"
+              className="btn btn-dark border w-72 block mx-auto p-2"
             >
               <img src={EnvelopeIcon} alt="email" className="inline" />
               <span className="ml-4 text-sm">Sign Up with Email</span>
             </Link>
 
             <button
-              className="btn btn-dark border w-72 mt-5 block mx-auto p-3"
+              className="btn btn-dark border w-72 mt-5 block mx-auto p-2"
               onClick={handleGoogleLogin}
               disabled={!!loading}
             >

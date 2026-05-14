@@ -9,6 +9,7 @@ import { Props as PostActionsProps } from ".";
 import DialogBox from "@/components/DialogBox";
 import ShareList from "@/features/chat/ShareList";
 import { Flag, Activity } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props extends PostActionsProps {
   handleLikePost?: (type: "like" | "unlike") => Promise<void>;
@@ -27,12 +28,12 @@ const PostActionsView: React.FC<Props> = ({
   return !isAdmin ? (
     <div className="flex justify-between items-center w-full mt-2">
       <div
-        className={[
+        className={cn(
           "flex items-center justify-around rounded-2xl bg-primary/20 border border-primary/10 p-1.5 shadow-sm backdrop-blur-md transition-all duration-300",
           hideComment
             ? `${showCommentsForSm ? "w-1/2 md:" : ""}w-[40%]`
             : "w-[50%]",
-        ].join(" ")}
+        )}
       >
         <div className="hover:bg-primary/40 rounded-xl p-1.5 transition-colors cursor-pointer group flex items-center justify-center">
           <IconButton
@@ -45,7 +46,12 @@ const PostActionsView: React.FC<Props> = ({
         </div>
 
         {(hideComment && !showCommentsForSm) || (
-          <div className={`hover:bg-primary/40 rounded-xl p-1.5 transition-colors cursor-pointer group flex items-center justify-center ${hideComment && showCommentsForSm ? "md:hidden" : ""}`}>
+          <div
+            className={cn(
+              "hover:bg-primary/40 rounded-xl p-1.5 transition-colors cursor-pointer group flex items-center justify-center",
+              hideComment && showCommentsForSm ? "md:hidden" : "",
+            )}
+          >
             <CommentButton
               postId={postData.postId}
               postCardData={{
@@ -84,13 +90,16 @@ const PostActionsView: React.FC<Props> = ({
           <span>{postData.reportCount} Reports</span>
         </div>
       )}
-      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold capitalize transition-all ${
-        postData?.status === "active" 
-          ? "bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]" 
-          : postData?.status === "blocked" 
-          ? "bg-red-500/20 text-red-400 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]" 
-          : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
-      }`}>
+      <div
+        className={cn(
+          "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold capitalize transition-all",
+          postData?.status === "active"
+            ? "bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
+            : postData?.status === "blocked"
+              ? "bg-red-500/20 text-red-400 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+              : "bg-gray-500/20 text-gray-400 border border-gray-500/30",
+        )}
+      >
         <Activity size={14} />
         <span>{postData?.status}</span>
       </div>

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 
 interface TimerButtonProps {
@@ -65,11 +66,12 @@ const TimerButton: React.FC<TimerButtonProps> = ({
 
   return (
     <div
-      className={`${
+      className={cn(
         isDisabled
           ? "text-foreground/35 cursor-not-allowed"
-          : "text-foreground cursor-pointer"
-      } ${className}`}
+          : "text-foreground cursor-pointer",
+        className,
+      )}
       onClick={!isDisabled ? handleOnClick : undefined}
     >
       {children}{" "}

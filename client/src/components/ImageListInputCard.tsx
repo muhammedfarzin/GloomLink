@@ -4,6 +4,7 @@ import AddImageIcon from "@/assets/icons/Add-Image.svg";
 import CloseIcon from "@/assets/icons/Close.svg";
 import { useToaster } from "@/hooks/useToaster";
 import type { RootState } from "@/redux/store";
+import { cn } from "@/lib/utils";
 
 interface ImageListInputProps {
   className?: string;
@@ -46,12 +47,15 @@ const ImageListInputCard: React.FC<ImageListInputProps> = ({
 
   return (
     <div className="flex overflow-x-scroll no-scrollbar">
-      <div className={`flex ${className || "gap-2"}`}>
+      <div className={cn("flex", className ?? "gap-2")}>
         {/* Added Image Listing */}
         {values.map((image, index) => (
           <div
             key={index}
-            className={`flex relative justify-center items-center bg-background border-border rounded-lg border h-40 ${cardClassName}`}
+            className={cn(
+              "flex relative justify-center items-center bg-background border-border rounded-lg border h-40",
+              cardClassName,
+            )}
           >
             <img
               className="h-full w-full object-contain rounded-lg"
@@ -86,7 +90,10 @@ const ImageListInputCard: React.FC<ImageListInputProps> = ({
 
         {/* Add Image Button */}
         <div
-          className={`flex justify-center items-center border border-border bg-background cursor-pointer rounded-lg h-40 w-72 ${cardClassName}`}
+          className={cn(
+            "flex justify-center items-center border border-border bg-background cursor-pointer rounded-lg h-40 w-72",
+            cardClassName,
+          )}
           onClick={() => imageInputRef.current?.click()}
         >
           <input

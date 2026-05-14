@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import ProfileImage from "../profile/ProfileImage";
+import { cn } from "@/lib/utils";
 
 interface ChatItemProps {
   username: string;
@@ -20,12 +21,13 @@ const ChatItem: React.FC<ChatItemProps> = ({
 
   return (
     <div
-      className={`flex items-center py-2 px-3 ${
+      className={cn(
+        "flex items-center py-2 px-3 text-foreground rounded-2xl cursor-pointer",
         currentUsername === username &&
-        /^\/messages\/[^/]+\/?$/.test(location.pathname)
+          /^\/messages\/[^/]+\/?$/.test(location.pathname)
           ? "bg-selection"
-          : "bg-primary hover:bg-primary/75"
-      } text-foreground rounded-2xl cursor-pointer`}
+          : "bg-primary hover:bg-primary/75",
+      )}
       onClick={onClick}
     >
       <ProfileImage

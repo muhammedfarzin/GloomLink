@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Link, type LinkProps } from "react-router-dom";
 import type { RootState } from "../redux/store";
 import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MenuButtonProps extends LinkProps {
   icon?: string | LucideIcon;
@@ -25,16 +26,18 @@ const MenuButton: React.FC<MenuButtonProps> = ({
 
   return (
     <Link
-      className={`btn-flex btn text-foreground ${
-        selected ? "bg-selection" : "bg-primary"
-      } ${className || ""}`}
+      className={cn(
+        "btn flex items-center justify-start px-4 py-3 font-bold text-foreground",
+        selected ? "bg-selection" : "bg-primary",
+        className,
+      )}
       {...props}
     >
       {typeof icon === "string" ? (
         <img
           src={icon}
           alt={alt ?? text}
-          className={`inline w-6 h-6 mr-4 ${iconClassName || ""}`}
+          className={cn("inline w-6 h-6 mr-4", iconClassName || "")}
           style={{
             filter: `invert(${colorTheme === "dark" ? 0 : 1})`,
           }}

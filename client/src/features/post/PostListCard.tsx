@@ -13,6 +13,7 @@ import PostView from "./PostView";
 import { formatTimeAgo } from "@/lib/dateUtils";
 import type { Post, CompactPost } from "@/types/post";
 import type { RootState } from "@/redux/store";
+import { cn } from "@/lib/utils";
 
 export interface PostListCardProps {
   postId: string;
@@ -88,9 +89,10 @@ const PostListCard: React.FC<PostListCardProps> = ({
   return (
     <ViewTracker onView={handleView}>
       <div
-        className={`flex flex-col gap-4 bg-primary/30 hover:bg-primary/40 border border-primary/20 backdrop-blur-sm p-5 w-full max-w-lg shadow-lg transition-all duration-300 ${
-          className || "rounded-2xl"
-        }`}
+        className={cn(
+          "flex flex-col gap-4 bg-primary/30 hover:bg-primary/40 border border-primary/20 backdrop-blur-sm p-5 w-full max-w-lg shadow-lg transition-all duration-300",
+          className || "rounded-2xl",
+        )}
       >
         {/* Uploaded By */}
         <div className="flex justify-between">

@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { Button } from "./ui/button";
 import { RootState } from "@/redux/store";
+import { cn } from "@/lib/utils";
 
 interface IconButtonProps {
   icon: string;
@@ -24,7 +25,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   return (
     <Button
       variant="ghost"
-      className={className + " aspect-square p-1 hover:bg-[#9ca3af66]"}
+      className={cn("aspect-square p-1 hover:bg-[#9ca3af66]", className)}
       onClick={onClick}
       disabled={disabled}
       style={{

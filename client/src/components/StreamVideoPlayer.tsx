@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useEffect, useRef } from "react";
 
 interface StreamVideoPlayerType {
@@ -61,7 +62,10 @@ const StreamVideoPlayer: React.FC<StreamVideoPlayerType> = ({
   return (
     <video
       ref={videoRef}
-      className={`bg-secondary border border-border rounded-xl object-cover ${className}`}
+      className={cn(
+        "bg-secondary border border-border rounded-xl object-cover",
+        className,
+      )}
       autoPlay
       muted={muted}
     />

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import CloseIcon from "@/assets/icons/Close.svg";
+import { cn } from "@/lib/utils";
 
 interface TagsInputProps {
   className?: string;
@@ -35,7 +36,7 @@ const TagInput: React.FC<TagsInputProps> = ({
   };
 
   return (
-    <div className={`rounded-lg bg-primary text-foreground ${className}`}>
+    <div className={cn("rounded-lg bg-primary text-foreground", className)}>
       {values.length ? (
         <div className="flex gap-1 px-1 py-1 overflow-x-scroll no-scrollbar">
           {values.map((value) => (

@@ -179,7 +179,7 @@ const Signup = () => {
 
             <button
               type="submit"
-              className="btn btn-primary border w-full"
+              className="btn btn-primary border w-full p-2"
               disabled={!!loading}
             >
               {loading ?? "Sign Up"}
@@ -188,7 +188,7 @@ const Signup = () => {
 
           <Link
             to="../login"
-            className="btn btn-dark border w-72 block mx-auto !mt-4 p-3"
+            className="btn btn-dark border w-72 block mx-auto !mt-4 p-2"
           >
             <span className="ml-4 text-sm">Already have an account?</span>
           </Link>

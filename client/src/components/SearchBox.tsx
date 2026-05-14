@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import SearchIcon from "../assets/icons/Search.svg";
 
 interface SearchBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -12,7 +13,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   ...props
 }) => {
   return (
-    <div className={"search-box w-full bg-primary " + className}>
+    <div className={cn("search-box w-full bg-primary", className)}>
       <input
         id="searchBox"
         type="search"

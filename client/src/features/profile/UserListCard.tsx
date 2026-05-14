@@ -6,6 +6,7 @@ import { useToaster } from "@/hooks/useToaster";
 import ProfileImage from "@/features/profile/ProfileImage";
 import { Button } from "@/components/ui/button";
 import type { CompactUser } from "@/types/user";
+import { cn } from "@/lib/utils";
 
 interface UserListCardProps {
   userData: Omit<CompactUser, "type">;
@@ -43,7 +44,10 @@ const UserListCard: React.FC<UserListCardProps> = ({
   return (
     <div
       key={userData.userId}
-      className={`flex items-center justify-between bg-[#6b728033] p-2 rounded-lg ${className}`}
+      className={cn(
+        "flex items-center justify-between bg-[#6b728033] p-2 rounded-lg",
+        className,
+      )}
     >
       <div className="flex items-center gap-1">
         <Link to={`/${userData.username}`}>

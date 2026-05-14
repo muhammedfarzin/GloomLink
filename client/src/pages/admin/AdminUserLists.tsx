@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ExpandedUser = UserAuthState & { mobile?: string };
 
@@ -183,10 +184,17 @@ const AdminUserLists: React.FC = () => {
               <div className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between sm:justify-end w-full sm:w-auto mt-4 sm:mt-0 gap-4 sm:gap-6 shrink-0">
                 {/* <StatusBadge status={user.status} /> */}
                 <span
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusMap[user.status]?.className ?? "bg-gray-500/20 text-gray-400 border border-gray-500/30"}`}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border",
+                    statusMap[user.status]?.className ??
+                      "bg-gray-500/20 text-gray-400 border border-gray-500/30",
+                  )}
                 >
                   <div
-                    className={`w-2 h-2 rounded-full ${statusMap[user.status]?.dotColor ?? "bg-gray-400"}`}
+                    className={cn(
+                      "w-2 h-2 rounded-full",
+                      statusMap[user.status]?.dotColor ?? "bg-gray-400",
+                    )}
                   />
                   {statusMap[user.status]?.text ?? user.status}
                 </span>
@@ -203,11 +211,12 @@ const AdminUserLists: React.FC = () => {
                     title={
                       user.status === "active" ? "Block User" : "Activate User"
                     }
-                    className={`p-2.5 rounded-lg transition-all flex items-center justify-center border w-full sm:w-auto group/btn ${
+                    className={cn(
+                      "p-2.5 rounded-lg transition-all flex items-center justify-center border w-full sm:w-auto group/btn",
                       user.status === "active"
                         ? "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-                        : "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
-                    }`}
+                        : "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]",
+                    )}
                   >
                     {user.status === "active" ? (
                       <ShieldBan

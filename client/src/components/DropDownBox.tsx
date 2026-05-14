@@ -1,14 +1,13 @@
+import { cn } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 
-interface DropDownBoxProps
-  extends React.DetailedHTMLProps<
-    React.SelectHTMLAttributes<HTMLSelectElement>,
-    HTMLSelectElement
-  > {
+interface DropDownBoxProps extends React.DetailedHTMLProps<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  HTMLSelectElement
+> {
   value?: string;
   placeholder?: string;
-  placeholderClassName?: string;
 }
 
 const DropDownBox: React.FC<DropDownBoxProps> = ({
@@ -16,7 +15,6 @@ const DropDownBox: React.FC<DropDownBoxProps> = ({
   placeholder,
   children,
   className = "",
-  placeholderClassName,
   ...props
 }) => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
@@ -24,9 +22,11 @@ const DropDownBox: React.FC<DropDownBoxProps> = ({
   return (
     <select
       id="gender"
-      className={`py-2 my-1 bg-primary text-foreground ${placeholderClassName} ${className} ${
-        colorTheme === "dark" ? "white" : "black"
-      }`}
+      className={cn(
+        "py-2 my-1 bg-primary text-foreground",
+        className,
+        colorTheme === "dark" ? "white" : "black",
+      )}
       value={value || placeholder}
       style={{
         color: value || !placeholder ? "currentcolor" : "#9ca3af",

@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface Props {
   className?: string;
 }
@@ -5,10 +7,10 @@ interface Props {
 const PostSkeleton: React.FC<Props> = ({ className }) => {
   return (
     <div
-      className={[
+      className={cn(
         "bg-foreground/10 rounded-2xl w-full max-w-lg p-4 flex flex-col gap-3 animate-pulse",
         className,
-      ].join(" ")}
+      )}
     >
       <div className="flex flex-row items-center gap-2">
         <div className="rounded-full w-10 bg-background/50 aspect-square" />

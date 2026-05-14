@@ -5,6 +5,7 @@ import type { Comment, ReplyCommentType } from "@/types/comment";
 import CommentListCard from "./CommentListCard";
 import CommentInputBox from "./CommentInputBox";
 import { CommentSkeleton } from "@/components/skeleton/CommentBoxSkeleton";
+import { cn } from "@/lib/utils";
 
 interface CommentBoxProps {
   postId: string;
@@ -37,12 +38,12 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId }) => {
       <h3 className="text-lg font-bold my-2 mx-4">Comments</h3>
       <div className="px-4 overflow-y-scroll no-scrollbar">
         <div
-          className={[
+          className={cn(
             "flex gap-2 w-full h-[calc(95vh-6.35rem)] md:h-[calc(82vh-6.35rem)]",
             !loading && !comments.length
               ? "justify-center items-center"
               : "flex-col",
-          ].join(" ")}
+          )}
         >
           {loading
             ? Array.from({ length: 5 }).map((_, i) => (

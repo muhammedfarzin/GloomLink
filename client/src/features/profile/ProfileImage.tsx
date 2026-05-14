@@ -1,4 +1,5 @@
 import ProfileAvatar from "@/assets/icons/Profile-Avatar.svg";
+import { cn } from "@/lib/utils";
 
 interface ProfileImageProps {
   className?: string;
@@ -15,9 +16,10 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
 }) => {
   return (
     <div
-      className={`bg-slate-300 min-w-8 max-w-16 rounded-full mr-2 relative ${
-        className || "w-1/4"
-      }`}
+      className={cn(
+        "bg-slate-300 min-w-8 max-w-16 rounded-full mr-2 relative",
+        className || "w-1/4",
+      )}
       onClick={onClick}
     >
       <img
