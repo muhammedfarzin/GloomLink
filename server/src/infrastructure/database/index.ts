@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import "dotenv/config";
 
-dotenv.config();
 const mongoURI = process.env.MONGO_URI;
 
 export const connectDatabase = async () => {
@@ -13,6 +12,7 @@ export const connectDatabase = async () => {
     await mongoose.connect(mongoURI);
     console.log("Connected to database");
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    process.exit(1);
   }
 };
