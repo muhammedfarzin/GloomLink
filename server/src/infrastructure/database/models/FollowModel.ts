@@ -33,4 +33,8 @@ followSchema.pre("save", function (next) {
   next();
 });
 
+followSchema.index({ followedBy: 1, followingTo: 1 }, { unique: true });
+followSchema.index({ followingTo: 1 });
+followSchema.index({ followedBy: 1 });
+
 export const FollowModel = model("Follow", followSchema, "follows");

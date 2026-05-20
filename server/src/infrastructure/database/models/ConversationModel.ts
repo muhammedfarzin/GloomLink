@@ -20,6 +20,8 @@ const conversationSchema = new Schema<Conversation>({
   },
 });
 
+conversationSchema.index({ participants: 1 });
+
 export const ConversationModel = model(
   "Conversation",
   conversationSchema,

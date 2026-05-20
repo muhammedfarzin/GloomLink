@@ -29,7 +29,7 @@ const ReportSchema = new Schema<ReportType>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 ReportSchema.post("save", async function () {
@@ -46,5 +46,8 @@ ReportSchema.post("save", async function () {
     await ReportModel.deleteMany({ targetId: this.targetId });
   }
 });
+
+ReportSchema.index({ targetId: 1 });
+ReportSchema.index({ reportedBy: 1 });
 
 export const ReportModel = model("Report", ReportSchema, "reports");

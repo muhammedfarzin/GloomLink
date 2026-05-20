@@ -46,4 +46,8 @@ const postSchema = new Schema<Post>(
   { timestamps: true }
 );
 
+postSchema.index({ userId: 1, createdAt: -1 });
+postSchema.index({ status: 1, publishedFor: 1, createdAt: -1 });
+postSchema.index({ tags: 1 });
+
 export const PostModel = model<Post>("Post", postSchema, "posts");

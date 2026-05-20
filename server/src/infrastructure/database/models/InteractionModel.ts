@@ -39,6 +39,7 @@ const interactionSchema = new Schema<Interaction>(
 
 interactionSchema.index({ userId: 1, createdAt: -1 });
 interactionSchema.index({ userId: 1, postId: 1, type: 1 });
+interactionSchema.index({ postId: 1, type: 1 });
 
 export const InteractionModel = model<Interaction>(
   "Interaction",

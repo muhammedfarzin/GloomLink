@@ -40,4 +40,7 @@ const messageSchema = new Schema<Message>(
   { timestamps: true },
 );
 
+messageSchema.index({ conversationId: 1, createdAt: 1 });
+messageSchema.index({ senderId: 1 });
+
 export const MessageModel = model("Message", messageSchema, "messages");

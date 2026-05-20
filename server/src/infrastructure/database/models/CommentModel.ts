@@ -35,4 +35,7 @@ const commentSchama = new Schema<CommentType>(
   { timestamps: true }
 );
 
+commentSchama.index({ targetId: 1, createdAt: -1 });
+commentSchama.index({ userId: 1 });
+
 export const CommentModel = model("Comment", commentSchama, "comments");

@@ -25,4 +25,6 @@ const otpSchema = new Schema<Otp>({
   },
 });
 
+otpSchema.index({ email: 1 });
+
 export const OtpModel = model("Otp", otpSchema, "otps");

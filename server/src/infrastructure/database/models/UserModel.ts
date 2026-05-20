@@ -67,4 +67,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+userSchema.index({ username: "text" });
+userSchema.index({ status: 1 });
+
 export const UserModel = model<User>("User", userSchema, "users");
