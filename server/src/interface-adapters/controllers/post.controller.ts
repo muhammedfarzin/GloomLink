@@ -12,9 +12,10 @@ import type { IToggleSavePost } from "@/domain/use-cases/IToggleSavePost";
 import type { IEditPost } from "@/domain/use-cases/IEditPost";
 import type { IDeletePost } from "@/domain/use-cases/IDeletePost";
 import type { IRecordInteraction } from "@/domain/use-cases/IRecordInteraction";
-import type { IGetRecommendedPosts } from "@/domain/use-cases/IGetRecommendedPosts";
+import type { IGetPosts } from "@/domain/use-cases/IGetPosts";
 
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
+import { paginationSchema } from "../validation/paginationSchema";
 
 @injectable()
 export class PostController {
@@ -25,8 +26,8 @@ export class PostController {
     @inject(TYPES.IToggleSavePost)
     private toggleSavePostUseCase: IToggleSavePost,
     @inject(TYPES.IGetPostById) private getPostByIdUseCase: IGetPostById,
-    @inject(TYPES.IGetRecommendedPosts)
-    private getRecommendedPostsUseCase: IGetRecommendedPosts,
+    @inject(TYPES.IGetPosts)
+    private getPostsUseCase: IGetPosts,
     @inject(TYPES.IDeletePost) private deletePostUseCase: IDeletePost,
     @inject(TYPES.IRecordInteraction)
     private recordInteractionUseCase: IRecordInteraction,
@@ -173,18 +174,18 @@ export class PostController {
         throw new HttpError(401, "Unauthorized");
       }
 
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 5;
+      const authorUsername = req.query.username as string | undefined;
+      const paginationData = paginationSchema.parse(req.query);
 
-      const postsData = await this.getRecommendedPostsUseCase.execute({
+      const postsData = await this.getPostsUseCase.execute({
+        ...paginationData,
         userId: req.user.id,
-        page,
-        limit,
+        authorUsername,
       });
 
       res.status(200).json({
         postsData,
-        isEnd: postsData.length < limit,
+        isEnd: postsData.length < paginationData.limit,
         message: "Posts fetched successfully",
       });
     } catch (error) {

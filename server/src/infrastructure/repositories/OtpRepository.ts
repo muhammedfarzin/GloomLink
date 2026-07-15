@@ -8,7 +8,7 @@ import { OtpType } from "@/domain/models/Otp";
 @injectable()
 export class OtpRepository implements IOtpRepository {
   async create(otp: Otp): Promise<Otp> {
-    const { createdAt, otpId, email, hashedOtp } = OtpMapper.toPersistence(otp);
+    const { email, hashedOtp } = OtpMapper.toPersistence(otp);
     await OtpModel.findOneAndDelete({ email });
 
     const newOtpModel = new OtpModel({ email, otp: hashedOtp });

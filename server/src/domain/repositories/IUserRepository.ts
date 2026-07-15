@@ -1,5 +1,5 @@
 import type { User } from "../entities/User";
-import type { UserListView } from "../models/User";
+import type { UserCompact } from "../models/User";
 import type { EnrichedPost } from "../models/Post";
 import type { UserProfile } from "../models/User";
 
@@ -27,35 +27,18 @@ export interface IUserRepository {
     currentUserId: string,
     limit?: number,
   ): Promise<UserProfile | null>;
-  findByStatus(
-    status: UserStatus,
-    options: UserOptions,
-  ): Promise<UserListView[]>;
-  findAll(options: {
-    filter: "all" | "active" | "blocked";
-    searchQuery?: string;
-    page: number;
-    limit: number;
-  }): Promise<User[]>;
-  findSuggestions(input: SuggestionInput): Promise<UserListView[]>;
+  findAll(options: UserFindOptions): Promise<User[]>;
+  findSuggestions(input: SuggestionInput): Promise<UserCompact[]>;
   getDashboardMetrics(
     startDate: Date,
     endDate: Date,
   ): Promise<UserDashboardMetrics>;
 }
 
-export type UserStatus = "active" | "blocked" | "inactive";
 export interface UserIdentifier {
   username: string;
   email: string;
   mobile: string;
-}
-
-export interface UserOptions {
-  userId?: string;
-  searchQuery?: string;
-  page: number;
-  limit: number;
 }
 
 export interface SuggestionInput {
@@ -68,4 +51,13 @@ export interface UserDashboardMetrics {
   totalUsers: number;
   newUsers: number;
   chartData: { date: string; count: number }[];
+}
+
+export interface UserFindOptions {
+  currUserId?: string;
+  filter: "all" | "active" | "blocked";
+  searchQuery?: string;
+  page: number;
+  limit: number;
+  searchWithPersonalInfo?: boolean;
 }

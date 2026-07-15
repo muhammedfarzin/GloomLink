@@ -34,7 +34,7 @@ export class CreatePost implements ICreatePost {
 
     // ---Creating Post---
     const postToCreate = new Post({
-      postId: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       userId: input.userId,
       caption: input.caption,
       images: imagesPath,

@@ -39,7 +39,7 @@ export class ConversationController {
       });
 
       res.status(201).json({
-        conversationId: conversation.getConversationId(),
+        conversationId: conversation.getId(),
         message: "Conversation created or retrieved successfully.",
       });
     } catch (error) {
@@ -87,7 +87,7 @@ export class ConversationController {
       });
 
       res.status(200).json({
-        conversationId: conversation.getConversationId(),
+        conversationId: conversation.getId(),
         message: "Conversation ID fetched successfully.",
       });
     } catch (error) {

@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import mongoose, { type PipelineStage } from "mongoose";
 import type { Follow } from "@/domain/entities/Follow";
-import type { UserListView } from "@/domain/models/User";
+import type { UserCompact } from "@/domain/models/User";
 import type {
   FollowListOptions,
   FollowListType,
@@ -36,7 +36,7 @@ export class FollowRepository implements IFollowRepository {
     userId: string,
     type: FollowListType,
     options: FollowListOptions,
-  ): Promise<UserListView[]> {
+  ): Promise<UserCompact[]> {
     const { currentUserId, page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -85,8 +85,7 @@ export class FollowRepository implements IFollowRepository {
       {
         $project: {
           _id: 0,
-          type: "user",
-          userId: `$${lookupAs}._id`,
+          id: { $toString: `$${lookupAs}._id` },
           username: `$${lookupAs}.username`,
           fullname: {
             $concat: [`$${lookupAs}.firstname`, " ", `$${lookupAs}.lastname`],
@@ -94,7 +93,9 @@ export class FollowRepository implements IFollowRepository {
           firstname: `$${lookupAs}.firstname`,
           lastname: `$${lookupAs}.lastname`,
           imageUrl: `$${lookupAs}.imageUrl`,
+          status: `$${lookupAs}.status`,
           isFollowing: `$${lookupAs}.isFollowing`,
+          type: "user",
         },
       },
     ];

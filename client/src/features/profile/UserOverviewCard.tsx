@@ -23,7 +23,7 @@ const UserOverviewCard: React.FC<Props> = ({
   const handleClickFollow = async () => {
     try {
       onClickFollow?.(!isFollowing);
-      await apiClient.post(`/profile/follow/${userData.userId}`);
+      await apiClient.post(`/profile/follow/${userData.id}`);
     } catch (error: any) {
       onClickFollow?.(isFollowing);
       toastError(error.message);
@@ -45,13 +45,13 @@ const UserOverviewCard: React.FC<Props> = ({
           </div>
           <div className="flex justify-around w-2/3">
             <FollowDialogButton
-              userId={userData.userId}
+              userId={userData.id}
               followCount={userData.followersCount}
               type="followers"
             />
 
             <FollowDialogButton
-              userId={userData.userId}
+              userId={userData.id}
               followCount={userData.followingCount}
               type="following"
             />

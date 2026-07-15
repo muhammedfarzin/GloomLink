@@ -53,9 +53,9 @@ const PostActionsView: React.FC<Props> = ({
             )}
           >
             <CommentButton
-              postId={postData.postId}
+              postId={postData.id}
               postCardData={{
-                postId: postData.postId,
+                postId: postData.id,
                 postData: postData,
                 handleChange,
               }}
@@ -66,7 +66,7 @@ const PostActionsView: React.FC<Props> = ({
         <div className="hover:bg-primary/40 rounded-xl p-1.5 transition-colors cursor-pointer group flex items-center justify-center">
           <DialogBox
             dialogElement={
-              <ShareList data={{ message: postData.postId, type: "post" }} />
+              <ShareList data={{ message: postData.id, type: "post" }} />
             }
             title="Share post"
           >
@@ -78,7 +78,7 @@ const PostActionsView: React.FC<Props> = ({
         <IconButton
           icon={postData?.isSaved ? SavedIcon : SaveIcon}
           alt="save"
-          onClick={() => postData && handleSavePost?.(postData.postId)}
+          onClick={() => postData && handleSavePost?.(postData.id)}
         />
       </div>
     </div>

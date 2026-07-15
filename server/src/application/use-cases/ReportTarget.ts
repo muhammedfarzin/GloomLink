@@ -41,7 +41,7 @@ export class ReportTarget implements IReportTarget {
     // ---Creating report---
     const reportToCreate = new Report({
       ...input,
-      reportId: crypto.randomUUID(),
+      id: crypto.randomUUID(),
     });
 
     await this.reportRepository.create(reportToCreate);

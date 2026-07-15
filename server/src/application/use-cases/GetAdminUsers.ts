@@ -14,6 +14,9 @@ export class GetAdminUsers implements IGetAdminUsers {
   ) {}
 
   async execute(input: GetAdminUsersInput): Promise<User[]> {
-    return this.userRepository.findAll(input);
+    return this.userRepository.findAll({
+      ...input,
+      searchWithPersonalInfo: true,
+    });
   }
 }

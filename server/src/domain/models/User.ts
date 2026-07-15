@@ -1,23 +1,32 @@
-import type { PostCompact } from "./Post";
+type UserStatus = "active" | "inactive" | "blocked" | "not-verified";
+type UserAuthType = "email" | "google";
 
-export interface UserCompactProfile {
-  userId: string;
+export interface UserCompact {
+  id: string;
   username: string;
   fullname: string;
   firstname: string;
   lastname?: string;
   imageUrl?: string;
+  status: UserStatus;
   isFollowing?: boolean;
+  type: "user";
 }
 
-export interface UserProfile extends UserCompactProfile {
-  posts: Omit<PostCompact, "tags">[];
+export interface UserSelf extends UserCompact {
+  passwordHash: string;
+  email: string;
+  mobile?: string;
+  gender?: "f" | "m";
+  dob?: Date;
+  authType: UserAuthType;
+  blockedUsers?: string[];
+  savedPosts?: string[];
+  interestKeywords?: string[];
+}
+
+export interface UserProfile extends Omit<UserCompact, "passwordHash"> {
   followersCount: number;
   followingCount: number;
   isFollowing?: boolean;
-}
-
-export interface UserListView extends UserCompactProfile {
-  isFollowing?: boolean;
-  type: "user";
 }

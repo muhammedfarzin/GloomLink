@@ -1,7 +1,7 @@
 import type { CompactMessage } from "../models/Message";
+import { Entity } from "./Entity";
 
-export class Message {
-  private readonly id: string;
+export class Message extends Entity {
   private readonly conversationId: string;
   private message?: string;
   private readonly image?: string;
@@ -26,7 +26,7 @@ export class Message {
       throw new Error("Post message must have a message");
     }
 
-    this.id = props.id;
+    super(props);
     this.conversationId = props.conversationId;
     this.message = props.message;
     this.image = props.type === "image" ? props.image : undefined;
@@ -56,10 +56,6 @@ export class Message {
   }
 
   // ---------------- GETTERS ----------------
-
-  getId(): CompactMessage["id"] {
-    return this.id;
-  }
 
   getConversationId(): CompactMessage["conversationId"] {
     return this.conversationId;

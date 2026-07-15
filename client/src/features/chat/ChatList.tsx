@@ -47,7 +47,7 @@ const ChatList = () => {
 
       setChats((prevState) => [conversation, ...prevState]);
       setSuggestedUsers((prevState) =>
-        prevState.filter((chat) => chat.userId !== conversation.participantId),
+        prevState.filter((chat) => chat.id !== conversation.participantId),
       );
     },
     [chats, setChats, setSuggestedUsers],
@@ -95,7 +95,7 @@ const ChatList = () => {
             {chats.length ? (
               chats.map((chat) => (
                 <ChatItem
-                  key={chat.conversationId}
+                  key={chat.id}
                   username={chat.username}
                   image={chat.imageUrl}
                   unread={chat.unread}
@@ -126,12 +126,12 @@ const ChatList = () => {
           <h2 className="text-xl font-bold">Suggested</h2>
 
           <div className="flex flex-col gap-2 mt-2" id="suggested-chats">
-            {suggestedUsers.map((chat) => (
+            {suggestedUsers.map((user) => (
               <ChatItem
-                key={chat.userId}
-                username={chat.username}
-                image={chat.imageUrl}
-                onClick={() => navigate(`/${chat.username}`)}
+                key={user.id}
+                username={user.username}
+                image={user.imageUrl}
+                onClick={() => navigate(`/${user.username}`)}
               />
             ))}
           </div>

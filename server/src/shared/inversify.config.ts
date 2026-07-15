@@ -75,7 +75,7 @@ import { ToggleUserStatus } from "@/application/use-cases/ToggleUserStatus";
 import { UpdateProfile } from "@/application/use-cases/UpdateProfile";
 import { VerifyOtp } from "@/application/use-cases/VerifyOtp";
 import { RecordInteraction } from "@/application/use-cases/RecordInteraction";
-import { GetRecommendedPosts } from "@/application/use-cases/GetRecommendedPosts";
+import { GetPosts } from "@/application/use-cases/GetPosts";
 import { GetDashboardData } from "@/application/use-cases/GetDashboardData";
 
 import { AuthController } from "@/interface-adapters/controllers/auth.controller";
@@ -149,9 +149,7 @@ container.bind<GetFollowList>(TYPES.IGetFollowList).to(GetFollowList);
 container.bind<GetLikedUsers>(TYPES.IGetLikedUsers).to(GetLikedUsers);
 container.bind<GetMessages>(TYPES.IGetMessages).to(GetMessages);
 container.bind<GetPostById>(TYPES.IGetPostById).to(GetPostById);
-container
-  .bind<GetRecommendedPosts>(TYPES.IGetRecommendedPosts)
-  .to(GetRecommendedPosts);
+container.bind<GetPosts>(TYPES.IGetPosts).to(GetPosts);
 container.bind<GetSavedPosts>(TYPES.IGetSavedPosts).to(GetSavedPosts);
 container.bind<FetchUser>(TYPES.IFetchUser).to(FetchUser);
 container.bind<GetUserProfile>(TYPES.IGetUserProfile).to(GetUserProfile);

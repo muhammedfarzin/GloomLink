@@ -1,23 +1,19 @@
 import type { LikeType } from "../models/Like";
+import { Entity } from "./Entity";
 
-export class Like {
-  private readonly id: string;
+export class Like extends Entity {
   private readonly userId: string;
   private readonly targetId: string;
   private readonly targetType: "post";
 
   constructor(props: LikeType) {
-    this.id = props.id ?? crypto.randomUUID();
+    super(props);
     this.userId = props.userId;
     this.targetId = props.targetId;
     this.targetType = props.type;
   }
 
   // ---------------- GETTERS ----------------
-
-  public getId(): LikeType["id"] {
-    return this.id;
-  }
 
   public getUserId(): LikeType["userId"] {
     return this.userId;

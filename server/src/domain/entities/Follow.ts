@@ -1,21 +1,17 @@
 import type { FollowType } from "../models/Follow";
+import { Entity } from "./Entity";
 
-export class Follow {
-  private readonly id: string;
+export class Follow extends Entity {
   private readonly followerId: string;
   private readonly followingId: string;
 
   constructor(props: FollowType) {
-    this.id = props.id;
+    super(props);
     this.followerId = props.followedBy;
     this.followingId = props.followingTo;
   }
 
   // ---------------- GETTERS ----------------
-
-  public getId(): FollowType["id"] {
-    return this.id;
-  }
 
   public getFollowerId(): FollowType["followedBy"] {
     return this.followerId;

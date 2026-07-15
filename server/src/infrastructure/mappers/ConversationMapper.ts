@@ -7,22 +7,22 @@ import type {
 export class ConversationMapper {
   public static toDomain(conversation: ConversationType): Conversation {
     return new Conversation({
-      conversationId: conversation.conversationId,
+      id: conversation.id,
       participants: conversation.participants,
     });
   }
 
   public static toPersistence(conversation: Conversation): ConversationType {
     return {
-      conversationId: conversation.getConversationId(),
+      id: conversation.getId(),
       participants: conversation.getParticipants(),
     };
   }
 
-  public static toListView(conversation: any): ConversationList {
+  public static toResponse(conversation: any): ConversationList {
     return {
+      id: conversation.id?.toString(),
       participantId: conversation.participantId?.toString(),
-      conversationId: conversation.conversationId?.toString(),
       username: conversation.username,
       firstname: conversation.firstname,
       lastname: conversation.lastname,

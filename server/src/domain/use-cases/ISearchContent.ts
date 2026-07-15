@@ -1,10 +1,10 @@
+import type { User } from "../entities/User";
 import type { EnrichedPost } from "../models/Post";
-import type { UserListView } from "../models/User";
 
-export type SearchResult = UserListView | EnrichedPost;
+export type SearchResult = { users: User[]; posts: EnrichedPost[] };
 
 export interface ISearchContent {
-  execute(input: SearchContentInput): Promise<SearchResult[]>;
+  execute(input: SearchContentInput): Promise<SearchResult>;
 }
 
 export interface SearchContentInput {
@@ -12,5 +12,5 @@ export interface SearchContentInput {
   filter: "all" | "users" | "posts";
   page: number;
   limit: number;
-  currentUserId: string;
+  currentUserId?: string;
 }

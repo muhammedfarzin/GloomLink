@@ -1,5 +1,5 @@
 export interface CompactPost {
-  postId: string;
+  id: string;
   userId: string;
   caption: string;
   images: string[];
@@ -12,12 +12,13 @@ export interface CompactPost {
   createdAt: string;
   updatedAt: string;
   uploadedBy: {
-    userId: string;
+    id: string;
     firstname: string;
     lastname: string;
     username: string;
     imageUrl?: string;
   };
+  type: "post";
 }
 
 export interface Post extends CompactPost {

@@ -1,40 +1,37 @@
 import { User } from "@/domain/entities/User";
-import type { UserListView } from "@/domain/models/User";
-import type { UserDto } from "@/application/dtos/UserDto";
-import type {
-  UserBasicDto,
-  UserWithAuthDto,
-  UserWithStatusDto,
-} from "@/application/dtos/UserDto";
+import type { UserProfile, UserSelf } from "@/domain/models/User";
+import type { UserResponseDto } from "@/application/dtos/UserDto";
+import type { UserDocument } from "../database/models/UserModel";
 
 export class UserMapper {
-  public static toDomain(data: Omit<UserDto, "fullname">): User {
+  public static toDomain(data: UserDomainProps): User {
     return new User({
-      ...data,
+      id: data.id?.toString(),
+      username: data.username,
+      passwordHash: data.passwordHash,
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      mobile: data.mobile,
+      authType: data.authType,
+      status: data.status,
+      imageUrl: data.imageUrl,
+      gender: data.gender,
+      dob: data.dob,
+      isFollowing: data.isFollowing,
+      interestKeywords: data.interestKeywords,
       savedPosts: data.savedPosts?.map((postId) => postId.toString()),
       blockedUsers: data.blockedUsers?.map((postId) => postId.toString()),
     });
   }
 
-  private static toBasicPersistence(user: User): UserBasicDto {
+  public static toPersistence(user: User): UserSelf {
     return {
-      userId: user.getId(),
-      username: user.getUsername(),
-      fullname: user.getFullName(),
-      firstname: user.getFirstName(),
-      lastname: user.getLastName(),
+      ...UserMapper.toResponse(user),
       email: user.getEmail(),
       mobile: user.getMobile(),
-      imageUrl: user.getImageUrl(),
       dob: user.getDateOfBirth(),
       gender: user.getGender(),
-    };
-  }
-
-  public static toPersistence(user: User): UserDto {
-    return {
-      ...UserMapper.toBasicPersistence(user),
-      email: user.getEmail(),
       passwordHash: user.getPasswordHash(),
       authType: user.getAuthType(),
       status: user.getStatus(),
@@ -44,24 +41,37 @@ export class UserMapper {
     };
   }
 
-  public static toResponseWithStatus(user: User): UserWithStatusDto {
+  public static toResponse(user: User): UserResponseDto {
     return {
-      ...UserMapper.toBasicPersistence(user),
+      id: user.getId(),
+      username: user.getUsername(),
+      fullname: user.getFullName(),
+      firstname: user.getFirstName(),
+      lastname: user.getLastName(),
+      imageUrl: user.getImageUrl(),
       status: user.getStatus(),
+      isFollowing: user.isFollowingUser(),
+      type: "user",
     };
   }
 
-  public static toResponseWithAuthType(user: User): UserWithAuthDto {
+  public static toProfile(data: any): UserProfile {
     return {
-      ...UserMapper.toBasicPersistence(user),
-      authType: user.getAuthType(),
-    };
-  }
-
-  public static toListView(user: any): UserListView {
-    return {
-      ...UserMapper.toBasicPersistence(user),
+      id: data.id?.toString(),
+      username: data.username,
+      firstname: data.firstname,
+      lastname: data.lastname,
+      fullname: `${data.firstname} ${data.lastname}`,
+      imageUrl: data.imageUrl,
+      followersCount: data.followersCount,
+      followingCount: data.followingCount,
+      status: data.status,
+      isFollowing: data.isFollowing,
       type: "user",
     };
   }
 }
+
+type UserDomainProps =
+  | Omit<UserSelf, "fullname">
+  | (UserDocument & { isFollowing?: boolean });

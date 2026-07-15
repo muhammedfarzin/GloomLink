@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { apiClient } from "@/apiClient";
@@ -7,19 +7,10 @@ import PostGridCard from "@/features/post/PostGridCard";
 import ProfileSkeleton from "@/components/skeleton/ProfileSkeleton";
 import type { UserProfile } from "@/types/user";
 import type { RootState } from "@/redux/store";
+import type { Post } from "@/types/post";
 
 interface ProfileProps {
   self?: boolean;
-}
-
-interface PostsType {
-  postId: string;
-  userId: string;
-  caption: string;
-  images: string[];
-  tags: string[];
-  publishedFor: string;
-  status: string;
 }
 
 const Profile: React.FC<ProfileProps> = ({ self = false }) => {
@@ -28,20 +19,37 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
   );
   const { username } = useParams();
   const [userData, setUserData] = useState<UserProfile>();
-  const [posts, setPosts] = useState<PostsType[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const pageRef = useRef(1);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
+    pageRef.current = 1;
+    const targetUsername = username || myUsername;
+
     apiClient
-      .get(`/profile/${username || myUsername}`)
+      .get(`/profile/${targetUsername}`)
       .then((response) => {
         const { posts, isFollowing, ...userData } = response.data.userData;
         setIsFollowing(isFollowing);
         setUserData(userData);
         setPosts(posts);
+
+        return apiClient.get("/posts", {
+          params: {
+            page: pageRef.current++,
+            username: targetUsername,
+            limit: 15,
+            sort: "latest",
+          },
+        });
+      })
+      .then((response) => {
+        setPosts(response.data.postsData);
       })
       .catch((error) => {
         setError(error.message);
@@ -75,8 +83,8 @@ const Profile: React.FC<ProfileProps> = ({ self = false }) => {
               <div className="flex flex-wrap gap-2 p-2">
                 {posts?.map((post) => (
                   <PostGridCard
-                    key={post.postId}
-                    postId={post.postId}
+                    key={post.id}
+                    postId={post.id}
                     image={post.images[0]}
                     caption={post.caption}
                   />

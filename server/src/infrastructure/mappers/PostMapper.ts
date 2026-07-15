@@ -9,7 +9,7 @@ export class PostMapper {
 
   public static toPersistence(post: Post): PostType {
     return {
-      postId: post.getPostId(),
+      id: post.getId(),
       userId: post.getUserId(),
       caption: post.getCaption(),
       images: post.getImages(),
@@ -23,7 +23,7 @@ export class PostMapper {
 
   public static toResponse(data: any): EnrichedPost {
     return {
-      postId: data.postId?.toString(),
+      id: data.id?.toString(),
       userId: data.userId?.toString(),
       images: data.images,
       caption: data.caption,
@@ -34,7 +34,7 @@ export class PostMapper {
       likesCount: data.likesCount,
       reportCount: data.reportCount,
       uploadedBy: {
-        userId: data.uploadedBy?.userId?.toString(),
+        id: data.uploadedBy?.id?.toString(),
         firstname: data.uploadedBy?.firstname,
         lastname: data.uploadedBy?.lastname,
         username: data.uploadedBy?.username,
@@ -45,31 +45,6 @@ export class PostMapper {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       type: "post",
-    };
-  }
-
-  public static toProfileResponse(data: any): UserProfile {
-    return {
-      userId: data.userId.toString(),
-      username: data.username,
-      firstname: data.firstname,
-      lastname: data.lastname,
-      fullname: `${data.firstname} ${data.lastname}`,
-      imageUrl: data.imageUrl,
-      posts: data.posts.map(
-        (post: PostCompact): Omit<PostCompact, "tags"> => ({
-          postId: post.postId,
-          userId: post.userId,
-          caption: post.caption,
-          images: post.images,
-          publishedFor: post.publishedFor,
-          createdAt: post.createdAt,
-          updatedAt: post.updatedAt,
-        }),
-      ),
-      followersCount: data.followersCount,
-      followingCount: data.followingCount,
-      isFollowing: data.isFollowing,
     };
   }
 }

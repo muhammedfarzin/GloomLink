@@ -6,6 +6,7 @@ import { Post } from "@/domain/entities/Post";
 import type {
   IPostRepository,
   PostDashboardMetrics,
+  PostFeedOptions,
 } from "@/domain/repositories/IPostRepository";
 import type { EnrichedPost, PostType } from "@/domain/models/Post";
 
@@ -28,6 +29,7 @@ export class PostRepository implements IPostRepository {
         as: "comments",
       },
     },
+    // ---Populate the author details---
     {
       $lookup: {
         from: "users",
@@ -38,7 +40,7 @@ export class PostRepository implements IPostRepository {
           {
             $project: {
               _id: 0,
-              userId: "$_id",
+              id: "$_id",
               username: 1,
               firstname: 1,
               lastname: 1,
@@ -111,10 +113,20 @@ export class PostRepository implements IPostRepository {
       {
         $project: {
           _id: 0,
-          likes: 0,
-          comments: 0,
-          currentUserInfo: 0,
-          status: 0,
+          id: "$_id",
+          userId: 1,
+          caption: 1,
+          images: 1,
+          tags: 1,
+          publishedFor: 1,
+          status: 1,
+          likesCount: 1,
+          commentsCount: 1,
+          isLiked: 1, 
+          isSaved: 1,
+          uploadedBy: 1,
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ];
@@ -128,34 +140,40 @@ export class PostRepository implements IPostRepository {
     return PostMapper.toResponse(results[0]);
   }
 
-  async findAndSortFeed(options: {
-    userId: string;
-    searchQuery?: string;
-    interestKeywords: string[];
-    followingUserIds: string[];
-    page: number;
-    limit: number;
-  }): Promise<EnrichedPost[]> {
-    const { interestKeywords, searchQuery = "", page, limit } = options;
+  async findAndSortFeed(options: PostFeedOptions): Promise<EnrichedPost[]> {
+    const {
+      userId,
+      authorId,
+      searchQuery = "",
+      sort = "relevant",
+      followingUserIds = [],
+      interestKeywords = [],
+      page,
+      limit,
+    } = options;
     const skip = (page - 1) * limit;
-    const currentUserId = new mongoose.Types.ObjectId(options.userId);
+    let currentUserId: mongoose.Types.ObjectId | null = null;
+
+    if (userId) {
+      currentUserId = new mongoose.Types.ObjectId(userId);
+    }
 
     const interestKeywordsRegex = interestKeywords.map(
       (keyword) => new RegExp(keyword, "i"),
     );
 
-    const aggregationPipeline: PipelineStage[] = [
-      {
-        $match: {
-          status: "active",
-          $or: [
-            { caption: { $regex: searchQuery, $options: "i" } },
-            { tags: searchQuery.toLowerCase().split(" ") },
-          ],
-        },
+    const matchStage: PipelineStage.Match = {
+      $match: {
+        status: "active",
+        ...(authorId && { userId: new mongoose.Types.ObjectId(authorId) }),
+        $or: [
+          { caption: { $regex: searchQuery, $options: "i" } },
+          { tags: searchQuery.toLowerCase().split(" ") },
+        ],
       },
+    };
 
-      // ---Excluding current user reported post---
+    const excludeReportedPostPipeline: PipelineStage[] = [
       {
         $lookup: {
           from: "reports",
@@ -177,77 +195,44 @@ export class PostRepository implements IPostRepository {
         },
       },
       { $match: { userReport: { $size: 0 } } },
+    ];
 
-      // ---Add a 'relevanceScore' field to each document---
-      {
-        $addFields: {
-          relevanceScore: {
-            $sum: [
-              { $size: { $setIntersection: ["$tags", interestKeywords] } },
-              { $cond: [{ $in: ["$caption", interestKeywordsRegex] }, 1, 0] },
-              {
-                $cond: [
-                  {
-                    $in: [
-                      "$userId",
-                      options.followingUserIds.map(
-                        (id) => new mongoose.Types.ObjectId(id),
-                      ),
-                    ],
-                  },
-                  1,
-                  0,
-                ],
-              },
-              { $cond: [{ $eq: ["$userId", currentUserId] }, -5, 0] },
-            ],
-          },
-        },
-      },
-
-      // ---Sort by the new relevanceScore and then by creation date---
-      { $sort: { relevanceScore: -1, createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
-
-      // ---Populate the author details---
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "_id",
-          as: "uploadedBy",
-          pipeline: [
+    const addRelevaceScoreStage: PipelineStage.AddFields = {
+      $addFields: {
+        relevanceScore: {
+          $sum: [
+            { $size: { $setIntersection: ["$tags", interestKeywords] } },
+            { $cond: [{ $in: ["$caption", interestKeywordsRegex] }, 1, 0] },
             {
-              $project: {
-                _id: 0,
-                userId: "$_id",
-                username: 1,
-                firstname: 1,
-                lastname: 1,
-                imageUrl: 1,
-              },
+              $cond: [
+                {
+                  $in: [
+                    "$userId",
+                    followingUserIds.map(
+                      (id) => new mongoose.Types.ObjectId(id),
+                    ),
+                  ],
+                },
+                1,
+                0,
+              ],
             },
+            { $cond: [{ $eq: ["$userId", currentUserId] }, -5, 0] },
           ],
         },
       },
-      { $unwind: "$uploadedBy" },
-      {
-        $lookup: {
-          from: "likes",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "likes",
-        },
-      },
-      {
-        $lookup: {
-          from: "comments",
-          localField: "_id",
-          foreignField: "targetId",
-          as: "comments",
-        },
-      },
+    };
+
+    const sortStage: PipelineStage.Sort = {
+      $sort:
+        sort === "relevant"
+          ? { relevanceScore: -1, createdAt: -1 }
+          : sort === "latest"
+            ? { createdAt: -1 }
+            : { createdAt: 1 },
+    };
+
+    const currentUserPipeline: PipelineStage[] = [
       {
         $lookup: {
           from: "users",
@@ -262,13 +247,22 @@ export class PostRepository implements IPostRepository {
       { $unwind: "$currentUserInfo" },
       {
         $addFields: {
-          postId: "$_id",
+          id: "$_id",
           isLiked: { $in: [currentUserId, "$likes.userId"] },
           isSaved: { $in: ["$_id", "$currentUserInfo.savedPosts"] },
-          commentsCount: { $size: "$comments" },
-          likesCount: { $size: "$likes" },
         },
       },
+    ];
+
+    const aggregationPipeline: PipelineStage[] = [
+      matchStage,
+      ...(currentUserId ? excludeReportedPostPipeline : []),
+      addRelevaceScoreStage,
+      sortStage,
+      { $skip: skip },
+      { $limit: limit },
+      ...this.enrichedPipeline,
+      ...(currentUserId ? currentUserPipeline : []),
       {
         $project: {
           _id: 0,
@@ -309,7 +303,14 @@ export class PostRepository implements IPostRepository {
       { $skip: skip },
       { $limit: limit },
       ...this.enrichedPipeline,
-      { $project: { likes: 0, comments: 0 } },
+      { $addFields: { id: "$_id" } },
+      {
+        $project: {
+          _id: 0,
+          likes: 0,
+          comments: 0,
+        },
+      },
     ];
 
     if (options.withReports) {
@@ -317,18 +318,17 @@ export class PostRepository implements IPostRepository {
         {
           $lookup: {
             from: "reports",
-            localField: "_id",
+            localField: "id",
             foreignField: "targetId",
             as: "reports",
           },
         },
         {
           $addFields: {
-            postId: "$_id",
             reportCount: { $size: "$reports" },
           },
         },
-        { $project: { _id: 0, reports: 0 } },
+        { $project: { reports: 0 } },
       );
     }
 

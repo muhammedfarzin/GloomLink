@@ -6,7 +6,7 @@ export class PostMapper {
     const images = post.getImages();
 
     return {
-      postId: post.getPostId(),
+      id: post.getId(),
       userId: post.getUserId(),
       caption: post.getCaption(),
       images: images.length ? images : undefined,

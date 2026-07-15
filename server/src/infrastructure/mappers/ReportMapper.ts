@@ -8,7 +8,7 @@ export class ReportMapper {
 
   public static toPersistence(report: Report): ReportType {
     return {
-      reportId: report.getId(),
+      id: report.getId(),
       type: report.getType(),
       targetId: report.getTargetId(),
       reportedBy: report.getReportedUserId(),

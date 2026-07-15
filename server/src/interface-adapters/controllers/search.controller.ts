@@ -6,6 +6,7 @@ import { TYPES } from "@/shared/types";
 import { ISearchContent } from "@/domain/use-cases/ISearchContent";
 
 import { searchSchema } from "../validation/searchSchemas";
+import { UserMapper } from "../mappers/UserMapper";
 
 @injectable()
 export class SearchController {
@@ -29,10 +30,13 @@ export class SearchController {
         currentUserId: req.user.id,
       });
 
-      res.status(200).json({
-        resultsData: results,
+      const resUsers = results.users.map(UserMapper.toResponse);
+      const resJson = {
+        resultsData: [...resUsers, ...results.posts],
         message: "Search results fetched successfully.",
-      });
+      };
+
+      res.status(200).json(resJson);
     } catch (error) {
       next(error);
     }

@@ -35,7 +35,7 @@ const Search: React.FC = () => {
   const handleUpdateUserData = (updatedData: CompactUser) => {
     setSearchResult((prevState) =>
       prevState.map((user) => {
-        if (user.type === "user" && user.userId === updatedData.userId) {
+        if (user.type === "user" && user.id === updatedData.id) {
           return updatedData;
         }
         return user;
@@ -71,17 +71,14 @@ const Search: React.FC = () => {
             {searchResult.map((data) =>
               data.type === "user" ? (
                 <UserListCard
-                  key={data.type + data.userId}
+                  key={data.type + data.id}
                   className="w-full"
                   userData={data}
                   handleChange={handleUpdateUserData}
                 />
               ) : (
-                <Suspense
-                  key={data.type + data.postId}
-                  fallback={<PostSkeleton />}
-                >
-                  <PostListCard postId={data.postId} postData={data} />
+                <Suspense key={data.type + data.id} fallback={<PostSkeleton />}>
+                  <PostListCard postId={data.id} postData={data} />
                 </Suspense>
               ),
             )}

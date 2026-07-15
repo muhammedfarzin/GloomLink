@@ -8,7 +8,7 @@ export class OtpMapper {
 
   public static toPersistence(otp: Otp): OtpType {
     return {
-      otpId: otp.getId(),
+      id: otp.getId(),
       email: otp.getEmail(),
       hashedOtp: otp.getHashedOtp(),
       createdAt: otp.getCreatedAt(),

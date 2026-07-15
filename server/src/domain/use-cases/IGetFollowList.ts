@@ -1,8 +1,8 @@
 import type { FollowListType } from "../repositories/IFollowRepository";
-import type { UserListView } from "../models/User";
+import type { UserCompact } from "../models/User";
 
 export interface IGetFollowList {
-  execute(input: GetFollowListInput): Promise<UserListView[]>;
+  execute(input: GetFollowListInput): Promise<UserCompact[]>;
 }
 
 export interface GetFollowListInput {

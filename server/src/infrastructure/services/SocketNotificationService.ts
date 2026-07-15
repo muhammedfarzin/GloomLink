@@ -20,24 +20,26 @@ export class SocketNotificationService implements INotificationService {
   }) => {
     const { conversation, creator, otherParticipants } = data;
 
-    const viewForCreator = ConversationMapper.toListView({
+    const rawConversationResponse = {
+      id: conversation.getId(),
+      participantId: conversation.getParticipants(),
+      lastMessageTime: new Date(),
+    };
+
+    const viewForCreator = ConversationMapper.toResponse({
+      ...rawConversationResponse,
       username: otherParticipants.map((u) => u.getUsername()).join(", "),
-      conversationId: conversation.getConversationId(),
-      lastMessageTime: new Date(),
     });
-    const viewForOthers = ConversationMapper.toListView({
+    const viewForOthers = ConversationMapper.toResponse({
+      ...rawConversationResponse,
       username: creator.getUsername(),
-      conversationId: conversation.getConversationId(),
-      lastMessageTime: new Date(),
     });
 
     // Emit to the creator
     const creatorSockets = this.activeUsers[creator.getUsername()];
     if (creatorSockets) {
       creatorSockets.forEach((socketId) => {
-        this.io.sockets.sockets
-          .get(socketId)
-          ?.join(conversation.getConversationId());
+        this.io.sockets.sockets.get(socketId)?.join(conversation.getId());
         this.io.to(socketId).emit("new-conversation", viewForCreator);
       });
     }
@@ -47,9 +49,7 @@ export class SocketNotificationService implements INotificationService {
       const participantSockets = this.activeUsers[participant.getUsername()];
       if (participantSockets) {
         participantSockets.forEach((socketId) => {
-          this.io.sockets.sockets
-            .get(socketId)
-            ?.join(conversation.getConversationId());
+          this.io.sockets.sockets.get(socketId)?.join(conversation.getId());
           this.io.to(socketId).emit("new-conversation", viewForOthers);
         });
       }

@@ -1,8 +1,8 @@
 import type { LikeableType } from "../repositories/ILikeRepository";
-import type { UserListView } from "../models/User";
+import type { UserCompact } from "../models/User";
 
 export interface IGetLikedUsers {
-  execute(input: GetLikedUsersInput): Promise<UserListView[]>;
+  execute(input: GetLikedUsersInput): Promise<UserCompact[]>;
 }
 
 export interface GetLikedUsersInput {

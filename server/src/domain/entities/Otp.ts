@@ -1,23 +1,19 @@
-import { OtpType } from "../models/Otp";
+import type { OtpType } from "../models/Otp";
+import { Entity } from "./Entity";
 
-export class Otp {
-  private readonly id: string;
+export class Otp extends Entity {
   private readonly email: string;
   private readonly hashedOtp: string;
   private readonly createdAt: Date;
 
   constructor(props: OtpProps) {
-    this.id = props.otpId;
+    super(props);
     this.email = props.email;
     this.hashedOtp = props.hashedOtp;
     this.createdAt = props.createdAt ?? new Date();
   }
 
   // ---------------- GETTERS ----------------
-
-  getId(): OtpType["otpId"] {
-    return this.id;
-  }
 
   getEmail(): OtpType["email"] {
     return this.email;

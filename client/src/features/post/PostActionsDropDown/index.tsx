@@ -27,9 +27,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
   isAdmin = false,
   handleChange,
 }) => {
-  const myUserId = useSelector(
-    (state: RootState) => state.auth.userData?.userId,
-  );
+  const myUserId = useSelector((state: RootState) => state.auth.userData?.id);
   const { toastMessage, toastError } = useToaster();
 
   const handleDeletePost = async (userType: "user" | "admin" = "user") => {
@@ -40,7 +38,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
         var response = await adminApiClient.delete(`/posts/${postId}`);
       }
 
-      handleChange?.((state) => state.filter((post) => post.postId !== postId));
+      handleChange?.((state) => state.filter((post) => post.id !== postId));
       toastMessage(response.data.message || "Post deleted successfully");
     } catch (error: any) {
       toastError(error.message);
@@ -67,7 +65,7 @@ const PostActionsDropDown: React.FC<PostActionsDropDownProps> = ({
           onBlockStatusChange={(newStatus) => {
             handleChange?.((state) =>
               state.map((post) => {
-                if (post.postId === postId) post.status = newStatus;
+                if (post.id === postId) post.status = newStatus;
                 return post;
               }),
             );

@@ -37,7 +37,7 @@ export class CommentMapper {
       type: data.type,
       repliesCount: data.repliesCount || 0,
       uploadedBy: {
-        userId: data.uploadedBy?.userId?.toString(),
+        id: data.uploadedBy?.id?.toString(),
         firstname: data.uploadedBy?.firstname,
         lastname: data.uploadedBy?.lastname,
         fullname: `${data.uploadedBy?.firstname} ${data.uploadedBy?.lastname}`,

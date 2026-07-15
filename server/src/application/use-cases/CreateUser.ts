@@ -30,7 +30,7 @@ export class CreateUser implements ICreateUser {
     const hashedPassword = await this.passwordHasher.hash(input.password);
     const userToCreate: User = new User({
       ...input,
-      userId: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       passwordHash: hashedPassword,
       status: "not-verified",
     });

@@ -106,7 +106,7 @@ export class CommentRepository implements ICommentRepository {
             {
               $project: {
                 _id: 0,
-                userId: "$_id",
+                id: "$_id",
                 firstname: 1,
                 lastname: 1,
                 username: 1,

@@ -3,7 +3,7 @@ import { PostNotFoundError } from "@/domain/errors/NotFoundErrors";
 import { TYPES } from "@/shared/types";
 import type { ILikeRepository } from "@/domain/repositories/ILikeRepository";
 import type { IPostRepository } from "@/domain/repositories/IPostRepository";
-import type { UserListView } from "@/domain/models/User";
+import type { UserCompact } from "@/domain/models/User";
 import type {
   IGetLikedUsers,
   GetLikedUsersInput,
@@ -16,7 +16,7 @@ export class GetLikedUsers implements IGetLikedUsers {
     @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
 
-  async execute(input: GetLikedUsersInput): Promise<UserListView[]> {
+  async execute(input: GetLikedUsersInput): Promise<UserCompact[]> {
     const { targetId, ...restInput } = input;
 
     const post = await this.postRepository.findById(targetId);

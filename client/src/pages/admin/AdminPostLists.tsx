@@ -110,10 +110,10 @@ const AdminPostLists: React.FC = () => {
             id="posts-list"
           >
             {posts.map((post) => (
-              <div key={post.postId} className="w-full min-w-[300px]">
+              <div key={post.id} className="w-full min-w-[300px]">
                 <Suspense fallback={<PostSkeleton />}>
                   <PostListCard
-                    postId={post.postId}
+                    postId={post.id}
                     postData={post}
                     isAdmin
                     noRecordInteraction

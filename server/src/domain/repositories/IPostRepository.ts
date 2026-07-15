@@ -9,16 +9,9 @@ export interface IPostRepository {
     postId: string,
     userId: string,
   ): Promise<EnrichedPost | null>;
-  findAndSortFeed(options: {
-    userId: string;
-    searchQuery?: string;
-    interestKeywords: string[];
-    followingUserIds: string[];
-    page: number;
-    limit: number;
-  }): Promise<EnrichedPost[]>;
+  findAndSortFeed(options: PostFeedOptions): Promise<EnrichedPost[]>;
   findAll(options: {
-    page: number;
+    page: number; 
     limit: number;
     searchQuery?: string;
     withReports?: boolean;
@@ -48,4 +41,15 @@ export interface IPostRepository {
 export interface PostDashboardMetrics {
   totalPosts: number;
   chartData: { date: string; count: number }[];
+}
+
+export interface PostFeedOptions {
+  userId?: string;
+  authorId?: string;
+  searchQuery?: string;
+  interestKeywords?: string[];
+  followingUserIds?: string[];
+  sort?: "relevant" | "latest" | "oldest";
+  page: number;
+  limit: number;
 }

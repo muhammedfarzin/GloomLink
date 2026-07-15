@@ -1,10 +1,11 @@
 export interface CompactUser {
-  userId: string;
+  id: string;
   username: string;
   firstname: string;
   lastname: string;
   fullname: string;
   imageUrl?: string;
+  status: "active" | "blocked" | "not-verified";
   isFollowing?: boolean;
   type: "user";
 }
@@ -16,7 +17,7 @@ export interface UserProfile extends CompactUser {
 }
 
 export type Conversation = {
-  conversationId: string;
+  id: string;
   participantId: string;
   username: string;
   firstname: string;

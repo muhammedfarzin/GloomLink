@@ -1,3 +1,4 @@
+import { set } from "mongoose";
 import { ValidationError } from "../errors/ValidationError";
 import { DateOfBirth } from "../value-objects/DateOfBirth";
 import { Email } from "../value-objects/Email";
@@ -7,9 +8,9 @@ import { Url } from "../value-objects/Url";
 import { UserGender } from "../value-objects/UserGender";
 import { Username } from "../value-objects/Username";
 import { UserStatus, type UserStatusType } from "../value-objects/UserStatus";
+import { Entity } from "./Entity";
 
-export class User {
-  private readonly userId: string;
+export class User extends Entity {
   private username: Username;
   private passwordHash: PasswordHash;
   private firstname: string;
@@ -24,27 +25,31 @@ export class User {
   private readonly blockedUsers: Set<string>;
   private readonly savedPosts: Set<string>;
   private readonly interestKeywords: Set<string>;
+  private isSelf: boolean | undefined;
+  private isFollowing: boolean | undefined;
 
-  constructor(userParams: UserType) {
-    this.userId = userParams.userId;
-    this.username = new Username(userParams.username);
-    this.firstname = userParams.firstname;
-    this.lastname = userParams.lastname ?? "";
-    this.email = new Email(userParams.email);
-    this.authType = userParams.authType;
-    this.status = new UserStatus(userParams.status);
-    this.passwordHash = new PasswordHash(userParams.passwordHash);
-    this.blockedUsers = new Set(userParams.blockedUsers ?? []);
-    this.savedPosts = new Set(userParams.savedPosts ?? []);
-    this.interestKeywords = new Set(userParams.interestKeywords ?? []);
-    this.dob = userParams.dob && new DateOfBirth(userParams.dob);
-    this.mobile = userParams.mobile
-      ? new MobileNumber(userParams.mobile)
-      : undefined;
-    this.imageUrl = userParams.imageUrl ? new Url(userParams.imageUrl) : null;
-    this.gender = userParams.gender
-      ? new UserGender(userParams.gender)
-      : undefined;
+  constructor(props: UserType) {
+    super(props);
+    this.username = new Username(props.username);
+    this.firstname = props.firstname;
+    this.lastname = props.lastname ?? "";
+    this.email = new Email(props.email);
+    this.authType = props.authType;
+    this.status = new UserStatus(props.status);
+    this.passwordHash = new PasswordHash(props.passwordHash);
+    this.blockedUsers = new Set(props.blockedUsers ?? []);
+    this.savedPosts = new Set(props.savedPosts ?? []);
+    this.interestKeywords = new Set(props.interestKeywords ?? []);
+    this.dob = props.dob && new DateOfBirth(props.dob);
+    this.mobile = props.mobile ? new MobileNumber(props.mobile) : undefined;
+    this.imageUrl = props.imageUrl ? new Url(props.imageUrl) : null;
+    this.gender = props.gender ? new UserGender(props.gender) : undefined;
+    this.isSelf = props.isSelf;
+    this.isFollowing = props.isFollowing;
+
+    if (props.isSelf) {
+      delete this.isFollowing;
+    }
   }
 
   // ---------------- SETTERS ----------------
@@ -90,10 +95,17 @@ export class User {
     this.status = new UserStatus(status);
   }
 
+  setSelf() {
+    if (this.isSelf === null) {
+      this.isSelf = true;
+      delete this.isFollowing;
+    }
+  }
+
   // ---------- Collection Setters -----------
 
   blockUser(userId: string) {
-    if (this.userId === userId) {
+    if (this.isId(userId)) {
       throw new ValidationError("User cannot block themselves");
     }
     this.blockedUsers.add(userId);
@@ -112,10 +124,6 @@ export class User {
   }
 
   // ---------------- GETTERS ----------------
-
-  getId(): UserType["userId"] {
-    return this.userId;
-  }
 
   getUsername(): UserType["username"] {
     return this.username.getValue();
@@ -200,10 +208,18 @@ export class User {
   hasSavedPost(postId: string): boolean {
     return this.savedPosts.has(postId);
   }
+
+  isSelfUser(): boolean | undefined {
+    return this.isSelf;
+  }
+
+  isFollowingUser(): boolean | undefined {
+    if (!this.isSelf) return this.isFollowing;
+  }
 }
 
 interface UserType {
-  userId: string;
+  id: string;
   username: string;
   passwordHash: string;
   firstname: string;
@@ -218,4 +234,6 @@ interface UserType {
   blockedUsers?: readonly string[];
   savedPosts?: readonly string[];
   interestKeywords?: readonly string[];
+  isSelf?: boolean;
+  isFollowing?: boolean;
 }

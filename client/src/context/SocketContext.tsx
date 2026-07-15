@@ -14,7 +14,7 @@ const SERVER_HOST = import.meta.env.VITE_API_BASE_URL as string;
 
 const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const username = useSelector(
-    (state: RootState) => state.auth.userData?.username
+    (state: RootState) => state.auth.userData?.username,
   );
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -39,7 +39,7 @@ const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
           socket.disconnect();
         };
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
 

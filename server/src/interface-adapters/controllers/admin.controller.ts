@@ -61,7 +61,7 @@ export class AdminController {
         ...validatedData,
       });
 
-      const usersData = users.map(UserMapper.toResponseWithStatus);
+      const usersData = users.map(UserMapper.toPersonalResponse);
 
       res.status(200).json({
         usersData,

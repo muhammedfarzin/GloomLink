@@ -18,7 +18,7 @@ const MessageViewer: React.FC = () => {
   const navigate = useNavigate();
   const callHandler = useCall();
   const myUserId = useSelector(
-    (state: RootState) => state.auth.userData?.userId,
+    (state: RootState) => state.auth.userData?.id,
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);

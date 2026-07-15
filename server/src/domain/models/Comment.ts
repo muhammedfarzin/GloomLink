@@ -1,4 +1,4 @@
-import type { UserCompactProfile } from "./User";
+import type { UserCompact } from "./User";
 
 export interface CommentType {
   id: string;
@@ -11,8 +11,8 @@ export interface CommentType {
 }
 
 type CommentAuthorDto = Pick<
-  UserCompactProfile,
-  "userId" | "fullname" | "firstname" | "lastname" | "username" | "imageUrl"
+  UserCompact,
+  "id" | "fullname" | "firstname" | "lastname" | "username" | "imageUrl"
 >;
 
 export interface CommentResponse extends CommentType {

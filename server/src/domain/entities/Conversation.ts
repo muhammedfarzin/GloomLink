@@ -1,18 +1,12 @@
 import type { ConversationType } from "../models/Conversation";
+import { Entity } from "./Entity";
 
-export class Conversation {
-  private readonly conversationId: string;
+export class Conversation extends Entity {
   private readonly participants: Set<string>;
 
   constructor(props: ConversationType) {
-    this.conversationId = props.conversationId;
+    super(props);
     this.participants = new Set(props.participants);
-  }
-
-  // ---------------- GETTERS ----------------
-
-  getConversationId(): ConversationType["conversationId"] {
-    return this.conversationId;
   }
 
   // ----------- COLLECTION GETTERS ----------

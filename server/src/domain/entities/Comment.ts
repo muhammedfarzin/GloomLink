@@ -1,7 +1,7 @@
 import type { CommentType } from "../models/Comment";
+import { Entity } from "./Entity";
 
-export class Comment {
-  private readonly id: string;
+export class Comment extends Entity {
   private readonly targetId: string;
   private readonly userId: string;
   private comment: string;
@@ -10,7 +10,7 @@ export class Comment {
   private updatedAt: Date;
 
   constructor(props: CommentProps) {
-    this.id = props.id;
+    super(props);
     this.targetId = props.targetId;
     this.userId = props.userId;
     this.comment = props.comment;
@@ -27,10 +27,6 @@ export class Comment {
   }
 
   // ---------------- GETTERS ----------------
-
-  public getId(): CommentType["id"] {
-    return this.id;
-  }
 
   public getTargetId(): CommentType["targetId"] {
     return this.targetId;

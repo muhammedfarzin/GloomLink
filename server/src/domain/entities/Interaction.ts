@@ -1,7 +1,7 @@
 import type { InteractionType } from "../models/Interaction";
+import { Entity } from "./Entity";
 
-export class Interaction {
-  private readonly id: string;
+export class Interaction extends Entity {
   private readonly userId: string;
   private readonly postId: string;
   private readonly type: "view" | "like" | "comment" | "save";
@@ -9,7 +9,7 @@ export class Interaction {
   private readonly createdAt: Date;
 
   constructor(props: InteractionProps) {
-    this.id = props.id;
+    super(props);
     this.userId = props.userId;
     this.postId = props.postId;
     this.type = props.type;
@@ -18,10 +18,6 @@ export class Interaction {
   }
 
   // ---------------- GETTERS ----------------
-
-  public getId(): InteractionType["id"] {
-    return this.id;
-  }
 
   public getUserId(): InteractionType["userId"] {
     return this.userId;

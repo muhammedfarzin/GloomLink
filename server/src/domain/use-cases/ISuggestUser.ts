@@ -1,7 +1,7 @@
-import type { UserListView } from "../models/User";
+import type { UserCompact } from "../models/User";
 
 export interface ISuggestUser {
-  execute(input: SuggestUserInput): Promise<UserListView[]>;
+  execute(input: SuggestUserInput): Promise<UserCompact[]>;
 }
 
 export interface SuggestUserInput {

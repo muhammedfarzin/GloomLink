@@ -1,13 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserAuthState {
-  userId: string;
+  id: string;
   username: string;
+  fullName: string;
   firstname: string;
   lastname: string;
+  imageUrl: string;
   status: "not-verified" | "active" | "blocked";
-  email: string;
-  image?: string;
 }
 
 export interface AdminAuthState {

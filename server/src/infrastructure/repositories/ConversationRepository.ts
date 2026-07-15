@@ -14,7 +14,7 @@ export class ConversationRepository implements IConversationRepository {
     });
     const savedDoc = await newConversation.save();
     return ConversationMapper.toDomain({
-      conversationId: savedDoc._id.toString(),
+      id: savedDoc.id.toString(),
       participants: savedDoc.participants.map((id) => id.toString()),
     });
   }
@@ -23,7 +23,7 @@ export class ConversationRepository implements IConversationRepository {
     const conversationDoc = await ConversationModel.findById(id);
     return conversationDoc
       ? ConversationMapper.toDomain({
-          conversationId: conversationDoc._id.toString(),
+          id: conversationDoc.id.toString(),
           participants: conversationDoc.participants.map((id) => id.toString()),
         })
       : null;
@@ -40,7 +40,7 @@ export class ConversationRepository implements IConversationRepository {
     });
     return conversationDoc
       ? ConversationMapper.toDomain({
-          conversationId: conversationDoc._id.toString(),
+          id: conversationDoc.id.toString(),
           participants: conversationDoc.participants.map((id) => id.toString()),
         })
       : null;
@@ -118,14 +118,15 @@ export class ConversationRepository implements IConversationRepository {
       {
         $project: {
           _id: 0,
+          id: "$_id",
           participantId: "$otherParticipant._id",
-          conversationId: "$_id",
           username: "$otherParticipant.username",
           firstname: "$otherParticipant.firstname",
           lastname: "$otherParticipant.lastname",
           imageUrl: "$otherParticipant.imageUrl",
           unread: { $ifNull: ["$messageInfo.unread", 0] },
           lastMessageTime: "$messageInfo.lastMessageTime",
+          type: "conversation",
         },
       },
       // ---Sort conversations by the most recent message---
@@ -133,7 +134,6 @@ export class ConversationRepository implements IConversationRepository {
     ];
 
     const results = await ConversationModel.aggregate(aggregationPipeline);
-
-    return results.map(ConversationMapper.toListView);
+    return results;
   }
 }

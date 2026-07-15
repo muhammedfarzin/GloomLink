@@ -1,5 +1,5 @@
 export interface PostCompact {
-  postId: string;
+  id: string;
   userId: string;
   caption?: string | null;
   images?: string[];
@@ -20,7 +20,7 @@ export interface EnrichedPost extends PostType {
   isSaved?: boolean;
   reportCount?: number;
   uploadedBy: {
-    userId: string;
+    id: string;
     username: string;
     firstname: string;
     lastname: string;

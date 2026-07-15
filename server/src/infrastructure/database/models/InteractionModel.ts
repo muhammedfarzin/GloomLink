@@ -1,7 +1,6 @@
 import { type Document, model, Schema } from "mongoose";
 
 export interface Interaction {
-  _id: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   postId: Schema.Types.ObjectId;
   type: "view" | "like" | "comment" | "save";
@@ -34,15 +33,14 @@ const interactionSchema = new Schema<Interaction>(
       default: 1,
     },
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
+  { timestamps: { createdAt: true, updatedAt: false } },
 );
 
-interactionSchema.index({ userId: 1, createdAt: -1 });
-interactionSchema.index({ userId: 1, postId: 1, type: 1 });
+interactionSchema.index({ userId: 1, type: 1, postId: 1 }, { unique: true });
 interactionSchema.index({ postId: 1, type: 1 });
 
 export const InteractionModel = model<Interaction>(
   "Interaction",
   interactionSchema,
-  "interactions"
+  "interactions",
 );

@@ -38,7 +38,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
   noRecordInteraction,
   handleChange,
 }) => {
-  const authId = useSelector((state: RootState) => state.auth.userData?.userId);
+  const authId = useSelector((state: RootState) => state.auth.userData?.id);
   const { toastError } = useToaster();
   const { recordInteraction } = useInteraction();
   const [postDataState, setPostDataState] = useState(postData);
@@ -77,9 +77,9 @@ const PostListCard: React.FC<PostListCardProps> = ({
     if (
       !noRecordInteraction &&
       postDataState &&
-      postDataState.uploadedBy.userId !== authId
+      postDataState.uploadedBy.id !== authId
     ) {
-      recordInteraction(postDataState.postId, "view");
+      recordInteraction(postDataState.id, "view");
     }
   }, [postDataState, recordInteraction, authId, noRecordInteraction]);
 
@@ -102,8 +102,8 @@ const PostListCard: React.FC<PostListCardProps> = ({
             </span>
           </ProfileViewCard>
           <PostActionsDropDown
-            postId={postDataState.postId}
-            userId={postDataState.uploadedBy.userId}
+            postId={postDataState.id}
+            userId={postDataState.uploadedBy.id}
             isAdmin={isAdmin}
             handleChange={handleChange}
             status={postDataState.status}
@@ -117,7 +117,7 @@ const PostListCard: React.FC<PostListCardProps> = ({
         />
 
         <PostInteractionCount
-          postId={postDataState.postId}
+          postId={postDataState.id}
           likesCount={postDataState.likesCount}
           commentsCount={postDataState.commentsCount}
         />

@@ -1,5 +1,5 @@
 export interface ReportType {
-  reportId: string;
+  id: string;
   type: "post" | "user";
   targetId: string;
   reportedBy: string;

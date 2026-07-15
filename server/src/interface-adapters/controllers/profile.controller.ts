@@ -47,7 +47,7 @@ export class ProfileController {
       }
 
       const user = await this.fetchUserUseCase.execute(req.user.id);
-      const userResponseDto = UserMapper.toResponseWithAuthType(user);
+      const userResponseDto = UserMapper.toPersonalResponse(user);
 
       res.status(200).json({
         userData: userResponseDto,
@@ -73,7 +73,7 @@ export class ProfileController {
         profileImageFile,
       });
 
-      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
+      const userResponse = UserMapper.toResponse(updatedUser);
 
       res.status(200).json({
         userData: userResponse,

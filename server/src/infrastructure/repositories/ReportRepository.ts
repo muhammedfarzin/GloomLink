@@ -24,7 +24,7 @@ export class ReportRepository implements IReportRepository {
   }
 
   async getExistingReport(report: Report): Promise<Report | null> {
-    const { reportId, ...reportQuery } = ReportMapper.toPersistence(report);
+    const { id, ...reportQuery } = ReportMapper.toPersistence(report);
     const reportModel = await ReportModel.findOne(reportQuery);
 
     return reportModel
@@ -34,7 +34,7 @@ export class ReportRepository implements IReportRepository {
 
   private safeParseReportDoc(reportDoc: ReportDocument): ReportType {
     return {
-      reportId: reportDoc._id.toString(),
+      id: reportDoc.id.toString(),
       type: reportDoc.type,
       targetId: reportDoc.targetId.toString(),
       reportedBy: reportDoc.reportedBy.toString(),

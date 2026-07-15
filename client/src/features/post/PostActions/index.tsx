@@ -27,7 +27,7 @@ const PostActions: React.FC<Props> = ({
   const handleSavePost = async (postId: string) => {
     const handleSavedState = (state: Post[]) =>
       state.map((post) => {
-        if (post.postId === postId) post.isSaved = !postData.isSaved;
+        if (post.id === postId) post.isSaved = !postData.isSaved;
         return post;
       });
     try {
@@ -45,7 +45,7 @@ const PostActions: React.FC<Props> = ({
   const handleLikePost = async (type: "like" | "unlike") => {
     const handleLikedState = (state: Post[]) =>
       state.map((post) => {
-        if (post.postId === postData.postId) {
+        if (post.id === postData.id) {
           post.isLiked = !postData.isLiked;
           if (!post.likesCount) {
             post.likesCount = type === "like" ? 1 : post.likesCount;
@@ -64,7 +64,7 @@ const PostActions: React.FC<Props> = ({
       }
 
       handleChange?.(handleLikedState);
-      await apiClient.post(`/likes/post/${postData.postId}`);
+      await apiClient.post(`/likes/post/${postData.id}`);
     } catch (error) {
       if (!handleChange && postData)
         onLike?.(!!postData.isLiked, postData.likesCount);

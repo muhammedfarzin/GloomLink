@@ -14,7 +14,7 @@ const CreatePost: React.FC = () => {
   const { toastError } = useToaster();
   const { postId } = useParams();
   const myUserId = useSelector(
-    (state: RootState) => state.auth.userData?.userId,
+    (state: RootState) => state.auth.userData?.id,
   );
 
   const [caption, setCaption] = useState<string>("");

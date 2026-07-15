@@ -95,7 +95,7 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchMetrics();
   }, [startDate, endDate]);
-  console.log(chartData);
+
   return (
     <div className="p-6 max-w-7xl mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 animate-in slide-in-from-top duration-500">

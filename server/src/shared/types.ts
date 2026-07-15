@@ -35,7 +35,7 @@ const TYPES = {
   IGetComments: Symbol.for("IGetComments"),
   IGetConversation: Symbol.for("IGetConversation"),
   IGetConversations: Symbol.for("IGetConversations"),
-  IGetRecommendedPosts: Symbol.for("IGetRecommendedPosts"),
+  IGetPosts: Symbol.for("IGetPosts"),
   IGetFollowList: Symbol.for("IGetFollowList"),
   IGetLikedUsers: Symbol.for("IGetLikedUsers"),
   IGetMessages: Symbol.for("IGetMessages"),

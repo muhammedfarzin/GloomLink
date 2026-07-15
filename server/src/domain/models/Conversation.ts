@@ -1,11 +1,11 @@
 export interface ConversationType {
-  conversationId: string;
+  id: string;
   participants: string[];
 }
 
 export interface ConversationList {
+  id: string;
   participantId: string;
-  conversationId: string;
   username: string;
   firstname: string;
   lastname: string;

@@ -1,7 +1,7 @@
 import type { PostType } from "@/domain/models/Post";
 
 export interface PostResponseDto {
-  readonly postId: string;
+  readonly id: string;
   readonly userId: string;
   caption?: string | null;
   images?: string[];

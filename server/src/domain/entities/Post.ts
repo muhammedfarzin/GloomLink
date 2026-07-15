@@ -1,8 +1,8 @@
 import type { PostType } from "../models/Post";
 import { Url } from "../value-objects/Url";
+import { Entity } from "./Entity";
 
-export class Post {
-  private readonly postId: string;
+export class Post extends Entity {
   private readonly userId: string;
   private caption?: string | null;
   private images: Url[];
@@ -14,11 +14,11 @@ export class Post {
   private updatedAt: Date;
 
   constructor(props: PostProps) {
-    if (!this.caption && (!props.images || props.images.length === 0)) {
+    if (!props.caption && (!props.images || props.images.length === 0)) {
       throw new Error("Post must have either a caption or an image");
     }
 
-    this.postId = props.postId;
+    super(props);
     this.userId = props.userId;
     this.caption = props.caption;
     this.images = (props.images ?? []).map((imageUrl) => new Url(imageUrl));
@@ -80,10 +80,6 @@ export class Post {
   }
 
   // ---------------- GETTERS ----------------
-
-  getPostId(): PostType["postId"] {
-    return this.postId;
-  }
 
   getUserId(): PostType["userId"] {
     return this.userId;

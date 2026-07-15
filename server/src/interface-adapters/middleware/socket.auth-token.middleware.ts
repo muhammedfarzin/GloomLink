@@ -39,9 +39,7 @@ export const authenticateTokenForSocket = async (
         throw new HttpError(401, "Unauthorized: User has been blocked");
 
       const conversations = await getConversationsUseCase.execute(user.getId());
-      socket.join(
-        conversations.map((conversation) => conversation.conversationId),
-      );
+      socket.join(conversations.map((conversation) => conversation.id));
 
       const username = user.getUsername();
       socket.user = {

@@ -23,7 +23,7 @@ export class OtpService implements IOtpService {
 
     const hashedOtp = await this.passwordHasher.hash(otp);
     const otpToCreate = new Otp({
-      otpId: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       email,
       hashedOtp,
     });

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type ExpandedUser = UserAuthState & { mobile?: string };
+type ExpandedUser = UserAuthState & { mobile?: string; email: string };
 
 const statusMap = {
   active: {
@@ -76,7 +76,7 @@ const AdminUserLists: React.FC = () => {
       toastMessage(response.data.message);
       setUsers(
         users.map((user) => {
-          if (user.userId === userId) {
+          if (user.id === userId) {
             user.status = user.status === "active" ? "blocked" : "active";
           }
           return user;
@@ -149,7 +149,7 @@ const AdminUserLists: React.FC = () => {
         <div className="space-y-4 animate-in fade-in duration-700 slide-in-from-bottom-4">
           {users.map((user) => (
             <div
-              key={user.userId}
+              key={user.id}
               className="group bg-primary/30 hover:bg-primary/40 border border-primary/10 hover:border-primary/30 p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-md transition-all duration-300"
             >
               {/* User Info */}
@@ -205,7 +205,7 @@ const AdminUserLists: React.FC = () => {
                   confirmButtonText={
                     user.status === "active" ? "Block" : "Activate"
                   }
-                  onSuccess={() => blockUser(user.userId)}
+                  onSuccess={() => blockUser(user.id)}
                 >
                   <button
                     title={

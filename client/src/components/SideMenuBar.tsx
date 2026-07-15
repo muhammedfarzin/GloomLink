@@ -72,6 +72,7 @@ const SideMenuBar: React.FC<SideMenuBarProps> = ({
         {(userType === "user" ? userSideMenuItems : adminSideMenuItems).map(
           (menu) => (
             <MenuButton
+              key={menu.path}
               to={menu.path}
               text={menu.title}
               icon={menu.icon}

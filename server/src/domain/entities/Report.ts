@@ -1,23 +1,19 @@
 import type { ReportType } from "../models/Report";
+import { Entity } from "./Entity";
 
-export class Report {
-  private readonly reportId: string;
+export class Report extends Entity {
   private readonly type: "post" | "user";
   private readonly targetId: string;
   private readonly reportedBy: string;
 
   constructor(props: ReportType) {
-    this.reportId = props.reportId;
+    super(props);
     this.type = props.type;
     this.targetId = props.targetId;
     this.reportedBy = props.reportedBy;
   }
 
   // ---------------- GETTERS ----------------
-
-  getId(): ReportType["reportId"] {
-    return this.reportId;
-  }
 
   getType(): ReportType["type"] {
     return this.type;

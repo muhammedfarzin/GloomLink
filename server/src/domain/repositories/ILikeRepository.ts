@@ -1,4 +1,4 @@
-import type { UserListView } from "../models/User";
+import type { UserCompact } from "../models/User";
 import type { Like } from "../entities/Like";
 
 export type LikeableType = "post";
@@ -16,5 +16,5 @@ export interface ILikeRepository {
   findLikersByTarget(
     targetId: string,
     options: LikeOptions,
-  ): Promise<UserListView[]>;
+  ): Promise<UserCompact[]>;
 }

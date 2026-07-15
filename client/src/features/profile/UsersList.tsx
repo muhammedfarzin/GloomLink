@@ -26,7 +26,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
   const updateUserData = (updatedData: CompactUser) => {
     setUsers((prevState) =>
       prevState.map((user) => {
-        if (user.userId === updatedData.userId) {
+        if (user.id === updatedData.id) {
           return updatedData;
         }
         return user;
@@ -39,7 +39,7 @@ const UsersList: React.FC<UsersListProps> = ({ apiUrl, title }) => {
       {users.length && !loading ? (
         users.map((user) => (
           <UserListCard
-            key={user.userId}
+            key={user.id}
             userData={user}
             className="my-2"
             handleChange={updateUserData}

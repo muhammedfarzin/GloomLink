@@ -40,7 +40,7 @@ export class SignInWithGoogle implements ISignInWithGoogle {
       .slice(-4)}${Math.random() * 90000}`;
 
     const newUser = new User({
-      userId: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       firstname,
       lastname,
       username,

@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import mongoose, { PipelineStage } from "mongoose";
-import type { UserListView } from "@/domain/models/User";
+import type { UserCompact } from "@/domain/models/User";
 import type {
   ILikeRepository,
   LikeOptions,
@@ -31,7 +31,7 @@ export class LikeRepository implements ILikeRepository {
   async findLikersByTarget(
     targetId: string,
     options: LikeOptions,
-  ): Promise<UserListView[]> {
+  ): Promise<UserCompact[]> {
     const { userId, type, page, limit } = options;
     const skip = (page - 1) * limit;
 
@@ -79,8 +79,7 @@ export class LikeRepository implements ILikeRepository {
       {
         $project: {
           _id: 0,
-          type: "user",
-          userId: "$likerInfo._id",
+          id: { $toString: "$likerInfo._id" },
           username: "$likerInfo.username",
           fullname: {
             $concat: [`$likerInfo.firstname`, " ", `$likerInfo.lastname`],
@@ -88,7 +87,9 @@ export class LikeRepository implements ILikeRepository {
           firstname: "$likerInfo.firstname",
           lastname: "$likerInfo.lastname",
           imageUrl: "$likerInfo.imageUrl",
+          status: "$likerInfo.status",
           isFollowing: "$likerInfo.isFollowing",
+          type: "user",
         },
       },
     ];

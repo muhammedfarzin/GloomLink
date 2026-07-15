@@ -52,7 +52,7 @@ export class AuthController {
         const authResponse = await this.loginUserUseCase.execute(validatedBody);
         user = authResponse.user;
         tokens = authResponse.tokens;
-        userResponse = UserMapper.toResponseWithStatus(user);
+        userResponse = UserMapper.toResponse(user);
 
         if (!user.isVerified()) {
           resMessage = "Verify your email";
@@ -92,10 +92,10 @@ export class AuthController {
       });
 
       // --- Generate Token & Respond ---
-      const userResponse = UserMapper.toResponseWithStatus(newUser);
+      const userResponse = UserMapper.toResponse(newUser);
 
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse.userId },
+        { role: "user", id: userResponse.id },
         false,
       );
 
@@ -136,10 +136,10 @@ export class AuthController {
         otp,
       });
 
-      const userResponse = UserMapper.toResponseWithStatus(updatedUser);
+      const userResponse = UserMapper.toResponse(updatedUser);
 
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse.userId },
+        { role: "user", id: userResponse.id },
         true,
       );
 
@@ -160,9 +160,9 @@ export class AuthController {
       const authData =
         await this.externalAuthService.verifyGoogleAuthToken(token);
       const user = await this.signInWithGoogleUseCase.execute(authData);
-      const userResponse = UserMapper.toResponseWithStatus(user);
+      const userResponse = UserMapper.toResponse(user);
       const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse.userId },
+        { role: "user", id: userResponse.id },
         true,
       );
 

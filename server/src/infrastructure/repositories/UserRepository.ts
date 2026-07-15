@@ -1,21 +1,19 @@
 import { injectable } from "inversify";
 import mongoose, { type PipelineStage } from "mongoose";
 import { PostMapper } from "../mappers/PostMapper";
-import { UserDocument, UserModel } from "../database/models/UserModel";
+import { UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../mappers/UserMapper";
 
 import { User } from "@/domain/entities/User";
 import type { EnrichedPost } from "@/domain/models/Post";
-import type { UserListView, UserProfile } from "@/domain/models/User";
+import type { UserCompact, UserProfile } from "@/domain/models/User";
 import type {
   IUserRepository,
   SuggestionInput,
   UserDashboardMetrics,
+  UserFindOptions,
   UserIdentifier,
-  UserOptions,
-  UserStatus,
 } from "@/domain/repositories/IUserRepository";
-import type { UserDto } from "@/application/dtos/UserDto";
 
 @injectable()
 export class UserRepository implements IUserRepository {
@@ -23,28 +21,28 @@ export class UserRepository implements IUserRepository {
     const userToPersist = UserMapper.toPersistence(userData);
     const newUserModel = new UserModel(userToPersist);
     const userDoc = await newUserModel.save();
-    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
+    return UserMapper.toDomain(userDoc);
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const userDoc = await UserModel.findOne({ email });
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
+    return UserMapper.toDomain(userDoc);
   }
 
   async findByUsername(username: string): Promise<User | null> {
     const userDoc = await UserModel.findOne({ username });
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
+    return UserMapper.toDomain(userDoc);
   }
 
   async findById(id: string): Promise<User | null> {
     const userDoc = await UserModel.findById(id);
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
+    return UserMapper.toDomain(userDoc);
   }
 
   async findByIdentifier(identifier: string): Promise<User | null> {
@@ -58,7 +56,7 @@ export class UserRepository implements IUserRepository {
 
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(this.safeParseUserDoc(userDoc));
+    return UserMapper.toDomain(userDoc);
   }
 
   async checkUserExist(
@@ -76,7 +74,7 @@ export class UserRepository implements IUserRepository {
         return {
           isExists: true,
           field,
-          data: UserMapper.toDomain(this.safeParseUserDoc(userDoc)),
+          data: UserMapper.toDomain(userDoc),
         };
       }
     }
@@ -86,7 +84,7 @@ export class UserRepository implements IUserRepository {
 
   async update(id: string, userData: User): Promise<User | null> {
     const {
-      userId: _userId,
+      id: _id,
       email: _email,
       blockedUsers: _blockedUser,
       savedPosts: _savedPost,
@@ -102,7 +100,7 @@ export class UserRepository implements IUserRepository {
 
     if (!updatedUserDoc) return null;
 
-    return UserMapper.toDomain(this.safeParseUserDoc(updatedUserDoc));
+    return UserMapper.toDomain(updatedUserDoc);
   }
 
   async findSavedPosts(
@@ -150,8 +148,8 @@ export class UserRepository implements IUserRepository {
                 pipeline: [
                   {
                     $project: {
-                      userId: "$_id",
                       _id: 0,
+                      id: "$_id",
                       username: 1,
                       firstname: 1,
                       lastname: 1,
@@ -164,14 +162,29 @@ export class UserRepository implements IUserRepository {
             { $unwind: "$uploadedBy" },
             {
               $addFields: {
-                postId: "$_id",
-                likesCount: { $size: "$likes" },
-                commentsCount: { $size: "$comments" },
-                isLiked: { $in: [userObjectId, "$likes.userId"] },
                 isSaved: true,
               },
             },
-            { $project: { _id: 0, likes: 0, comments: 0 } },
+            {
+              $project: {
+                _id: 0,
+                id: "$_id",
+                userId: 1,
+                caption: 1,
+                images: 1,
+                tags: 1,
+                publishedFor: 1,
+                status: 1,
+                likesCount: { $size: "$likes" },
+                commentsCount: { $size: "$comments" },
+                isLiked: { $in: [userObjectId, "$likes.userId"] },
+                isSaved: 1,
+                uploadedBy: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                type: "post",
+              },
+            },
           ],
         },
       },
@@ -224,22 +237,8 @@ export class UserRepository implements IUserRepository {
         },
       },
       {
-        $lookup: {
-          from: "posts",
-          localField: "_id",
-          foreignField: "userId",
-          as: "posts",
-          pipeline: [
-            { $match: { status: "active" } },
-            { $sort: { createdAt: -1 } },
-            { $limit: limit },
-            { $addFields: { postId: "$_id" } },
-            { $project: { _id: 0, tags: 0 } },
-          ],
-        },
-      },
-      {
         $addFields: {
+          id: "$_id",
           followersCount: { $size: "$followers" },
           followingCount: { $size: "$following" },
           isFollowing: viewerId
@@ -250,16 +249,16 @@ export class UserRepository implements IUserRepository {
       {
         $project: {
           _id: 0,
-          userId: "$_id",
+          id: 1,
           username: 1,
           firstname: 1,
           lastname: 1,
           fullname: 1,
           imageUrl: 1,
-          posts: 1,
           followersCount: 1,
           followingCount: 1,
           isFollowing: 1,
+          status: 1,
         },
       },
     ];
@@ -272,90 +271,59 @@ export class UserRepository implements IUserRepository {
 
     const profileData = results[0];
 
-    if (viewerId && viewerId.toString() === profileData.userId.toString()) {
+    if (viewerId && viewerId.toString() === profileData.id.toString()) {
       delete profileData.isFollowing;
     }
 
-    return PostMapper.toProfileResponse(profileData);
+    return UserMapper.toProfile(profileData);
   }
 
-  async findByStatus(
-    status: UserStatus,
-    options: UserOptions,
-  ): Promise<UserListView[]> {
-    const { userId, searchQuery = "", page, limit } = options;
-    const skip = (page - 1) * limit;
-
-    const aggregationPipeline: PipelineStage[] = [
-      {
-        $match: {
-          status,
-          $or: [
-            { username: { $regex: searchQuery, $options: "i" } },
-            { firstname: { $regex: searchQuery, $options: "i" } },
-            { lastname: { $regex: searchQuery, $options: "i" } },
-          ],
-        },
-      },
-      { $skip: skip },
-      { $limit: limit },
-      {
-        $lookup: {
-          from: "follows",
-          localField: "_id",
-          foreignField: "followingTo",
-          as: "followers",
-        },
-      },
-      {
-        $addFields: {
-          isFollowing: userId
-            ? {
-                $in: [
-                  new mongoose.Types.ObjectId(userId),
-                  "$followers.followedBy",
-                ],
-              }
-            : undefined,
-          fullname: {
-            $concat: [`$firstname`, " ", `$lastname`],
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          userId: "$_id",
-          username: 1,
-          firstname: 1,
-          lastname: 1,
-          imageUrl: "$image",
-          isFollowing: 1,
-          type: "user",
-        },
-      },
-    ];
-
-    const users = await UserModel.aggregate(aggregationPipeline);
-    return users;
-  }
-
-  async findAll(options: {
-    filter?: "all" | "active" | "blocked";
-    searchQuery?: string;
-    page: number;
-    limit: number;
-  }): Promise<User[]> {
+  async findAll(options: UserFindOptions): Promise<User[]> {
     const { filter = "all", searchQuery = "", page, limit } = options;
     const skip = (page - 1) * limit;
 
     const matchStage: PipelineStage.Match["$match"] = {
       $or: [
         { username: { $regex: searchQuery, $options: "i" } },
-        { email: { $regex: searchQuery, $options: "i" } },
-        { mobile: { $regex: searchQuery, $options: "i" } },
+        { firstname: { $regex: searchQuery, $options: "i" } },
+        { lastname: { $regex: searchQuery, $options: "i" } },
+        ...(options.searchWithPersonalInfo
+          ? [
+              { email: { $regex: searchQuery, $options: "i" } },
+              { mobile: { $regex: searchQuery, $options: "i" } },
+            ]
+          : []),
       ],
     };
+
+    const isFollowingStage: PipelineStage[] = [
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followingTo",
+          as: "followers",
+          pipeline: [
+            {
+              $match: {
+                followedBy: new mongoose.Types.ObjectId(options.currUserId),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          isFollowing: { $gt: [{ $size: "$followers" }, 0] },
+          fullname: {
+            $concat: [`$firstname`, " ", `$lastname`],
+          },
+        },
+      },
+      {
+        $project: { followers: 0 },
+      },
+    ];
 
     if (filter !== "all") {
       matchStage.status = filter;
@@ -366,7 +334,12 @@ export class UserRepository implements IUserRepository {
       { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
+      { $addFields: { id: "$_id" } },
     ];
+
+    if (options.currUserId) {
+      aggregationPipeline.push(...isFollowingStage);
+    }
 
     const userList = await UserModel.aggregate(aggregationPipeline);
 
@@ -375,7 +348,7 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  async findSuggestions(input: SuggestionInput): Promise<UserListView[]> {
+  async findSuggestions(input: SuggestionInput): Promise<UserCompact[]> {
     const userObjectId = new mongoose.Types.ObjectId(input.userId);
     const excludeObjectIds = input.excludeIds.map(
       (id) => new mongoose.Types.ObjectId(id),
@@ -436,8 +409,7 @@ export class UserRepository implements IUserRepository {
       {
         $project: {
           _id: 0,
-          type: "user",
-          userId: { $toString: "$_id" },
+          id: { $toString: "$_id" },
           username: 1,
           fullname: {
             $concat: ["$firstname", " ", "$lastname"],
@@ -445,12 +417,14 @@ export class UserRepository implements IUserRepository {
           firstname: 1,
           lastname: 1,
           imageUrl: 1,
+          status: 1,
           isFollowing: {
             $eq: [
               { $toString: { $arrayElemAt: ["$followDoc.followedBy", 0] } },
               input.userId,
             ],
           },
+          type: "user",
         },
       },
     ];
@@ -497,21 +471,5 @@ export class UserRepository implements IUserRepository {
     }));
 
     return { totalUsers, newUsers, chartData };
-  }
-
-  private safeParseUserDoc(userDoc: UserDocument): Omit<UserDto, "fullname"> {
-    const {
-      _id: userId,
-      savedPosts,
-      blockedUsers,
-      ...userObj
-    } = userDoc.toObject();
-
-    return {
-      ...userObj,
-      userId: userId.toString(),
-      savedPosts: savedPosts.map((ids: any) => ids.toString()),
-      blockedUsers: blockedUsers.map((ids: any) => ids.toString()),
-    };
   }
 }

@@ -1,6 +1,6 @@
 import { inject } from "inversify";
 import { TYPES } from "@/shared/types";
-import type { UserListView } from "@/domain/models/User";
+import type { UserCompact } from "@/domain/models/User";
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type {
   ISuggestUser,
@@ -12,7 +12,7 @@ export class SuggestUser implements ISuggestUser {
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
   ) {}
 
-  execute(input: SuggestUserInput): Promise<UserListView[]> {
+  execute(input: SuggestUserInput): Promise<UserCompact[]> {
     return this.userRepository.findSuggestions(input);
   }
 }
