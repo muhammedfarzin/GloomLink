@@ -64,21 +64,17 @@ export class PostRepository implements IPostRepository {
       PostMapper.toPersistence(post);
     const newPostModel = new PostModel(postToPersist);
     const savedPost = await newPostModel.save();
-    return PostMapper.toDomain(this.safeParsePostDoc(savedPost));
+    return PostMapper.toDomain(savedPost);
   }
 
   async findById(id: string): Promise<Post | null> {
     const postModel = await PostModel.findById(id);
-    return postModel
-      ? PostMapper.toDomain(this.safeParsePostDoc(postModel))
-      : null;
+    return postModel && PostMapper.toDomain(postModel);
   }
 
   async findByIds(ids: string[]): Promise<Post[]> {
     const postModels = await PostModel.find({ _id: { $in: ids } });
-    return postModels.map((post) =>
-      PostMapper.toDomain(this.safeParsePostDoc(post)),
-    );
+    return postModels.map((post) => PostMapper.toDomain(post));
   }
 
   async findEnrichedById(
@@ -122,7 +118,7 @@ export class PostRepository implements IPostRepository {
           status: 1,
           likesCount: 1,
           commentsCount: 1,
-          isLiked: 1, 
+          isLiked: 1,
           isSaved: 1,
           uploadedBy: 1,
           createdAt: 1,
@@ -433,21 +429,23 @@ export class PostRepository implements IPostRepository {
     return results.map(PostMapper.toResponse);
   }
 
-  async update(postId: string, post: Post): Promise<Post | null> {
-    const { createdAt, updatedAt, ...postToPersist } =
+  async update(post: Post): Promise<Post | null> {
+    const { id, createdAt, updatedAt, ...postToPersist } =
       PostMapper.toPersistence(post);
-    const updatedPost = await PostModel.findByIdAndUpdate(
-      postId,
-      postToPersist,
-      { new: true },
-    );
-    return updatedPost
-      ? PostMapper.toDomain(this.safeParsePostDoc(updatedPost))
-      : null;
+    const updatedPost = await PostModel.findByIdAndUpdate(id, postToPersist, {
+      new: true,
+    });
+    return updatedPost && PostMapper.toDomain(updatedPost);
   }
 
-  async deleteById(postId: string): Promise<void> {
-    await PostModel.findByIdAndUpdate(postId, { status: "deleted" });
+  async deleteById(postId: string): Promise<Post | null> {
+    const deletedPost = await PostModel.findByIdAndUpdate(
+      postId,
+      { status: "deleted" },
+      { new: true },
+    );
+
+    return deletedPost && PostMapper.toDomain(deletedPost);
   }
 
   async getDashboardMetrics(
@@ -487,15 +485,5 @@ export class PostRepository implements IPostRepository {
     }));
 
     return { totalPosts, chartData };
-  }
-
-  private safeParsePostDoc(postDoc: PostDocument): PostType {
-    const { _id: postId, userId, ...postObj } = postDoc.toObject();
-
-    return {
-      ...postObj,
-      postId: postId.toString(),
-      userId: userId.toString(),
-    };
   }
 }

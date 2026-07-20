@@ -1,4 +1,3 @@
-import { set } from "mongoose";
 import { ValidationError } from "../errors/ValidationError";
 import { DateOfBirth } from "../value-objects/DateOfBirth";
 import { Email } from "../value-objects/Email";
@@ -7,7 +6,8 @@ import { PasswordHash } from "../value-objects/PasswordHash";
 import { Url } from "../value-objects/Url";
 import { UserGender } from "../value-objects/UserGender";
 import { Username } from "../value-objects/Username";
-import { UserStatus, type UserStatusType } from "../value-objects/UserStatus";
+import { UserStatus } from "../value-objects/UserStatus";
+import { UserStatusType } from "../models/User";
 import { Entity } from "./Entity";
 
 export class User extends Entity {

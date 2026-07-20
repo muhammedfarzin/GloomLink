@@ -1,10 +1,12 @@
+import type { UserStatusType } from "../models/User";
+
 export class UserStatus {
   constructor(private readonly value: UserStatusType) {
     switch (value) {
       case "active":
-      case "inactive":
       case "blocked":
       case "not-verified":
+      case "deleted":
         this.value = value;
         break;
       default:
@@ -16,5 +18,3 @@ export class UserStatus {
     return this.value;
   }
 }
-
-export type UserStatusType = "active" | "inactive" | "blocked" | "not-verified";

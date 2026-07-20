@@ -67,4 +67,9 @@ export class MessageRepository implements IMessageRepository {
     const messages = await MessageModel.aggregate(aggregationPipeline);
     return messages.map(MessageMapper.toDomain);
   }
+
+  async deleteById(id: string): Promise<Message | null> {
+    const deletedDoc = await MessageModel.findByIdAndDelete(id);
+    return deletedDoc && MessageMapper.toDomain(deletedDoc);
+  }
 }

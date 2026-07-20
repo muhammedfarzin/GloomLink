@@ -41,7 +41,7 @@ export class EditPost implements IEditPost {
     removedFiles.forEach((imgUrl) => post.removeImage(imgUrl));
     newImageUrls.forEach((imgUrl) => post.addImage(imgUrl));
 
-    const updatedPost = await this.postRepository.update(postId, post);
+    const updatedPost = await this.postRepository.update(post);
 
     if (!updatedPost) {
       throw new Error("Failed to update the post");

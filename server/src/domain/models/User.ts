@@ -1,4 +1,4 @@
-type UserStatus = "active" | "inactive" | "blocked" | "not-verified";
+export type UserStatusType = "active" | "blocked" | "not-verified" | "deleted";
 type UserAuthType = "email" | "google";
 
 export interface UserCompact {
@@ -8,7 +8,7 @@ export interface UserCompact {
   firstname: string;
   lastname?: string;
   imageUrl?: string;
-  status: UserStatus;
+  status: UserStatusType;
   isFollowing?: boolean;
   type: "user";
 }

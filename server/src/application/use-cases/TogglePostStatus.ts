@@ -25,7 +25,7 @@ export class TogglePostStatus implements ITogglePostStatus {
     const newStatus = post.isActive() ? "blocked" : "active";
     post.updateStatus(newStatus);
 
-    await this.postRepository.update(postId, post);
+    await this.postRepository.update(post);
 
     return { updatedStatus: newStatus };
   }

@@ -62,7 +62,7 @@ const Signup = () => {
       const tokens = response.data.tokens as TokensState;
 
       dispatch(setAuthUser({ userData, tokens }));
-      navigate("/signup/verify");
+      navigate("verify");
     } catch (error: any) {
       toastError(error.message);
     } finally {

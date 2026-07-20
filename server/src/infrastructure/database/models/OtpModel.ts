@@ -3,7 +3,7 @@ import { type Document, model, Schema } from "mongoose";
 export interface Otp {
   _id: Schema.Types.ObjectId;
   email: string;
-  otp: string;
+  hashedOtp: string;
   createdAt: Date;
 }
 
@@ -14,7 +14,7 @@ const otpSchema = new Schema<Otp>({
     type: String,
     required: true,
   },
-  otp: {
+  hashedOtp: {
     type: String,
     required: true,
   },

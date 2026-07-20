@@ -1,9 +1,8 @@
 import { injectable } from "inversify";
-import { ReportDocument, ReportModel } from "../database/models/ReportModel";
+import { ReportModel } from "../database/models/ReportModel";
 import { ReportMapper } from "../mappers/ReportMapper";
-import { IReportRepository } from "@/domain/repositories/IReportRepository";
-import { Report } from "@/domain/entities/Report";
-import { ReportType } from "@/domain/models/Report";
+import type { IReportRepository } from "@/domain/repositories/IReportRepository";
+import type { Report } from "@/domain/entities/Report";
 
 @injectable()
 export class ReportRepository implements IReportRepository {
@@ -16,7 +15,12 @@ export class ReportRepository implements IReportRepository {
     const reportToPersist = ReportMapper.toPersistence(reportData);
     const newReportModel = new ReportModel(reportToPersist);
     const savedReport = await newReportModel.save();
-    return ReportMapper.toDomain(this.safeParseReportDoc(savedReport));
+    return ReportMapper.toDomain(savedReport);
+  }
+
+  async findById(id: string): Promise<Report | null> {
+    const reportDoc = await ReportModel.findById(id);
+    return reportDoc && ReportMapper.toDomain(reportDoc);
   }
 
   countByTarget(targetId: string): Promise<number> {
@@ -27,17 +31,19 @@ export class ReportRepository implements IReportRepository {
     const { id, ...reportQuery } = ReportMapper.toPersistence(report);
     const reportModel = await ReportModel.findOne(reportQuery);
 
-    return reportModel
-      ? ReportMapper.toDomain(this.safeParseReportDoc(reportModel))
-      : null;
+    return reportModel && ReportMapper.toDomain(reportModel);
   }
 
-  private safeParseReportDoc(reportDoc: ReportDocument): ReportType {
-    return {
-      id: reportDoc.id.toString(),
-      type: reportDoc.type,
-      targetId: reportDoc.targetId.toString(),
-      reportedBy: reportDoc.reportedBy.toString(),
-    };
+  async update(data: Report): Promise<Report | null> {
+    const { id, ...updateData } = ReportMapper.toPersistence(data);
+    const updatedReport = await ReportModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+    return updatedReport && ReportMapper.toDomain(updatedReport);
+  }
+
+  async deleteById(id: string): Promise<Report | null> {
+    const deletedReport = await ReportModel.findByIdAndDelete(id);
+    return deletedReport && ReportMapper.toDomain(deletedReport);
   }
 }

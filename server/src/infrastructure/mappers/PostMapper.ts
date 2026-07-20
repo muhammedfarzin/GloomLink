@@ -1,10 +1,20 @@
 import { Post } from "@/domain/entities/Post";
-import type { UserProfile } from "@/domain/models/User";
-import type { EnrichedPost, PostCompact, PostType } from "@/domain/models/Post";
+import type { EnrichedPost, PostType } from "@/domain/models/Post";
+import type { PostDocument } from "../database/models/PostModel";
 
 export class PostMapper {
-  public static toDomain(data: PostType): Post {
-    return new Post(data);
+  public static toDomain(data: PostType | PostDocument): Post {
+    return new Post({
+      id: data.id?.toString(),
+      userId: data.userId?.toString(),
+      images: data.images,
+      caption: data.caption,
+      tags: data.tags,
+      publishedFor: data.publishedFor,
+      status: data.status,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    });
   }
 
   public static toPersistence(post: Post): PostType {

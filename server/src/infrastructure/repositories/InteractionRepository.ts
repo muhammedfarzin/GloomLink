@@ -40,6 +40,11 @@ export class InteractionRepository implements IInteractionRepository {
     return InteractionMapper.toDomain(savedInteraction);
   }
 
+  async findById(id: string): Promise<Interaction | null> {
+    const interaction = await InteractionModel.findById(id);
+    return interaction && InteractionMapper.toDomain(interaction);
+  }
+
   async findByUserId(
     userId: string,
     limit: number = 100,
@@ -127,5 +132,26 @@ export class InteractionRepository implements IInteractionRepository {
     }));
 
     return { totalInteractions, activeUsers, chartData };
+  }
+
+  async update(data: Interaction): Promise<Interaction | null> {
+    const {
+      id,
+      createdAt: _createdAt,
+      ...interactionToPersist
+    } = InteractionMapper.toPersistence(data);
+
+    const interaction = await InteractionModel.findByIdAndUpdate(
+      id,
+      interactionToPersist,
+      { new: true },
+    );
+
+    return interaction && InteractionMapper.toDomain(interaction);
+  }
+
+  async deleteById(id: string): Promise<Interaction | null> {
+    const interactionDoc = await InteractionModel.findByIdAndDelete(id);
+    return interactionDoc && InteractionMapper.toDomain(interactionDoc);
   }
 }

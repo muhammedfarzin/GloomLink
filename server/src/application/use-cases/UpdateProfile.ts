@@ -84,7 +84,7 @@ export class UpdateProfile implements IUpdateProfile {
     user.updateGender(input.gender);
     user.updateDateOfBirth(input.dob);
 
-    const updatedUser = await this.userRepository.update(userId, user);
+    const updatedUser = await this.userRepository.update(user);
     if (!updatedUser) {
       throw new Error("Failed to update profile.");
     }

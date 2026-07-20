@@ -38,12 +38,12 @@ export class VerifyOtp implements IVerifyOtp {
     }
 
     user.updateStatus("active");
-    const updatedUser = await this.userRepository.update(user.getId(), user);
+    const updatedUser = await this.userRepository.update(user);
     if (!updatedUser) {
       throw new Error("Failed to activate user account.");
     }
 
-    await this.otpRepository.delete(input.email);
+    await this.otpRepository.deleteByEmail(input.email);
 
     return updatedUser;
   }

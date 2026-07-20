@@ -1,3 +1,5 @@
+import type { UserStatusType } from "@/domain/models/User";
+
 export interface AuthUser {
   role: "user";
   id: string;
@@ -6,5 +8,5 @@ export interface AuthUser {
   username: string;
   email: string;
   authType: "email" | "google";
-  status: "active" | "inactive" | "blocked" | "not-verified";
+  status: UserStatusType;
 }

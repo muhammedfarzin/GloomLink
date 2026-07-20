@@ -1,9 +1,10 @@
 import type { Comment } from "../entities/Comment";
 import type { CommentResponse } from "../models/Comment";
+import type { IRepository } from "./IRepository";
 
 export type CommentableType = "post" | "comment";
 
-export interface ICommentRepository {
+export interface ICommentRepository extends IRepository {
   create(comment: Comment): Promise<Comment>;
 
   findById(id: string): Promise<Comment | null>;
@@ -28,4 +29,7 @@ export interface ICommentRepository {
     page: number,
     limit: number,
   ): Promise<CommentResponse[]>;
+
+  update(data: Comment): Promise<Comment | null>;
+  deleteById(id: string): Promise<Comment | null>;
 }

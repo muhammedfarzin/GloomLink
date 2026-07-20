@@ -27,6 +27,11 @@ export class FollowRepository implements IFollowRepository {
     return followDoc ? FollowMapper.toDomain(followDoc) : null;
   }
 
+  async findById(id: string) {
+    const followDoc = await FollowModel.findById(id);
+    return followDoc && FollowMapper.toDomain(followDoc);
+  }
+
   async findFollowing(userId: string): Promise<Follow[]> {
     const followModels = await FollowModel.find({ followedBy: userId });
     return followModels.map(FollowMapper.toDomain);
@@ -104,7 +109,16 @@ export class FollowRepository implements IFollowRepository {
     return result;
   }
 
-  async deleteById(id: string): Promise<void> {
-    await FollowModel.findByIdAndDelete(id);
+  async update(data: Follow) {
+    const { id, ...followToPersist } = FollowMapper.toPersistence(data);
+    const followDoc = await FollowModel.findByIdAndUpdate(id, followToPersist, {
+      new: true,
+    });
+    return followDoc && FollowMapper.toDomain(followDoc);
+  }
+
+  async deleteById(id: string) {
+    const followDoc = await FollowModel.findByIdAndDelete(id);
+    return followDoc && FollowMapper.toDomain(followDoc);
   }
 }

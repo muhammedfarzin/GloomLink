@@ -1,7 +1,8 @@
-import { Post } from "../entities/Post";
+import type { Post } from "../entities/Post";
 import type { EnrichedPost } from "../models/Post";
+import type { IRepository } from "./IRepository";
 
-export interface IPostRepository {
+export interface IPostRepository extends IRepository {
   create(post: Post): Promise<Post>;
   findById(id: string): Promise<Post | null>;
   findByIds(ids: string[]): Promise<Post[]>;
@@ -11,7 +12,7 @@ export interface IPostRepository {
   ): Promise<EnrichedPost | null>;
   findAndSortFeed(options: PostFeedOptions): Promise<EnrichedPost[]>;
   findAll(options: {
-    page: number; 
+    page: number;
     limit: number;
     searchQuery?: string;
     withReports?: boolean;
@@ -30,8 +31,8 @@ export interface IPostRepository {
     limit: number;
     searchQuery?: string;
   }): Promise<EnrichedPost[]>;
-  update(postId: string, post: Post): Promise<Post | null>;
-  deleteById(postId: string): Promise<void>;
+  update(post: Post): Promise<Post | null>;
+  deleteById(id: string): Promise<Post | null>;
   getDashboardMetrics(
     startDate: Date,
     endDate: Date,

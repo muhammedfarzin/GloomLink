@@ -1,14 +1,15 @@
 import { injectable } from "inversify";
-import mongoose, { PipelineStage } from "mongoose";
+import mongoose, { type PipelineStage } from "mongoose";
 import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 import type { ConversationList } from "@/domain/models/Conversation";
-import { Conversation } from "@/domain/entities/Conversation";
+import type { Conversation } from "@/domain/entities/Conversation";
 import { ConversationModel } from "../database/models/ConversationModel";
 import { ConversationMapper } from "../mappers/ConversationMapper";
 
 @injectable()
 export class ConversationRepository implements IConversationRepository {
-  async create(participantIds: string[]): Promise<Conversation> {
+  async create(data: Conversation): Promise<Conversation> {
+    const participantIds = data.getParticipants();
     const newConversation = new ConversationModel({
       participants: participantIds,
     });
@@ -135,5 +136,24 @@ export class ConversationRepository implements IConversationRepository {
 
     const results = await ConversationModel.aggregate(aggregationPipeline);
     return results;
+  }
+
+  async update(data: Conversation) {
+    const id = data.getId();
+    const participantIds = data.getParticipants();
+    const conversationDoc = await ConversationModel.findByIdAndUpdate(
+      id,
+      {
+        $set: { participants: participantIds },
+      },
+      { new: true },
+    );
+
+    return conversationDoc && ConversationMapper.toDomain(conversationDoc);
+  }
+
+  async deleteById(id: string) {
+    const conversationDoc = await ConversationModel.findByIdAndDelete(id);
+    return conversationDoc && ConversationMapper.toDomain(conversationDoc);
   }
 }

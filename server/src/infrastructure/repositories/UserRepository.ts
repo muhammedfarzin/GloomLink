@@ -82,9 +82,9 @@ export class UserRepository implements IUserRepository {
     return { isExists: false };
   }
 
-  async update(id: string, userData: User): Promise<User | null> {
+  async update(userData: User): Promise<User | null> {
     const {
-      id: _id,
+      id,
       email: _email,
       blockedUsers: _blockedUser,
       savedPosts: _savedPost,
@@ -471,5 +471,15 @@ export class UserRepository implements IUserRepository {
     }));
 
     return { totalUsers, newUsers, chartData };
+  }
+
+  async deleteById(id: string): Promise<User | null> {
+    const deletedUserDoc = await UserModel.findByIdAndUpdate(
+      id,
+      { $set: { status: "deleted" } },
+      { new: true },
+    );
+
+    return deletedUserDoc && UserMapper.toDomain(deletedUserDoc);
   }
 }

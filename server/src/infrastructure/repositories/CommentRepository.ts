@@ -91,6 +91,23 @@ export class CommentRepository implements ICommentRepository {
     return results.map(CommentMapper.toResponseDto);
   }
 
+  async update(data: Comment) {
+    const { id, comment } = CommentMapper.toPersistence(data);
+
+    const updatedComment = await CommentModel.findByIdAndUpdate(
+      id,
+      { comment },
+      { new: true },
+    );
+
+    return updatedComment && CommentMapper.toDomain(updatedComment);
+  }
+
+  async deleteById(id: string) {
+    const commentDoc = await CommentModel.findByIdAndDelete(id);
+    return commentDoc && CommentMapper.toDomain(commentDoc);
+  }
+
   private createCommentAggregationPipeline(
     initialMatchStage: PipelineStage[],
   ): PipelineStage[] {

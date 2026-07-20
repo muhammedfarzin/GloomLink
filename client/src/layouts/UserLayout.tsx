@@ -21,7 +21,7 @@ const UserLayout = () => {
       if (userData.status === "blocked") {
         dispatch(logout({ type: "user" }));
       } else if (userData.status === "not-verified") {
-        navigate("/signup/verify");
+        navigate("/auth/signup/verify");
       }
     }
   }, [userData]);

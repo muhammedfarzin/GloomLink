@@ -24,8 +24,9 @@ export class LikeRepository implements ILikeRepository {
     return likeModel ? LikeMapper.toDomain(likeModel) : null;
   }
 
-  async delete(id: string): Promise<void> {
-    await LikeModel.findByIdAndDelete(id);
+  async findById(id: string): Promise<Like | null> {
+    const likeDoc = await LikeModel.findById(id);
+    return likeDoc && LikeMapper.toDomain(likeDoc);
   }
 
   async findLikersByTarget(
@@ -96,5 +97,18 @@ export class LikeRepository implements ILikeRepository {
 
     const result = await LikeModel.aggregate(aggregationPipeline);
     return result;
+  }
+
+  async update(data: Like): Promise<Like | null> {
+    const { id, ...likeToUpdate } = LikeMapper.toPersistence(data);
+    const updatedLike = await LikeModel.findByIdAndUpdate(id, likeToUpdate, {
+      new: true,
+    });
+    return updatedLike && LikeMapper.toDomain(updatedLike);
+  }
+
+  async deleteById(id: string): Promise<Like | null> {
+    const likeDoc = await LikeModel.findByIdAndDelete(id);
+    return likeDoc && LikeMapper.toDomain(likeDoc);
   }
 }

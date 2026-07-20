@@ -29,7 +29,7 @@ export class ToggleLike implements IToggleLike {
     const existingLike = await this.likeRepository.find(likeToCreate);
 
     if (existingLike) {
-      await this.likeRepository.delete(existingLike.getId());
+      await this.likeRepository.deleteById(existingLike.getId());
       return { status: "unliked" };
     } else {
       await this.likeRepository.create(likeToCreate);

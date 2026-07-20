@@ -52,9 +52,9 @@ export class ReportTarget implements IReportTarget {
     if (reportCount >= REPORT_THRESHOLD) {
       target.updateStatus("blocked");
       if (target instanceof User) {
-        await this.userRepository.update(targetId, target);
+        await this.userRepository.update(target);
       } else {
-        await this.postRepository.update(targetId, target);
+        await this.postRepository.update(target);
       }
     }
   }

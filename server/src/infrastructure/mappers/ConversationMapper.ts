@@ -3,12 +3,15 @@ import type {
   ConversationType,
   ConversationList,
 } from "@/domain/models/Conversation";
+import type { ConversationDocument } from "../database/models/ConversationModel";
 
 export class ConversationMapper {
-  public static toDomain(conversation: ConversationType): Conversation {
+  public static toDomain(
+    conversation: ConversationType | ConversationDocument,
+  ): Conversation {
     return new Conversation({
       id: conversation.id,
-      participants: conversation.participants,
+      participants: conversation.participants.map((p) => p.toString()),
     });
   }
 

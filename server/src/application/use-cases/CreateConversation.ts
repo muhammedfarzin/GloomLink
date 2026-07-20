@@ -66,8 +66,12 @@ export class CreateConversation implements ICreateConversation {
     }
 
     // ---If not, create a new one---
+    const conversationToCreate = new Conversation({
+      id: crypto.randomUUID(),
+      participants: participantsIds,
+    });
     const newConversation =
-      await this.conversationRepository.create(participantsIds);
+      await this.conversationRepository.create(conversationToCreate);
 
     // Inform to all participants
     this.notificationService.notifyConversationCreated({

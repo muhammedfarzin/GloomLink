@@ -9,7 +9,7 @@ export interface User {
   email: string;
   mobile?: string;
   authType: "email" | "google";
-  status: "active" | "inactive" | "blocked" | "not-verified";
+  status: "active" | "blocked" | "not-verified" | "deleted";
   imageUrl?: string;
   gender?: "m" | "f";
   dob?: Date;
@@ -40,7 +40,7 @@ const userSchema = new Schema<User>(
     status: {
       type: String,
       default: "not-verified",
-      enum: ["active", "inactive", "blocked", "not-verified"],
+      enum: ["active", "blocked", "not-verified", "deleted"],
     },
     gender: { type: String, default: null, enum: ["m", "f"] },
     dob: { type: Date, default: null },

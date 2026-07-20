@@ -18,7 +18,7 @@ export class ToggleUserStatus implements IToggleUserStatus {
 
     const newStatus = user.isActive() ? "blocked" : "active";
     user.updateStatus(newStatus);
-    await this.userRepository.update(userId, user);
+    await this.userRepository.update(user);
 
     return { updatedStatus: newStatus };
   }
