@@ -1,7 +1,7 @@
 import type { CommentType } from "../models/Comment";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Comment extends Entity {
+export class Comment extends BaseEntity {
   private readonly targetId: string;
   private readonly userId: string;
   private comment: string;

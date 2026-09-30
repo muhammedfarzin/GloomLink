@@ -1,4 +1,4 @@
-export class Entity {
+export class BaseEntity {
   private readonly id: string;
 
   constructor({ id }: { id: string }) {

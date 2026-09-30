@@ -1,8 +1,8 @@
 import type { PostType } from "../models/Post";
 import { Url } from "../value-objects/Url";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Post extends Entity {
+export class Post extends BaseEntity {
   private readonly userId: string;
   private caption?: string | null;
   private images: Url[];

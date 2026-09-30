@@ -1,7 +1,7 @@
 import type { InteractionType } from "../models/Interaction";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Interaction extends Entity {
+export class Interaction extends BaseEntity {
   private readonly userId: string;
   private readonly postId: string;
   private readonly type: "view" | "like" | "comment" | "save";

@@ -1,7 +1,7 @@
 import type { ReportType } from "../models/Report";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Report extends Entity {
+export class Report extends BaseEntity {
   private readonly type: "post" | "user";
   private readonly targetId: string;
   private readonly reportedBy: string;

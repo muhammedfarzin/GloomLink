@@ -1,7 +1,7 @@
 import type { LikeType } from "../models/Like";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Like extends Entity {
+export class Like extends BaseEntity {
   private readonly userId: string;
   private readonly targetId: string;
   private readonly targetType: "post";

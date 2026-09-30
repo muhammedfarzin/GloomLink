@@ -1,7 +1,7 @@
 import type { FollowType } from "../models/Follow";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Follow extends Entity {
+export class Follow extends BaseEntity {
   private readonly followerId: string;
   private readonly followingId: string;
 

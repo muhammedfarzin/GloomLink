@@ -1,7 +1,7 @@
 import type { OtpType } from "../models/Otp";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Otp extends Entity {
+export class Otp extends BaseEntity {
   private readonly email: string;
   private readonly hashedOtp: string;
   private readonly createdAt: Date;

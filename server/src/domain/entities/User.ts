@@ -8,9 +8,9 @@ import { UserGender } from "../value-objects/UserGender";
 import { Username } from "../value-objects/Username";
 import { UserStatus } from "../value-objects/UserStatus";
 import { UserStatusType } from "../models/User";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class User extends Entity {
+export class User extends BaseEntity {
   private username: Username;
   private passwordHash: PasswordHash;
   private firstname: string;

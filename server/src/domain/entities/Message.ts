@@ -1,7 +1,7 @@
 import type { CompactMessage } from "../models/Message";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Message extends Entity {
+export class Message extends BaseEntity {
   private readonly conversationId: string;
   private message?: string;
   private readonly image?: string;

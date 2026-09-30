@@ -1,7 +1,7 @@
 import type { ConversationType } from "../models/Conversation";
-import { Entity } from "./Entity";
+import { BaseEntity } from "./BaseEntity";
 
-export class Conversation extends Entity {
+export class Conversation extends BaseEntity {
   private readonly participants: Set<string>;
 
   constructor(props: ConversationType) {
