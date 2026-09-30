@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import SideMenuBar from "@/components/SideMenuBar";
 import ChatList from "@/features/chat/ChatList";
@@ -10,7 +10,6 @@ import { ScreenSizeEnum, useScreenSize } from "@/hooks/useScreenSize";
 import type { RootState } from "@/redux/store";
 
 const UserLayout = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth.userData);
@@ -20,13 +19,17 @@ const UserLayout = () => {
     if (userData) {
       if (userData.status === "blocked") {
         dispatch(logout({ type: "user" }));
-      } else if (userData.status === "not-verified") {
-        navigate("/auth/signup/verify");
       }
     }
   }, [userData]);
 
-  return userData ? (
+  if (!userData) {
+    return <Navigate to="/auth/login" />;
+  } else if (userData.status === "not-verified") {
+    return <Navigate to="/auth/signup/verify" />;
+  }
+
+  return (
     <>
       {screenGreaterThan(ScreenSizeEnum.xs) && <SideMenuBar userType="user" />}
 
@@ -46,8 +49,6 @@ const UserLayout = () => {
         </div>
       )}
     </>
-  ) : (
-    <Navigate to="/auth/login" />
   );
 };
 
