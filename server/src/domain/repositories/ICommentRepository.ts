@@ -1,10 +1,10 @@
 import type { Comment } from "../entities/Comment";
 import type { CommentResponse } from "../models/Comment";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
 export type CommentableType = "post" | "comment";
 
-export interface ICommentRepository extends IRepository {
+export interface ICommentRepository extends IBaseRepository<Comment> {
   create(comment: Comment): Promise<Comment>;
 
   findById(id: string): Promise<Comment | null>;

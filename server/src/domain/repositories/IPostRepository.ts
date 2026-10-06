@@ -1,8 +1,8 @@
 import type { Post } from "../entities/Post";
 import type { EnrichedPost } from "../models/Post";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
-export interface IPostRepository extends IRepository {
+export interface IPostRepository extends IBaseRepository<Post> {
   create(post: Post): Promise<Post>;
   findById(id: string): Promise<Post | null>;
   findByIds(ids: string[]): Promise<Post[]>;

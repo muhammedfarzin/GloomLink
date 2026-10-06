@@ -2,9 +2,9 @@ import type { User } from "../entities/User";
 import type { UserCompact } from "../models/User";
 import type { EnrichedPost } from "../models/Post";
 import type { UserProfile } from "../models/User";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
-export interface IUserRepository extends IRepository {
+export interface IUserRepository extends IBaseRepository<User> {
   create: (user: User) => Promise<User>;
   findById(id: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
@@ -63,3 +63,4 @@ export interface UserFindOptions {
   limit: number;
   searchWithPersonalInfo?: boolean;
 }
+

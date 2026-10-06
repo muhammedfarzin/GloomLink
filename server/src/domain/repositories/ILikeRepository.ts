@@ -1,6 +1,6 @@
 import type { UserCompact } from "../models/User";
 import type { Like } from "../entities/Like";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
 export type LikeableType = "post";
 export interface LikeOptions {
@@ -10,7 +10,7 @@ export interface LikeOptions {
   limit: number;
 }
 
-export interface ILikeRepository extends IRepository {
+export interface ILikeRepository extends IBaseRepository<Like> {
   create(like: Like): Promise<Like>;
   find(like: Like): Promise<Like | null>;
   findById(id: string): Promise<Like | null>;

@@ -1,7 +1,7 @@
 import { Message } from "../entities/Message";
-import { IRepository } from "./IRepository";
+import { IBaseRepository } from "./IBaseRepository";
 
-export interface IMessageRepository extends IRepository {
+export interface IMessageRepository extends IBaseRepository<Message> {
   create(messageData: Message): Promise<Message>;
   findById(messageId: string): Promise<Message | null>;
   update(message: Message): Promise<Message | null>;

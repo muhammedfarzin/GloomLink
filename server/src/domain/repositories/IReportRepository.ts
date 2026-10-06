@@ -1,7 +1,7 @@
 import { Report } from "../entities/Report";
-import { IRepository } from "./IRepository";
+import { IBaseRepository } from "./IBaseRepository";
 
-export interface IReportRepository extends IRepository {
+export interface IReportRepository extends IBaseRepository<Report> {
   create(reportData: Report): Promise<Report>;
   findById(id: string): Promise<Report | null>;
   countByTarget(targetId: string): Promise<number>;
@@ -11,3 +11,4 @@ export interface IReportRepository extends IRepository {
 }
 
 export type ReportableType = "post" | "user";
+

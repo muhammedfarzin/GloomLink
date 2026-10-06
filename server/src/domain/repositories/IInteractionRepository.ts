@@ -1,7 +1,7 @@
 import type { Interaction } from "../entities/Interaction";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
-export interface IInteractionRepository extends IRepository {
+export interface IInteractionRepository extends IBaseRepository<Interaction> {
   create(interaction: Interaction): Promise<Interaction>;
   findById(id: string): Promise<Interaction | null>;
   findByUserId(userId: string, limit?: number): Promise<Interaction[]>;

@@ -1,6 +1,6 @@
 import type { UserCompact } from "../models/User";
 import type { Follow } from "../entities/Follow";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
 export type FollowListType = "followers" | "following";
 export interface FollowListOptions {
@@ -9,7 +9,7 @@ export interface FollowListOptions {
   limit: number;
 }
 
-export interface IFollowRepository extends IRepository {
+export interface IFollowRepository extends IBaseRepository<Follow> {
   create(follow: Follow): Promise<Follow>;
   find(followerId: string, followingId: string): Promise<Follow | null>;
   findById(id: string): Promise<Follow | null>;

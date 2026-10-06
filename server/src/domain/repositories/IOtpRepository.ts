@@ -1,7 +1,7 @@
 import type { Otp } from "../entities/Otp";
-import type { IRepository } from "./IRepository";
+import type { IBaseRepository } from "./IBaseRepository";
 
-export interface IOtpRepository extends IRepository {
+export interface IOtpRepository extends IBaseRepository<Otp> {
   create(otp: Otp): Promise<Otp>;
   findById(id: string): Promise<Otp | null>;
   findByEmail(email: string): Promise<Otp | null>;
