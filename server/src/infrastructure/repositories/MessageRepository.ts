@@ -1,24 +1,19 @@
 import { injectable } from "inversify";
 import { IMessageRepository } from "@/domain/repositories/IMessageRepository";
 import { Message } from "@/domain/entities/Message";
+import type { MessageDocument } from "../database/models/MessageModel";
 import { MessageModel } from "../database/models/MessageModel";
 import { MessageMapper } from "../mappers/MessageMapper";
 import mongoose, { PipelineStage } from "mongoose";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class MessageRepository implements IMessageRepository {
-  async create(message: Message): Promise<Message> {
-    const { id, createdAt, updatedAt, ...messageToPersist } =
-      MessageMapper.toPersistence(message);
-    const newMessageModel = new MessageModel(messageToPersist);
-    const savedDoc = await newMessageModel.save();
-    return MessageMapper.toDomain(savedDoc);
-  }
-
-  async findById(messageId: string): Promise<Message | null> {
-    const messageDoc = await MessageModel.findById(messageId);
-    return messageDoc ? MessageMapper.toDomain(messageDoc) : null;
-  }
+export class MessageRepository
+  extends BaseRepository<Message, MessageDocument>
+  implements IMessageRepository
+{
+  protected readonly model = MessageModel;
+  protected readonly mapper = MessageMapper;
 
   async update(message: Message): Promise<Message | null> {
     const { id, createdAt, updatedAt, ...messageToPersist } =
@@ -66,10 +61,5 @@ export class MessageRepository implements IMessageRepository {
 
     const messages = await MessageModel.aggregate(aggregationPipeline);
     return messages.map(MessageMapper.toDomain);
-  }
-
-  async deleteById(id: string): Promise<Message | null> {
-    const deletedDoc = await MessageModel.findByIdAndDelete(id);
-    return deletedDoc && MessageMapper.toDomain(deletedDoc);
   }
 }

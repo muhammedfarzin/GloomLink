@@ -1,15 +1,23 @@
 import mongoose from "mongoose";
 import { injectable } from "inversify";
 import { Interaction } from "@/domain/entities/Interaction";
+import type { InteractionDocument } from "../database/models/InteractionModel";
 import { InteractionModel } from "../database/models/InteractionModel";
 import { InteractionMapper } from "../mappers/InteractionMapper";
 import type {
   IInteractionRepository,
   InteractionDashboardMetrics,
 } from "@/domain/repositories/IInteractionRepository";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class InteractionRepository implements IInteractionRepository {
+export class InteractionRepository
+  extends BaseRepository<Interaction, InteractionDocument>
+  implements IInteractionRepository
+{
+  protected readonly model = InteractionModel;
+  protected readonly mapper = InteractionMapper;
+
   async create(interaction: Interaction): Promise<Interaction> {
     const { id, ...interactionToPersist } =
       InteractionMapper.toPersistence(interaction);
@@ -38,11 +46,6 @@ export class InteractionRepository implements IInteractionRepository {
     }
 
     return InteractionMapper.toDomain(savedInteraction);
-  }
-
-  async findById(id: string): Promise<Interaction | null> {
-    const interaction = await InteractionModel.findById(id);
-    return interaction && InteractionMapper.toDomain(interaction);
   }
 
   async findByUserId(
@@ -148,10 +151,5 @@ export class InteractionRepository implements IInteractionRepository {
     );
 
     return interaction && InteractionMapper.toDomain(interaction);
-  }
-
-  async deleteById(id: string): Promise<Interaction | null> {
-    const interactionDoc = await InteractionModel.findByIdAndDelete(id);
-    return interactionDoc && InteractionMapper.toDomain(interactionDoc);
   }
 }

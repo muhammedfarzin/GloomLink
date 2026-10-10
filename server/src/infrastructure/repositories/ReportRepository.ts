@@ -1,11 +1,19 @@
 import { injectable } from "inversify";
+import type { Report } from "@/domain/entities/Report";
+import type { IReportRepository } from "@/domain/repositories/IReportRepository";
+import type { ReportDocument } from "../database/models/ReportModel";
 import { ReportModel } from "../database/models/ReportModel";
 import { ReportMapper } from "../mappers/ReportMapper";
-import type { IReportRepository } from "@/domain/repositories/IReportRepository";
-import type { Report } from "@/domain/entities/Report";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class ReportRepository implements IReportRepository {
+export class ReportRepository
+  extends BaseRepository<Report, ReportDocument>
+  implements IReportRepository
+{
+  protected readonly model = ReportModel;
+  protected readonly mapper = ReportMapper;
+
   async create(reportData: Report): Promise<Report> {
     // ---Checking user already reported the target---
     const existingReport = await this.getExistingReport(reportData);
@@ -18,11 +26,6 @@ export class ReportRepository implements IReportRepository {
     return ReportMapper.toDomain(savedReport);
   }
 
-  async findById(id: string): Promise<Report | null> {
-    const reportDoc = await ReportModel.findById(id);
-    return reportDoc && ReportMapper.toDomain(reportDoc);
-  }
-
   countByTarget(targetId: string): Promise<number> {
     return ReportModel.countDocuments({ targetId });
   }
@@ -32,18 +35,5 @@ export class ReportRepository implements IReportRepository {
     const reportModel = await ReportModel.findOne(reportQuery);
 
     return reportModel && ReportMapper.toDomain(reportModel);
-  }
-
-  async update(data: Report): Promise<Report | null> {
-    const { id, ...updateData } = ReportMapper.toPersistence(data);
-    const updatedReport = await ReportModel.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-    return updatedReport && ReportMapper.toDomain(updatedReport);
-  }
-
-  async deleteById(id: string): Promise<Report | null> {
-    const deletedReport = await ReportModel.findByIdAndDelete(id);
-    return deletedReport && ReportMapper.toDomain(deletedReport);
   }
 }

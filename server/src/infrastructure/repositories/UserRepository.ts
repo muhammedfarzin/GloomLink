@@ -3,7 +3,7 @@ import mongoose, { type PipelineStage } from "mongoose";
 import { PostMapper } from "../mappers/PostMapper";
 import { UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../mappers/UserMapper";
-
+import type { UserDocument } from "../database/models/UserModel";
 import { User } from "@/domain/entities/User";
 import type { EnrichedPost } from "@/domain/models/Post";
 import type { UserCompact, UserProfile } from "@/domain/models/User";
@@ -14,15 +14,15 @@ import type {
   UserFindOptions,
   UserIdentifier,
 } from "@/domain/repositories/IUserRepository";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class UserRepository implements IUserRepository {
-  async create(userData: User): Promise<User> {
-    const userToPersist = UserMapper.toPersistence(userData);
-    const newUserModel = new UserModel(userToPersist);
-    const userDoc = await newUserModel.save();
-    return UserMapper.toDomain(userDoc);
-  }
+export class UserRepository
+  extends BaseRepository<User, UserDocument>
+  implements IUserRepository
+{
+  protected readonly model = UserModel;
+  protected readonly mapper = UserMapper;
 
   async findByEmail(email: string): Promise<User | null> {
     const userDoc = await UserModel.findOne({ email });
@@ -33,13 +33,6 @@ export class UserRepository implements IUserRepository {
 
   async findByUsername(username: string): Promise<User | null> {
     const userDoc = await UserModel.findOne({ username });
-    if (!userDoc) return null;
-
-    return UserMapper.toDomain(userDoc);
-  }
-
-  async findById(id: string): Promise<User | null> {
-    const userDoc = await UserModel.findById(id);
     if (!userDoc) return null;
 
     return UserMapper.toDomain(userDoc);

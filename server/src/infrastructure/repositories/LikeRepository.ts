@@ -8,25 +8,21 @@ import type {
 import { Like } from "@/domain/entities/Like";
 import { LikeModel } from "../database/models/LikeModel";
 import { LikeMapper } from "../mappers/LikeMapper";
+import type { LikeDocument } from "../database/models/LikeModel";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class LikeRepository implements ILikeRepository {
-  async create(like: Like): Promise<Like> {
-    const { id, ...likeToPersist } = LikeMapper.toPersistence(like);
-    const newLikeModel = new LikeModel(likeToPersist);
-    const savedLike = await newLikeModel.save();
-    return LikeMapper.toDomain(savedLike);
-  }
+export class LikeRepository
+  extends BaseRepository<Like, LikeDocument>
+  implements ILikeRepository
+{
+  protected readonly model = LikeModel;
+  protected readonly mapper = LikeMapper;
 
   async find(like: Like): Promise<Like | null> {
     const { id, ...likeToFind } = LikeMapper.toPersistence(like);
     const likeModel = await LikeModel.findOne(likeToFind);
     return likeModel ? LikeMapper.toDomain(likeModel) : null;
-  }
-
-  async findById(id: string): Promise<Like | null> {
-    const likeDoc = await LikeModel.findById(id);
-    return likeDoc && LikeMapper.toDomain(likeDoc);
   }
 
   async findLikersByTarget(
@@ -97,18 +93,5 @@ export class LikeRepository implements ILikeRepository {
 
     const result = await LikeModel.aggregate(aggregationPipeline);
     return result;
-  }
-
-  async update(data: Like): Promise<Like | null> {
-    const { id, ...likeToUpdate } = LikeMapper.toPersistence(data);
-    const updatedLike = await LikeModel.findByIdAndUpdate(id, likeToUpdate, {
-      new: true,
-    });
-    return updatedLike && LikeMapper.toDomain(updatedLike);
-  }
-
-  async deleteById(id: string): Promise<Like | null> {
-    const likeDoc = await LikeModel.findByIdAndDelete(id);
-    return likeDoc && LikeMapper.toDomain(likeDoc);
   }
 }

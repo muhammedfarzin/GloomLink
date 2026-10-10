@@ -8,10 +8,17 @@ import type {
   PostDashboardMetrics,
   PostFeedOptions,
 } from "@/domain/repositories/IPostRepository";
-import type { EnrichedPost, PostType } from "@/domain/models/Post";
+import type { EnrichedPost } from "@/domain/models/Post";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class PostRepository implements IPostRepository {
+export class PostRepository
+  extends BaseRepository<Post, PostDocument>
+  implements IPostRepository
+{
+  protected readonly model = PostModel;
+  protected readonly mapper = PostMapper;
+
   private enrichedPipeline: PipelineStage[] = [
     {
       $lookup: {
@@ -58,24 +65,6 @@ export class PostRepository implements IPostRepository {
       },
     },
   ];
-
-  async create(post: Post): Promise<Post> {
-    const { createdAt, updatedAt, ...postToPersist } =
-      PostMapper.toPersistence(post);
-    const newPostModel = new PostModel(postToPersist);
-    const savedPost = await newPostModel.save();
-    return PostMapper.toDomain(savedPost);
-  }
-
-  async findById(id: string): Promise<Post | null> {
-    const postModel = await PostModel.findById(id);
-    return postModel && PostMapper.toDomain(postModel);
-  }
-
-  async findByIds(ids: string[]): Promise<Post[]> {
-    const postModels = await PostModel.find({ _id: { $in: ids } });
-    return postModels.map((post) => PostMapper.toDomain(post));
-  }
 
   async findEnrichedById(
     postId: string,

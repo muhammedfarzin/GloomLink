@@ -3,11 +3,19 @@ import mongoose, { type PipelineStage } from "mongoose";
 import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 import type { ConversationList } from "@/domain/models/Conversation";
 import type { Conversation } from "@/domain/entities/Conversation";
+import type { ConversationDocument } from "../database/models/ConversationModel";
 import { ConversationModel } from "../database/models/ConversationModel";
 import { ConversationMapper } from "../mappers/ConversationMapper";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class ConversationRepository implements IConversationRepository {
+export class ConversationRepository
+  extends BaseRepository<Conversation, ConversationDocument>
+  implements IConversationRepository
+{
+  protected readonly model = ConversationModel;
+  protected readonly mapper = ConversationMapper;
+
   async create(data: Conversation): Promise<Conversation> {
     const participantIds = data.getParticipants();
     const newConversation = new ConversationModel({
@@ -20,16 +28,6 @@ export class ConversationRepository implements IConversationRepository {
     });
   }
 
-  async findById(id: string): Promise<Conversation | null> {
-    const conversationDoc = await ConversationModel.findById(id);
-    return conversationDoc
-      ? ConversationMapper.toDomain({
-          id: conversationDoc.id.toString(),
-          participants: conversationDoc.participants.map((id) => id.toString()),
-        })
-      : null;
-  }
-
   async findByParticipants(
     participantIds: string[],
   ): Promise<Conversation | null> {
@@ -40,10 +38,7 @@ export class ConversationRepository implements IConversationRepository {
       },
     });
     return conversationDoc
-      ? ConversationMapper.toDomain({
-          id: conversationDoc.id.toString(),
-          participants: conversationDoc.participants.map((id) => id.toString()),
-        })
+      ? ConversationMapper.toDomain(conversationDoc)
       : null;
   }
 
@@ -149,11 +144,6 @@ export class ConversationRepository implements IConversationRepository {
       { new: true },
     );
 
-    return conversationDoc && ConversationMapper.toDomain(conversationDoc);
-  }
-
-  async deleteById(id: string) {
-    const conversationDoc = await ConversationModel.findByIdAndDelete(id);
     return conversationDoc && ConversationMapper.toDomain(conversationDoc);
   }
 }

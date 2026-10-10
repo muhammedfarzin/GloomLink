@@ -7,17 +7,18 @@ import type {
   FollowListType,
   IFollowRepository,
 } from "@/domain/repositories/IFollowRepository";
+import type { FollowDocument } from "../database/models/FollowModel";
 import { FollowModel } from "../database/models/FollowModel";
 import { FollowMapper } from "../mappers/FollowMapper";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class FollowRepository implements IFollowRepository {
-  async create(follow: Follow): Promise<Follow> {
-    const { id, ...followToPersist } = FollowMapper.toPersistence(follow);
-    const newFollow = new FollowModel(followToPersist);
-    const savedDoc = await newFollow.save();
-    return FollowMapper.toDomain(savedDoc);
-  }
+export class FollowRepository
+  extends BaseRepository<Follow, FollowDocument>
+  implements IFollowRepository
+{
+  protected readonly model = FollowModel;
+  protected readonly mapper = FollowMapper;
 
   async find(followerId: string, followingId: string): Promise<Follow | null> {
     const followDoc = await FollowModel.findOne({
@@ -25,11 +26,6 @@ export class FollowRepository implements IFollowRepository {
       followingTo: followingId,
     });
     return followDoc ? FollowMapper.toDomain(followDoc) : null;
-  }
-
-  async findById(id: string) {
-    const followDoc = await FollowModel.findById(id);
-    return followDoc && FollowMapper.toDomain(followDoc);
   }
 
   async findFollowing(userId: string): Promise<Follow[]> {
@@ -107,18 +103,5 @@ export class FollowRepository implements IFollowRepository {
 
     const result = await FollowModel.aggregate(aggregationPipeline);
     return result;
-  }
-
-  async update(data: Follow) {
-    const { id, ...followToPersist } = FollowMapper.toPersistence(data);
-    const followDoc = await FollowModel.findByIdAndUpdate(id, followToPersist, {
-      new: true,
-    });
-    return followDoc && FollowMapper.toDomain(followDoc);
-  }
-
-  async deleteById(id: string) {
-    const followDoc = await FollowModel.findByIdAndDelete(id);
-    return followDoc && FollowMapper.toDomain(followDoc);
   }
 }
