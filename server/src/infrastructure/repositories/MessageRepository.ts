@@ -1,8 +1,9 @@
-import { injectable } from "inversify";
+import type { Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import { IMessageRepository } from "@/domain/repositories/IMessageRepository";
 import { Message } from "@/domain/entities/Message";
 import type { MessageDocument } from "../database/models/MessageModel";
-import { MessageModel } from "../database/models/MessageModel";
 import { MessageMapper } from "../mappers/MessageMapper";
 import mongoose, { PipelineStage } from "mongoose";
 import { BaseRepository } from "./BaseRepository";
@@ -12,18 +13,22 @@ export class MessageRepository
   extends BaseRepository<Message, MessageDocument>
   implements IMessageRepository
 {
-  protected readonly model = MessageModel;
-  protected readonly mapper = MessageMapper;
+  constructor(
+    @inject(TYPES.MessageModel) protected readonly model: Model<MessageDocument>,
+    @inject(TYPES.MessageMapper) protected readonly mapper: MessageMapper,
+  ) {
+    super();
+  }
 
   async update(message: Message): Promise<Message | null> {
     const { id, createdAt, updatedAt, ...messageToPersist } =
-      MessageMapper.toPersistence(message);
-    const updatedDoc = await MessageModel.findByIdAndUpdate(
+      this.mapper.toPersistence(message);
+    const updatedDoc = await this.model.findByIdAndUpdate(
       id,
       { $set: messageToPersist },
       { new: true },
     );
-    return updatedDoc ? MessageMapper.toDomain(updatedDoc) : null;
+    return updatedDoc ? this.mapper.toDomain(updatedDoc) : null;
   }
 
   async findByConversationId(
@@ -59,7 +64,7 @@ export class MessageRepository
       },
     ];
 
-    const messages = await MessageModel.aggregate(aggregationPipeline);
-    return messages.map(MessageMapper.toDomain);
+    const messages = await this.model.aggregate(aggregationPipeline);
+    return messages.map((item) => this.mapper.toDomain(item));
   }
 }

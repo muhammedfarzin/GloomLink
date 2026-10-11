@@ -1,4 +1,6 @@
-import { injectable } from "inversify";
+import type { Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import mongoose, { type PipelineStage } from "mongoose";
 import type { Follow } from "@/domain/entities/Follow";
 import type { UserCompact } from "@/domain/models/User";
@@ -8,7 +10,6 @@ import type {
   IFollowRepository,
 } from "@/domain/repositories/IFollowRepository";
 import type { FollowDocument } from "../database/models/FollowModel";
-import { FollowModel } from "../database/models/FollowModel";
 import { FollowMapper } from "../mappers/FollowMapper";
 import { BaseRepository } from "./BaseRepository";
 
@@ -17,20 +18,24 @@ export class FollowRepository
   extends BaseRepository<Follow, FollowDocument>
   implements IFollowRepository
 {
-  protected readonly model = FollowModel;
-  protected readonly mapper = FollowMapper;
+  constructor(
+    @inject(TYPES.FollowModel) protected readonly model: Model<FollowDocument>,
+    @inject(TYPES.FollowMapper) protected readonly mapper: FollowMapper,
+  ) {
+    super();
+  }
 
   async find(followerId: string, followingId: string): Promise<Follow | null> {
-    const followDoc = await FollowModel.findOne({
+    const followDoc = await this.model.findOne({
       followedBy: followerId,
       followingTo: followingId,
     });
-    return followDoc ? FollowMapper.toDomain(followDoc) : null;
+    return followDoc ? this.mapper.toDomain(followDoc) : null;
   }
 
   async findFollowing(userId: string): Promise<Follow[]> {
-    const followModels = await FollowModel.find({ followedBy: userId });
-    return followModels.map(FollowMapper.toDomain);
+    const followModels = await this.model.find({ followedBy: userId });
+    return followModels.map((item) => this.mapper.toDomain(item));
   }
 
   async findFollowList(
@@ -101,7 +106,7 @@ export class FollowRepository
       },
     ];
 
-    const result = await FollowModel.aggregate(aggregationPipeline);
+    const result = await this.model.aggregate(aggregationPipeline);
     return result;
   }
 }

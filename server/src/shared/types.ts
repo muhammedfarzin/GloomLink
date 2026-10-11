@@ -1,4 +1,27 @@
 const TYPES = {
+
+  // Persistence models and mappers
+  CommentModel: Symbol.for("CommentModel"),
+  CommentMapper: Symbol.for("CommentMapper"),
+  ConversationModel: Symbol.for("ConversationModel"),
+  ConversationMapper: Symbol.for("ConversationMapper"),
+  FollowModel: Symbol.for("FollowModel"),
+  FollowMapper: Symbol.for("FollowMapper"),
+  InteractionModel: Symbol.for("InteractionModel"),
+  InteractionMapper: Symbol.for("InteractionMapper"),
+  LikeModel: Symbol.for("LikeModel"),
+  LikeMapper: Symbol.for("LikeMapper"),
+  MessageModel: Symbol.for("MessageModel"),
+  MessageMapper: Symbol.for("MessageMapper"),
+  OtpModel: Symbol.for("OtpModel"),
+  OtpMapper: Symbol.for("OtpMapper"),
+  PostModel: Symbol.for("PostModel"),
+  PostMapper: Symbol.for("PostMapper"),
+  ReportModel: Symbol.for("ReportModel"),
+  ReportMapper: Symbol.for("ReportMapper"),
+  UserModel: Symbol.for("UserModel"),
+  UserMapper: Symbol.for("UserMapper"),
+
   // Repositories
   IUserRepository: Symbol.for("IUserRepository"),
   IPostRepository: Symbol.for("IPostRepository"),

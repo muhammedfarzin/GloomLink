@@ -1,10 +1,16 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { Comment } from "@/domain/entities/Comment";
 import type { CommentDocument } from "../database/models/CommentModel";
 import type { CommentResponse } from "@/domain/models/Comment";
 import type { CommentType } from "@/domain/models/Comment";
 
-export class CommentMapper {
-  public static toDomain(comment: CommentType | CommentDocument): Comment {
+@injectable()
+export class CommentMapper extends Mapper<
+  Comment,
+  CommentType | CommentDocument
+> {
+  public toDomain(comment: CommentType | CommentDocument): Comment {
     return new Comment({
       id: comment.id.toString(),
       userId: comment.userId.toString(),
@@ -16,7 +22,7 @@ export class CommentMapper {
     });
   }
 
-  public static toPersistence(comment: Comment): CommentType {
+  public toPersistence(comment: Comment): CommentType {
     return {
       id: comment.getId(),
       userId: comment.getUserId(),
@@ -28,7 +34,7 @@ export class CommentMapper {
     };
   }
 
-  public static toResponseDto(data: any): CommentResponse {
+  public toResponseDto(data: any): CommentResponse {
     return {
       id: data.id?.toString(),
       userId: data.userId.toString(),

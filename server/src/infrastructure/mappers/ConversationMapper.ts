@@ -1,3 +1,5 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { Conversation } from "@/domain/entities/Conversation";
 import type {
   ConversationType,
@@ -5,8 +7,12 @@ import type {
 } from "@/domain/models/Conversation";
 import type { ConversationDocument } from "../database/models/ConversationModel";
 
-export class ConversationMapper {
-  public static toDomain(
+@injectable()
+export class ConversationMapper extends Mapper<
+  Conversation,
+  ConversationType | ConversationDocument
+> {
+  public toDomain(
     conversation: ConversationType | ConversationDocument,
   ): Conversation {
     return new Conversation({
@@ -15,14 +21,14 @@ export class ConversationMapper {
     });
   }
 
-  public static toPersistence(conversation: Conversation): ConversationType {
+  public toPersistence(conversation: Conversation): ConversationType {
     return {
       id: conversation.getId(),
       participants: conversation.getParticipants(),
     };
   }
 
-  public static toResponse(conversation: any): ConversationList {
+  public toResponse(conversation: any): ConversationList {
     return {
       id: conversation.id?.toString(),
       participantId: conversation.participantId?.toString(),

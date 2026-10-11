@@ -1,9 +1,12 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { Report } from "@/domain/entities/Report";
 import type { ReportType } from "@/domain/models/Report";
 import type { ReportDocument } from "../database/models/ReportModel";
 
-export class ReportMapper {
-  public static toDomain(report: ReportType | ReportDocument): Report {
+@injectable()
+export class ReportMapper extends Mapper<Report, ReportType | ReportDocument> {
+  public toDomain(report: ReportType | ReportDocument): Report {
     return new Report({
       id: report.id.toString(),
       targetId: report.targetId.toString(),
@@ -12,7 +15,7 @@ export class ReportMapper {
     });
   }
 
-  public static toPersistence(report: Report): ReportType {
+  public toPersistence(report: Report): ReportType {
     return {
       id: report.getId(),
       type: report.getType(),

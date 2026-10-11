@@ -1,9 +1,12 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { Otp } from "@/domain/entities/Otp";
 import type { OtpType } from "@/domain/models/Otp";
 import type { OtpDocument } from "../database/models/OtpModel";
 
-export class OtpMapper {
-  public static toDomain(otp: OtpType | OtpDocument): Otp {
+@injectable()
+export class OtpMapper extends Mapper<Otp, OtpType | OtpDocument> {
+  public toDomain(otp: OtpType | OtpDocument): Otp {
     return new Otp({
       id: otp.id,
       email: otp.email,
@@ -12,7 +15,7 @@ export class OtpMapper {
     });
   }
 
-  public static toPersistence(otp: Otp): OtpType {
+  public toPersistence(otp: Otp): OtpType {
     return {
       id: otp.getId(),
       email: otp.getEmail(),

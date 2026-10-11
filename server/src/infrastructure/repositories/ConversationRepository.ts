@@ -1,10 +1,11 @@
-import { injectable } from "inversify";
+import type { Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import mongoose, { type PipelineStage } from "mongoose";
 import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 import type { ConversationList } from "@/domain/models/Conversation";
 import type { Conversation } from "@/domain/entities/Conversation";
 import type { ConversationDocument } from "../database/models/ConversationModel";
-import { ConversationModel } from "../database/models/ConversationModel";
 import { ConversationMapper } from "../mappers/ConversationMapper";
 import { BaseRepository } from "./BaseRepository";
 
@@ -13,16 +14,22 @@ export class ConversationRepository
   extends BaseRepository<Conversation, ConversationDocument>
   implements IConversationRepository
 {
-  protected readonly model = ConversationModel;
-  protected readonly mapper = ConversationMapper;
+  constructor(
+    @inject(TYPES.ConversationModel)
+    protected readonly model: Model<ConversationDocument>,
+    @inject(TYPES.ConversationMapper)
+    protected readonly mapper: ConversationMapper,
+  ) {
+    super();
+  }
 
   async create(data: Conversation): Promise<Conversation> {
     const participantIds = data.getParticipants();
-    const newConversation = new ConversationModel({
+    const newConversation = new this.model({
       participants: participantIds,
     });
     const savedDoc = await newConversation.save();
-    return ConversationMapper.toDomain({
+    return this.mapper.toDomain({
       id: savedDoc.id.toString(),
       participants: savedDoc.participants.map((id) => id.toString()),
     });
@@ -31,15 +38,13 @@ export class ConversationRepository
   async findByParticipants(
     participantIds: string[],
   ): Promise<Conversation | null> {
-    const conversationDoc = await ConversationModel.findOne({
+    const conversationDoc = await this.model.findOne({
       participants: {
         $all: participantIds,
         $size: participantIds.length,
       },
     });
-    return conversationDoc
-      ? ConversationMapper.toDomain(conversationDoc)
-      : null;
+    return conversationDoc ? this.mapper.toDomain(conversationDoc) : null;
   }
 
   async findConversationsByUserId(userId: string): Promise<ConversationList[]> {
@@ -129,14 +134,14 @@ export class ConversationRepository
       { $sort: { lastMessageTime: -1 } },
     ];
 
-    const results = await ConversationModel.aggregate(aggregationPipeline);
+    const results = await this.model.aggregate(aggregationPipeline);
     return results;
   }
 
   async update(data: Conversation) {
     const id = data.getId();
     const participantIds = data.getParticipants();
-    const conversationDoc = await ConversationModel.findByIdAndUpdate(
+    const conversationDoc = await this.model.findByIdAndUpdate(
       id,
       {
         $set: { participants: participantIds },
@@ -144,6 +149,6 @@ export class ConversationRepository
       { new: true },
     );
 
-    return conversationDoc && ConversationMapper.toDomain(conversationDoc);
+    return conversationDoc && this.mapper.toDomain(conversationDoc);
   }
 }

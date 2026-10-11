@@ -1,10 +1,13 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { User } from "@/domain/entities/User";
 import type { UserProfile, UserSelf } from "@/domain/models/User";
 import type { UserResponseDto } from "@/application/dtos/UserDto";
 import type { UserDocument } from "../database/models/UserModel";
 
-export class UserMapper {
-  public static toDomain(data: UserDomainProps): User {
+@injectable()
+export class UserMapper extends Mapper<User, UserDomainProps> {
+  public toDomain(data: UserDomainProps): User {
     return new User({
       id: data.id?.toString(),
       username: data.username,
@@ -25,9 +28,9 @@ export class UserMapper {
     });
   }
 
-  public static toPersistence(user: User): UserSelf {
+  public toPersistence(user: User): UserSelf {
     return {
-      ...UserMapper.toResponse(user),
+      ...this.toResponse(user),
       email: user.getEmail(),
       mobile: user.getMobile(),
       dob: user.getDateOfBirth(),
@@ -41,7 +44,7 @@ export class UserMapper {
     };
   }
 
-  public static toResponse(user: User): UserResponseDto {
+  public toResponse(user: User): UserResponseDto {
     return {
       id: user.getId(),
       username: user.getUsername(),
@@ -55,7 +58,7 @@ export class UserMapper {
     };
   }
 
-  public static toProfile(data: any): UserProfile {
+  public toProfile(data: any): UserProfile {
     return {
       id: data.id?.toString(),
       username: data.username,

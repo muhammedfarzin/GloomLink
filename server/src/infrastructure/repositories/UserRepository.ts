@@ -1,7 +1,8 @@
-import { injectable } from "inversify";
+import type { Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import mongoose, { type PipelineStage } from "mongoose";
 import { PostMapper } from "../mappers/PostMapper";
-import { UserModel } from "../database/models/UserModel";
 import { UserMapper } from "../mappers/UserMapper";
 import type { UserDocument } from "../database/models/UserModel";
 import { User } from "@/domain/entities/User";
@@ -21,25 +22,30 @@ export class UserRepository
   extends BaseRepository<User, UserDocument>
   implements IUserRepository
 {
-  protected readonly model = UserModel;
-  protected readonly mapper = UserMapper;
+  constructor(
+    @inject(TYPES.UserModel) protected readonly model: Model<UserDocument>,
+    @inject(TYPES.UserMapper) protected readonly mapper: UserMapper,
+    @inject(TYPES.PostMapper) private readonly postMapper: PostMapper,
+  ) {
+    super();
+  }
 
   async findByEmail(email: string): Promise<User | null> {
-    const userDoc = await UserModel.findOne({ email });
+    const userDoc = await this.model.findOne({ email });
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(userDoc);
+    return this.mapper.toDomain(userDoc);
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const userDoc = await UserModel.findOne({ username });
+    const userDoc = await this.model.findOne({ username });
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(userDoc);
+    return this.mapper.toDomain(userDoc);
   }
 
   async findByIdentifier(identifier: string): Promise<User | null> {
-    const userDoc = await UserModel.findOne({
+    const userDoc = await this.model.findOne({
       $or: [
         { username: identifier },
         { email: identifier },
@@ -49,7 +55,7 @@ export class UserRepository
 
     if (!userDoc) return null;
 
-    return UserMapper.toDomain(userDoc);
+    return this.mapper.toDomain(userDoc);
   }
 
   async checkUserExist(
@@ -61,13 +67,13 @@ export class UserRepository
     for (const [field, value] of Object.entries({ username, email, mobile })) {
       if (!value) continue;
 
-      const userDoc = await UserModel.findOne({ [field]: value });
+      const userDoc = await this.model.findOne({ [field]: value });
 
       if (userDoc) {
         return {
           isExists: true,
           field,
-          data: UserMapper.toDomain(userDoc),
+          data: this.mapper.toDomain(userDoc),
         };
       }
     }
@@ -83,9 +89,9 @@ export class UserRepository
       savedPosts: _savedPost,
       interestKeywords,
       ...userToPersist
-    } = UserMapper.toPersistence(userData);
+    } = this.mapper.toPersistence(userData);
 
-    const updatedUserDoc = await UserModel.findByIdAndUpdate(
+    const updatedUserDoc = await this.model.findByIdAndUpdate(
       id,
       { $set: userToPersist },
       { new: true },
@@ -93,7 +99,7 @@ export class UserRepository
 
     if (!updatedUserDoc) return null;
 
-    return UserMapper.toDomain(updatedUserDoc);
+    return this.mapper.toDomain(updatedUserDoc);
   }
 
   async findSavedPosts(
@@ -184,19 +190,21 @@ export class UserRepository
       { $project: { _id: 0, savedPostsData: 1 } },
     ];
 
-    const results = await UserModel.aggregate(aggregationPipeline);
-    return results[0].savedPostsData.map(PostMapper.toResponse);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results[0].savedPostsData.map((post: any) =>
+      this.postMapper.toResponse(post),
+    );
   }
 
   async savePost(userId: string, postId: string): Promise<void> {
-    await UserModel.updateOne(
+    await this.model.updateOne(
       { _id: userId },
       { $addToSet: { savedPosts: postId } },
     );
   }
 
   async unsavePost(userId: string, postId: string): Promise<void> {
-    await UserModel.updateOne(
+    await this.model.updateOne(
       { _id: userId },
       { $pull: { savedPosts: postId } },
     );
@@ -256,7 +264,7 @@ export class UserRepository
       },
     ];
 
-    const results = await UserModel.aggregate(aggregationPipeline);
+    const results = await this.model.aggregate(aggregationPipeline);
 
     if (results.length === 0) {
       return null;
@@ -268,7 +276,7 @@ export class UserRepository
       delete profileData.isFollowing;
     }
 
-    return UserMapper.toProfile(profileData);
+    return this.mapper.toProfile(profileData);
   }
 
   async findAll(options: UserFindOptions): Promise<User[]> {
@@ -334,10 +342,10 @@ export class UserRepository
       aggregationPipeline.push(...isFollowingStage);
     }
 
-    const userList = await UserModel.aggregate(aggregationPipeline);
+    const userList = await this.model.aggregate(aggregationPipeline);
 
     return userList.map((user) => {
-      return UserMapper.toDomain({ ...user, userId: user._id.toString() });
+      return this.mapper.toDomain({ ...user, userId: user._id.toString() });
     });
   }
 
@@ -422,7 +430,7 @@ export class UserRepository
       },
     ];
 
-    const users = await UserModel.aggregate(aggregationPipeline);
+    const users = await this.model.aggregate(aggregationPipeline);
     return users;
   }
 
@@ -443,12 +451,12 @@ export class UserRepository
       },
     };
 
-    const totalUsers = await UserModel.countDocuments();
-    const newUsers = await UserModel.countDocuments({
+    const totalUsers = await this.model.countDocuments();
+    const newUsers = await this.model.countDocuments({
       createdAt: { $gte: start, $lte: end },
     });
 
-    const newUsersAgg = await UserModel.aggregate([
+    const newUsersAgg = await this.model.aggregate([
       matchDateRange,
       {
         $group: {
@@ -467,12 +475,12 @@ export class UserRepository
   }
 
   async deleteById(id: string): Promise<User | null> {
-    const deletedUserDoc = await UserModel.findByIdAndUpdate(
+    const deletedUserDoc = await this.model.findByIdAndUpdate(
       id,
       { $set: { status: "deleted" } },
       { new: true },
     );
 
-    return deletedUserDoc && UserMapper.toDomain(deletedUserDoc);
+    return deletedUserDoc && this.mapper.toDomain(deletedUserDoc);
   }
 }

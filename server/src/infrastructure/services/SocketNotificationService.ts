@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import type { Server } from "socket.io";
 import { ConversationMapper } from "../mappers/ConversationMapper";
 import type { INotificationService } from "@/domain/services/INotificationService";
@@ -6,11 +6,14 @@ import type { Conversation } from "@/domain/entities/Conversation";
 import type { User } from "@/domain/entities/User";
 import { TYPES } from "@/shared/types";
 
+@injectable()
 export class SocketNotificationService implements INotificationService {
   constructor(
     @inject(TYPES.SocketServer) private readonly io: Server,
     @inject(TYPES.SocketActiveUsers)
     private readonly activeUsers: Record<string, Set<string>>,
+    @inject(TYPES.ConversationMapper)
+    private readonly conversationMapper: ConversationMapper,
   ) {}
 
   public notifyConversationCreated = (data: {
@@ -26,11 +29,11 @@ export class SocketNotificationService implements INotificationService {
       lastMessageTime: new Date(),
     };
 
-    const viewForCreator = ConversationMapper.toResponse({
+    const viewForCreator = this.conversationMapper.toResponse({
       ...rawConversationResponse,
       username: otherParticipants.map((u) => u.getUsername()).join(", "),
     });
-    const viewForOthers = ConversationMapper.toResponse({
+    const viewForOthers = this.conversationMapper.toResponse({
       ...rawConversationResponse,
       username: creator.getUsername(),
     });

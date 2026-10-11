@@ -1,3 +1,4 @@
+import type { Model } from "mongoose";
 import type { SocketActiveUsers } from "socket.io";
 import { Container } from "inversify";
 import { TYPES } from "./types";
@@ -91,6 +92,27 @@ import { AdminController } from "@/interface-adapters/controllers/admin.controll
 import { SocketController } from "@/interface-adapters/controllers/socket.controller";
 import { CallController } from "@/interface-adapters/controllers/call.controller";
 
+import { CommentModel } from "@/infrastructure/database/models/CommentModel";
+import { CommentMapper } from "@/infrastructure/mappers/CommentMapper";
+import { ConversationModel } from "@/infrastructure/database/models/ConversationModel";
+import { ConversationMapper } from "@/infrastructure/mappers/ConversationMapper";
+import { FollowModel } from "@/infrastructure/database/models/FollowModel";
+import { FollowMapper } from "@/infrastructure/mappers/FollowMapper";
+import { InteractionModel } from "@/infrastructure/database/models/InteractionModel";
+import { InteractionMapper } from "@/infrastructure/mappers/InteractionMapper";
+import { LikeModel } from "@/infrastructure/database/models/LikeModel";
+import { LikeMapper } from "@/infrastructure/mappers/LikeMapper";
+import { MessageModel } from "@/infrastructure/database/models/MessageModel";
+import { MessageMapper } from "@/infrastructure/mappers/MessageMapper";
+import { OtpModel } from "@/infrastructure/database/models/OtpModel";
+import { OtpMapper } from "@/infrastructure/mappers/OtpMapper";
+import { PostModel } from "@/infrastructure/database/models/PostModel";
+import { PostMapper } from "@/infrastructure/mappers/PostMapper";
+import { ReportModel } from "@/infrastructure/database/models/ReportModel";
+import { ReportMapper } from "@/infrastructure/mappers/ReportMapper";
+import { UserModel } from "@/infrastructure/database/models/UserModel";
+import { UserMapper } from "@/infrastructure/mappers/UserMapper";
+
 // Create a new container
 const container = new Container();
 
@@ -109,6 +131,28 @@ container
   .bind<INotificationService>(TYPES.INotificationService)
   .to(SocketNotificationService)
   .inSingletonScope();
+
+// --- BIND MODELS AND MAPPERS ---
+container.bind<typeof CommentModel>(TYPES.CommentModel).toConstantValue(CommentModel);
+container.bind(TYPES.CommentMapper).to(CommentMapper);
+container.bind<typeof ConversationModel>(TYPES.ConversationModel).toConstantValue(ConversationModel);
+container.bind(TYPES.ConversationMapper).to(ConversationMapper);
+container.bind<typeof FollowModel>(TYPES.FollowModel).toConstantValue(FollowModel);
+container.bind(TYPES.FollowMapper).to(FollowMapper);
+container.bind<typeof InteractionModel>(TYPES.InteractionModel).toConstantValue(InteractionModel);
+container.bind(TYPES.InteractionMapper).to(InteractionMapper);
+container.bind<typeof LikeModel>(TYPES.LikeModel).toConstantValue(LikeModel);
+container.bind(TYPES.LikeMapper).to(LikeMapper);
+container.bind<typeof MessageModel>(TYPES.MessageModel).toConstantValue(MessageModel);
+container.bind(TYPES.MessageMapper).to(MessageMapper);
+container.bind<typeof OtpModel>(TYPES.OtpModel).toConstantValue(OtpModel);
+container.bind(TYPES.OtpMapper).to(OtpMapper);
+container.bind<typeof PostModel>(TYPES.PostModel).toConstantValue(PostModel);
+container.bind(TYPES.PostMapper).to(PostMapper);
+container.bind<typeof ReportModel>(TYPES.ReportModel).toConstantValue(ReportModel);
+container.bind(TYPES.ReportMapper).to(ReportMapper);
+container.bind<typeof UserModel>(TYPES.UserModel).toConstantValue(UserModel);
+container.bind(TYPES.UserMapper).to(UserMapper);
 
 // --- BIND REPOSITORIES ---
 container.bind<IFollowRepository>(TYPES.IFollowRepository).to(FollowRepository);

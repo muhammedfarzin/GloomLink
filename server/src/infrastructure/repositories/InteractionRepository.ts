@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import { injectable } from "inversify";
+import mongoose, { type Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import { Interaction } from "@/domain/entities/Interaction";
 import type { InteractionDocument } from "../database/models/InteractionModel";
-import { InteractionModel } from "../database/models/InteractionModel";
 import { InteractionMapper } from "../mappers/InteractionMapper";
 import type {
   IInteractionRepository,
@@ -15,54 +15,62 @@ export class InteractionRepository
   extends BaseRepository<Interaction, InteractionDocument>
   implements IInteractionRepository
 {
-  protected readonly model = InteractionModel;
-  protected readonly mapper = InteractionMapper;
+  constructor(
+    @inject(TYPES.InteractionModel)
+    protected readonly model: Model<InteractionDocument>,
+    @inject(TYPES.InteractionMapper)
+    protected readonly mapper: InteractionMapper,
+  ) {
+    super();
+  }
 
   async create(interaction: Interaction): Promise<Interaction> {
     const { id, ...interactionToPersist } =
-      InteractionMapper.toPersistence(interaction);
+      this.mapper.toPersistence(interaction);
 
-    const newInteraction = new InteractionModel(interactionToPersist);
+    const newInteraction = new this.model(interactionToPersist);
     const savedInteraction = await newInteraction.save();
 
     // Limit to latest 100 interactions per user
     const limit = 100;
-    const count = await InteractionModel.countDocuments({
+    const count = await this.model.countDocuments({
       userId: interaction.getUserId(),
     });
 
     if (count > limit) {
-      const interactionsToDelete = await InteractionModel.find({
-        userId: interaction.getUserId(),
-      })
+      const interactionsToDelete = await this.model
+        .find({
+          userId: interaction.getUserId(),
+        })
         .sort({ createdAt: -1 })
         .skip(limit)
         .select("_id");
 
       if (interactionsToDelete.length > 0) {
         const idsToDelete = interactionsToDelete.map((doc) => doc._id);
-        await InteractionModel.deleteMany({ _id: { $in: idsToDelete } });
+        await this.model.deleteMany({ _id: { $in: idsToDelete } });
       }
     }
 
-    return InteractionMapper.toDomain(savedInteraction);
+    return this.mapper.toDomain(savedInteraction);
   }
 
   async findByUserId(
     userId: string,
     limit: number = 100,
   ): Promise<Interaction[]> {
-    const interactions = await InteractionModel.find({ userId })
+    const interactions = await this.model
+      .find({ userId })
       .sort({ createdAt: -1 })
       .limit(limit);
-    return interactions.map(InteractionMapper.toDomain);
+    return interactions.map((item) => this.mapper.toDomain(item));
   }
 
   async getTopInteractedTags(
     userId: string,
     limit: number = 10,
   ): Promise<string[]> {
-    const result = await InteractionModel.aggregate([
+    const result = await this.model.aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
@@ -105,11 +113,11 @@ export class InteractionRepository
       },
     };
 
-    const totalInteractions = await InteractionModel.countDocuments({
+    const totalInteractions = await this.model.countDocuments({
       createdAt: { $gte: start, $lte: end },
     });
 
-    const activeUsersAggregation = await InteractionModel.aggregate([
+    const activeUsersAggregation = await this.model.aggregate([
       matchDateRange,
       { $group: { _id: "$userId" } },
       { $count: "activeUsers" },
@@ -119,7 +127,7 @@ export class InteractionRepository
         ? activeUsersAggregation[0].activeUsers
         : 0;
 
-    const interactionsAgg = await InteractionModel.aggregate([
+    const interactionsAgg = await this.model.aggregate([
       matchDateRange,
       {
         $group: {
@@ -142,14 +150,14 @@ export class InteractionRepository
       id,
       createdAt: _createdAt,
       ...interactionToPersist
-    } = InteractionMapper.toPersistence(data);
+    } = this.mapper.toPersistence(data);
 
-    const interaction = await InteractionModel.findByIdAndUpdate(
+    const interaction = await this.model.findByIdAndUpdate(
       id,
       interactionToPersist,
       { new: true },
     );
 
-    return interaction && InteractionMapper.toDomain(interaction);
+    return interaction && this.mapper.toDomain(interaction);
   }
 }

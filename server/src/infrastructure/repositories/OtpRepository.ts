@@ -1,8 +1,9 @@
-import { injectable } from "inversify";
+import type { Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import type { IOtpRepository } from "@/domain/repositories/IOtpRepository";
 import type { Otp } from "@/domain/entities/Otp";
 import type { OtpDocument } from "../database/models/OtpModel";
-import { OtpModel } from "../database/models/OtpModel";
 import { OtpMapper } from "../mappers/OtpMapper";
 import { BaseRepository } from "./BaseRepository";
 
@@ -11,25 +12,29 @@ export class OtpRepository
   extends BaseRepository<Otp, OtpDocument>
   implements IOtpRepository
 {
-  protected readonly model = OtpModel;
-  protected readonly mapper = OtpMapper;
+  constructor(
+    @inject(TYPES.OtpModel) protected readonly model: Model<OtpDocument>,
+    @inject(TYPES.OtpMapper) protected readonly mapper: OtpMapper,
+  ) {
+    super();
+  }
 
   async create(otp: Otp): Promise<Otp> {
-    const { email, hashedOtp } = OtpMapper.toPersistence(otp);
-    await OtpModel.findOneAndDelete({ email });
+    const { email, hashedOtp } = this.mapper.toPersistence(otp);
+    await this.model.findOneAndDelete({ email });
 
-    const newOtpModel = new OtpModel({ email, hashedOtp });
+    const newOtpModel = new this.model({ email, hashedOtp });
     const savedOtp = await newOtpModel.save();
-    return OtpMapper.toDomain(savedOtp);
+    return this.mapper.toDomain(savedOtp);
   }
 
   async findByEmail(email: string): Promise<Otp | null> {
-    const otpModel = await OtpModel.findOne({ email });
-    return otpModel && OtpMapper.toDomain(otpModel);
+    const otpModel = await this.model.findOne({ email });
+    return otpModel && this.mapper.toDomain(otpModel);
   }
 
   async deleteByEmail(email: string): Promise<boolean> {
-    const deletedOtp = await OtpModel.deleteOne({ email });
+    const deletedOtp = await this.model.deleteOne({ email });
     return deletedOtp.acknowledged;
   }
 }

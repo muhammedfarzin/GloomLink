@@ -1,9 +1,15 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { Message } from "@/domain/entities/Message";
 import type { CompactMessage } from "@/domain/models/Message";
 import type { MessageDocument } from "../database/models/MessageModel";
 
-export class MessageMapper {
-  public static toDomain(
+@injectable()
+export class MessageMapper extends Mapper<
+  Message,
+  CompactMessage | (MessageDocument & { senderUsername?: string })
+> {
+  public toDomain(
     message: CompactMessage | (MessageDocument & { senderUsername?: string }),
   ): Message {
     return new Message({
@@ -20,7 +26,7 @@ export class MessageMapper {
     });
   }
 
-  public static toPersistence(message: Message): CompactMessage {
+  public toPersistence(message: Message): CompactMessage {
     return {
       id: message.getId(),
       conversationId: message.getConversationId(),

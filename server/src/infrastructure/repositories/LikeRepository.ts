@@ -1,12 +1,13 @@
-import { injectable } from "inversify";
-import mongoose, { PipelineStage } from "mongoose";
+import type { Model, PipelineStage } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
+import mongoose from "mongoose";
 import type { UserCompact } from "@/domain/models/User";
 import type {
   ILikeRepository,
   LikeOptions,
 } from "@/domain/repositories/ILikeRepository";
 import { Like } from "@/domain/entities/Like";
-import { LikeModel } from "../database/models/LikeModel";
 import { LikeMapper } from "../mappers/LikeMapper";
 import type { LikeDocument } from "../database/models/LikeModel";
 import { BaseRepository } from "./BaseRepository";
@@ -16,13 +17,17 @@ export class LikeRepository
   extends BaseRepository<Like, LikeDocument>
   implements ILikeRepository
 {
-  protected readonly model = LikeModel;
-  protected readonly mapper = LikeMapper;
+  constructor(
+    @inject(TYPES.LikeModel) protected readonly model: Model<LikeDocument>,
+    @inject(TYPES.LikeMapper) protected readonly mapper: LikeMapper,
+  ) {
+    super();
+  }
 
   async find(like: Like): Promise<Like | null> {
-    const { id, ...likeToFind } = LikeMapper.toPersistence(like);
-    const likeModel = await LikeModel.findOne(likeToFind);
-    return likeModel ? LikeMapper.toDomain(likeModel) : null;
+    const { id, ...likeToFind } = this.mapper.toPersistence(like);
+    const likeModel = await this.model.findOne(likeToFind);
+    return likeModel ? this.mapper.toDomain(likeModel) : null;
   }
 
   async findLikersByTarget(
@@ -91,7 +96,7 @@ export class LikeRepository
       },
     ];
 
-    const result = await LikeModel.aggregate(aggregationPipeline);
+    const result = await this.model.aggregate(aggregationPipeline);
     return result;
   }
 }

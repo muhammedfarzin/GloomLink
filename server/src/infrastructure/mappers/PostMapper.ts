@@ -1,9 +1,12 @@
+import { Mapper } from "./Mapper";
+import { injectable } from "inversify";
 import { Post } from "@/domain/entities/Post";
 import type { EnrichedPost, PostType } from "@/domain/models/Post";
 import type { PostDocument } from "../database/models/PostModel";
 
-export class PostMapper {
-  public static toDomain(data: PostType | PostDocument): Post {
+@injectable()
+export class PostMapper extends Mapper<Post, PostType | PostDocument> {
+  public toDomain(data: PostType | PostDocument): Post {
     return new Post({
       id: data.id?.toString(),
       userId: data.userId?.toString(),
@@ -17,7 +20,7 @@ export class PostMapper {
     });
   }
 
-  public static toPersistence(post: Post): PostType {
+  public toPersistence(post: Post): PostType {
     return {
       id: post.getId(),
       userId: post.getUserId(),
@@ -31,7 +34,7 @@ export class PostMapper {
     };
   }
 
-  public static toResponse(data: any): EnrichedPost {
+  public toResponse(data: any): EnrichedPost {
     return {
       id: data.id?.toString(),
       userId: data.userId?.toString(),

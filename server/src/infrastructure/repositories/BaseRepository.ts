@@ -2,11 +2,7 @@ import { Model, Document, UpdateQuery } from "mongoose";
 import { injectable } from "inversify";
 import type { IBaseRepository } from "@/domain/repositories/IBaseRepository";
 import { BaseEntity } from "@/domain/entities/BaseEntity";
-
-export interface IMapper<T extends BaseEntity, TDoc> {
-  toDomain(doc: TDoc): T;
-  toPersistence(entity: T): object;
-}
+import type { Mapper } from "../mappers/Mapper";
 
 @injectable()
 export abstract class BaseRepository<
@@ -14,9 +10,8 @@ export abstract class BaseRepository<
   TDoc extends Document = Document,
   TId = string,
 > implements IBaseRepository<T, TId> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected abstract readonly model: Model<any>;
-  protected abstract readonly mapper: IMapper<T, TDoc>;
+  protected abstract readonly model: Model<TDoc>;
+  protected abstract readonly mapper: Mapper<T, TDoc>;
 
   async create(data: T): Promise<T> {
     const raw = this.mapper.toPersistence(data) as Record<string, unknown>;

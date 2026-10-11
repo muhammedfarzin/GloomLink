@@ -1,4 +1,6 @@
-import { injectable } from "inversify";
+import type { Model } from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import mongoose, { PipelineStage } from "mongoose";
 import type { CommentResponse } from "@/domain/models/Comment";
 import type {
@@ -7,7 +9,6 @@ import type {
 } from "@/domain/repositories/ICommentRepository";
 import { Comment } from "@/domain/entities/Comment";
 import type { CommentDocument } from "../database/models/CommentModel";
-import { CommentModel } from "../database/models/CommentModel";
 import { CommentMapper } from "../mappers/CommentMapper";
 import { BaseRepository } from "./BaseRepository";
 
@@ -16,8 +17,12 @@ export class CommentRepository
   extends BaseRepository<Comment, CommentDocument>
   implements ICommentRepository
 {
-  protected readonly model = CommentModel;
-  protected readonly mapper = CommentMapper;
+  constructor(
+    @inject(TYPES.CommentModel) protected readonly model: Model<CommentDocument>,
+    @inject(TYPES.CommentMapper) protected readonly mapper: CommentMapper,
+  ) {
+    super();
+  }
 
   async findByTargetId(
     targetId: string,
@@ -39,8 +44,8 @@ export class CommentRepository
         { $limit: limit },
       ]);
 
-    const results = await CommentModel.aggregate(aggregationPipeline);
-    return results.map(CommentMapper.toResponseDto);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results.map((item) => this.mapper.toResponseDto(item));
   }
 
   async findByUserAndTarget(
@@ -58,8 +63,8 @@ export class CommentRepository
           },
         },
       ]);
-    const results = await CommentModel.aggregate(aggregationPipeline);
-    return results.map(CommentMapper.toResponseDto);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results.map((item) => this.mapper.toResponseDto(item));
   }
 
   async findOtherCommentsByTarget(
@@ -81,20 +86,20 @@ export class CommentRepository
       { $skip: skip },
       { $limit: limit },
     ]);
-    const results = await CommentModel.aggregate(aggregationPipeline);
-    return results.map(CommentMapper.toResponseDto);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results.map((item) => this.mapper.toResponseDto(item));
   }
 
   async update(data: Comment) {
-    const { id, comment } = CommentMapper.toPersistence(data);
+    const { id, comment } = this.mapper.toPersistence(data);
 
-    const updatedComment = await CommentModel.findByIdAndUpdate(
+    const updatedComment = await this.model.findByIdAndUpdate(
       id,
       { comment },
       { new: true },
     );
 
-    return updatedComment && CommentMapper.toDomain(updatedComment);
+    return updatedComment && this.mapper.toDomain(updatedComment);
   }
 
   private createCommentAggregationPipeline(

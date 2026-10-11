@@ -1,7 +1,9 @@
-import mongoose, { type PipelineStage } from "mongoose";
-import { injectable } from "inversify";
+import type { Model, PipelineStage } from "mongoose";
+import mongoose from "mongoose";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@/shared/types";
 import { PostMapper } from "../mappers/PostMapper";
-import { type PostDocument, PostModel } from "../database/models/PostModel";
+import { type PostDocument } from "../database/models/PostModel";
 import { Post } from "@/domain/entities/Post";
 import type {
   IPostRepository,
@@ -16,9 +18,12 @@ export class PostRepository
   extends BaseRepository<Post, PostDocument>
   implements IPostRepository
 {
-  protected readonly model = PostModel;
-  protected readonly mapper = PostMapper;
-
+  constructor(
+    @inject(TYPES.PostModel) protected readonly model: Model<PostDocument>,
+    @inject(TYPES.PostMapper) protected readonly mapper: PostMapper,
+  ) {
+    super();
+  }
   private enrichedPipeline: PipelineStage[] = [
     {
       $lookup: {
@@ -116,13 +121,13 @@ export class PostRepository
       },
     ];
 
-    const results = await PostModel.aggregate(aggregationPipeline);
+    const results = await this.model.aggregate(aggregationPipeline);
 
     if (results.length === 0) {
       return null;
     }
 
-    return PostMapper.toResponse(results[0]);
+    return this.mapper.toResponse(results[0]);
   }
 
   async findAndSortFeed(options: PostFeedOptions): Promise<EnrichedPost[]> {
@@ -260,9 +265,9 @@ export class PostRepository
       },
     ];
 
-    const postModels = await PostModel.aggregate(aggregationPipeline);
+    const postModels = await this.model.aggregate(aggregationPipeline);
 
-    return postModels.map((data) => PostMapper.toResponse(data));
+    return postModels.map((data) => this.mapper.toResponse(data));
   }
 
   async findAll(options: {
@@ -317,8 +322,8 @@ export class PostRepository
       );
     }
 
-    const results = await PostModel.aggregate(aggregationPipeline);
-    return results.map(PostMapper.toResponse);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results.map((item) => this.mapper.toResponse(item));
   }
 
   async findByStatus(
@@ -370,8 +375,8 @@ export class PostRepository
       );
     }
 
-    const results = await PostModel.aggregate(aggregationPipeline);
-    return results.map(PostMapper.toResponse);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results.map((item) => this.mapper.toResponse(item));
   }
 
   async findReported(options: {
@@ -414,27 +419,27 @@ export class PostRepository
       { $project: { _id: 0, reports: 0, likes: 0, comments: 0 } },
     ];
 
-    const results = await PostModel.aggregate(aggregationPipeline);
-    return results.map(PostMapper.toResponse);
+    const results = await this.model.aggregate(aggregationPipeline);
+    return results.map((item) => this.mapper.toResponse(item));
   }
 
   async update(post: Post): Promise<Post | null> {
     const { id, createdAt, updatedAt, ...postToPersist } =
-      PostMapper.toPersistence(post);
-    const updatedPost = await PostModel.findByIdAndUpdate(id, postToPersist, {
+      this.mapper.toPersistence(post);
+    const updatedPost = await this.model.findByIdAndUpdate(id, postToPersist, {
       new: true,
     });
-    return updatedPost && PostMapper.toDomain(updatedPost);
+    return updatedPost && this.mapper.toDomain(updatedPost);
   }
 
   async deleteById(postId: string): Promise<Post | null> {
-    const deletedPost = await PostModel.findByIdAndUpdate(
+    const deletedPost = await this.model.findByIdAndUpdate(
       postId,
       { status: "deleted" },
       { new: true },
     );
 
-    return deletedPost && PostMapper.toDomain(deletedPost);
+    return deletedPost && this.mapper.toDomain(deletedPost);
   }
 
   async getDashboardMetrics(
@@ -454,11 +459,11 @@ export class PostRepository
       },
     };
 
-    const totalPosts = await PostModel.countDocuments({
+    const totalPosts = await this.model.countDocuments({
       createdAt: { $gte: start, $lte: end },
     });
 
-    const postsAgg = await PostModel.aggregate([
+    const postsAgg = await this.model.aggregate([
       matchDateRange,
       {
         $group: {
