@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import GloomLinkLogo from "@/assets/images/GloomLink-Logo.svg";
 import OtpIllustrationDark from "@/assets/images/OTP-Illustration-Dark.svg";
 import FormBox from "@/components/FormBox";
@@ -15,25 +15,26 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { authApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
+import { SESSION_STORAGE_KEYS } from "@/constants/storageKeys";
 
 const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
-  const userData = useSelector((state: RootState) => state.auth.userData);
   const { toastError, toastMessage } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [otp, setOtp] = useState<string>("");
 
-  useEffect(() => {
-    if (!userData || userData.status !== "not-verified")
-      navigate("/auth/login");
-  }, [userData]);
+  const verificationEmail = sessionStorage.getItem(
+    SESSION_STORAGE_KEYS.verificationEmail,
+  );
 
   const handleResendOtp = async () => {
     try {
       setLoading("Resending OTP...");
-      const response = await authApiClient.post("/resend-otp");
+      const response = await authApiClient.post("/resend-otp", {
+        email: verificationEmail,
+      });
       toastMessage(response.data.message);
     } catch (error: any) {
       toastError(error.message);
@@ -51,12 +52,14 @@ const OtpVerification: React.FC = () => {
       });
 
       const response = await authApiClient.post("/verify-otp", {
+        email: verificationEmail,
         otp,
       });
       const userData = response.data.userData as UserAuthState;
       const tokens = response.data.tokens as TokensState;
 
       dispatch(setAuthUser({ userData, tokens }));
+      sessionStorage.removeItem(SESSION_STORAGE_KEYS.verificationEmail);
       navigate("/");
     } catch (error: any) {
       if (error.status === 401) {
@@ -70,6 +73,16 @@ const OtpVerification: React.FC = () => {
       setLoading(null);
     }
   };
+
+  const cancelVerification = () => {
+    sessionStorage.removeItem(SESSION_STORAGE_KEYS.verificationEmail);
+    dispatch(logout({ type: "user" }));
+    navigate("/auth/login");
+  };
+
+  if (!verificationEmail) {
+    return <Navigate to="/auth/login" />;
+  }
 
   return (
     <>
@@ -98,7 +111,7 @@ const OtpVerification: React.FC = () => {
             <div className="w-full flex justify-between mt-[-1rem]">
               <span
                 className="cursor-pointer hover:opacity-75"
-                onClick={() => dispatch(logout({ type: "user" }))}
+                onClick={cancelVerification}
               >
                 Cancel
               </span>

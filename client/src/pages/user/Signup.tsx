@@ -5,17 +5,13 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DropDownBox from "../../components/DropDownBox";
 import { validateSignUpForm, type SignUpFormType } from "./formValidations";
-import {
-  logout,
-  setAuthUser,
-  type TokensState,
-  type UserAuthState,
-} from "../../redux/reducers/auth";
+import { logout } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
 import DateInput from "@/components/DateInput";
 import { authApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
+import { SESSION_STORAGE_KEYS } from "@/constants/storageKeys";
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5));
 const Signup = () => {
@@ -58,10 +54,10 @@ const Signup = () => {
         gender: gender,
       });
 
-      const userData = response.data.userData as UserAuthState;
-      const tokens = response.data.tokens as TokensState;
-
-      dispatch(setAuthUser({ userData, tokens }));
+      sessionStorage.setItem(
+        SESSION_STORAGE_KEYS.verificationEmail,
+        response.data.verificationEmail,
+      );
       navigate("verify");
     } catch (error: any) {
       toastError(error.message);

@@ -19,6 +19,8 @@ import { firebaseAuth, googleAuthProvider } from "@/firebase";
 import { FirebaseError } from "firebase/app";
 import { authApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
+import { SESSION_STORAGE_KEYS } from "@/constants/storageKeys";
+import { isAxiosError } from "axios";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -49,6 +51,14 @@ const Login: React.FC = () => {
     navigate("/");
   };
 
+  const handleNotVerifiedEmail = (data: any) => {
+    sessionStorage.setItem(
+      SESSION_STORAGE_KEYS.verificationEmail,
+      data.verificationEmail,
+    );
+    navigate("/auth/signup/verify");
+  };
+
   const handleOnLogin = async () => {
     setLoading("Authenticating...");
 
@@ -64,6 +74,13 @@ const Login: React.FC = () => {
       });
       handleSuccessLogin(response.data);
     } catch (error: any) {
+      if (isAxiosError(error)) {
+        const resData = error.response?.data;
+        if (error.status === 403 && resData?.message === "Verify your email") {
+          handleNotVerifiedEmail(resData);
+          return;
+        }
+      }
       toastError(error.message);
     } finally {
       setLoading(null);

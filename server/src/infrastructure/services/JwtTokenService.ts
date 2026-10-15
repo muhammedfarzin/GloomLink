@@ -3,8 +3,10 @@ import jwt from "jsonwebtoken";
 import { UnauthorizedError } from "@/domain/errors/AuthErrors";
 import type {
   ITokenService,
+  AccessToken,
   TokenPayload,
   Tokens,
+  TokensWithRefresh,
 } from "@/domain/services/ITokenService";
 
 @injectable()
@@ -13,7 +15,13 @@ export class JwtTokenService implements ITokenService {
   private readonly refreshSecret =
     process.env.JWT_REFRESH_SECRET || "refresh_secret";
 
-  generate(payload: TokenPayload, withRefreshToken: boolean = true): Tokens {
+  generate(payload: TokenPayload): TokensWithRefresh;
+  generate(payload: TokenPayload, withRefreshToken: true): TokensWithRefresh;
+  generate(payload: TokenPayload, withRefreshToken: false): AccessToken;
+  generate(
+    payload: TokenPayload,
+    withRefreshToken: boolean = true,
+  ): Tokens {
     const accessToken = jwt.sign(payload, this.accessSecret, {
       expiresIn: "10m",
     });

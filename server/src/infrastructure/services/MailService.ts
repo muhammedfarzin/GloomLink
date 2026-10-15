@@ -1,6 +1,10 @@
 import { injectable } from "inversify";
 import nodemailer from "nodemailer";
 import { IMailService } from "@/domain/services/IMailService";
+import {
+  createVerificationEmailHtml,
+  verificationEmailSubject,
+} from "../templates/verificationEmailTemplate";
 
 @injectable()
 export class MailService implements IMailService {
@@ -16,12 +20,20 @@ export class MailService implements IMailService {
     });
   }
 
-  async send(email: string, title: string, body: string): Promise<void> {
+  async send(email: string, subject: string, body: string): Promise<void> {
     await this.transporter.sendMail({
       from: "GloomLink",
       to: email,
-      subject: title,
+      subject,
       html: body,
     });
+  }
+
+  async sendVerification(
+    email: string,
+    verificationCode: string | number,
+  ): Promise<void> {
+    const body = createVerificationEmailHtml(verificationCode.toString());
+    await this.send(email, verificationEmailSubject, body);
   }
 }

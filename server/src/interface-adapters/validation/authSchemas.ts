@@ -11,6 +11,8 @@ export const passwordSchema = z
       "Password must be at least 8 characters long and include at least one letter, one number, and one special character.",
   });
 
+const emailSchema = z.email({ message: "Invalid email address" });
+
 export const loginInputSchema = z.object({
   username: z
     .string(validateRequiredString("Username or email", "Invalid credentials"))
@@ -37,7 +39,7 @@ export const signupInputSchema = z.object({
     .string(validateRequiredString("Username"))
     .trim()
     .regex(usernameRegex, { message: "Invalid username format" }),
-  email: z.email({ message: "Invalid email address" }),
+  email: emailSchema,
   mobile: z
     .string(validateRequiredString("Mobile number"))
     .regex(/^[6-9]\d{9}$/, { message: "Invalid mobile number" }),
@@ -66,9 +68,14 @@ export const signupInputSchema = z.object({
 });
 
 export const otpInputSchema = z.object({
+  email: emailSchema,
   otp: z
     .string(validateRequiredString("OTP"))
     .regex(/^\d{6}$/, { message: "Invalid OTP!" }),
+});
+
+export const otpEmailSchema = z.object({
+  email: emailSchema,
 });
 
 export const googleAuthSchema = z.object({

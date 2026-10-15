@@ -29,7 +29,7 @@ export class VerifyOtp implements IVerifyOtp {
     );
 
     if (!isMatch) {
-      throw new ValidationError("Invalid OTP provided");
+      throw new ValidationError("Invalid OTP!");
     }
 
     const user = await this.userRepository.findByEmail(input.email);

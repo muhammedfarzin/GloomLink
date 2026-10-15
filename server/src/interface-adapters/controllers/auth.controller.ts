@@ -19,6 +19,7 @@ import type { IAdminLogin } from "@/domain/use-cases/IAdminLogin";
 import {
   googleAuthSchema,
   loginInputSchema,
+  otpEmailSchema,
   otpInputSchema,
   refreshTokenSchema,
   signupInputSchema,
@@ -46,30 +47,33 @@ export class AuthController {
       let user: User | undefined;
       let tokens: Tokens;
       let userResponse: any;
-      let resMessage = "Login successful";
 
       if (role === "user") {
         const authResponse = await this.loginUserUseCase.execute(validatedBody);
         user = authResponse.user;
-        tokens = authResponse.tokens;
-        userResponse = UserMapper.toResponse(user);
 
         if (!user.isVerified()) {
-          resMessage = "Verify your email";
-
           await this.sendVerificationEmailUseCase.execute({
             email: user.getEmail(),
           });
+          res.status(403).json({
+            message: "Verify your email",
+            verificationEmail: user.getEmail(),
+          });
+          return;
         }
+
+        userResponse = UserMapper.toResponse(user);
+        tokens = authResponse.tokens!;
       } else {
         tokens = await this.adminLoginUseCase.execute(validatedBody);
         userResponse = { username: validatedBody.username };
       }
 
       res.status(200).json({
+        message: "Login successful",
         userData: userResponse,
         tokens,
-        message: resMessage,
       });
     } catch (error) {
       next(error);
@@ -91,17 +95,12 @@ export class AuthController {
         email: newUser.getEmail(),
       });
 
-      // --- Generate Token & Respond ---
+      // --- Response ---
       const userResponse = UserMapper.toResponse(newUser);
 
-      const tokens = this.tokenService.generate(
-        { role: "user", id: userResponse.id },
-        false,
-      );
-
       res.status(201).json({
-        tokens,
         userData: userResponse,
+        verificationEmail: newUser.getEmail(),
         message: "User created successfully. Please check your email for OTP.",
       });
     } catch (err) {
@@ -111,12 +110,8 @@ export class AuthController {
 
   resendOTP: RequestHandler = async (req, res, next) => {
     try {
-      if (!req.user || req.user.role !== "user")
-        throw new HttpError(401, "Unauthorized");
-
-      await this.sendVerificationEmailUseCase.execute({
-        email: req.user.email,
-      });
+      const { email } = otpEmailSchema.parse(req.body);
+      await this.sendVerificationEmailUseCase.execute({ email });
 
       res.status(200).json({ message: "Otp has been send successfully" });
     } catch (error) {
@@ -126,13 +121,10 @@ export class AuthController {
 
   verifyOTP: RequestHandler = async (req, res, next) => {
     try {
-      if (!req.user || req.user.role !== "user")
-        throw new HttpError(401, "Unauthorized");
-
-      const { otp } = otpInputSchema.parse(req.body);
+      const { otp, email } = otpInputSchema.parse(req.body);
 
       const updatedUser = await this.verifyOtpUseCase.execute({
-        email: req.user.email,
+        email,
         otp,
       });
 

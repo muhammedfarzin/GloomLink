@@ -41,10 +41,9 @@ export class LoginUser implements ILoginUser {
       throw new ForbiddenError("Your account has been blocked");
     }
 
-    const tokens = this.tokenService.generate(
-      { role: "user", id: user.getId() },
-      user.isVerified(),
-    );
+    const tokens = user.isVerified()
+      ? this.tokenService.generate({ role: "user", id: user.getId() }, true)
+      : undefined;
 
     return { user, tokens };
   }

@@ -12,5 +12,5 @@ export interface LoginInput {
 
 export interface UserWithTokens {
   user: User;
-  tokens: Tokens;
+  tokens?: Tokens;
 }
