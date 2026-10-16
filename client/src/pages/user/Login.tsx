@@ -156,6 +156,12 @@ const Login: React.FC = () => {
               onChange={handleOnChange}
             />
 
+            <div className="text-right -mt-2 mb-2">
+              <Link to="../forgot-password" className="text-sm text-[#82919E] hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+
             <button
               type="submit"
               className="btn btn-primary border w-full p-2"

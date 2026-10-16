@@ -3,6 +3,7 @@ import UserLogin from "@/pages/user/Login";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import Signup from "@/pages/user/Signup";
 import OtpVerification from "@/pages/user/OtpVerification";
+import ForgotPassword from "@/pages/user/ForgotPassword";
 
 const AuthRoutes = () => {
   return (
@@ -11,6 +12,7 @@ const AuthRoutes = () => {
       <Route path="login" element={<UserLogin />} />
       <Route path="signup" element={<Signup />} />
       <Route path="signup/verify" element={<OtpVerification />} />
+      <Route path="forgot-password" element={<ForgotPassword />} />
       <Route path="admin/login" element={<AdminLogin />} />
     </Routes>
   );

@@ -78,6 +78,21 @@ export const otpEmailSchema = z.object({
   email: emailSchema,
 });
 
+export const passwordResetIdentifierSchema = z.object({
+  identifier: z
+    .string(validateRequiredString("Email, username, or phone number"))
+    .trim()
+    .min(1, { error: "Invalid Request" }),
+});
+
+export const resetPasswordInputSchema = passwordResetIdentifierSchema.extend({
+  otp: z
+    .string(validateRequiredString("OTP"))
+    .trim()
+    .regex(/^\d{6}$/, { message: "Invalid reset code" }),
+  password: passwordSchema,
+});
+
 export const googleAuthSchema = z.object({
   token: z
     .string(validateRequiredString("Google auth token"))

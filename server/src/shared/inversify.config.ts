@@ -75,6 +75,8 @@ import { ToggleSavePost } from "@/application/use-cases/ToggleSavePost";
 import { ToggleUserStatus } from "@/application/use-cases/ToggleUserStatus";
 import { UpdateProfile } from "@/application/use-cases/UpdateProfile";
 import { VerifyOtp } from "@/application/use-cases/VerifyOtp";
+import { RequestPasswordReset } from "@/application/use-cases/RequestPasswordReset";
+import { ResetPassword } from "@/application/use-cases/ResetPassword";
 import { RecordInteraction } from "@/application/use-cases/RecordInteraction";
 import { GetPosts } from "@/application/use-cases/GetPosts";
 import { GetDashboardData } from "@/application/use-cases/GetDashboardData";
@@ -220,6 +222,8 @@ container.bind<ToggleSavePost>(TYPES.IToggleSavePost).to(ToggleSavePost);
 container.bind<ToggleUserStatus>(TYPES.IToggleUserStatus).to(ToggleUserStatus);
 container.bind<UpdateProfile>(TYPES.IUpdateProfile).to(UpdateProfile);
 container.bind<VerifyOtp>(TYPES.IVerifyOtp).to(VerifyOtp);
+container.bind<RequestPasswordReset>(TYPES.IRequestPasswordReset).to(RequestPasswordReset);
+container.bind<ResetPassword>(TYPES.IResetPassword).to(ResetPassword);
 container.bind<GetDashboardData>(TYPES.IGetDashboardData).to(GetDashboardData);
 
 // --- BIND CONTROLLER ---

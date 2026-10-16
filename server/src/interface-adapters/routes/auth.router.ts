@@ -13,5 +13,7 @@ router.post("/google", authController.signInUsingGoogle);
 router.post("/refresh", authController.refreshToken);
 router.post("/verify-otp", authController.verifyOTP);
 router.post("/resend-otp", authController.resendOTP);
+router.post("/forgot-password", authController.requestPasswordReset);
+router.post("/reset-password", authController.resetPassword);
 
 export { router as authApiRouter };

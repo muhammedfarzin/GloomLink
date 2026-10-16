@@ -15,13 +15,17 @@ import type { ISendVerificationEmail } from "@/domain/use-cases/ISendVerificatio
 import type { IVerifyOtp } from "@/domain/use-cases/IVerifyOtp";
 import type { IRefreshToken } from "@/domain/use-cases/IRefreshToken";
 import type { IAdminLogin } from "@/domain/use-cases/IAdminLogin";
+import type { IRequestPasswordReset } from "@/domain/use-cases/IRequestPasswordReset";
+import type { IResetPassword } from "@/domain/use-cases/IResetPassword";
 
 import {
   googleAuthSchema,
   loginInputSchema,
   otpEmailSchema,
   otpInputSchema,
+  passwordResetIdentifierSchema,
   refreshTokenSchema,
+  resetPasswordInputSchema,
   signupInputSchema,
 } from "../validation/authSchemas";
 
@@ -39,6 +43,9 @@ export class AuthController {
     @inject(TYPES.ITokenService) private tokenService: ITokenService,
     @inject(TYPES.IExternalAuthService)
     private externalAuthService: IExternalAuthService,
+    @inject(TYPES.IRequestPasswordReset)
+    private requestPasswordResetUseCase: IRequestPasswordReset,
+    @inject(TYPES.IResetPassword) private resetPasswordUseCase: IResetPassword,
   ) {}
 
   login: RequestHandler = async (req, res, next) => {
@@ -185,6 +192,29 @@ export class AuthController {
         tokens: newTokens,
         message: "Token refreshed successfully",
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  requestPasswordReset: RequestHandler = async (req, res, next) => {
+    try {
+      const { identifier } = passwordResetIdentifierSchema.parse(req.body);
+      await this.requestPasswordResetUseCase.execute({ identifier });
+      res.status(200).json({
+        message:
+          "If an account exists with the provided information, a password reset code has been sent.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  resetPassword: RequestHandler = async (req, res, next) => {
+    try {
+      const body = resetPasswordInputSchema.parse(req.body);
+      await this.resetPasswordUseCase.execute(body);
+      res.status(200).json({ message: "Password reset successfully." });
     } catch (error) {
       next(error);
     }

@@ -80,6 +80,8 @@ const TYPES = {
   IToggleUserStatus: Symbol.for("IToggleUserStatus"),
   IUpdateProfile: Symbol.for("IUpdateProfile"),
   IVerifyOtp: Symbol.for("IVerifyOtp"),
+  IRequestPasswordReset: Symbol.for("IRequestPasswordReset"),
+  IResetPassword: Symbol.for("IResetPassword"),
   IRecordInteraction: Symbol.for("IRecordInteraction"),
   IGetDashboardData: Symbol.for("IGetDashboardData"),
 

@@ -5,6 +5,10 @@ import {
   createVerificationEmailHtml,
   verificationEmailSubject,
 } from "../templates/verificationEmailTemplate";
+import {
+  createPasswordResetEmailHtml,
+  passwordResetEmailSubject,
+} from "../templates/passwordResetEmailTemplate";
 
 @injectable()
 export class MailService implements IMailService {
@@ -35,5 +39,10 @@ export class MailService implements IMailService {
   ): Promise<void> {
     const body = createVerificationEmailHtml(verificationCode.toString());
     await this.send(email, verificationEmailSubject, body);
+  }
+
+  async sendPasswordReset(email: string, resetCode: string): Promise<void> {
+    const body = createPasswordResetEmailHtml(resetCode);
+    await this.send(email, passwordResetEmailSubject, body);
   }
 }
