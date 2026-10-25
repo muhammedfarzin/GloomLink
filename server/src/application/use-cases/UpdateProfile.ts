@@ -1,9 +1,10 @@
 import { injectable, inject } from "inversify";
 import { User } from "@/domain/entities/User";
 import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
-import { ValidationError } from "@/domain/errors/ValidationError";
-import { InvalidCredentialsError } from "@/domain/errors/AuthErrors";
-import { ConflictError } from "@/domain/errors/ConflictError";
+import {
+  FormConflictError,
+  FormValidationError,
+} from "@/domain/errors/FormValidationError";
 import { TYPES } from "@/shared/types";
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type { IFileStorageService } from "@/domain/services/IFileStorageService";
@@ -32,7 +33,9 @@ export class UpdateProfile implements IUpdateProfile {
 
     // ---Validating User---
     if (user.getAuthType() === "email") {
-      if (!input.password) throw new ValidationError("Password is required");
+      if (!input.password) {
+        throw new FormValidationError({ password: "Password is required." });
+      }
 
       const isPasswordMatch = await this.passwordHasher.compare(
         input.password,
@@ -40,7 +43,11 @@ export class UpdateProfile implements IUpdateProfile {
       );
 
       if (!isPasswordMatch) {
-        throw new InvalidCredentialsError();
+        throw new FormValidationError(
+          { password: "Current password is incorrect." },
+          "Current password is incorrect.",
+          "INVALID_CREDENTIALS",
+        );
       }
 
       delete input.password;
@@ -57,7 +64,8 @@ export class UpdateProfile implements IUpdateProfile {
         input.username,
       );
       if (existingUser && existingUser.getId() !== userId) {
-        throw new ConflictError("This username is already taken");
+        const message = "This username is already taken.";
+        throw new FormConflictError({ username: message }, message);
       }
 
       user.changeUsername(input.username);

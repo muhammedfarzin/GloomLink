@@ -4,7 +4,13 @@ import SignUpIllustrationDark from "../../assets/images/SignUp-Illustration-Dark
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DropDownBox from "../../components/DropDownBox";
-import { validateSignUpForm, type SignUpFormType } from "./formValidations";
+import {
+  applyServerFormErrors,
+  validateSignUpFields,
+  type FieldErrors,
+  type SignUpFormType,
+} from "@/lib/formValidations";
+import FieldError from "@/components/FieldError";
 import { logout } from "../../redux/reducers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
@@ -32,6 +38,7 @@ const Signup = () => {
   });
   const [dob, setDob] = useState<Date>();
   const [gender, setGender] = useState<string>();
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -45,8 +52,9 @@ const Signup = () => {
   const handleOnSignup = async () => {
     try {
       setLoading("Signing up...");
-      const isValidated = validateSignUpForm(formData, toastError);
-      if (!isValidated) return;
+      const validationErrors = validateSignUpFields(formData);
+      setErrors(validationErrors);
+      if (Object.keys(validationErrors).length) return;
 
       const response = await authApiClient.post("/signup", {
         ...formData,
@@ -60,7 +68,10 @@ const Signup = () => {
       );
       navigate("verify");
     } catch (error: any) {
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -68,6 +79,7 @@ const Signup = () => {
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   return (
@@ -97,6 +109,7 @@ const Signup = () => {
             <div className="flex gap-2">
               <input
                 className="input-box"
+                aria-invalid={!!errors.firstname}
                 value={formData.firstname}
                 name="firstname"
                 onChange={handleOnChange}
@@ -105,6 +118,7 @@ const Signup = () => {
               />
               <input
                 className="input-box"
+                aria-invalid={!!errors.lastname}
                 value={formData.lastname}
                 name="lastname"
                 onChange={handleOnChange}
@@ -112,31 +126,45 @@ const Signup = () => {
                 type="text"
               />
             </div>
+            <div className="flex gap-2">
+              <div className="w-1/2">
+                <FieldError message={errors.firstname} />
+              </div>
+              <div className="w-1/2">
+                <FieldError message={errors.lastname} />
+              </div>
+            </div>
 
             <input
               className="input-box"
+              aria-invalid={!!errors.username}
               value={formData.username}
               name="username"
               onChange={handleOnChange}
               placeholder="Username"
               type="text"
             />
+            <FieldError message={errors.username} />
             <input
               className="input-box"
+              aria-invalid={!!errors.email}
               value={formData.email}
               name="email"
               onChange={handleOnChange}
               placeholder="Email"
               type="email"
             />
+            <FieldError message={errors.email} />
             <input
               className="input-box"
+              aria-invalid={!!errors.mobile}
               value={formData.mobile}
               name="mobile"
               onChange={handleOnChange}
               placeholder="Mobile"
               type="number"
             />
+            <FieldError message={errors.mobile} />
 
             <div className="flex gap-2 items-center">
               <DropDownBox
@@ -158,20 +186,24 @@ const Signup = () => {
 
             <input
               className="input-box"
+              aria-invalid={!!errors.password}
               value={formData.password}
               name="password"
               onChange={handleOnChange}
               placeholder="Password"
               type="password"
             />
+            <FieldError message={errors.password} />
             <input
               className="input-box"
+              aria-invalid={!!errors.confirmPassword}
               value={formData.confirmPassword}
               name="confirmPassword"
               onChange={handleOnChange}
               placeholder="Confirm password"
               type="password"
             />
+            <FieldError message={errors.confirmPassword} />
 
             <button
               type="submit"

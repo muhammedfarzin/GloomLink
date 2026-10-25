@@ -9,8 +9,11 @@ import Button from "@/components/Button";
 import CropperDialogBox from "@/components/CropperDialogBox";
 import {
   EditProfileFormType,
-  validateEditProfileForm,
-} from "./formValidations";
+  applyServerFormErrors,
+  validateEditProfileFields,
+  type FieldErrors,
+} from "@/lib/formValidations";
+import FieldError from "@/components/FieldError";
 import { apiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
 import { updateUserData } from "@/redux/reducers/auth";
@@ -38,6 +41,7 @@ const EditProfile: React.FC = () => {
     newPassword: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState<FieldErrors>({});
   const imageInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<ReactCropperElement>(null);
 
@@ -62,6 +66,7 @@ const EditProfile: React.FC = () => {
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   const handleOnUpload: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -100,13 +105,9 @@ const EditProfile: React.FC = () => {
   const handleSubmit = async () => {
     try {
       setLoading("Updating...");
-      if (
-        !validateEditProfileForm(formData, authType, (errMessage) => {
-          throw new Error(errMessage);
-        })
-      ) {
-        return;
-      }
+      const validationErrors = validateEditProfileFields(formData, authType);
+      setErrors(validationErrors);
+      if (Object.keys(validationErrors).length) return;
 
       const formDatas = new FormData();
 
@@ -127,7 +128,10 @@ const EditProfile: React.FC = () => {
       dispatch(updateUserData(response.data.userData));
       navigate("/profile");
     } catch (error: any) {
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -167,15 +171,18 @@ const EditProfile: React.FC = () => {
             >
               <input
                 className="input-box"
+                aria-invalid={!!errors.username}
                 value={formData.username}
                 onChange={handleOnChange}
                 name="username"
                 placeholder="Username"
                 type="text"
               />
+              <FieldError message={errors.username} />
               <div className="flex gap-2 w-full">
                 <input
                   className="input-box"
+                  aria-invalid={!!errors.firstname}
                   value={formData.firstname}
                   onChange={handleOnChange}
                   name="firstname"
@@ -184,6 +191,7 @@ const EditProfile: React.FC = () => {
                 />
                 <input
                   className="input-box"
+                  aria-invalid={!!errors.lastname}
                   value={formData.lastname}
                   onChange={handleOnChange}
                   name="lastname"
@@ -191,9 +199,18 @@ const EditProfile: React.FC = () => {
                   type="text"
                 />
               </div>
+              <div className="flex gap-2 w-full">
+                <div className="w-1/2">
+                  <FieldError message={errors.firstname} />
+                </div>
+                <div className="w-1/2">
+                  <FieldError message={errors.lastname} />
+                </div>
+              </div>
               <div className="flex gap-2">
                 <input
                   className="input-box"
+                  aria-invalid={!!errors.mobile}
                   value={formData.email}
                   name="email"
                   placeholder="Email"
@@ -209,13 +226,18 @@ const EditProfile: React.FC = () => {
                   type="number"
                 />
               </div>
+              <FieldError message={errors.mobile} />
 
               <div className="flex gap-2 items-center">
                 <DropDownBox
                   className="w-full"
                   placeholder="Gender (Optional)"
                   value={gender}
-                  onChange={(e) => setGender(e.target.value)}
+                  aria-invalid={!!errors.gender}
+                  onChange={(e) => {
+                    setGender(e.target.value);
+                    setErrors((current) => ({ ...current, gender: "" }));
+                  }}
                 >
                   <option value="m">Male</option>
                   <option value="f">Female</option>
@@ -228,12 +250,14 @@ const EditProfile: React.FC = () => {
                   className="w-full"
                 />
               </div>
+              <FieldError message={errors.gender} />
 
               {authType === "email" ? (
                 <>
                   <div className="flex gap-2">
                     <input
                       className="input-box"
+                      aria-invalid={!!errors.newPassword}
                       value={formData.newPassword}
                       name="newPassword"
                       onChange={handleOnChange}
@@ -242,6 +266,7 @@ const EditProfile: React.FC = () => {
                     />
                     <input
                       className="input-box"
+                      aria-invalid={!!errors.confirmPassword}
                       value={formData.confirmPassword}
                       name="confirmPassword"
                       onChange={handleOnChange}
@@ -249,23 +274,29 @@ const EditProfile: React.FC = () => {
                       type="password"
                     />
                   </div>
+                  <div className="flex gap-2">
+                    <div className="w-1/2">
+                      <FieldError message={errors.newPassword} />
+                    </div>
+                    <div className="w-1/2">
+                      <FieldError message={errors.confirmPassword} />
+                    </div>
+                  </div>
 
                   <input
                     className="input-box"
+                    aria-invalid={!!errors.password}
                     value={formData.password}
                     name="password"
                     onChange={handleOnChange}
                     placeholder="Current password"
                     type="password"
                   />
+                  <FieldError message={errors.password} />
                 </>
               ) : null}
               <div className="flex justify-end mt-1">
-                <Button
-                  type="submit"
-                  onClick={handleSubmit}
-                  disabled={!!loading}
-                >
+                <Button type="submit" disabled={!!loading}>
                   {loading || "Update"}
                 </Button>
               </div>

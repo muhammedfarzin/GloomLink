@@ -25,7 +25,7 @@ export class LoginUser implements ILoginUser {
     const user = await this.userRepository.findByIdentifier(input.username);
 
     if (!user) {
-      throw new InvalidCredentialsError();
+      throw new InvalidCredentialsError("Invalid username or password.");
     }
 
     const isPasswordMatch = await this.passwordHasher.compare(
@@ -34,7 +34,7 @@ export class LoginUser implements ILoginUser {
     );
 
     if (!isPasswordMatch) {
-      throw new InvalidCredentialsError();
+      throw new InvalidCredentialsError("Invalid username or password.");
     }
 
     if (user.isBlocked()) {

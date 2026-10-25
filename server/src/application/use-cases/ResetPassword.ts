@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { TYPES } from "@/shared/types";
-import { ValidationError } from "@/domain/errors/ValidationError";
+import { FormValidationError } from "@/domain/errors/FormValidationError";
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type { IOtpRepository } from "@/domain/repositories/IOtpRepository";
 import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
@@ -20,12 +20,12 @@ export class ResetPassword implements IResetPassword {
   async execute(input: ResetPasswordInput): Promise<void> {
     const user = await this.userRepo.findByIdentifier(input.identifier.trim());
     if (!user || !user.isActive()) {
-      throw new ValidationError("Invalid or expired reset code.");
+      throw new FormValidationError({ otp: "Invalid or expired reset code." });
     }
     const email = user.getEmail();
     const otp = await this.otpRepo.findByEmail(email);
     if (!otp || !(await this.hasher.compare(input.otp, otp.getHashedOtp()))) {
-      throw new ValidationError("Invalid or expired reset code.");
+      throw new FormValidationError({ otp: "Invalid or expired reset code." });
     }
     user.updatePasswordHash(await this.hasher.hash(input.password));
     const updated = await this.userRepo.update(user);

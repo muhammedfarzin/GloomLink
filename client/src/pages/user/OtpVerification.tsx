@@ -4,7 +4,12 @@ import GloomLinkLogo from "@/assets/images/GloomLink-Logo.svg";
 import OtpIllustrationDark from "@/assets/images/OTP-Illustration-Dark.svg";
 import FormBox from "@/components/FormBox";
 import TimerButton from "@/components/TimerButton";
-import { validateOtpForm } from "./formValidations";
+import {
+  applyServerFormErrors,
+  validateOtpFields,
+  type FieldErrors,
+} from "@/lib/formValidations";
+import FieldError from "@/components/FieldError";
 import {
   logout,
   setAuthUser,
@@ -24,6 +29,7 @@ const OtpVerification: React.FC = () => {
   const { toastError, toastMessage } = useToaster();
   const [loading, setLoading] = useState<string | null>(null);
   const [otp, setOtp] = useState<string>("");
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   const verificationEmail = sessionStorage.getItem(
     SESSION_STORAGE_KEYS.verificationEmail,
@@ -44,13 +50,12 @@ const OtpVerification: React.FC = () => {
   };
 
   const handleVerifyOtp = async () => {
+    const validationErrors = validateOtpFields(otp);
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length) return;
     setLoading("Verifying...");
 
     try {
-      validateOtpForm(otp, (errorMessage) => {
-        throw new Error(errorMessage);
-      });
-
       const response = await authApiClient.post("/verify-otp", {
         email: verificationEmail,
         otp,
@@ -68,7 +73,10 @@ const OtpVerification: React.FC = () => {
       } else if (error.status === 404) {
         error.message = "Your otp has been expired";
       }
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -119,12 +127,17 @@ const OtpVerification: React.FC = () => {
             </div>
             <input
               className="input-box"
+              aria-invalid={!!errors.otp}
               value={otp}
               name="otp"
               placeholder="Enter OTP send to your email"
               type="number"
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => {
+                setOtp(e.target.value);
+                setErrors((current) => ({ ...current, otp: "" }));
+              }}
             />
+            <FieldError message={errors.otp} />
 
             <button
               type="submit"

@@ -77,6 +77,11 @@ select.black option {
   @apply my-1 disabled:opacity-50 bg-input/80 focus:bg-input text-foreground;
 }
 
+.input-box[aria-invalid="true"],
+select[aria-invalid="true"] {
+  @apply !border-red-500 !outline !outline-1 !outline-red-500;
+}
+
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari, and Opera */
   .no-scrollbar::-webkit-scrollbar {

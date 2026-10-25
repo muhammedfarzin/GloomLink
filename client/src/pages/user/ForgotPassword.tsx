@@ -7,6 +7,12 @@ import { authApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import FieldError from "@/components/FieldError";
+import {
+  applyServerFormErrors,
+  validateForgotFields,
+  type FieldErrors,
+} from "@/lib/formValidations";
 
 const ForgotPassword = () => {
   const colorTheme = useSelector((state: RootState) => state.theme.colorTheme);
@@ -17,6 +23,7 @@ const ForgotPassword = () => {
   const [requested, setRequested] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   const requestForgotPassword = async () => {
     await authApiClient.post("/forgot-password", { identifier });
@@ -37,6 +44,14 @@ const ForgotPassword = () => {
   };
 
   const handleSubmit = async () => {
+    const validationErrors = validateForgotFields(
+      identifier,
+      requested,
+      otp,
+      password,
+    );
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length) return;
     setLoading(true);
     try {
       if (!requested) {
@@ -45,7 +60,10 @@ const ForgotPassword = () => {
         await resetPassword();
       }
     } catch (error: any) {
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(false);
     }
@@ -97,34 +115,48 @@ const ForgotPassword = () => {
               </p>
               <input
                 className="input-box"
+                aria-invalid={!!errors.identifier}
                 type="text"
                 autoComplete="username"
                 placeholder="Email, username, or phone number"
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={(e) => {
+                  setIdentifier(e.target.value);
+                  setErrors((current) => ({ ...current, identifier: "" }));
+                }}
                 disabled={requested}
               />
+              <FieldError message={errors.identifier} />
               {requested && (
                 <>
                   <input
                     className="input-box"
+                    aria-invalid={!!errors.otp}
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    pattern="[0-9]{6}"
                     maxLength={6}
                     placeholder="Six-digit reset code"
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
+                    onChange={(e) => {
+                      setOtp(e.target.value);
+                      setErrors((current) => ({ ...current, otp: "" }));
+                    }}
                   />
+                  <FieldError message={errors.otp} />
                   <input
                     className="input-box"
+                    aria-invalid={!!errors.password}
                     type="password"
                     autoComplete="new-password"
                     minLength={8}
                     placeholder="New password (8+ characters)"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((current) => ({ ...current, password: "" }));
+                    }}
                   />
+                  <FieldError message={errors.password} />
                 </>
               )}
               <button
@@ -144,7 +176,7 @@ const ForgotPassword = () => {
                   className="mt-3 text-sm text-[#82919E] hover:underline"
                   onClick={() => setRequested(false)}
                 >
-                  Use a different email
+                  Use a different account
                 </button>
               )}
             </FormBox>

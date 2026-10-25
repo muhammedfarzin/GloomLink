@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import { User } from "@/domain/entities/User";
-import { ConflictError } from "@/domain/errors/ConflictError";
+import { FormConflictError } from "@/domain/errors/FormValidationError";
 import { TYPES } from "@/shared/types";
 
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
@@ -22,9 +22,8 @@ export class CreateUser implements ICreateUser {
   async execute(input: CreateUserInput): Promise<User> {
     const existingUser = await this.userRepository.checkUserExist(input);
     if (existingUser.isExists) {
-      throw new ConflictError(
-        `User with this ${existingUser.field} already exists.`,
-      );
+      const message = `This ${existingUser.field} already exists.`;
+      throw new FormConflictError({ [existingUser.field]: message }, message);
     }
 
     const hashedPassword = await this.passwordHasher.hash(input.password);

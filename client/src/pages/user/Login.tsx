@@ -11,7 +11,8 @@ import {
   type TokensState,
   type UserAuthState,
 } from "../../redux/reducers/auth";
-import { validateLoginForm, type LoginFormType } from "./formValidations";
+import { applyServerFormErrors, validateLoginFields, type FieldErrors, type LoginFormType } from "@/lib/formValidations";
+import FieldError from "@/components/FieldError";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { signInWithPopup } from "firebase/auth";
@@ -33,6 +34,7 @@ const Login: React.FC = () => {
     username: "",
     password: "",
   });
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -63,10 +65,9 @@ const Login: React.FC = () => {
     setLoading("Authenticating...");
 
     try {
-      const isValidated = validateLoginForm(formData, toastError);
-      if (!isValidated) {
-        throw new Error("Please enter valid username and password");
-      }
+      const validationErrors = validateLoginFields(formData);
+      setErrors(validationErrors);
+      if (Object.keys(validationErrors).length) return;
 
       const response = await authApiClient.post("/login", {
         ...formData,
@@ -81,7 +82,10 @@ const Login: React.FC = () => {
           return;
         }
       }
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -89,6 +93,7 @@ const Login: React.FC = () => {
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   const handleGoogleLogin = async () => {
@@ -141,20 +146,24 @@ const Login: React.FC = () => {
           <FormBox title="Login" onSubmit={handleOnLogin}>
             <input
               className="input-box"
+              aria-invalid={!!errors.username}
               value={formData.username}
               name="username"
               placeholder="Phone number, username, or email"
               type="text"
               onChange={handleOnChange}
             />
+            <FieldError message={errors.username} />
             <input
               className="input-box"
+              aria-invalid={!!errors.password}
               value={formData.password}
               name="password"
               placeholder="Password"
               type="password"
               onChange={handleOnChange}
             />
+            <FieldError message={errors.password} />
 
             <div className="text-right -mt-2 mb-2">
               <Link to="../forgot-password" className="text-sm text-[#82919E] hover:underline">

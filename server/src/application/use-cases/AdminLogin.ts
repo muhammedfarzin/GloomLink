@@ -22,7 +22,7 @@ export class AdminLogin implements IAdminLogin {
     const adminPassword = process.env.ADMIN_PASSWORD || "password";
 
     if (input.username !== adminUsername || input.password !== adminPassword) {
-      throw new InvalidCredentialsError();
+      throw new InvalidCredentialsError("Invalid username or password.");
     }
 
     const payload: TokenPayload = { role: "admin", id: adminUsername };

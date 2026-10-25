@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { User } from "@/domain/entities/User";
-import { ValidationError } from "@/domain/errors/ValidationError";
 import { UserNotFoundError } from "@/domain/errors/NotFoundErrors";
+import { FormValidationError } from "@/domain/errors/FormValidationError";
 import { TYPES } from "@/shared/types";
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type { IOtpRepository } from "@/domain/repositories/IOtpRepository";
@@ -20,7 +20,7 @@ export class VerifyOtp implements IVerifyOtp {
     const storedOtp = await this.otpRepository.findByEmail(input.email);
 
     if (!storedOtp) {
-      throw new ValidationError("OTP has expired or is invalid");
+      throw new FormValidationError({ otp: "OTP has expired or is invalid." });
     }
 
     const isMatch = await this.passwordHasher.compare(
@@ -29,7 +29,7 @@ export class VerifyOtp implements IVerifyOtp {
     );
 
     if (!isMatch) {
-      throw new ValidationError("Invalid OTP!");
+      throw new FormValidationError({ otp: "Invalid OTP." });
     }
 
     const user = await this.userRepository.findByEmail(input.email);

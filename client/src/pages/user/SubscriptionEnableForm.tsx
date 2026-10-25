@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@/components/Button";
-import { validateRequiredFields } from "./formValidations";
+import { applyServerFormErrors, type FieldErrors } from "@/lib/formValidations";
+import FieldError from "@/components/FieldError";
 import { useToaster } from "@/hooks/useToaster";
 import { apiClient } from "@/apiClient";
 
@@ -22,6 +23,7 @@ const SubscriptionEnableForm: React.FC = () => {
     accNumber: "",
     ifsc: "",
   });
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     apiClient
@@ -38,15 +40,27 @@ const SubscriptionEnableForm: React.FC = () => {
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
       setLoading("Processing...");
-      validateRequiredFields(formData, (errMessage) => {
-        throw new Error(errMessage);
-      });
+      const nextErrors: FieldErrors = {};
+      for (const [field, value] of Object.entries(formData)) {
+        if (!value.trim())
+          nextErrors[field] =
+            `${field === "accNumber" ? "Account number" : field === "ifsc" ? "IFSC code" : field[0].toUpperCase() + field.slice(1)} is required.`;
+      }
+      if (formData.amount && Number(formData.amount) <= 0)
+        nextErrors.amount = "Amount must be greater than zero.";
+      if (formData.accNumber && !/^\d{6,18}$/.test(formData.accNumber))
+        nextErrors.accNumber = "Enter a valid account number.";
+      if (formData.ifsc && !/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/.test(formData.ifsc))
+        nextErrors.ifsc = "Enter a valid IFSC code.";
+      setErrors(nextErrors);
+      if (Object.keys(nextErrors).length) return;
 
       const response = await apiClient.post("/subscriptions/enable", formData);
       toastMessage(
@@ -55,7 +69,10 @@ const SubscriptionEnableForm: React.FC = () => {
 
       navigate("/profile");
     } catch (error: any) {
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -72,36 +89,44 @@ const SubscriptionEnableForm: React.FC = () => {
           >
             <input
               className="input-box"
+              aria-invalid={!!errors.amount}
               placeholder="Amount"
               type="number"
               value={formData.amount}
               name="amount"
               onChange={handleOnChange}
             />
+            <FieldError message={errors.amount} />
             <input
               className="input-box"
+              aria-invalid={!!errors.name}
               placeholder="Bank account holder name"
               type="text"
               value={formData.name}
               name="name"
               onChange={handleOnChange}
             />
+            <FieldError message={errors.name} />
             <input
               className="input-box"
+              aria-invalid={!!errors.accNumber}
               placeholder="Bank account number"
               type="number"
               value={formData.accNumber}
               name="accNumber"
               onChange={handleOnChange}
             />
+            <FieldError message={errors.accNumber} />
             <input
               className="input-box"
+              aria-invalid={!!errors.ifsc}
               placeholder="Bank IFSC code"
               type="text"
               value={formData.ifsc}
               name="ifsc"
               onChange={handleOnChange}
             />
+            <FieldError message={errors.ifsc} />
 
             <div className="flex justify-end mt-1">
               <Button className="px-4" type="submit" disabled={!!loading}>

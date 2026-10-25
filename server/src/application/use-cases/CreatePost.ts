@@ -1,5 +1,5 @@
 import { injectable, inject } from "inversify";
-import { ValidationError } from "@/domain/errors/ValidationError";
+import { FormValidationError } from "@/domain/errors/FormValidationError";
 import { Post } from "@/domain/entities/Post";
 import { TYPES } from "@/shared/types";
 import type { IPostRepository } from "@/domain/repositories/IPostRepository";
@@ -20,7 +20,7 @@ export class CreatePost implements ICreatePost {
 
   async execute(input: CreatePostInput): Promise<Post> {
     if (!input.caption && input.files.length === 0) {
-      throw new ValidationError("Post must have either a caption or an image.");
+      throw new FormValidationError({ content: "Add a caption or upload an image." });
     }
 
     // ---Upload media files---

@@ -11,7 +11,13 @@ import {
   setAuthAdmin,
   TokensState,
 } from "@/redux/reducers/auth";
-import { LoginFormType, validateLoginForm } from "../user/formValidations";
+import {
+  applyServerFormErrors,
+  validateLoginFields,
+  type FieldErrors,
+  type LoginFormType,
+} from "@/lib/formValidations";
+import FieldError from "@/components/FieldError";
 import { authApiClient } from "@/apiClient";
 import { useToaster } from "@/hooks/useToaster";
 
@@ -26,6 +32,7 @@ const AdminLogin: React.FC = () => {
     username: "",
     password: "",
   });
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     const adminAccessToken = localStorage.getItem("adminAccessToken");
@@ -37,10 +44,11 @@ const AdminLogin: React.FC = () => {
   }, [adminData]);
 
   const handleOnLogin = async () => {
-    setLoading("Authenticating...");
-    const isValidated = validateLoginForm(formData, toastError);
+    const validationErrors = validateLoginFields(formData);
+    setErrors(validationErrors);
 
-    if (!isValidated) return;
+    if (Object.keys(validationErrors).length) return;
+    setLoading("Authenticating...");
 
     try {
       const response = await authApiClient.post("/login", {
@@ -53,7 +61,10 @@ const AdminLogin: React.FC = () => {
       dispatch(setAuthAdmin({ adminData, tokens }));
       navigate("/admin");
     } catch (error: any) {
-      toastError(error.message);
+      const serverErrors = applyServerFormErrors(error);
+      if (Object.keys(serverErrors).length) {
+        setErrors((current) => ({ ...current, ...serverErrors }));
+      } else toastError(error.message);
     } finally {
       setLoading(null);
     }
@@ -61,6 +72,7 @@ const AdminLogin: React.FC = () => {
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   return (
@@ -92,15 +104,19 @@ const AdminLogin: React.FC = () => {
               type="text"
               name="username"
               className="input-box"
+              aria-invalid={!!errors.username}
               onChange={handleOnChange}
             />
+            <FieldError message={errors.username} />
             <input
               placeholder="Password"
               type="password"
               name="password"
               className="input-box"
+              aria-invalid={!!errors.password}
               onChange={handleOnChange}
             />
+            <FieldError message={errors.password} />
             <button
               className="btn btn-primary border w-full p-2"
               disabled={!!loading}
