@@ -27,7 +27,8 @@ export class PostRepository
   private enrichedPipeline: PipelineStage[] = [
     {
       $lookup: {
-        from: "likes",
+        from: "user-activities",
+        pipeline: [{ $match: { action: "like", targetType: "post" } }],
         localField: "_id",
         foreignField: "targetId",
         as: "likes",
@@ -83,21 +84,30 @@ export class PostRepository
       ...this.enrichedPipeline,
       {
         $lookup: {
-          from: "users",
-          let: { currentUserId: currentUserId },
+          from: "user-activities",
+          let: { currentUserId: currentUserId, postId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $eq: ["$_id", "$$currentUserId"] } } },
-            { $project: { savedPosts: 1 } },
+            {
+              $match: {
+                action: "save",
+                targetType: "post",
+                $expr: {
+                  $and: [
+                    { $eq: ["$userId", "$$currentUserId"] },
+                    { $eq: ["$targetId", "$$postId"] },
+                  ],
+                },
+              },
+            },
           ],
-          as: "currentUserInfo",
+          as: "savedPostsActivity",
         },
       },
-      { $unwind: "$currentUserInfo" },
       {
         $addFields: {
           postId: "$_id",
           isLiked: { $in: [currentUserId, "$likes.userId"] },
-          isSaved: { $in: [postObjectId, "$currentUserInfo.savedPosts"] },
+          isSaved: { $gt: [{ $size: "$savedPostsActivity" }, 0] },
         },
       },
       {
@@ -225,21 +235,30 @@ export class PostRepository
     const currentUserPipeline: PipelineStage[] = [
       {
         $lookup: {
-          from: "users",
-          let: { currentUserId: currentUserId },
+          from: "user-activities",
+          let: { currentUserId: currentUserId, postId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $eq: ["$_id", "$$currentUserId"] } } },
-            { $project: { savedPosts: 1 } },
+            {
+              $match: {
+                action: "save",
+                targetType: "post",
+                $expr: {
+                  $and: [
+                    { $eq: ["$userId", "$$currentUserId"] },
+                    { $eq: ["$targetId", "$$postId"] },
+                  ],
+                },
+              },
+            },
           ],
-          as: "currentUserInfo",
+          as: "savedPostsActivity",
         },
       },
-      { $unwind: "$currentUserInfo" },
       {
         $addFields: {
           id: "$_id",
           isLiked: { $in: [currentUserId, "$likes.userId"] },
-          isSaved: { $in: ["$_id", "$currentUserInfo.savedPosts"] },
+          isSaved: { $gt: [{ $size: "$savedPostsActivity" }, 0] },
         },
       },
     ];
@@ -259,7 +278,7 @@ export class PostRepository
           likes: 0,
           comments: 0,
           relevanceScore: 0,
-          currentUserInfo: 0,
+          savedPostsActivity: 0,
           userReport: 0,
         },
       },

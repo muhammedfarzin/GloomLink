@@ -4,7 +4,7 @@ import { ValidationError } from "@/domain/errors/ValidationError";
 
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type { IPostRepository } from "@/domain/repositories/IPostRepository";
-import type { IInteractionRepository } from "@/domain/repositories/IInteractionRepository";
+import type { IUserActivityRepository } from "@/domain/repositories/IUserActivityRepository";
 import type {
   IGetDashboardData,
   DashboardMetrics,
@@ -15,8 +15,8 @@ export class GetDashboardData implements IGetDashboardData {
   constructor(
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
     @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
-    @inject(TYPES.InteractionRepository)
-    private interactionRepository: IInteractionRepository,
+    @inject(TYPES.UserActivityRepository)
+    private userActivityRepository: IUserActivityRepository,
   ) {}
 
   async execute(startDate: Date, endDate: Date): Promise<DashboardMetrics> {
@@ -27,7 +27,7 @@ export class GetDashboardData implements IGetDashboardData {
     const [userMetrics, postMetrics, interactionMetrics] = await Promise.all([
       this.userRepository.getDashboardMetrics(startDate, endDate),
       this.postRepository.getDashboardMetrics(startDate, endDate),
-      this.interactionRepository.getDashboardMetrics(startDate, endDate),
+      this.userActivityRepository.getDashboardMetrics(startDate, endDate),
     ]);
 
     // Generate a list for chart

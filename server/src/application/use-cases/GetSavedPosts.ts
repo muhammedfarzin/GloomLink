@@ -1,5 +1,5 @@
 import { injectable, inject } from "inversify";
-import type { IUserRepository } from "@/domain/repositories/IUserRepository";
+import type { IUserActivityRepository } from "@/domain/repositories/IUserActivityRepository";
 import type { EnrichedPost } from "@/domain/models/Post";
 import { TYPES } from "@/shared/types";
 import type {
@@ -10,11 +10,12 @@ import type {
 @injectable()
 export class GetSavedPosts implements IGetSavedPosts {
   constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.UserActivityRepository)
+    private userActivityRepository: IUserActivityRepository,
   ) {}
 
   async execute(input: GetSavedPostsInput): Promise<EnrichedPost[]> {
-    return this.userRepository.findSavedPosts(
+    return this.userActivityRepository.getSavedPosts(
       input.userId,
       input.page,
       input.limit,

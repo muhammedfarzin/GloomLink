@@ -14,12 +14,11 @@ import { UserRepository } from "@/infrastructure/repositories/UserRepository";
 import { CommentRepository } from "@/infrastructure/repositories/CommentRepository";
 import { ConversationRepository } from "@/infrastructure/repositories/ConversationRepository";
 import { FollowRepository } from "@/infrastructure/repositories/FollowRepository";
-import { LikeRepository } from "@/infrastructure/repositories/LikeRepository";
 import { MessageRepository } from "@/infrastructure/repositories/MessageRepository";
 import { OtpRepository } from "@/infrastructure/repositories/OtpRepository";
 import { PostRepository } from "@/infrastructure/repositories/PostRepository";
 import { ReportRepository } from "@/infrastructure/repositories/ReportRepository";
-import { InteractionRepository } from "@/infrastructure/repositories/InteractionRepository";
+import { UserActivityRepository } from "@/infrastructure/repositories/UserActivityRepository";
 
 import type { IPasswordHasher } from "@/domain/services/IPasswordHasher";
 import type { IFileStorageService } from "@/domain/services/IFileStorageService";
@@ -33,12 +32,11 @@ import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type { ICommentRepository } from "@/domain/repositories/ICommentRepository";
 import type { IConversationRepository } from "@/domain/repositories/IConversationRepository";
 import type { IFollowRepository } from "@/domain/repositories/IFollowRepository";
-import type { ILikeRepository } from "@/domain/repositories/ILikeRepository";
 import type { IMessageRepository } from "@/domain/repositories/IMessageRepository";
 import type { IOtpRepository } from "@/domain/repositories/IOtpRepository";
 import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type { IReportRepository } from "@/domain/repositories/IReportRepository";
-import type { IInteractionRepository } from "@/domain/repositories/IInteractionRepository";
+import type { IUserActivityRepository } from "@/domain/repositories/IUserActivityRepository";
 
 import { CreateUser } from "@/application/use-cases/CreateUser";
 import { AddComment } from "@/application/use-cases/AddComment";
@@ -77,7 +75,7 @@ import { UpdateProfile } from "@/application/use-cases/UpdateProfile";
 import { VerifyOtp } from "@/application/use-cases/VerifyOtp";
 import { RequestPasswordReset } from "@/application/use-cases/RequestPasswordReset";
 import { ResetPassword } from "@/application/use-cases/ResetPassword";
-import { RecordInteraction } from "@/application/use-cases/RecordInteraction";
+import { RecordUserActivity } from "@/application/use-cases/RecordUserActivity";
 import { GetPosts } from "@/application/use-cases/GetPosts";
 import { GetDashboardData } from "@/application/use-cases/GetDashboardData";
 
@@ -100,10 +98,8 @@ import { ConversationModel } from "@/infrastructure/database/models/Conversation
 import { ConversationMapper } from "@/infrastructure/mappers/ConversationMapper";
 import { FollowModel } from "@/infrastructure/database/models/FollowModel";
 import { FollowMapper } from "@/infrastructure/mappers/FollowMapper";
-import { InteractionModel } from "@/infrastructure/database/models/InteractionModel";
-import { InteractionMapper } from "@/infrastructure/mappers/InteractionMapper";
-import { LikeModel } from "@/infrastructure/database/models/LikeModel";
-import { LikeMapper } from "@/infrastructure/mappers/LikeMapper";
+import { UserActivityModel } from "@/infrastructure/database/models/UserActivityModel";
+import { UserActivityMapper } from "@/infrastructure/mappers/UserActivityMapper";
 import { MessageModel } from "@/infrastructure/database/models/MessageModel";
 import { MessageMapper } from "@/infrastructure/mappers/MessageMapper";
 import { OtpModel } from "@/infrastructure/database/models/OtpModel";
@@ -135,23 +131,33 @@ container
   .inSingletonScope();
 
 // --- BIND MODELS AND MAPPERS ---
-container.bind<typeof CommentModel>(TYPES.CommentModel).toConstantValue(CommentModel);
+container
+  .bind<typeof CommentModel>(TYPES.CommentModel)
+  .toConstantValue(CommentModel);
 container.bind(TYPES.CommentMapper).to(CommentMapper);
-container.bind<typeof ConversationModel>(TYPES.ConversationModel).toConstantValue(ConversationModel);
+container
+  .bind<typeof ConversationModel>(TYPES.ConversationModel)
+  .toConstantValue(ConversationModel);
 container.bind(TYPES.ConversationMapper).to(ConversationMapper);
-container.bind<typeof FollowModel>(TYPES.FollowModel).toConstantValue(FollowModel);
+container
+  .bind<typeof FollowModel>(TYPES.FollowModel)
+  .toConstantValue(FollowModel);
 container.bind(TYPES.FollowMapper).to(FollowMapper);
-container.bind<typeof InteractionModel>(TYPES.InteractionModel).toConstantValue(InteractionModel);
-container.bind(TYPES.InteractionMapper).to(InteractionMapper);
-container.bind<typeof LikeModel>(TYPES.LikeModel).toConstantValue(LikeModel);
-container.bind(TYPES.LikeMapper).to(LikeMapper);
-container.bind<typeof MessageModel>(TYPES.MessageModel).toConstantValue(MessageModel);
+container
+  .bind<typeof UserActivityModel>(TYPES.UserActivityModel)
+  .toConstantValue(UserActivityModel);
+container.bind(TYPES.UserActivityMapper).to(UserActivityMapper);
+container
+  .bind<typeof MessageModel>(TYPES.MessageModel)
+  .toConstantValue(MessageModel);
 container.bind(TYPES.MessageMapper).to(MessageMapper);
 container.bind<typeof OtpModel>(TYPES.OtpModel).toConstantValue(OtpModel);
 container.bind(TYPES.OtpMapper).to(OtpMapper);
 container.bind<typeof PostModel>(TYPES.PostModel).toConstantValue(PostModel);
 container.bind(TYPES.PostMapper).to(PostMapper);
-container.bind<typeof ReportModel>(TYPES.ReportModel).toConstantValue(ReportModel);
+container
+  .bind<typeof ReportModel>(TYPES.ReportModel)
+  .toConstantValue(ReportModel);
 container.bind(TYPES.ReportMapper).to(ReportMapper);
 container.bind<typeof UserModel>(TYPES.UserModel).toConstantValue(UserModel);
 container.bind(TYPES.UserMapper).to(UserMapper);
@@ -161,7 +167,6 @@ container.bind<IFollowRepository>(TYPES.IFollowRepository).to(FollowRepository);
 container.bind<IReportRepository>(TYPES.IReportRepository).to(ReportRepository);
 container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
 container.bind<IPostRepository>(TYPES.IPostRepository).to(PostRepository);
-container.bind<ILikeRepository>(TYPES.ILikeRepository).to(LikeRepository);
 container.bind<IOtpRepository>(TYPES.IOtpRepository).to(OtpRepository);
 container
   .bind<ICommentRepository>(TYPES.ICommentRepository)
@@ -173,8 +178,8 @@ container
   .bind<IConversationRepository>(TYPES.IConversationRepository)
   .to(ConversationRepository);
 container
-  .bind<IInteractionRepository>(TYPES.InteractionRepository)
-  .to(InteractionRepository);
+  .bind<IUserActivityRepository>(TYPES.UserActivityRepository)
+  .to(UserActivityRepository);
 
 // --- BIND USE CASES ---
 container.bind<AdminLogin>(TYPES.IAdminLogin).to(AdminLogin);
@@ -204,8 +209,8 @@ container
   .bind<MarkMessageAsSeen>(TYPES.IMarkMessageAsSeen)
   .to(MarkMessageAsSeen);
 container
-  .bind<RecordInteraction>(TYPES.IRecordInteraction)
-  .to(RecordInteraction);
+  .bind<RecordUserActivity>(TYPES.IRecordUserActivity)
+  .to(RecordUserActivity);
 container.bind<RefreshToken>(TYPES.IRefreshToken).to(RefreshToken);
 container.bind<ReportTarget>(TYPES.IReportTarget).to(ReportTarget);
 container.bind<SearchContent>(TYPES.ISearchContent).to(SearchContent);
@@ -222,7 +227,9 @@ container.bind<ToggleSavePost>(TYPES.IToggleSavePost).to(ToggleSavePost);
 container.bind<ToggleUserStatus>(TYPES.IToggleUserStatus).to(ToggleUserStatus);
 container.bind<UpdateProfile>(TYPES.IUpdateProfile).to(UpdateProfile);
 container.bind<VerifyOtp>(TYPES.IVerifyOtp).to(VerifyOtp);
-container.bind<RequestPasswordReset>(TYPES.IRequestPasswordReset).to(RequestPasswordReset);
+container
+  .bind<RequestPasswordReset>(TYPES.IRequestPasswordReset)
+  .to(RequestPasswordReset);
 container.bind<ResetPassword>(TYPES.IResetPassword).to(ResetPassword);
 container.bind<GetDashboardData>(TYPES.IGetDashboardData).to(GetDashboardData);
 

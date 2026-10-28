@@ -23,7 +23,6 @@ export class User extends BaseEntity {
   private gender: UserGender | undefined;
   private dob: DateOfBirth | undefined;
   private readonly blockedUsers: Set<string>;
-  private readonly savedPosts: Set<string>;
   private readonly interestKeywords: Set<string>;
   private isSelf: boolean | undefined;
   private isFollowing: boolean | undefined;
@@ -38,7 +37,6 @@ export class User extends BaseEntity {
     this.status = new UserStatus(props.status);
     this.passwordHash = new PasswordHash(props.passwordHash);
     this.blockedUsers = new Set(props.blockedUsers ?? []);
-    this.savedPosts = new Set(props.savedPosts ?? []);
     this.interestKeywords = new Set(props.interestKeywords ?? []);
     this.dob = props.dob && new DateOfBirth(props.dob);
     this.mobile = props.mobile ? new MobileNumber(props.mobile) : undefined;
@@ -115,14 +113,6 @@ export class User extends BaseEntity {
     this.blockedUsers.delete(userId);
   }
 
-  savePost(postId: string) {
-    this.savedPosts.add(postId);
-  }
-
-  unsavePost(postId: string) {
-    this.savedPosts.delete(postId);
-  }
-
   // ---------------- GETTERS ----------------
 
   getUsername(): UserType["username"] {
@@ -179,10 +169,6 @@ export class User extends BaseEntity {
     return Array.from(this.blockedUsers);
   }
 
-  getSavedPosts(): string[] {
-    return Array.from(this.savedPosts);
-  }
-
   getInterestKeywords(): string[] {
     return Array.from(this.interestKeywords);
   }
@@ -203,10 +189,6 @@ export class User extends BaseEntity {
 
   hasBlocked(userId: string): boolean {
     return this.blockedUsers.has(userId);
-  }
-
-  hasSavedPost(postId: string): boolean {
-    return this.savedPosts.has(postId);
   }
 
   isSelfUser(): boolean | undefined {
@@ -232,7 +214,6 @@ interface UserType {
   gender?: "m" | "f";
   dob?: Date;
   blockedUsers?: readonly string[];
-  savedPosts?: readonly string[];
   interestKeywords?: readonly string[];
   isSelf?: boolean;
   isFollowing?: boolean;

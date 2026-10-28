@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { TYPES } from "@/shared/types";
-import type { IInteractionRepository } from "@/domain/repositories/IInteractionRepository";
+import type { IUserActivityRepository } from "@/domain/repositories/IUserActivityRepository";
 import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type { IFollowRepository } from "@/domain/repositories/IFollowRepository";
 import type { EnrichedPost } from "@/domain/models/Post";
@@ -11,8 +11,8 @@ import { User } from "@/domain/entities/User";
 @injectable()
 export class GetPosts implements IGetPosts {
   constructor(
-    @inject(TYPES.InteractionRepository)
-    private interactionRepository: IInteractionRepository,
+    @inject(TYPES.UserActivityRepository)
+    private userActivityRepository: IUserActivityRepository,
     @inject(TYPES.IPostRepository)
     private postRepository: IPostRepository,
     @inject(TYPES.IFollowRepository)
@@ -25,7 +25,7 @@ export class GetPosts implements IGetPosts {
     const { userId, authorUsername } = input;
     // 1. Fetch top interest tags directly from DB
     const getInterestKeywordsPromise =
-      this.interactionRepository.getTopInteractedTags(userId, 10);
+      this.userActivityRepository.getTopInteractedTags(userId, 20);
     // 2. Get following users (to boost their content)
     const getFollowingPromise = this.followRepository.findFollowing(userId);
     let getAuthorPromise: Promise<User | null> | undefined;

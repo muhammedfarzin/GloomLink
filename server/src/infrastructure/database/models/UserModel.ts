@@ -14,7 +14,6 @@ export interface User {
   gender?: "m" | "f";
   dob?: Date;
   blockedUsers: Schema.Types.ObjectId[];
-  savedPosts: Schema.Types.ObjectId[];
   subscriptionAmount?: number;
   interestKeywords: string[];
 }
@@ -45,7 +44,6 @@ const userSchema = new Schema<User>(
     gender: { type: String, default: null, enum: ["m", "f"] },
     dob: { type: Date, default: null },
     blockedUsers: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
-    savedPosts: { type: [Schema.Types.ObjectId], ref: "Post", default: [] },
     subscriptionAmount: Number,
     interestKeywords: {
       type: [String],

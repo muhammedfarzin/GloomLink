@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 import { inject, injectable } from "inversify";
 import { PostMapper } from "../mappers/PostMapper";
 import { HttpError } from "../errors/HttpError";
-import { recordInteractionSchema } from "../validation/interactionSchemas";
+import { recordPostViewActivitySchema } from "../validation/userActivitySchemas";
 import { TYPES } from "@/shared/types";
 
 import type { ICreatePost } from "@/domain/use-cases/ICreatePost";
@@ -11,7 +11,7 @@ import type { IGetSavedPosts } from "@/domain/use-cases/IGetSavedPosts";
 import type { IToggleSavePost } from "@/domain/use-cases/IToggleSavePost";
 import type { IEditPost } from "@/domain/use-cases/IEditPost";
 import type { IDeletePost } from "@/domain/use-cases/IDeletePost";
-import type { IRecordInteraction } from "@/domain/use-cases/IRecordInteraction";
+import type { IRecordUserActivity } from "@/domain/use-cases/IRecordUserActivity";
 import type { IGetPosts } from "@/domain/use-cases/IGetPosts";
 
 import { createPostSchema, editPostSchema } from "../validation/postSchemas";
@@ -29,8 +29,8 @@ export class PostController {
     @inject(TYPES.IGetPosts)
     private getPostsUseCase: IGetPosts,
     @inject(TYPES.IDeletePost) private deletePostUseCase: IDeletePost,
-    @inject(TYPES.IRecordInteraction)
-    private recordInteractionUseCase: IRecordInteraction,
+    @inject(TYPES.IRecordUserActivity)
+    private recordUserActivityUseCase: IRecordUserActivity,
   ) {}
 
   createPost: RequestHandler = async (req, res, next) => {
@@ -131,14 +131,6 @@ export class PostController {
         postId,
       });
 
-      if (result.status === "saved") {
-        await this.recordInteractionUseCase.execute({
-          userId: req.user.id,
-          postId,
-          type: "save",
-        });
-      }
-
       res.status(200).json({ message: `Post successfully ${result.status}` });
     } catch (error) {
       next(error);
@@ -211,20 +203,25 @@ export class PostController {
     }
   };
 
-  recordInteraction: RequestHandler = async (req, res, next) => {
+  recordPostView: RequestHandler = async (req, res, next) => {
     try {
       if (!req.user || req.user.role !== "user") {
         throw new HttpError(401, "Unauthorized");
       }
 
-      const validatedBody = recordInteractionSchema.parse(req.body);
+      const validatedBody = recordPostViewActivitySchema.parse(req.body);
 
-      await this.recordInteractionUseCase.execute({
-        ...validatedBody,
+      await this.recordUserActivityUseCase.execute({
         userId: req.user.id,
+        targetId: validatedBody.postId,
+        targetType: "post",
+        action: "view",
+        metadata: validatedBody.metadata,
       });
 
-      res.status(200).json({ message: "Interaction recorded successfully" });
+      res
+        .status(200)
+        .json({ message: "Post view activity recorded successfully" });
     } catch (error) {
       next(error);
     }

@@ -1,4 +1,4 @@
-import type { LikeableType } from "../repositories/ILikeRepository";
+import type { UserActivityType } from "../models/UserActivity";
 import type { UserCompact } from "../models/User";
 
 export interface IGetLikedUsers {
@@ -8,7 +8,7 @@ export interface IGetLikedUsers {
 export interface GetLikedUsersInput {
   targetId: string;
   userId?: string;
-  type: LikeableType;
+  type: UserActivityType["targetType"];
   page: number;
   limit: number;
 }

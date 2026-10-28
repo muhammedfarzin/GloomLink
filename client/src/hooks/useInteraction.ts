@@ -3,14 +3,14 @@ import { apiClient } from "@/apiClient";
 
 export const useInteraction = () => {
   const recordInteraction = useCallback(
-    async (postId: string, type: "view" | "like" | "comment" | "save") => {
+    async (postId: string, action: "view") => {
       try {
-        await apiClient.post("/posts/interaction", { postId, type });
+        await apiClient.post("/posts/record-activity", { postId, action });
       } catch (error) {
-        console.error("Failed to record interaction:", error);
+        console.error("Failed to record activity:", error);
       }
     },
-    []
+    [],
   );
 
   return { recordInteraction };

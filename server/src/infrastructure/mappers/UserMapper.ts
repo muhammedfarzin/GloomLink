@@ -23,7 +23,6 @@ export class UserMapper extends Mapper<User, UserDomainProps> {
       dob: data.dob,
       isFollowing: data.isFollowing,
       interestKeywords: data.interestKeywords,
-      savedPosts: data.savedPosts?.map((postId) => postId.toString()),
       blockedUsers: data.blockedUsers?.map((postId) => postId.toString()),
     });
   }
@@ -39,7 +38,6 @@ export class UserMapper extends Mapper<User, UserDomainProps> {
       authType: user.getAuthType(),
       status: user.getStatus(),
       blockedUsers: user.getBlockedUsers(),
-      savedPosts: user.getSavedPosts(),
       interestKeywords: user.getInterestKeywords(),
     };
   }

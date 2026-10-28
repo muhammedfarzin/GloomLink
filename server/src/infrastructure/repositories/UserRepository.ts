@@ -2,11 +2,9 @@ import type { Model } from "mongoose";
 import { inject, injectable } from "inversify";
 import { TYPES } from "@/shared/types";
 import mongoose, { type PipelineStage } from "mongoose";
-import { PostMapper } from "../mappers/PostMapper";
 import { UserMapper } from "../mappers/UserMapper";
 import type { UserDocument } from "../database/models/UserModel";
 import { User } from "@/domain/entities/User";
-import type { EnrichedPost } from "@/domain/models/Post";
 import type { UserCompact, UserProfile } from "@/domain/models/User";
 import type {
   IUserRepository,
@@ -25,7 +23,6 @@ export class UserRepository
   constructor(
     @inject(TYPES.UserModel) protected readonly model: Model<UserDocument>,
     @inject(TYPES.UserMapper) protected readonly mapper: UserMapper,
-    @inject(TYPES.PostMapper) private readonly postMapper: PostMapper,
   ) {
     super();
   }
@@ -86,7 +83,6 @@ export class UserRepository
       id,
       email: _email,
       blockedUsers: _blockedUser,
-      savedPosts: _savedPost,
       interestKeywords,
       ...userToPersist
     } = this.mapper.toPersistence(userData);
@@ -100,114 +96,6 @@ export class UserRepository
     if (!updatedUserDoc) return null;
 
     return this.mapper.toDomain(updatedUserDoc);
-  }
-
-  async findSavedPosts(
-    userId: string,
-    page: number,
-    limit: number,
-  ): Promise<EnrichedPost[]> {
-    const skip = (page - 1) * limit;
-    const userObjectId = new mongoose.Types.ObjectId(userId);
-
-    const aggregationPipeline: PipelineStage[] = [
-      { $match: { _id: userObjectId } },
-      {
-        $lookup: {
-          from: "posts",
-          localField: "savedPosts",
-          foreignField: "_id",
-          as: "savedPostsData",
-          pipeline: [
-            { $match: { status: "active" } },
-            { $skip: skip },
-            { $limit: limit },
-            {
-              $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "targetId",
-                as: "likes",
-              },
-            },
-            {
-              $lookup: {
-                from: "comments",
-                localField: "_id",
-                foreignField: "targetId",
-                as: "comments",
-              },
-            },
-            {
-              $lookup: {
-                from: "users",
-                localField: "userId",
-                foreignField: "_id",
-                as: "uploadedBy",
-                pipeline: [
-                  {
-                    $project: {
-                      _id: 0,
-                      id: "$_id",
-                      username: 1,
-                      firstname: 1,
-                      lastname: 1,
-                      imageUrl: 1,
-                    },
-                  },
-                ],
-              },
-            },
-            { $unwind: "$uploadedBy" },
-            {
-              $addFields: {
-                isSaved: true,
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                id: "$_id",
-                userId: 1,
-                caption: 1,
-                images: 1,
-                tags: 1,
-                publishedFor: 1,
-                status: 1,
-                likesCount: { $size: "$likes" },
-                commentsCount: { $size: "$comments" },
-                isLiked: { $in: [userObjectId, "$likes.userId"] },
-                isSaved: 1,
-                uploadedBy: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                type: "post",
-              },
-            },
-          ],
-        },
-      },
-      { $project: { _id: 0, savedPostsData: 1 } },
-    ];
-
-    const results = await this.model.aggregate(aggregationPipeline);
-    return results[0].savedPostsData.map((post: any) =>
-      this.postMapper.toResponse(post),
-    );
-  }
-
-  async savePost(userId: string, postId: string): Promise<void> {
-    await this.model.updateOne(
-      { _id: userId },
-      { $addToSet: { savedPosts: postId } },
-    );
-  }
-
-  async unsavePost(userId: string, postId: string): Promise<void> {
-    await this.model.updateOne(
-      { _id: userId },
-      { $pull: { savedPosts: postId } },
-    );
   }
 
   async findProfileByUsername(

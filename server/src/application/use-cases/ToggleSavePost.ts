@@ -1,5 +1,6 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "@/shared/types";
+import type { IUserActivityRepository } from "@/domain/repositories/IUserActivityRepository";
 import type { IUserRepository } from "@/domain/repositories/IUserRepository";
 import type { IPostRepository } from "@/domain/repositories/IPostRepository";
 import type {
@@ -15,6 +16,8 @@ import {
 @injectable()
 export class ToggleSavePost implements IToggleSavePost {
   constructor(
+    @inject(TYPES.UserActivityRepository)
+    private userActivityRepository: IUserActivityRepository,
     @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
     @inject(TYPES.IPostRepository) private postRepository: IPostRepository,
   ) {}
@@ -30,14 +33,10 @@ export class ToggleSavePost implements IToggleSavePost {
       throw new PostNotFoundError();
     }
 
-    const isAlreadySaved = user.getSavedPosts().includes(postId);
-
-    if (isAlreadySaved) {
-      await this.userRepository.unsavePost(userId, postId);
-      return { status: "unsaved" };
-    } else {
-      await this.userRepository.savePost(userId, postId);
-      return { status: "saved" };
-    }
+    const isSaved = await this.userActivityRepository.toggleSavePost(
+      userId,
+      postId,
+    );
+    return { status: isSaved ? "saved" : "unsaved" };
   }
 }

@@ -33,8 +33,7 @@ const PostActions: React.FC<Props> = ({
     try {
       if (!handleChange && postData) onSave?.(!postData.isSaved);
       handleChange?.(handleSavedState);
-      const response = await apiClient.post(`/posts/save/${postId}`);
-      toastMessage(response.data.message);
+      await apiClient.post(`/posts/save/${postId}`);
     } catch (error) {
       if (!handleChange && postData) onSave?.(!!postData.isSaved);
       handleChange?.(handleSavedState);

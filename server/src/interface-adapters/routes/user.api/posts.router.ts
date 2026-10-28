@@ -18,10 +18,10 @@ router.get(
 );
 
 router.post(
-  "/interaction",
+  "/record-activity",
   authenticateToken,
   authorizeRole("user"),
-  postController.recordInteraction,
+  postController.recordPostView,
 );
 
 router.post(

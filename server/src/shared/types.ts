@@ -7,10 +7,8 @@ const TYPES = {
   ConversationMapper: Symbol.for("ConversationMapper"),
   FollowModel: Symbol.for("FollowModel"),
   FollowMapper: Symbol.for("FollowMapper"),
-  InteractionModel: Symbol.for("InteractionModel"),
-  InteractionMapper: Symbol.for("InteractionMapper"),
-  LikeModel: Symbol.for("LikeModel"),
-  LikeMapper: Symbol.for("LikeMapper"),
+  UserActivityModel: Symbol.for("UserActivityModel"),
+  UserActivityMapper: Symbol.for("UserActivityMapper"),
   MessageModel: Symbol.for("MessageModel"),
   MessageMapper: Symbol.for("MessageMapper"),
   OtpModel: Symbol.for("OtpModel"),
@@ -29,10 +27,9 @@ const TYPES = {
   ICommentRepository: Symbol.for("ICommentRepository"),
   IConversationRepository: Symbol.for("IConversationRepository"),
   IFollowRepository: Symbol.for("IFollowRepository"),
-  ILikeRepository: Symbol.for("ILikeRepository"),
   IMessageRepository: Symbol.for("IMessageRepository"),
   IReportRepository: Symbol.for("IReportRepository"),
-  InteractionRepository: Symbol.for("InteractionRepository"),
+  UserActivityRepository: Symbol.for("UserActivityRepository"),
 
   // Services
   IPasswordHasher: Symbol.for("IPasswordHasher"),
@@ -82,7 +79,7 @@ const TYPES = {
   IVerifyOtp: Symbol.for("IVerifyOtp"),
   IRequestPasswordReset: Symbol.for("IRequestPasswordReset"),
   IResetPassword: Symbol.for("IResetPassword"),
-  IRecordInteraction: Symbol.for("IRecordInteraction"),
+  IRecordUserActivity: Symbol.for("IRecordUserActivity"),
   IGetDashboardData: Symbol.for("IGetDashboardData"),
 
   // Controllers

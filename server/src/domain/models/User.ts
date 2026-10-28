@@ -21,7 +21,6 @@ export interface UserSelf extends UserCompact {
   dob?: Date;
   authType: UserAuthType;
   blockedUsers?: string[];
-  savedPosts?: string[];
   interestKeywords?: string[];
 }
 

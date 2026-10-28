@@ -5,7 +5,6 @@ import { TYPES } from "@/shared/types";
 
 import type { IGetLikedUsers } from "@/domain/use-cases/IGetLikedUsers";
 import type { IToggleLike } from "@/domain/use-cases/IToggleLike";
-import type { IRecordInteraction } from "@/domain/use-cases/IRecordInteraction";
 
 import {
   getLikedUsersSchema,
@@ -17,8 +16,6 @@ export class LikeController {
   constructor(
     @inject(TYPES.IGetLikedUsers) private getLikedUsersUseCase: IGetLikedUsers,
     @inject(TYPES.IToggleLike) private toggleLikeUseCase: IToggleLike,
-    @inject(TYPES.IRecordInteraction)
-    private recordInteractionUseCase: IRecordInteraction,
   ) {}
 
   getLikedUsers: RequestHandler = async (req, res, next) => {
@@ -55,14 +52,6 @@ export class LikeController {
         ...validatedData,
         userId: req.user.id,
       });
-
-      if (result.status === "liked" && validatedData.type === "post") {
-        await this.recordInteractionUseCase.execute({
-          userId: req.user.id,
-          postId: validatedData.targetId,
-          type: "like",
-        });
-      }
 
       res.status(200).json({
         message: `Post successfully ${result.status}`,

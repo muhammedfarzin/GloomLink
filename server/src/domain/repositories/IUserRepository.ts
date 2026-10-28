@@ -1,6 +1,5 @@
 import type { User } from "../entities/User";
 import type { UserCompact } from "../models/User";
-import type { EnrichedPost } from "../models/Post";
 import type { UserProfile } from "../models/User";
 import type { IBaseRepository } from "./IBaseRepository";
 
@@ -15,13 +14,6 @@ export interface IUserRepository extends IBaseRepository<User> {
   ) => Promise<
     { isExists: false } | { isExists: true; data: User; field: string }
   >;
-  findSavedPosts(
-    userId: string,
-    page: number,
-    limit: number,
-  ): Promise<EnrichedPost[]>;
-  savePost(userId: string, postId: string): Promise<void>;
-  unsavePost(userId: string, postId: string): Promise<void>;
   findProfileByUsername(
     username: string,
     currentUserId: string,

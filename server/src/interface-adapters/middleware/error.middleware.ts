@@ -15,32 +15,34 @@ export const ErrorToHttpStatusCode: Record<ErrorType, number> = {
 };
 
 const errorMiddleware = (
-  err: Error,
+  error: Error,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   let status = 500;
-  let message = err.message || "Something went wrong";
+  let message = error.message || "Something went wrong";
   let fieldErrors: Record<string, string> | undefined;
 
-  if (err instanceof ZodError) {
+  if (error instanceof ZodError) {
     status = 400;
-    message = err.issues[0].message;
+    message = error.issues[0].message;
     fieldErrors = {};
-    for (const issue of err.issues) {
+    for (const issue of error.issues) {
       const field = issue.path[0];
       if (typeof field === "string" && !fieldErrors[field]) {
         fieldErrors[field] = issue.message;
       }
     }
-  } else if (err instanceof FormValidationError) {
-    fieldErrors = err.errors;
-    status = ErrorToHttpStatusCode[err.type];
-  } else if (err instanceof AppError) {
-    status = ErrorToHttpStatusCode[err.type];
-  } else if (err instanceof HttpError) {
-    status = err.statusCode;
+  } else if (error instanceof FormValidationError) {
+    fieldErrors = error.errors;
+    status = ErrorToHttpStatusCode[error.type];
+  } else if (error instanceof AppError) {
+    status = ErrorToHttpStatusCode[error.type];
+  } else if (error instanceof HttpError) {
+    status = error.statusCode;
+  } else {
+    console.error(error);
   }
 
   res.status(status).json({
