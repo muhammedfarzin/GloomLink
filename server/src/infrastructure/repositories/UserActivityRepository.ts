@@ -1,3 +1,4 @@
+import { ActivityWeight } from "@/domain/rules/RecommendationWeight";
 import type { UserActivityType } from "@/domain/models/UserActivity";
 import type { UserCompact } from "@/domain/models/User";
 import type { EnrichedPost } from "@/domain/models/Post";
@@ -330,10 +331,10 @@ export class UserActivityRepository
             $sum: {
               $switch: {
                 branches: [
-                  { case: { $eq: ["$action", "save"] }, then: 7 },
-                  { case: { $eq: ["$action", "like"] }, then: 3 },
+                  { case: { $eq: ["$action", "save"] }, then: ActivityWeight.Save },
+                  { case: { $eq: ["$action", "like"] }, then: ActivityWeight.Like },
                 ],
-                default: 1,
+                default: ActivityWeight.View,
               },
             },
           },

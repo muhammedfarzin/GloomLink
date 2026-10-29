@@ -22,7 +22,7 @@ const PostActions: React.FC<Props> = ({
   onSave,
   onLike,
 }) => {
-  const { toastMessage, toastError } = useToaster();
+  const { toastError } = useToaster();
 
   const handleSavePost = async (postId: string) => {
     const handleSavedState = (state: Post[]) =>
