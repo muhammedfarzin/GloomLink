@@ -5,6 +5,10 @@ import mongoose, { type PipelineStage } from "mongoose";
 import { UserMapper } from "../mappers/UserMapper";
 import type { UserDocument } from "../database/models/UserModel";
 import { User } from "@/domain/entities/User";
+import {
+  ActivityWeight,
+  UserSuggestionWeight,
+} from "@/domain/rules/RecommendationWeight";
 import type { UserCompact, UserProfile } from "@/domain/models/User";
 import type {
   IUserRepository,
@@ -238,88 +242,225 @@ export class UserRepository
   }
 
   async findSuggestions(input: SuggestionInput): Promise<UserCompact[]> {
+    if (input.limit <= 0) return [];
+
     const userObjectId = new mongoose.Types.ObjectId(input.userId);
     const excludeObjectIds = input.excludeIds.map(
       (id) => new mongoose.Types.ObjectId(id),
     );
 
-    const aggregationPipeline: PipelineStage[] = [
+    // Use the same activity weights as the feed, alongside saved interests.
+    const interestStages: Exclude<
+      PipelineStage,
+      PipelineStage.Merge | PipelineStage.Out
+    >[] = [
       {
-        $match: {
-          _id: { $nin: [...excludeObjectIds, userObjectId] },
-          status: "active",
-        },
-      },
-      {
-        $facet: {
-          following: [
+        $lookup: {
+          from: "user-activities",
+          localField: "_id",
+          foreignField: "userId",
+          pipeline: [
+            { $match: { targetType: "post" } },
             {
               $lookup: {
-                from: "follows",
-                let: { potentialUserId: "$_id" },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: {
-                        $and: [
-                          { $eq: ["$followedBy", userObjectId] },
-                          { $eq: ["$followingTo", "$$potentialUserId"] },
-                        ],
-                      },
-                    },
-                  },
-                ],
-                as: "followDoc",
+                from: "posts",
+                localField: "targetId",
+                foreignField: "_id",
+                as: "post",
               },
             },
-            { $match: { "followDoc.0": { $exists: true } } },
-          ],
-          random: [
+            { $unwind: "$post" },
+            { $match: { "post.status": "active" } },
+            { $unwind: "$post.tags" },
             {
-              $sample: { size: input.limit * 2 },
+              $group: {
+                _id: { $toLower: { $trim: { input: "$post.tags" } } },
+                weight: {
+                  $sum: {
+                    $switch: {
+                      branches: [
+                        {
+                          case: { $eq: ["$action", "save"] },
+                          then: ActivityWeight.Save,
+                        },
+                        {
+                          case: { $eq: ["$action", "like"] },
+                          then: ActivityWeight.Like,
+                        },
+                      ],
+                      default: ActivityWeight.View,
+                    },
+                  },
+                },
+              },
             },
+            { $sort: { weight: -1, _id: 1 } },
+            { $limit: 20 },
           ],
+          as: "activityInterests",
         },
       },
       {
-        $project: {
-          suggestions: { $concatArrays: ["$following", "$random"] },
-        },
-      },
-      { $unwind: "$suggestions" },
-      {
-        $group: {
-          _id: "$suggestions._id",
-          doc: { $first: "$suggestions" },
-        },
-      },
-      { $limit: input.limit },
-      { $replaceRoot: { newRoot: "$doc" } },
-      {
-        $project: {
-          _id: 0,
-          id: { $toString: "$_id" },
-          username: 1,
-          fullname: {
-            $concat: ["$firstname", " ", "$lastname"],
-          },
-          firstname: 1,
-          lastname: 1,
-          imageUrl: 1,
-          status: 1,
-          isFollowing: {
-            $eq: [
-              { $toString: { $arrayElemAt: ["$followDoc.followedBy", 0] } },
-              input.userId,
+        $set: {
+          interests: {
+            $setDifference: [
+              {
+                $setUnion: [
+                  {
+                    $map: {
+                      input: { $ifNull: ["$interestKeywords", []] },
+                      as: "keyword",
+                      in: { $toLower: { $trim: { input: "$$keyword" } } },
+                    },
+                  },
+                  "$activityInterests._id",
+                ],
+              },
+              [""],
             ],
           },
-          type: "user",
         },
       },
     ];
 
-    const users = await this.model.aggregate(aggregationPipeline);
-    return users;
+    const aggregationPipeline: PipelineStage[] = [
+      { $match: { _id: userObjectId, status: "active" } },
+      ...interestStages,
+      {
+        $lookup: {
+          from: "follows",
+          localField: "_id",
+          foreignField: "followedBy",
+          as: "following",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            followingIds: "$following.followingTo",
+            viewerInterests: "$interests",
+            blockedIds: { $ifNull: ["$blockedUsers", []] },
+          },
+          pipeline: [
+            {
+              $match: {
+                _id: { $nin: [...excludeObjectIds, userObjectId] },
+                status: "active",
+                blockedUsers: { $ne: userObjectId },
+                $expr: { $not: [{ $in: ["$_id", "$$blockedIds"] }] },
+              },
+            },
+            ...interestStages,
+            // candidate -> shared following <- viewer
+            {
+              $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "followedBy",
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $in: ["$followingTo", "$$followingIds"] },
+                    },
+                  },
+                ],
+                as: "sharedFollowing",
+              },
+            },
+            // viewer -> following -> candidate
+            {
+              $lookup: {
+                from: "follows",
+                localField: "_id",
+                foreignField: "followingTo",
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $in: ["$followedBy", "$$followingIds"] },
+                    },
+                  },
+                ],
+                as: "followedByFollowing",
+              },
+            },
+            {
+              $set: {
+                sharedInterests: {
+                  $size: {
+                    $setIntersection: ["$interests", "$$viewerInterests"],
+                  },
+                },
+                mutualConnections: {
+                  $add: [
+                    { $size: "$sharedFollowing" },
+                    { $size: "$followedByFollowing" },
+                  ],
+                },
+                isFollowing: { $in: ["$_id", "$$followingIds"] },
+              },
+            },
+            // Existing follows remain relevant for starting a conversation.
+            {
+              $set: {
+                relevance: {
+                  $add: [
+                    {
+                      $multiply: [
+                        "$sharedInterests",
+                        UserSuggestionWeight.SharedInterest,
+                      ],
+                    },
+                    {
+                      $multiply: [
+                        "$mutualConnections",
+                        UserSuggestionWeight.MutualConnection,
+                      ],
+                    },
+                    {
+                      $cond: [
+                        "$isFollowing",
+                        UserSuggestionWeight.Following,
+                        0,
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            { $match: { relevance: { $gt: 0 } } },
+            {
+              $sort: {
+                relevance: -1,
+                mutualConnections: -1,
+                sharedInterests: -1,
+                _id: 1,
+              },
+            },
+            { $limit: input.limit },
+            {
+              $project: {
+                _id: 0,
+                id: { $toString: "$_id" },
+                username: 1,
+                fullname: { $concat: ["$firstname", " ", "$lastname"] },
+                firstname: 1,
+                lastname: 1,
+                imageUrl: 1,
+                status: 1,
+                isFollowing: 1,
+                type: { $literal: "user" },
+              },
+            },
+          ],
+          as: "suggestions",
+        },
+      },
+      { $unwind: "$suggestions" },
+      { $replaceRoot: { newRoot: "$suggestions" } },
+    ];
+
+    return this.model.aggregate<UserCompact>(aggregationPipeline);
   }
 
   async getDashboardMetrics(
