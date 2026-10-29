@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config";
+import { logger } from "../logging/logger";
 
 const mongoURI = process.env.MONGO_URI;
 
@@ -10,9 +11,9 @@ export const connectDatabase = async () => {
     }
 
     await mongoose.connect(mongoURI);
-    console.log("Connected to database");
+    logger.info("Connected to database");
   } catch (error) {
-    console.error(error);
+    logger.error("Database connection failed", { error });
     process.exit(1);
   }
 };

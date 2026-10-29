@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
+import { logger } from "../../infrastructure/logging/logger";
 import { AppError, type ErrorType } from "@/domain/errors/AppError.js";
 import { HttpError } from "../errors/HttpError.js";
 import { FormValidationError } from "@/domain/errors/FormValidationError.js";
@@ -41,9 +42,14 @@ const errorMiddleware = (
     status = ErrorToHttpStatusCode[error.type];
   } else if (error instanceof HttpError) {
     status = error.statusCode;
-  } else {
-    console.error(error);
   }
+
+  logger[status >= 500 ? "error" : "warn"]("HTTP request failed", {
+    requestId: res.locals.requestId,
+    method: req.method,
+    statusCode: status,
+    error,
+  });
 
   res.status(status).json({
     status,

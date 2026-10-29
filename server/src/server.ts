@@ -6,6 +6,8 @@ import dns from "dns";
 import { connectDatabase } from "./infrastructure/database";
 import { setupSocket } from "./interface-adapters/websocket";
 import "dotenv/config";
+import { logger } from "./infrastructure/logging/logger";
+import { requestLogger } from "./interface-adapters/middleware/request-logger.middleware";
 
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
@@ -16,6 +18,7 @@ const server = http.createServer(app);
 
 setupSocket(server);
 
+app.use(requestLogger);
 app.use(express.json());
 app.use(cors());
 
@@ -25,5 +28,5 @@ import("./interface-adapters/routes").then(({ default: router }) => {
 
 server.listen(PORT, async () => {
   await connectDatabase();
-  console.log("Server is running on port", PORT);
+  logger.info("Server is running", { port: PORT });
 });

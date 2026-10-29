@@ -111,6 +111,8 @@ npm start
 
 This command will start the backend from the `dist/` directory using Node.js.
 
+For log levels, structured output, and HTTP request IDs, see [Server logging](docs/logging.md).
+
 ---
 
 ### 🎨 3. Client Setup

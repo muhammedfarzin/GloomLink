@@ -1,4 +1,5 @@
 import { injectable } from "inversify";
+import { logger } from "../logging/logger";
 import { v2 as cloudinary } from "cloudinary";
 import { StorageServiceError } from "@/domain/errors/InternalError";
 import type {
@@ -38,7 +39,7 @@ export class CloudinaryStorageService implements IFileStorageService {
         mediaType: result.resource_type as "image" | "video",
       }));
     } catch (error) {
-      console.error("Cloudinary upload failed:", error);
+      logger.error("Cloudinary upload failed", { error });
       throw new StorageServiceError("Failed to upload files to cloud storage.");
     }
   }
@@ -64,7 +65,7 @@ export class CloudinaryStorageService implements IFileStorageService {
     try {
       await Promise.all(deletePromises);
     } catch (error) {
-      console.error("Cloudinary deletion failed:", error);
+      logger.error("Cloudinary deletion failed", { error });
     }
   }
 }
